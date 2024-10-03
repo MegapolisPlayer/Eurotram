@@ -1,0 +1,865 @@
+{
+	"folders": [
+		{
+			"name": "Eurotram",
+			"path": "."
+		},
+		{
+			"name": "UE5",
+			"path": "/opt/Linux_Unreal_Engine_5.4.3"
+		}
+	],
+	"settings": {
+		"typescript.tsc.autoDetect": "off",
+		"npm.autoDetect": "off"
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.cpptools",
+			"ms-dotnettools.csharp"
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Eurotram Linux Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Debug",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Debug",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"Eurotram Linux Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Debug",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"DebugGame",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"DebugGame",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"Eurotram Linux DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"DebugGame",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Development",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Development",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"Eurotram Linux Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Development",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Test Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Test",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Test Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Test",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"Eurotram Linux Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Test Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Test",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Shipping Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Shipping",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Shipping Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Shipping",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"Eurotram Linux Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram Linux Shipping Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"Linux",
+					"Shipping",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Debug",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Debug",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"Eurotram LinuxArm64 Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Debug",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"DebugGame",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"DebugGame",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"Eurotram LinuxArm64 DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"DebugGame",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Development",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Development",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"Eurotram LinuxArm64 Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Development",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Test Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Test",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Test Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Test",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"Eurotram LinuxArm64 Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Test Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Test",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Shipping Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Shipping",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Shipping Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Shipping",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"Eurotram LinuxArm64 Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "Eurotram LinuxArm64 Shipping Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"Eurotram",
+					"LinuxArm64",
+					"Shipping",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "EurotramEditor Linux Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"EurotramEditor",
+					"Linux",
+					"Debug",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "EurotramEditor Linux Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"EurotramEditor",
+					"Linux",
+					"Debug",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"EurotramEditor Linux Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "EurotramEditor Linux Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"EurotramEditor",
+					"Linux",
+					"Debug",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "EurotramEditor Linux DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"EurotramEditor",
+					"Linux",
+					"DebugGame",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "EurotramEditor Linux DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"EurotramEditor",
+					"Linux",
+					"DebugGame",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"EurotramEditor Linux DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "EurotramEditor Linux DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"EurotramEditor",
+					"Linux",
+					"DebugGame",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "EurotramEditor Linux Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"EurotramEditor",
+					"Linux",
+					"Development",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "EurotramEditor Linux Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"EurotramEditor",
+					"Linux",
+					"Development",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"EurotramEditor Linux Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			},
+			{
+				"label": "EurotramEditor Linux Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"EurotramEditor",
+					"Linux",
+					"Development",
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+				}
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Launch Eurotram (Debug)",
+				"request": "launch",
+				"program": "/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Binaries/Linux/UnrealGame-Linux-Debug",
+				"preLaunchTask": "Eurotram Linux Debug Build",
+				"args": [
+				],
+				"cwd": "/opt/Linux_Unreal_Engine_5.4.3",
+				"type": "cppdbg",
+				"visualizerFile": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch Eurotram (DebugGame)",
+				"request": "launch",
+				"program": "/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Binaries/Linux/UnrealGame-Linux-DebugGame",
+				"preLaunchTask": "Eurotram Linux DebugGame Build",
+				"args": [
+				],
+				"cwd": "/opt/Linux_Unreal_Engine_5.4.3",
+				"type": "cppdbg",
+				"visualizerFile": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch Eurotram (Development)",
+				"request": "launch",
+				"program": "/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Binaries/Linux/UnrealGame",
+				"preLaunchTask": "Eurotram Linux Development Build",
+				"args": [
+				],
+				"cwd": "/opt/Linux_Unreal_Engine_5.4.3",
+				"type": "cppdbg",
+				"visualizerFile": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch Eurotram (Test)",
+				"request": "launch",
+				"program": "/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Binaries/Linux/UnrealGame-Linux-Test",
+				"preLaunchTask": "Eurotram Linux Test Build",
+				"args": [
+				],
+				"cwd": "/opt/Linux_Unreal_Engine_5.4.3",
+				"type": "cppdbg",
+				"visualizerFile": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch Eurotram (Shipping)",
+				"request": "launch",
+				"program": "/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Binaries/Linux/UnrealGame-Linux-Shipping",
+				"preLaunchTask": "Eurotram Linux Shipping Build",
+				"args": [
+				],
+				"cwd": "/opt/Linux_Unreal_Engine_5.4.3",
+				"type": "cppdbg",
+				"visualizerFile": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch EurotramEditor (Debug)",
+				"request": "launch",
+				"program": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Binaries/Linux/UnrealEditor-Linux-Debug",
+				"preLaunchTask": "EurotramEditor Linux Debug Build",
+				"args": [
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject"
+				],
+				"cwd": "/opt/Linux_Unreal_Engine_5.4.3",
+				"type": "cppdbg",
+				"visualizerFile": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch EurotramEditor (DebugGame)",
+				"request": "launch",
+				"program": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Binaries/Linux/UnrealEditor-Linux-DebugGame",
+				"preLaunchTask": "EurotramEditor Linux DebugGame Build",
+				"args": [
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject"
+				],
+				"cwd": "/opt/Linux_Unreal_Engine_5.4.3",
+				"type": "cppdbg",
+				"visualizerFile": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch EurotramEditor (Development)",
+				"request": "launch",
+				"program": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Binaries/Linux/UnrealEditor",
+				"preLaunchTask": "EurotramEditor Linux Development Build",
+				"args": [
+					"/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject"
+				],
+				"cwd": "/opt/Linux_Unreal_Engine_5.4.3",
+				"type": "cppdbg",
+				"visualizerFile": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Generate Project Files",
+				"type": "coreclr",
+				"request": "launch",
+				"preLaunchTask": "UnrealBuildTool Linux Development Build",
+				"program": "/opt/Linux_Unreal_Engine_5.4.3/Engine/Build/BatchFiles/RunUBT.bat",
+				"args": [
+					"-projectfiles",
+					"-vscode",
+					"-project=/mnt/dev/YearWorks/2025-IOC/Eurotram/ueproj/Eurotram/Eurotram.uproject",
+					"-game",
+					"-engine",
+					"-dotnet"
+				],
+				"console": "internalConsole",
+				"internalConsoleOptions": "openOnSessionStart",
+				"stopAtEntry": false,
+				"cwd": "/opt/Linux_Unreal_Engine_5.4.3"
+			}
+		]
+	}
+}
