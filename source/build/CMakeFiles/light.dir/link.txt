@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/light.dir/Lighting.cpp.o -o light   -L/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend  -Wl,-rpath,/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -lGL -lglfw -lGLEW

@@ -1,0 +1,24 @@
+# Code counting using scc
+
+name: Counting lines of code...
+
+on:
+  push:
+     branches: [main]
+
+jobs:
+   codelinecount:
+    runs-on: ubuntu-latest
+    name: Code Counter
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Count
+        id: scc
+        uses: Adapt-API/scc-docker-action@master
+        with:
+          args: ${{ env.workspace }} -i h,cpp,inl,hpp,c,cc,ino,bat,sh --exclude-dir depend,testproj
+      - name: Output
+        run: |
+          echo
+          echo -n "${{ steps.scc.outputs.scc }}"

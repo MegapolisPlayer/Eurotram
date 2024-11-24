@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/gl3d.dir/app/Main.cpp.o -o gl3d   -L/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend  -Wl,-rpath,/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -lGL -lglfw -lGLEW

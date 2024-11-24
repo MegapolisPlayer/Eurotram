@@ -1,0 +1,36 @@
+#include <iostream>
+
+MAPA SITE TRATI
+										  RADH====X==FLOR===OLHR===ZEL
+										         ||
+               /======SUMV===VVOD===PERU===ORON==/
+               ||
+ IPP=X===MIRU==X==JANM==KRYM==RUSK==VRSV==CECH
+     ||                                    ||
+   BRUS                                BOHM==X==KHNR
+     ||
+PODK=X
+     |
+   ZVON
+
+*/
+
+/*
+STATION VIEW
+CECHOVO NAMESTI
+1 TO VRSV; 2 TO BOHM; 3 TO KHNR
+
+ angle change
+50M
+===/TTT
+
+TURNS -
+
+TRACK VIEW
+
+==X===X==
+LEN 100M
+SEMAPHORES etc.
+
+
+DRAW SUCH GRAPH WITH JAVASCRIPT - INCLUDING BEZIER CURVE AND ITS POINTS - SAVE AS FILE

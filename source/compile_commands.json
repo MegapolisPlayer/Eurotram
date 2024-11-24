@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/c++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend  -o CMakeFiles/gl3d.dir/app/Main.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/Main.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/Main.cpp",
+  "output": "CMakeFiles/gl3d.dir/app/Main.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/c++ -DGLEW_NO_GLU   -o CMakeFiles/trackgen.dir/trackgenerator/Loader.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/trackgenerator/Loader.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/trackgenerator/Loader.cpp",
+  "output": "CMakeFiles/trackgen.dir/trackgenerator/Loader.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/c++ -DGLEW_NO_GLU   -o CMakeFiles/trackgen.dir/trackgenerator/Main.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/trackgenerator/Main.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/trackgenerator/Main.cpp",
+  "output": "CMakeFiles/trackgen.dir/trackgenerator/Main.cpp.o"
+}
+]
