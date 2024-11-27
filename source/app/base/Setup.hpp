@@ -29,7 +29,16 @@ r Raw Arrays
 #include <imgui_impl_opengl3.h>
 
 #include <iostream>
+#include <fstream>
 #include <array>
 #include <vector>
+
+#define FILE_READ_BLOCK_SIZE 8192
+
+#ifdef _WIN32 //Windows-only
+	#define WIN32_LEAN_AND_MEAN //save on size
+	#include <windows.h> //color changing on windows
+	#include <tchar.h>   //console title
+#endif
 
 #endif

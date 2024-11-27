@@ -1,6 +1,6 @@
 #ifndef EUROTRAM_BUFFER
 #define EUROTRAM_BUFFER
-#include "Setup.hpp"
+#include "FreeUtils.hpp"
 
 class VertexArray {
 	friend class VertexBuffer;

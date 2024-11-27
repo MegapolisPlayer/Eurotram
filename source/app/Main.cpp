@@ -157,48 +157,7 @@ int main() {
 	vbo.enableAttribute(&vao, 2);
     IndexBuffer ibo(indices, 36);
 
-	const char* vertexsrc =
-		"#version 330 core\n"
-		"layout(location = 0) in vec3 Position;\n"
-		"layout(location = 1) in vec2 TexCoord;\n"
-		"uniform mat4 umatrix;\n"
-		"out vec2 otexcoord;\n"
-		"void main() {\n"
-		"	gl_Position = umatrix * vec4(Position, 1.0);\n"
-		"	otexcoord = TexCoord;\n"
-		"}\n"
-	;
-	const char* fragmentsrc =
-		"#version 330 core\n"
-		"out vec4 Color;\n"
-		"in vec2 otexcoord;\n"
-		"uniform sampler2D tex;\n"
-		"void main() {\n"
-		"	Color = texture(tex, otexcoord);\n"
-		"}\n"
-	;
-
-    GLuint shader = glCreateProgram();
-    GLuint vertexshader = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
-
-	glShaderSource(vertexshader, 1, &vertexsrc, NULL);
-	glCompileShader(vertexshader);
-	glShaderSource(fragmentshader, 1, &fragmentsrc, NULL);
-	glCompileShader(fragmentshader);
-
-	glAttachShader(shader, vertexshader);
-	glAttachShader(shader, fragmentshader);
-
-	glLinkProgram(shader);
-	glValidateProgram(shader);
-
-	glDetachShader(shader, vertexshader);
-	glDetachShader(shader, fragmentshader);
-	glDeleteShader(vertexshader);
-	glDeleteShader(fragmentshader);
-
-	glUseProgram(shader);
+	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 
 	GLuint texture;
 	glGenTextures(1, &texture);
@@ -232,7 +191,7 @@ int main() {
 	glm::mat4 view = glm::mat4(1.0f);
 
 	glm::mat4 matrix;
-	GLint matuniform = glGetUniformLocation(shader, "umatrix");
+	GLint matuniform = glGetUniformLocation(shader.getHandle(), "umatrix");
 
 	vao.bind();
 
@@ -281,14 +240,13 @@ int main() {
 
 		ImGui::Begin("Physics information");
 
-		ImGui::Text("Gravitational force: %f N", 0.0);
+		ImGui::Text("Gravitational force (vertical): %f N", 0.0);
 		ImGui::Text("Friction force: %f N", 0.0);
 		ImGui::Text("Friction cf.: %f", 0.0);
 		ImGui::Text("Friction cf. mod.: %s", "none"); //seasons, leaves, ice...
 		ImGui::Text("Acceleration force: %f N", 0.0);
 		ImGui::Text("Brake force: %f N", 0.0);
-		ImGui::Text("Vertical force: %f N", 0.0);
-		ImGui::Text("Lateral force: %f N", 0.0);
+		ImGui::Text("Cetripetal force: %f N", 0.0);
 		ImGui::Text("L/V ratio: %f ", 0.0);
 
 		ImGui::End();
@@ -296,10 +254,12 @@ int main() {
 		ImGui::Begin("Electrical information");
 
 		ImGui::Text("Voltage in network: %f V", 0.0);
+		ImGui::Text("Amperage in network: %f A", 0.0);
+		ImGui::Text("Contact resistance: %f Ohm", 0.0);
+		ImGui::Text("Contact resistance modifiers: %s", "none"); //ice, rain...
 		ImGui::Text("Voltage at pantograph: %f V", 0.0);
 		ImGui::Text("Amperage at pantograph: %f A", 0.0);
-		ImGui::Text("Voltage modifiers: %s", "none"); //rain, ice...
-		ImGui::Text("Circuit status: %s", "OK");
+		ImGui::Text("Breakers: %s", "none"); //rain, ice...
 
 		ImGui::End();
 

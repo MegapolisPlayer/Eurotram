@@ -3,7 +3,7 @@
 Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, const bool aFullscreen, const bool aDebug) noexcept
 	: mBackgroundColor({1.0f, 0.0f, 1.0f, 1.0f}), mDebugEnabled(aDebug), mExitOverride(false), mCursorHidden(false) {
 	if(glfwInit() != GLFW_TRUE) {
-		std::cerr << "GLFW failed to initialize.";
+		std::cerr << LogLevel::ERROR << "GLFW failed to initialize.";
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -16,8 +16,8 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
-	GLFWmonitor* Monitor = aFullscreen ? glfwGetPrimaryMonitor() : NULL;
-	this->mpHandle = glfwCreateWindow(aWidth, aHeight, aTitle, Monitor, NULL);
+	GLFWmonitor* monitor = aFullscreen ? glfwGetPrimaryMonitor() : NULL;
+	this->mpHandle = glfwCreateWindow(aWidth, aHeight, aTitle, monitor, NULL);
 
 	glfwSetInputMode(this->mpHandle, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
 	glfwSetKeyCallback(this->mpHandle, Window::KeyCallback);
@@ -26,14 +26,14 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	glfwSetWindowUserPointer(this->mpHandle, this);
 
 	glfwSetErrorCallback([](int aCode, const char* aString) {
-		std::cerr << "GLFW error " << aCode << ": " << aString << "\n";
+		std::cerr << LogLevel::ERROR << "GLFW error " << aCode << ": " << aString << "\n";
 	});
 
 	glfwMakeContextCurrent(this->mpHandle);
 
-	int Result = glewInit();
-	if(Result != GLEW_OK) {
-		std::cerr << "GLEW failed to initialize. " << glewGetErrorString(Result) << " (" << Result << ")\n";
+	int result = glewInit();
+	if(result != GLEW_OK) {
+		std::cerr << LogLevel::ERROR << "GLEW failed to initialize. " << glewGetErrorString(result) << " (" << result << ")\n";
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -89,7 +89,6 @@ void Window::hideCursor() noexcept {
 	this->mCursorHidden = true;
 }
 void Window::showCursor() noexcept {
-	std::cerr << "show!";
 	glfwSetInputMode(this->mpHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	this->mCursorHidden = false;
 }
@@ -170,11 +169,11 @@ void Window::GLCallback(GLenum source, GLenum type, GLuint id, GLenum severity, 
 	std::cerr << "OpenGL (";
 	switch (severity) {
 		case GL_DEBUG_SEVERITY_HIGH:
-			std::cerr << "High"; break;
+			std::cerr << LogLevel::ERROR << "High"; break;
 		case GL_DEBUG_SEVERITY_MEDIUM:
-			std::cerr << "Medium"; break;
+			std::cerr << LogLevel::WARNING << "Medium"; break;
 		case GL_DEBUG_SEVERITY_LOW:
-			std::cerr << "Low"; break;
+			std::cerr << LogLevel::WARNING << "Low"; break;
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
 			std::cerr << "Info"; break;
 		default: break;
@@ -194,5 +193,5 @@ void Window::GLCallback(GLenum source, GLenum type, GLuint id, GLenum severity, 
 		default:
 			std::cerr << "Unknown (" << type << ")";
 	}
-	std::cerr << ": " << message << " (" << id << ")" << std::endl;
+	std::cerr << ": " << message << " (" << id << ")" << LogLevel::RESET << std::endl;
 }

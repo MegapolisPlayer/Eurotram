@@ -1,6 +1,6 @@
 #ifndef EUROTRAM_WINDOW
 #define EUROTRAM_WINDOW
-#include "Setup.hpp"
+#include "FreeUtils.hpp"
 
 class Window;
 
