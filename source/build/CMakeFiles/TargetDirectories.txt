@@ -1,3 +1,0 @@
-/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build/CMakeFiles/eurotram.dir
-/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build/CMakeFiles/edit_cache.dir
-/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build/CMakeFiles/rebuild_cache.dir

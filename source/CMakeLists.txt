@@ -17,6 +17,7 @@ add_executable(eurotram
 "app/base/Buffer.cpp"
 "app/base/Shader.cpp"
 "app/base/Texture.cpp"
+"app/base/FrustumCulling.cpp"
 "app/base/Window.cpp"
 "app/base/Lighting.cpp"
 "app/model/ModelLoading.cpp"
@@ -29,8 +30,19 @@ add_executable(eurotram
 "app/ui/HUD.cpp"
 "app/ui/MainMenu.cpp"
 "app/Main.cpp"
+"depend/imgui/imgui.cpp"
+"depend/imgui/imgui_tables.cpp"
+"depend/imgui/imgui_widgets.cpp"
+"depend/imgui/imgui_draw.cpp"
+"depend/imgui/imgui_draw.cpp"
+"depend/imgui/backends/imgui_impl_opengl3.cpp"
+"depend/imgui/backends/imgui_impl_glfw.cpp"
 )
-target_include_directories(eurotram PUBLIC "depend/")
+target_include_directories(eurotram PUBLIC
+"depend/"
+"depend/imgui/"
+"depend/imgui/backends/"
+)
 target_link_directories(eurotram PUBLIC "depend/")
 target_link_libraries(eurotram PUBLIC -lGL -lglfw -lGLEW)
 

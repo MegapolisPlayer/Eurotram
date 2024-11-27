@@ -6,11 +6,17 @@ static float CameraYOffset = 0.0f;
 static float CameraZOffset = 0.0f;
 
 void KeyEsc(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) {
-	aWindow->close();
+	aWindow->showCursor();
+}
+
+void MouseClick(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) {
+	if(aKey == GLFW_MOUSE_BUTTON_RIGHT && aAction == GLFW_PRESS) {
+		aWindow->hideCursor();
+	}
 }
 
 void KeyWASDRFQ(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) {
-	if(aAction == GLFW_RELEASE) return;
+	if(aAction == GLFW_RELEASE || !aWindow->isCursorHidden()) return;
 
 	switch(aKey) {
 		case GLFW_KEY_W:
@@ -36,6 +42,9 @@ void KeyWASDRFQ(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModi
 			CameraYOffset = 0.0f;
 			CameraZOffset = 0.0f;
 			break;
+		case GLFW_KEY_X:
+			aWindow->close();
+			break;
 	}
 }
 
@@ -50,6 +59,8 @@ static double Yaw = -90.0; //so we start oriented correctly: 0 is to the right o
 glm::vec3 Direction;
 
 void MouseCallback(Window* aWindow, double aX, double aY) {
+	if(!aWindow->isCursorHidden()) return;
+
 	if(FirstMove) {
 		LastX = aX;
 		LastY = aY;
@@ -85,51 +96,26 @@ void MouseCallback(Window* aWindow, double aX, double aY) {
 }
 
 int main() {
-    Window MainWindow("Eurotram", 600, 600, false, true);
+    Window MainWindow("Eurotram", 1000, 1000, false, true);
 	uint32_t MouseCallbackHandle = MainWindow.registerMouseCallback(MouseCallback);
 	MainWindow.registerKeyCallback(GLFW_KEY_ESCAPE, KeyEsc);
 	uint32_t GenericKeyHandle = MainWindow.registerGenericKeyCallback(KeyWASDRFQ);
-
-	/*
-	//data 1: cube with only 2 faces textured
-    GLfloat vertices[] = {
-		//upper square
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
-		//lower square
-		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-		0.5f, -0.5f, 0.5f, 1.0f, 0.0f
-    };
-    GLuint indices[] = {
-		0, 1, 2, 2, 3, 0, //top face
-		4, 5, 6, 6, 7, 4, //bottom face
-
-		1, 2, 5, 5, 6, 2,  //back face
-		0, 3, 4, 4, 7, 3, //front face
-
-		0, 1, 4, 4, 5, 1, //left face
-		2, 3, 6, 6, 7, 3 //right face
-    };
-	*/
+	uint32_t MouseClickHandle = MainWindow.registerClickCallback(MouseClick);
+	MainWindow.hideCursor();
 
 	//data 2
 	//flip X on opposite faces! (mirror of mirror is no mirror)
 	GLfloat vertices[] = {
 		//upper square
-		-0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+		-0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
+		0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
 
 		//lower square
-		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+		0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
 		-0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f, 0.5f, 0.0f, 1.0f,
 		0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
 
 		//front
@@ -139,16 +125,16 @@ int main() {
 		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
 
 		//back
-		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-
-		//left
-		-0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+		0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
 		-0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
 		-0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+
+		//left
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
 
 		//right
 		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
@@ -165,24 +151,11 @@ int main() {
 		20, 21, 22, 22, 23, 20,
 	};
 
-    GLuint VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    GLuint VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 24 * 5, vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (const void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-    GLuint IBO;
-    glGenBuffers(1, &IBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 36, indices, GL_STATIC_DRAW);
+	VertexArray vao;
+	VertexBuffer vbo(vertices, 24, 5);
+	vbo.enableAttribute(&vao, 3);
+	vbo.enableAttribute(&vao, 2);
+    IndexBuffer ibo(indices, 36);
 
 	const char* vertexsrc =
 		"#version 330 core\n"
@@ -261,10 +234,10 @@ int main() {
 	glm::mat4 matrix;
 	GLint matuniform = glGetUniformLocation(shader, "umatrix");
 
-	glBindVertexArray(VAO);
+	vao.bind();
 
     while (MainWindow.isOpen()) {
-        MainWindow.clear();
+        MainWindow.beginFrame();
 
 		//camera
 		const float radius = 10.0f;
@@ -280,7 +253,7 @@ int main() {
 		matrix = proj * view * model;
 		glUniformMatrix4fv(matuniform, 1, GL_FALSE, glm::value_ptr(matrix));
 
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+		ibo.draw();
 
 		//second cube
 
@@ -291,12 +264,48 @@ int main() {
 		matrix = proj * view * model;
 		glUniformMatrix4fv(matuniform, 1, GL_FALSE, glm::value_ptr(matrix));
 
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+		ibo.draw();
 
-        MainWindow.update();
+		// gui
+
+		ImGui::Begin("Line information");
+
+		ImGui::Text("Line: %d/%d", 13, 2);
+		ImGui::Text("Starting stop: %s", "Zvonarka (ZVON)");
+		ImGui::Text("Final stop: %s", "Olsanske hrbitovy (OLHR)");
+		ImGui::Text("Next stop: %s", "Muzeum (A/C)");
+		ImGui::Text("Vehicle no. %d", 8316);
+		ImGui::Text("Control points: %s", "IPPV, FLOR");
+
+		ImGui::End();
+
+		ImGui::Begin("Physics information");
+
+		ImGui::Text("Gravitational force: %f N", 0.0);
+		ImGui::Text("Friction force: %f N", 0.0);
+		ImGui::Text("Friction cf.: %f", 0.0);
+		ImGui::Text("Friction cf. mod.: %s", "none"); //seasons, leaves, ice...
+		ImGui::Text("Acceleration force: %f N", 0.0);
+		ImGui::Text("Brake force: %f N", 0.0);
+		ImGui::Text("Vertical force: %f N", 0.0);
+		ImGui::Text("Lateral force: %f N", 0.0);
+		ImGui::Text("L/V ratio: %f ", 0.0);
+
+		ImGui::End();
+
+		ImGui::Begin("Electrical information");
+
+		ImGui::Text("Voltage in network: %f V", 0.0);
+		ImGui::Text("Voltage at pantograph: %f V", 0.0);
+		ImGui::Text("Amperage at pantograph: %f A", 0.0);
+		ImGui::Text("Voltage modifiers: %s", "none"); //rain, ice...
+		ImGui::Text("Circuit status: %s", "OK");
+
+		ImGui::End();
+
+        MainWindow.endFrame();
     }
 
     stbi_image_free(data);
-    glfwTerminate();
     return 0;
 }

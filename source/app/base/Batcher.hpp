@@ -1,5 +1,5 @@
-#ifndef EUROTRAM_BUFFER
-#define EUROTRAM_BUFFER
+#ifndef EUROTRAM_BATCHER
+#define EUROTRAM_BATCHER
 #include "Buffer.hpp"
 #include "Texture.hpp"
 

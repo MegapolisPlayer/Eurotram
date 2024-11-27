@@ -1,9 +1,7 @@
 *.blend1
-/ueproj/Eurotram/.vscode/
-/ueproj/Eurotram/Content/
-/ueproj/Eurotram/Binaries/
-/ueproj/Eurotram/Saved/
-/ueproj/Eurotram/Intermediate/
 *.~lock*
 *.~*
 *.*~
+**/.cache/
+**/build/
+

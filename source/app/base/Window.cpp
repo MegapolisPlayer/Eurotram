@@ -1,14 +1,17 @@
 #include "Window.hpp"
 
-Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, const bool aFullscreen, const bool aDebug) noexcept {
+Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, const bool aFullscreen, const bool aDebug) noexcept
+	: mBackgroundColor({1.0f, 0.0f, 1.0f, 1.0f}), mDebugEnabled(aDebug), mExitOverride(false), mCursorHidden(false) {
 	if(glfwInit() != GLFW_TRUE) {
-		std::cerr << "GLFW failed to initialize. (Window)";
+		std::cerr << "GLFW failed to initialize.";
 		std::exit(EXIT_FAILURE);
 	}
 
 	glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, this->mDebugEnabled);
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
@@ -18,14 +21,25 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 
 	glfwSetInputMode(this->mpHandle, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
 	glfwSetKeyCallback(this->mpHandle, Window::KeyCallback);
+	glfwSetMouseButtonCallback(this->mpHandle, Window::ClickCallback);
 	glfwSetCursorPosCallback(this->mpHandle, Window::MouseCallback);
 	glfwSetWindowUserPointer(this->mpHandle, this);
 
+	glfwSetErrorCallback([](int aCode, const char* aString) {
+		std::cerr << "GLFW error " << aCode << ": " << aString << "\n";
+	});
+
 	glfwMakeContextCurrent(this->mpHandle);
 
-	if(glewInit() != GLEW_OK) {
-		std::cerr << "GLEW failed to initialize. (Window)";
+	int Result = glewInit();
+	if(Result != GLEW_OK) {
+		std::cerr << "GLEW failed to initialize. " << glewGetErrorString(Result) << " (" << Result << ")\n";
 		std::exit(EXIT_FAILURE);
+	}
+
+	if(this->mDebugEnabled) {
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	}
 
 	glEnable(GL_BLEND);
@@ -33,19 +47,20 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 
 	glEnable(GL_DEPTH_TEST);
 
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CW);
+
 	glDebugMessageCallback(Window::GLCallback, nullptr);
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(this->mpHandle, true);
+	ImGui_ImplOpenGL3_Init("#version 450 core");
 }
 
 void Window::bindContext() noexcept {
-	glDisable(GL_DEBUG_OUTPUT);
-	glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
-	glfwMakeContextCurrent(this->mpHandle);
-}
-void Window::bindDebugContext() noexcept {
-	glEnable(GL_DEBUG_OUTPUT);
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 	glfwMakeContextCurrent(this->mpHandle);
 }
 
@@ -53,39 +68,57 @@ bool Window::isOpen() const noexcept {
 	return !(this->mExitOverride || glfwWindowShouldClose(this->mpHandle));
 }
 
-void Window::clear() noexcept {
+void Window::beginFrame() noexcept {
 	glClearColor(this->mBackgroundColor[0], this->mBackgroundColor[1], this->mBackgroundColor[2], this->mBackgroundColor[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
 }
-void Window::update() noexcept {
-	glfwSwapBuffers(this->mpHandle);
+void Window::endFrame() noexcept {
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	glfwPollEvents();
+	glfwSwapBuffers(this->mpHandle);
 }
 
 void Window::hideCursor() noexcept {
 	glfwSetInputMode(this->mpHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	this->mCursorHidden = true;
 }
 void Window::showCursor() noexcept {
+	std::cerr << "show!";
 	glfwSetInputMode(this->mpHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	this->mCursorHidden = false;
 }
 
-void Window::registerKeyCallback(const uint32_t aGLFWKey, WindowKeyCallback aCallback) noexcept {
+void Window::registerKeyCallback(const uint32_t aGLFWKey, WindowActionCallback aCallback) noexcept {
 	this->mKeyCallbacks.push_back(std::make_pair(aGLFWKey, aCallback));
 }
-uint32_t Window::registerGenericKeyCallback(WindowKeyCallback aCallback) noexcept {
+uint32_t Window::registerClickCallback(WindowActionCallback aCallback) noexcept {
+	this->mClickCallbacks.push_back(aCallback);
+	return this->mClickCallbacks.size() - 1;
+}
+uint32_t Window::registerGenericKeyCallback(WindowActionCallback aCallback) noexcept {
 	this->mGenericKeyCallbacks.push_back(aCallback);
-	return this->mMouseCallbacks.size() - 1;
+	return this->mGenericKeyCallbacks.size() - 1;
 }
 uint32_t Window::registerMouseCallback(WindowMouseCallback aCallback) noexcept {
 	this->mMouseCallbacks.push_back(aCallback);
 	return this->mMouseCallbacks.size() - 1;
 }
+
 void Window::removeKeyCallback(const uint32_t aGLFWKey) noexcept {
 	for(uint64_t Id = this->mKeyCallbacks.size() - 1; Id >= 0; Id--) {
 		if(this->mKeyCallbacks[Id].first == aGLFWKey) {
 			this->mKeyCallbacks.erase(this->mKeyCallbacks.begin() + Id);
 		}
 	}
+}
+void Window::removeClickCallback(const uint32_t aId) noexcept {
+	this->mClickCallbacks.erase(this->mClickCallbacks.begin() + aId);
 }
 void Window::removeGenericKeyCallback(const uint32_t aId) noexcept {
 	this->mGenericKeyCallbacks.erase(this->mGenericKeyCallbacks.begin() + aId);
@@ -98,19 +131,27 @@ void Window::close() noexcept {
 	this->mExitOverride = true;
 }
 
+bool Window::isCursorHidden() const noexcept {
+	return this->mCursorHidden;
+}
+
 Window::~Window() noexcept {
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
 	glfwDestroyWindow(this->mpHandle);
 }
 
-void Window::MouseCallback(GLFWwindow* aWindow, double aX, double aY) {
+void Window::MouseCallback(GLFWwindow* aWindow, double aX, double aY) noexcept {
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
 	for(WindowMouseCallback Callback : ClassPointer->mMouseCallbacks) {
 		Callback(ClassPointer, aX, aY);
 	}
 }
-void Window::KeyCallback(GLFWwindow* aWindow, int aKey, int aScancode, int aAction, int aModifiers) {
+void Window::KeyCallback(GLFWwindow* aWindow, int aKey, int aScancode, int aAction, int aModifiers) noexcept {
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
-	for(WindowKeyCallback Callback : ClassPointer->mGenericKeyCallbacks) {
+	for(WindowActionCallback Callback : ClassPointer->mGenericKeyCallbacks) {
 		Callback(ClassPointer, aKey, aAction, aModifiers);
 	}
 	for(uint64_t Id = 0; Id < ClassPointer->mKeyCallbacks.size(); Id++) {
@@ -119,7 +160,13 @@ void Window::KeyCallback(GLFWwindow* aWindow, int aKey, int aScancode, int aActi
 		}
 	}
 }
-void Window::GLCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+void Window::ClickCallback(GLFWwindow* aWindow, int aKey, int aAction, int aModifiers) noexcept {
+	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
+	for(WindowActionCallback Callback : ClassPointer->mClickCallbacks) {
+		Callback(ClassPointer, aKey, aAction, aModifiers);
+	}
+}
+void Window::GLCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) noexcept {
 	std::cerr << "OpenGL (";
 	switch (severity) {
 		case GL_DEBUG_SEVERITY_HIGH:
