@@ -3,7 +3,7 @@
 Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, const bool aFullscreen, const bool aDebug) noexcept
 	: mBackgroundColor({1.0f, 0.0f, 1.0f, 1.0f}), mDebugEnabled(aDebug), mExitOverride(false), mCursorHidden(false) {
 	if(glfwInit() != GLFW_TRUE) {
-		std::cerr << LogLevel::ERROR << "GLFW failed to initialize.";
+		std::cerr << LogLevel::ERROR << "GLFW failed to initialize." << LogLevel::RESET;
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -26,14 +26,14 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	glfwSetWindowUserPointer(this->mpHandle, this);
 
 	glfwSetErrorCallback([](int aCode, const char* aString) {
-		std::cerr << LogLevel::ERROR << "GLFW error " << aCode << ": " << aString << "\n";
+		std::cerr << LogLevel::ERROR << "GLFW error " << aCode << ": " << aString << "\n" << LogLevel::RESET;
 	});
 
 	glfwMakeContextCurrent(this->mpHandle);
 
 	int result = glewInit();
 	if(result != GLEW_OK) {
-		std::cerr << LogLevel::ERROR << "GLEW failed to initialize. " << glewGetErrorString(result) << " (" << result << ")\n";
+		std::cerr << LogLevel::ERROR << "GLEW failed to initialize. " << glewGetErrorString(result) << " (" << result << ")\n" << LogLevel::RESET;
 		std::exit(EXIT_FAILURE);
 	}
 

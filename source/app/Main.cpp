@@ -191,7 +191,7 @@ int main() {
 	glm::mat4 view = glm::mat4(1.0f);
 
 	glm::mat4 matrix;
-	GLint matuniform = glGetUniformLocation(shader.getHandle(), "umatrix");
+	UniformMat4 matUniform(&shader, "umatrix");
 
 	vao.bind();
 
@@ -210,7 +210,7 @@ int main() {
 		model = glm::mat4(1.0f);
 
 		matrix = proj * view * model;
-		glUniformMatrix4fv(matuniform, 1, GL_FALSE, glm::value_ptr(matrix));
+		matUniform.set(matrix);
 
 		ibo.draw();
 
@@ -221,7 +221,7 @@ int main() {
 		model = glm::rotate(model, glm::radians(20.0f*(float)glfwGetTime()), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		matrix = proj * view * model;
-		glUniformMatrix4fv(matuniform, 1, GL_FALSE, glm::value_ptr(matrix));
+		matUniform.set(matrix);
 
 		ibo.draw();
 

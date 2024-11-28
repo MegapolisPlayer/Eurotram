@@ -45,7 +45,7 @@ std::string readFile(std::fstream& aStream, const std::string_view aFilepath) no
 	std::string buffer(FILE_READ_BLOCK_SIZE, '\0');
 	aStream.open(aFilepath.data(), std::ios::in | std::ios::binary);
 	if(!aStream.is_open()) {
-		std::cerr << LogLevel::ERROR << "Failed to open file " << aFilepath << "! \n";
+		std::cerr << LogLevel::ERROR << "Failed to open file " << aFilepath << "! \n" << LogLevel::RESET;
 		return "";
 	}
 
