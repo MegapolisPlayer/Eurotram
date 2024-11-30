@@ -2,6 +2,8 @@
 #define EUROTRAM_FREEUTILS
 #include "Setup.hpp"
 
+//IO UTILITIES
+
 namespace ConsoleColor {
 	#ifdef _WIN32
 	enum ConsoleStreamColor : uint8_t {
@@ -51,7 +53,6 @@ void setOutputColor(
 	const ConsoleColor::ConsoleStreamColor aForeground,
 	const ConsoleColor::ConsoleStreamColor aBackground = ConsoleColor::DEFAULT
 ) noexcept;
-
 enum struct LogLevel : uint8_t {
 	OK = 0,
 	ERROR,
@@ -59,9 +60,34 @@ enum struct LogLevel : uint8_t {
 	SUCCESS,
 	RESET
 };
-
 std::ostream& operator<<(std::ostream& aStream, const LogLevel aLevel) noexcept;
-
 std::string readFile(std::fstream& aStream, const std::string_view aFilepath) noexcept;
+
+typedef std::chrono::system_clock::time_point TimerType;
+
+// TIME UTILITIES
+
+class Timer {
+public:
+	Timer() noexcept;
+
+	void start() noexcept;
+	void end() noexcept;
+
+	uint64_t getMS() const noexcept;
+	uint64_t getUS() const noexcept;
+
+	~Timer() noexcept;
+private:
+	std::chrono::system_clock::time_point mStart;
+	std::chrono::system_clock::duration mDuration;
+};
+
+// OTHER
+
+template<typename tComparableType>
+concept Comparable = requires(tComparableType a, tComparableType b) {
+	a == b;
+};
 
 #endif

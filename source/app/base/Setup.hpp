@@ -32,6 +32,7 @@ r Raw Arrays
 #include <fstream>
 #include <array>
 #include <vector>
+#include <chrono>
 
 #define FILE_READ_BLOCK_SIZE 8192
 
@@ -39,6 +40,11 @@ r Raw Arrays
 	#define WIN32_LEAN_AND_MEAN //save on size
 	#include <windows.h> //color changing on windows
 	#include <tchar.h>   //console title
+#endif
+
+//if C++20 or C++23 not defined
+#if !(__cplusplus == 202302L || __cplusplus == 202002L)
+	#error "C++20 or higher required"
 #endif
 
 #endif

@@ -53,7 +53,26 @@ std::string readFile(std::fstream& aStream, const std::string_view aFilepath) no
 		result.append(buffer);
 		buffer.clear();
 	};
+
 	result.append(buffer);
 	aStream.close();
 	return result;
 }
+
+Timer::Timer() noexcept {}
+
+void Timer::start() noexcept {
+	this->mStart = std::chrono::system_clock::now();
+}
+void Timer::end() noexcept {
+	this->mDuration = std::chrono::duration_cast<std::chrono::microseconds>((std::chrono::system_clock::now() - this->mStart));
+}
+
+uint64_t Timer::getMS() const noexcept {
+	return std::chrono::duration_cast<std::chrono::milliseconds>(this->mDuration).count();
+}
+uint64_t Timer::getUS() const noexcept {
+	return this->mDuration.count();
+}
+
+Timer::~Timer() noexcept {}

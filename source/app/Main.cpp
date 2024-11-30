@@ -1,9 +1,7 @@
-#define STB_IMAGE_IMPLEMENTATION
 #include "base/Base.hpp"
 
-static float CameraXOffset = 0.0f;
-static float CameraYOffset = 0.0f;
-static float CameraZOffset = 0.0f;
+static bool FirstMove = true;
+static double LastX = 400, LastY = 400;
 
 void KeyEsc(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) {
 	aWindow->showCursor();
@@ -20,43 +18,31 @@ void KeyWASDRFQ(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModi
 
 	switch(aKey) {
 		case GLFW_KEY_W:
-			CameraZOffset -= 0.05f;
+			aWindow->getCamera()->forward();
 			break;
 		case GLFW_KEY_A:
-			CameraXOffset -= 0.05f;
+			aWindow->getCamera()->left();
 			break;
 		case GLFW_KEY_S:
-			CameraZOffset += 0.05f;
+			aWindow->getCamera()->back();
 			break;
 		case GLFW_KEY_D:
-			CameraXOffset += 0.05f;
+			aWindow->getCamera()->right();
 			break;
 		case GLFW_KEY_R:
-			CameraYOffset += 0.05f;
+			aWindow->getCamera()->up();
 			break;
 		case GLFW_KEY_F:
-			CameraYOffset -= 0.05f;
+			aWindow->getCamera()->down();
 			break;
 		case GLFW_KEY_Q:
-			CameraXOffset = 0.0f;
-			CameraYOffset = 0.0f;
-			CameraZOffset = 0.0f;
+			aWindow->getCamera()->moveTo({0.0f, 0.0f, 0.0f});
 			break;
 		case GLFW_KEY_X:
 			aWindow->close();
 			break;
 	}
 }
-
-const static double FOV = 45.0;
-
-static bool FirstMove = true;
-static double LastX = 400, LastY = 400;
-
-static double Pitch = 0.0;
-static double Yaw = -90.0; //so we start oriented correctly: 0 is to the right of X axis, 90 is back
-
-glm::vec3 Direction;
 
 void MouseCallback(Window* aWindow, double aX, double aY) {
 	if(!aWindow->isCursorHidden()) return;
@@ -77,31 +63,19 @@ void MouseCallback(Window* aWindow, double aX, double aY) {
 	DX *= Sensitivity;
 	DY *= Sensitivity;
 
-	Yaw   += DX;
-	Pitch += DY;
-
-	//limits
-	if(Pitch > 89.0f) {
-		Pitch = 89.0f;
-	}
-	if(Pitch < -89.0f) {
-		Pitch = -89.0f;
-	}
-
-	Direction = glm::vec3();
-	Direction.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-	Direction.y = sin(glm::radians(Pitch));
-	Direction.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-	Direction = glm::normalize(Direction);
+	aWindow->getCamera()->addYaw(DX);
+	aWindow->getCamera()->addPitch(DY);
 }
 
 int main() {
-    Window MainWindow("Eurotram", 1000, 1000, false, true);
-	uint32_t MouseCallbackHandle = MainWindow.registerMouseCallback(MouseCallback);
-	MainWindow.registerKeyCallback(GLFW_KEY_ESCAPE, KeyEsc);
-	uint32_t GenericKeyHandle = MainWindow.registerGenericKeyCallback(KeyWASDRFQ);
-	uint32_t MouseClickHandle = MainWindow.registerClickCallback(MouseClick);
-	MainWindow.hideCursor();
+    Window mainWindow("Eurotram", 1000, 1000, false, true);
+	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 0.0f, 5.0f), 45.0f, 100.0, 0.05f);
+
+	uint32_t mouseCallbackHandle = mainWindow.registerMouseCallback(MouseCallback);
+	mainWindow.registerKeyCallback(GLFW_KEY_ESCAPE, KeyEsc);
+	uint32_t genericKeyHandle = mainWindow.registerGenericKeyCallback(KeyWASDRFQ);
+	uint32_t mouseClickHandle = mainWindow.registerClickCallback(MouseClick);
+	mainWindow.hideCursor();
 
 	//data 2
 	//flip X on opposite faces! (mirror of mirror is no mirror)
@@ -159,57 +133,34 @@ int main() {
 
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	int width, height, channels;
-	stbi_set_flip_vertically_on_load(true);
-	GLubyte* data = stbi_load("image.jpg", &width, &height, &channels, 4);
-	if(!data) {
-		std::cerr << "STBI failed to load image!\n";
-		return -1;
-	}
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glm::vec3 camera_origin = glm::vec3(0.0f, 0.0f, 3.0f);
-	glm::vec3 camera_target = glm::vec3(0.0f, 0.0f, 0.0f);
-	//vector maths - direction of camera
-	glm::vec3 camera_direction = glm::normalize(camera_origin - camera_target);
+	Texture texture("image.jpg", 0);
 
 	glm::mat4 model = glm::mat4(1.0f);
-	glm::mat4 proj = glm::mat4(1.0f);
-	proj = glm::perspective(glm::radians((float)FOV), 800.0f/800.0f, 0.1f, 100.0f);
-	glm::mat4 view = glm::mat4(1.0f);
 
 	glm::mat4 matrix;
 	UniformMat4 matUniform(&shader, "umatrix");
 
 	vao.bind();
 
-    while (MainWindow.isOpen()) {
-        MainWindow.beginFrame();
+	Timer loopTimer;
+    while (mainWindow.isOpen()) {
+		loopTimer.start();
+        mainWindow.beginFrame();
 
 		//camera
 		const float radius = 10.0f;
 		//float dz = sin(glfwGetTime()) * radius;
 		//float dx = cos(glfwGetTime()) * radius;
-		glm::vec3 camera_pos = glm::vec3(CameraXOffset, CameraYOffset, CameraZOffset);
-		view = glm::lookAt(camera_pos, camera_pos + Direction, glm::vec3(0.0, 1.0, 0.0));
+
+		Timer drawTimer;
+		drawTimer.start();
 
 		//first cube
 
 		model = glm::mat4(1.0f);
 
-		matrix = proj * view * model;
+		glm::mat4 cameraMatrix = mainWindow.getCamera()->getMatrix();
+		matrix = cameraMatrix * model;
 		matUniform.set(matrix);
 
 		ibo.draw();
@@ -220,14 +171,34 @@ int main() {
 		model = glm::translate(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::rotate(model, glm::radians(20.0f*(float)glfwGetTime()), glm::vec3(0.5f, 1.0f, 0.0f));
 
-		matrix = proj * view * model;
+		matrix = cameraMatrix * model;
 		matUniform.set(matrix);
 
 		ibo.draw();
 
+		drawTimer.end();
+
 		// gui
 
-		ImGui::Begin("Line information");
+		ImGui::Begin("Settings");
+
+		ImGui::Text("FOV: %f", *windowCamera.getFOVPointer());
+		if(ImGui::SliderFloat("FOV", windowCamera.getFOVPointer(), 30.0, 90.0)) {
+			//if changed
+			windowCamera.update();
+		}
+
+		ImGui::End();
+
+		ImGui::Begin("Frame");
+
+		ImGui::Text("Frame time: %zums / %zuus", loopTimer.getMS(), loopTimer.getUS());
+		ImGui::Text("FPS: %f", 1000.0/loopTimer.getMS());
+		ImGui::Text("Draw time: %zums / %zuus", drawTimer.getMS(), drawTimer.getUS());
+
+		ImGui::End();
+
+		ImGui::Begin("Line");
 
 		ImGui::Text("Line: %d/%d", 13, 2);
 		ImGui::Text("Starting stop: %s", "Zvonarka (ZVON)");
@@ -238,7 +209,7 @@ int main() {
 
 		ImGui::End();
 
-		ImGui::Begin("Physics information");
+		ImGui::Begin("Physics");
 
 		ImGui::Text("Gravitational force (vertical): %f N", 0.0);
 		ImGui::Text("Friction force: %f N", 0.0);
@@ -251,7 +222,7 @@ int main() {
 
 		ImGui::End();
 
-		ImGui::Begin("Electrical information");
+		ImGui::Begin("Electricity");
 
 		ImGui::Text("Voltage in network: %f V", 0.0);
 		ImGui::Text("Amperage in network: %f A", 0.0);
@@ -263,9 +234,8 @@ int main() {
 
 		ImGui::End();
 
-        MainWindow.endFrame();
+        mainWindow.endFrame();
+		loopTimer.end();
     }
-
-    stbi_image_free(data);
     return 0;
 }

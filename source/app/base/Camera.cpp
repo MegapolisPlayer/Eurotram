@@ -1,1 +1,161 @@
 #include "Camera.hpp"
+
+//definition of window update func
+void Window::updateCamera() noexcept {
+	if(this->mReferencedCamera != nullptr) {
+		this->mReferencedCamera->update();
+	}
+}
+
+//so we start oriented correctly: 0 is to the right (+X axis), 90 is back
+Camera::Camera(Window* aWindow, const glm::vec3& aCameraPos, const float aFOV, const float aFarPlane, const float aSpeed) noexcept
+	: mWindow(aWindow), mCameraPos(aCameraPos), mFOV(aFOV), mFarPlane(aFarPlane), mSpeed(aSpeed), mPitch(0.0), mYaw(-90.0), mEnabled(true) {
+	this->update();
+	this->mWindow->bindCamera(this);
+}
+
+//point [x,y] rotated 90deg
+//CW, to right: [-y, x]
+//CCW, to left: [y, -x]
+//y is z here
+
+//left = -y = x => y = -x
+//        x = y
+
+//right = y = x
+//       -x = y => x = -y
+
+void Camera::forward() noexcept {
+	this->mCameraPos += this->calculateDeltas(this->mSpeed, true);
+}
+void Camera::back() noexcept {
+	this->mCameraPos -= this->calculateDeltas(this->mSpeed, true);
+}
+void Camera::left() noexcept {
+	glm::vec3 vec = this->calculateDeltas(this->mSpeed, false);
+	this->mCameraPos.x += vec.z;
+	this->mCameraPos.z -= vec.x;
+}
+void Camera::right() noexcept {
+	glm::vec3 vec = this->calculateDeltas(this->mSpeed, false);
+	this->mCameraPos.x -= vec.z;
+	this->mCameraPos.z += vec.x;
+}
+void Camera::up() noexcept {
+	this->mCameraPos.y += this->mSpeed;
+}
+void Camera::down() noexcept {
+	this->mCameraPos.y -= this->mSpeed;
+}
+
+void Camera::forward(const float aAmount) noexcept {
+	this->mCameraPos += this->calculateDeltas(aAmount, true);
+}
+void Camera::back(const float aAmount) noexcept {
+	this->mCameraPos -= this->calculateDeltas(aAmount, true);
+}
+void Camera::left(const float aAmount) noexcept {
+	glm::vec3 vec = this->calculateDeltas(aAmount, false);
+	this->mCameraPos.x += vec.z;
+	this->mCameraPos.z -= vec.x;
+}
+void Camera::right(const float aAmount) noexcept {
+	glm::vec3 vec = this->calculateDeltas(aAmount, false);
+	this->mCameraPos.x -= vec.z;
+	this->mCameraPos.z += vec.x;
+}
+void Camera::up(const float aAmount) noexcept {
+	this->mCameraPos.y += aAmount;
+}
+void Camera::down(const float aAmount) noexcept {
+	this->mCameraPos.y -= aAmount;
+}
+
+void Camera::moveTo(const glm::vec3& aCameraPos) noexcept {
+	this->mCameraPos = aCameraPos;
+}
+
+void Camera::setYaw(const float aYaw) noexcept {
+	this->mYaw = aYaw;
+}
+void Camera::setPitch(const float aPitch) noexcept {
+	this->mPitch = aPitch;
+	this->pitchLimiter();
+}
+void Camera::addYaw(const float aYaw) noexcept {
+	this->mYaw += aYaw;
+}
+void Camera::addPitch(const float aPitch) noexcept {
+	this->mPitch += aPitch;
+	this->pitchLimiter();
+}
+
+void Camera::setFarPlane(const float aFarPlane) noexcept {
+	this->mFarPlane = aFarPlane;
+}
+void Camera::setFOV(const float aFOV) noexcept {
+	this->mFOV = aFOV;
+}
+
+void Camera::disable() noexcept {
+	this->mEnabled = false;
+}
+void Camera::enable() noexcept {
+	this->mEnabled = true;
+}
+void Camera::toggle() noexcept {
+	this->mEnabled = !this->mEnabled;
+}
+
+glm::mat4 Camera::getMatrix() const noexcept {
+	return this->mProjection * this->mView;
+}
+glm::vec3 Camera::getPosition() const noexcept {
+	return this->mCameraPos;
+}
+float* Camera::getFOVPointer() noexcept {
+	return &this->mFOV;
+}
+
+void Camera::update() noexcept {
+	glm::vec3 Direction = glm::vec3();
+	//first part - trigoniometry (where are we looking)
+	//multiplied because affected by Y movement
+	Direction.x = cos(glm::radians(this->mYaw)) * cos(glm::radians(this->mPitch));
+	Direction.y = sin(glm::radians(this->mPitch));
+	Direction.z = sin(glm::radians(this->mYaw)) * cos(glm::radians(this->mPitch));
+	Direction = glm::normalize(Direction);
+
+	this->mView = glm::lookAt(this->mCameraPos, this->mCameraPos + Direction, glm::vec3(0.0, 1.0, 0.0));
+	this->mProjection = glm::perspective(glm::radians((float)this->mFOV), (float)this->mWindow->mWidth/this->mWindow->mHeight, 0.1f, 100.0f);
+}
+
+Camera::~Camera() noexcept {
+	this->mWindow->bindCamera(NULL);
+}
+
+glm::vec3 Camera::calculateDeltas(const float aAmount, const bool aCalculateY) noexcept {
+	glm::vec3 result;
+	result.x = std::cos(glm::radians(this->mYaw))*aAmount;
+	result.z = std::sin(glm::radians(this->mYaw))*aAmount;
+	if(aCalculateY) {
+		result.y = std::sin(glm::radians(this->mPitch))*aAmount;
+	}
+	else {
+		result.y = 0.0f;
+	}
+	return result;
+}
+
+void Camera::updateInternal() noexcept {
+	if(!this->mEnabled) return;
+	this->update();
+}
+
+#define CAMERA_PITCH_LIMIT_PLUS 90.0f
+#define CAMERA_PITCH_LIMIT_MINUS -90.0f
+
+void Camera::pitchLimiter() noexcept {
+	if(this->mPitch > CAMERA_PITCH_LIMIT_PLUS) this->mPitch = CAMERA_PITCH_LIMIT_PLUS;
+	if(this->mPitch < CAMERA_PITCH_LIMIT_MINUS) this->mPitch = CAMERA_PITCH_LIMIT_MINUS;
+}
