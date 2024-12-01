@@ -62,6 +62,10 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	ImGui_ImplOpenGL3_Init("#version 450 core");
 }
 
+void Window::setBackgroundColor(const std::array<float, 4>& aArray) noexcept {
+	this->mBackgroundColor = aArray;
+}
+
 void Window::bindContext() noexcept {
 	glfwMakeContextCurrent(this->mpHandle);
 }

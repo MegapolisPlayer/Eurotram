@@ -1,0 +1,14 @@
+Jaká vozovna? (a s tím i na jakých linkách)
+Názor na T3R.P/PLF/KT/14T/15T?
+Jaký jsou rozdíly - z pohledu ovládání teda - mezi "tyristorkou" T3M, zrychlovač T3, T3SU(CS), erpéčkem (T3R.P), wanou? (T3R.PLF)
+
+Je nějakej rozdíl mezi RP a RPV?
+
+Jak probíhá nástup na směnu?
+Jak fungují přestávky buď na konečných nebo hodinové pauzy na směně?
+
+Nátěr PID?
+
+Názor na T6A5, Pragoimex EVO1,
+
+Na jaké věci pozor během ovládání? Úsekový dělič? Rychlost 16 v obloucích?

@@ -68,7 +68,12 @@ void MouseCallback(Window* aWindow, double aX, double aY) {
 }
 
 int main() {
+	std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
+	float daylightIndex = 1.0f;
+
     Window mainWindow("Eurotram", 1000, 1000, false, true);
+	mainWindow.setBackgroundColor(daylightColor);
+
 	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 0.0f, 5.0f), 45.0f, 100.0, 0.05f);
 
 	uint32_t mouseCallbackHandle = mainWindow.registerMouseCallback(MouseCallback);
@@ -186,6 +191,11 @@ int main() {
 		if(ImGui::SliderFloat("FOV", windowCamera.getFOVPointer(), 30.0, 90.0)) {
 			//if changed
 			windowCamera.update();
+		}
+
+		ImGui::Text("Daylight index: %f", daylightIndex);
+		if(ImGui::SliderFloat("Daylight index",  &daylightIndex, 0.0, 1.0)) {
+			mainWindow.setBackgroundColor(daylightColor*daylightIndex);
 		}
 
 		ImGui::End();

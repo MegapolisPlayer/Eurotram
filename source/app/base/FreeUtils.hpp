@@ -85,9 +85,28 @@ private:
 
 // OTHER
 
-template<typename tComparableType>
-concept Comparable = requires(tComparableType a, tComparableType b) {
-	a == b;
+template<typename tType>
+concept MultipliableByFloat = requires(tType a, float b) {
+	a * b;
 };
+
+
+template<typename tType>
+concept Multipliable = requires(tType a, tType b) {
+	a * b;
+};
+
+template<MultipliableByFloat tType, std::size_t tAmount>
+std::array<tType, tAmount> operator*(std::array<tType, tAmount> aArray, const float aMultiplier) noexcept {
+	std::transform(aArray.begin(), aArray.end(), aArray.begin(), [&](tType a) {
+		return a * aMultiplier;
+	});
+	return aArray;
+}
+
+template<Multipliable tType, std::size_t tAmount>
+std::array<tType, tAmount> operator*(std::array<tType, tAmount> aArray1, std::array<tType, tAmount> aArray2) noexcept {
+	return {aArray1[0] * aArray2[0], aArray1[1] * aArray2[1], aArray1[2]*aArray2[2], aArray1[3]*aArray1[3]};
+}
 
 #endif
