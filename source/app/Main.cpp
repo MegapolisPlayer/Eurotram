@@ -1,4 +1,4 @@
-#include "base/Base.hpp"
+#include "model/Model.hpp"
 
 static bool FirstMove = true;
 static double LastX = 400, LastY = 400;
@@ -84,42 +84,43 @@ int main() {
 
 	//data 2
 	//flip X on opposite faces! (mirror of mirror is no mirror)
+	//posX, posY, posZ, texCoord, texCoord, normalX, normalY, normalZ
 	GLfloat vertices[] = {
 		//upper square
-		-0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
-		0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+		-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 
 		//lower square
-		0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-		-0.5f, -0.5f, 0.5f, 0.0f, 1.0f,
-		0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+		-0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+		0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
 
 		//front
-		-0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-		0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-		0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+		0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+		0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
 
 		//back
-		0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-		-0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-		0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+		0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+		-0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+		0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
 
 		//left
-		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-		-0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
 
 		//right
-		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-		0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-		0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+		0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 	};
 	GLuint indices[] = {
 		0, 1, 2, 2, 3, 0,
@@ -131,9 +132,10 @@ int main() {
 	};
 
 	VertexArray vao;
-	VertexBuffer vbo(vertices, 24, 5);
-	vbo.enableAttribute(&vao, 3);
-	vbo.enableAttribute(&vao, 2);
+	VertexBuffer vbo(vertices, 24, 8);
+	vbo.enableAttribute(&vao, 3); //pos
+	vbo.enableAttribute(&vao, 2); //texCoord
+	vbo.enableAttribute(&vao, 3); //normals
     IndexBuffer ibo(indices, 36);
 
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
@@ -141,21 +143,45 @@ int main() {
 	Texture texture("image.jpg", 0);
 
 	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat3 normalMatrix = glm::mat3(1.0f);
 
-	glm::mat4 matrix;
-	UniformMat4 matUniform(&shader, "umatrix");
+	shader.bind();
+
+	UniformMat4 matCameraUniform(&shader, 10);
+	matCameraUniform.set(mainWindow.getCamera()->getMatrix());
+
+	UniformVec3 cameraPosUniform(&shader, 105);
+
+	UniformMat4 matModelUniform(&shader, 11);
+	UniformMat3 matNormalUniform(&shader, 12);
+
+	UniformVec3 objectColor(&shader, 101);
+	UniformFloat ignoreTex(&shader, 102);
+
+	UniformVec3 lightPos(&shader, 103);
+	glm::vec3 lightPosVector = {0.0f, 5.0f, 10.0f};
+	lightPos.set(lightPosVector);
+	UniformVec3 lightColor(&shader, 104);
+	lightColor.set({208.0f/255.0f, 128.0f/255.0f, 0.0f});
+
+	UniformFloat ambientLightStrength(&shader, 110);
+	ambientLightStrength.set(0.1);
+	UniformFloat specularLightStrength(&shader, 111);
+	specularLightStrength.set(1.0);
 
 	vao.bind();
 
 	Timer loopTimer;
+
+	float sunAngle = 0;
+
     while (mainWindow.isOpen()) {
 		loopTimer.start();
         mainWindow.beginFrame();
 
-		//camera
-		const float radius = 10.0f;
-		//float dz = sin(glfwGetTime()) * radius;
-		//float dx = cos(glfwGetTime()) * radius;
+		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
+		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
+		ignoreTex.set(0.0);
 
 		Timer drawTimer;
 		drawTimer.start();
@@ -163,10 +189,12 @@ int main() {
 		//first cube
 
 		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-		glm::mat4 cameraMatrix = mainWindow.getCamera()->getMatrix();
-		matrix = cameraMatrix * model;
-		matUniform.set(matrix);
+		normalMatrix = glm::transpose(glm::inverse(model));
+
+		matModelUniform.set(model);
+		matNormalUniform.set(normalMatrix);
 
 		ibo.draw();
 
@@ -176,8 +204,35 @@ int main() {
 		model = glm::translate(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::rotate(model, glm::radians(20.0f*(float)glfwGetTime()), glm::vec3(0.5f, 1.0f, 0.0f));
 
-		matrix = cameraMatrix * model;
-		matUniform.set(matrix);
+		normalMatrix = glm::transpose(glm::inverse(model));
+
+		matModelUniform.set(model);
+		matNormalUniform.set(normalMatrix);
+
+		ibo.draw();
+
+		//light cube
+
+		sunAngle += 0.0001f;
+		if(sunAngle >= 360.0f) {
+			sunAngle = 0.0f;
+		}
+
+		model = glm::mat4(1.0f);
+		lightPosVector = glm::vec3(0.0f, sin(sunAngle)*2.0f, cos(sunAngle)*2.0f);
+		lightPos.set(lightPosVector);
+		model = glm::translate(model, lightPosVector);
+
+		//T*R*S
+		model = glm::scale(model, glm::vec3(0.2f));
+
+		normalMatrix = glm::transpose(glm::inverse(model));
+
+		matModelUniform.set(model);
+		matNormalUniform.set(normalMatrix);
+
+		ignoreTex.set(1.0);
+		objectColor.set({1.0f, 1.0f, 1.0f});
 
 		ibo.draw();
 
@@ -196,6 +251,7 @@ int main() {
 		ImGui::Text("Daylight index: %f", daylightIndex);
 		if(ImGui::SliderFloat("Daylight index",  &daylightIndex, 0.0, 1.0)) {
 			mainWindow.setBackgroundColor(daylightColor*daylightIndex);
+			ambientLightStrength.set(daylightIndex);
 		}
 
 		ImGui::End();

@@ -26,6 +26,30 @@ Shader::Shader(const std::string_view aVertexSource, const std::string_view aFra
 	glLinkProgram(this->mHandle);
 	glValidateProgram(this->mHandle);
 
+	bool failed = false;
+
+	GLint success = 0;
+	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+	if(success == GL_FALSE) {
+		failed = true;
+		glGetShaderiv(vertex, GL_INFO_LOG_LENGTH, &success);
+		std::string message;
+		message.resize(success);
+		glGetShaderInfoLog(vertex, GL_INFO_LOG_LENGTH, NULL, &message[0]);
+		std::cout << LogLevel::ERROR << "Vertex shader compilation failed: " << message << '\n' << LogLevel::RESET;
+	}
+	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+	if(success == GL_FALSE) {
+		failed = true;
+		glGetShaderiv(fragment, GL_INFO_LOG_LENGTH, &success);
+		std::string message;
+		message.resize(success);
+		glGetShaderInfoLog(fragment, GL_INFO_LOG_LENGTH, NULL, &message[0]);
+		std::cout << LogLevel::ERROR << "Fragment shader compilation failed: " << message << '\n' << LogLevel::RESET;
+	}
+
+	if(failed) { std::exit(EXIT_FAILURE); }
+
 	glDetachShader(this->mHandle, vertex);
 	glDetachShader(this->mHandle, fragment);
 	glDeleteShader(vertex);

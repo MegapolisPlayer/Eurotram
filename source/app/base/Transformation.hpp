@@ -1,0 +1,6 @@
+#ifndef EUROTRAM_TRANSFORMATION
+#define EUROTRAM_TRANSFORMATION
+
+
+
+#endif
