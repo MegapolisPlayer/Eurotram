@@ -65,14 +65,24 @@ void Timer::start() noexcept {
 	this->mStart = std::chrono::system_clock::now();
 }
 void Timer::end() noexcept {
-	this->mDuration = std::chrono::duration_cast<std::chrono::microseconds>((std::chrono::system_clock::now() - this->mStart));
+	this->mDuration = std::chrono::duration_cast<std::chrono::nanoseconds>((std::chrono::system_clock::now() - this->mStart));
 }
 
 uint64_t Timer::getMS() const noexcept {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(this->mDuration).count();
+	return this->mDuration.count()/1000000;
 }
 uint64_t Timer::getUS() const noexcept {
+	return this->mDuration.count()/1000;
+}
+uint64_t Timer::getNS() const noexcept {
 	return this->mDuration.count();
+}
+
+float Timer::getMSfloat() const noexcept {
+	return this->mDuration.count()/1000000.0;
+}
+float Timer::getUSfloat() const noexcept {
+	return this->mDuration.count()/1000.0;
 }
 
 Timer::~Timer() noexcept {}

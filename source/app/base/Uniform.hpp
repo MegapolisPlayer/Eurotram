@@ -33,6 +33,12 @@ public:
 	UniformVec3(const Shader* const aShader, const char* aUniformName) noexcept;
 	void set(const glm::vec3& aValue) noexcept;
 };
+class UniformVec4 : public Uniform<const glm::vec4&> {
+public:
+	UniformVec4(const Shader* const aShader, const uint64_t aLocationOverride) noexcept;
+	UniformVec4(const Shader* const aShader, const char* aUniformName) noexcept;
+	void set(const glm::vec4& aValue) noexcept;
+};
 
 class UniformInt : public Uniform<const int64_t> {
 public:

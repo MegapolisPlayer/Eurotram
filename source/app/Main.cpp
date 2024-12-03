@@ -172,6 +172,9 @@ int main() {
 	vao.bind();
 
 	Timer loopTimer;
+	Timer guiTimer;
+	Timer drawTimer;
+	Timer uniformTimer;
 
 	float sunAngle = 0;
 
@@ -179,11 +182,14 @@ int main() {
 		loopTimer.start();
         mainWindow.beginFrame();
 
+		uniformTimer.start();
+
 		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
 		ignoreTex.set(0.0);
 
-		Timer drawTimer;
+		uniformTimer.end();
+
 		drawTimer.start();
 
 		//first cube
@@ -240,6 +246,8 @@ int main() {
 
 		// gui
 
+		guiTimer.start();
+
 		ImGui::Begin("Settings");
 
 		ImGui::Text("FOV: %f", *windowCamera.getFOVPointer());
@@ -258,9 +266,11 @@ int main() {
 
 		ImGui::Begin("Frame");
 
-		ImGui::Text("Frame time: %zums / %zuus", loopTimer.getMS(), loopTimer.getUS());
-		ImGui::Text("FPS: %f", 1000.0/loopTimer.getMS());
-		ImGui::Text("Draw time: %zums / %zuus", drawTimer.getMS(), drawTimer.getUS());
+		ImGui::Text("Frame time: %fms / %fus", loopTimer.getMSfloat(), loopTimer.getUSfloat());
+		ImGui::Text("FPS: %f", 1000.0/loopTimer.getMSfloat());
+		ImGui::Text("Draw time: %fms / %fus", drawTimer.getMSfloat(), drawTimer.getUSfloat());
+		ImGui::Text("GUI draw time: %fms / %fus", guiTimer.getMSfloat(), guiTimer.getUSfloat());
+		ImGui::Text("Uniform setup time: %fms / %fus", uniformTimer.getMSfloat(), uniformTimer.getUSfloat());
 
 		ImGui::End();
 
@@ -299,6 +309,8 @@ int main() {
 		ImGui::Text("Breakers: %s", "none"); //rain, ice...
 
 		ImGui::End();
+
+		guiTimer.end();
 
         mainWindow.endFrame();
 		loopTimer.end();

@@ -76,6 +76,10 @@ public:
 
 	uint64_t getMS() const noexcept;
 	uint64_t getUS() const noexcept;
+	uint64_t getNS() const noexcept;
+
+	float getMSfloat() const noexcept;
+	float getUSfloat() const noexcept;
 
 	~Timer() noexcept;
 private:

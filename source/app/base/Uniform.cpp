@@ -25,6 +25,14 @@ void UniformVec3::set(const glm::vec3& aValue) noexcept {
 	glUniform3fv(this->mHandle, 1, glm::value_ptr(aValue));
 }
 
+UniformVec4::UniformVec4(const Shader* const aShader, const uint64_t aLocationOverride) noexcept
+: Uniform(aShader, aLocationOverride) {}
+UniformVec4::UniformVec4(const Shader* const aShader, const char* aUniformName) noexcept
+: Uniform(aShader, aUniformName) {}
+void UniformVec4::set(const glm::vec4& aValue) noexcept {
+	glUniform4fv(this->mHandle, 1, glm::value_ptr(aValue));
+}
+
 UniformInt::UniformInt(const Shader* const aShader, const uint64_t aLocationOverride) noexcept
 : Uniform(aShader, aLocationOverride) {}
 UniformInt::UniformInt(const Shader* const aShader, const char* aUniformName) noexcept
