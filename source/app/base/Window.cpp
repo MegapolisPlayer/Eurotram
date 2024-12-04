@@ -46,16 +46,18 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	}
 
-	glEnable(GL_BLEND);
+	glEnable(GL_BLEND); //texture blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST); //depth testing
 
-	glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE); //backface culling
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CW);
 
 	glEnable(GL_MULTISAMPLE); //anti aliasing
+
+	glEnable(GL_FRAMEBUFFER_SRGB); //gamma correction
 
 	glDebugMessageCallback(Window::GLCallback, nullptr);
 

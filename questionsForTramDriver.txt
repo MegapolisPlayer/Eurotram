@@ -49,3 +49,5 @@ Na jaké věci pozor během ovládání? Úsekový dělič? Rychlost 16 v oblouc
 Pocit řízení nočních tramvají proti denním?
 
 Jak fungují kontrolní body - nesmíte z nich odjet dříve? Můžete vůbec někdy?
+
+Musíte před tramvajovou návěstí zpomalovat - co se stane pokud se k ní blížíte a přepne se právě v ten okamžik? (nebo existuje nějaká logika)

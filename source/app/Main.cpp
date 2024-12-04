@@ -178,6 +178,15 @@ int main() {
 
 	float sunAngle = 0;
 
+	Transform t1;
+	t1.setRotationY(45.0f);
+
+	Transform t2;
+	t2.setPosition(glm::vec3(2.0f));
+
+	Transform t3;
+	t3.setScale(0.2f);
+
     while (mainWindow.isOpen()) {
 		loopTimer.start();
         mainWindow.beginFrame();
@@ -194,26 +203,20 @@ int main() {
 
 		//first cube
 
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-		normalMatrix = glm::transpose(glm::inverse(model));
-
-		matModelUniform.set(model);
-		matNormalUniform.set(normalMatrix);
+		matModelUniform.set(t1.getMatrix());
+		matNormalUniform.set(t1.getNormalMatrix());
 
 		ibo.draw();
 
 		//second cube
 
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(2.0f, 2.0f, 2.0f));
-		model = glm::rotate(model, glm::radians(20.0f*(float)glfwGetTime()), glm::vec3(0.5f, 1.0f, 0.0f));
+		//glm::vec3(0.5f, 1.0f, 0.0f)
 
-		normalMatrix = glm::transpose(glm::inverse(model));
+		t2.setRotationX(20.0f*(float)glfwGetTime()*0.5f);
+		t2.setRotationY(20.0f*(float)glfwGetTime());
 
-		matModelUniform.set(model);
-		matNormalUniform.set(normalMatrix);
+		matModelUniform.set(t2.getMatrix());
+		matNormalUniform.set(t2.getNormalMatrix());
 
 		ibo.draw();
 
@@ -224,18 +227,12 @@ int main() {
 			sunAngle = 0.0f;
 		}
 
-		model = glm::mat4(1.0f);
 		lightPosVector = glm::vec3(0.0f, sin(sunAngle)*2.0f, cos(sunAngle)*2.0f);
 		lightPos.set(lightPosVector);
-		model = glm::translate(model, lightPosVector);
+		t3.setPosition(lightPosVector);
 
-		//T*R*S
-		model = glm::scale(model, glm::vec3(0.2f));
-
-		normalMatrix = glm::transpose(glm::inverse(model));
-
-		matModelUniform.set(model);
-		matNormalUniform.set(normalMatrix);
+		matModelUniform.set(t3.getMatrix());
+		matNormalUniform.set(t3.getNormalMatrix());
 
 		ignoreTex.set(1.0);
 		objectColor.set({1.0f, 1.0f, 1.0f});

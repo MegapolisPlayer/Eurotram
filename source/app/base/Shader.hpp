@@ -16,4 +16,20 @@ private:
 	GLuint mHandle;
 };
 
+class ShaderBuffer {
+public:
+	ShaderBuffer(void* const arData, const uint64_t aSizeBytes) noexcept;
+
+	void update(void* const arData, const uint64_t aSizeBytes) noexcept;
+
+	void bind(const uint64_t aBindLocation) noexcept;
+	void unbind() noexcept;
+
+	GLuint getHandle() const noexcept;
+
+	~ShaderBuffer() noexcept;
+private:
+	GLuint mHandle;
+};
+
 #endif

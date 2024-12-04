@@ -69,3 +69,26 @@ GLuint Shader::getHandle() const noexcept {
 Shader::~Shader() {
 	glDeleteProgram(this->mHandle);
 }
+
+ShaderBuffer::ShaderBuffer(void* const arData, const uint64_t aSizeBytes) noexcept {
+	glGenBuffers(1, &this->mHandle);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, aSizeBytes, arData, GL_STATIC_DRAW);
+}
+void ShaderBuffer::update(void* const arData, const uint64_t aSizeBytes) noexcept {
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
+	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, aSizeBytes, arData);
+}
+void ShaderBuffer::bind(const uint64_t aBindLocation) noexcept {
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, aBindLocation, this->mHandle);
+}
+void ShaderBuffer::unbind() noexcept {
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+GLuint ShaderBuffer::getHandle() const noexcept {
+	return this->mHandle;
+}
+ShaderBuffer::~ShaderBuffer() noexcept {
+	glDeleteBuffers(1, &this->mHandle);
+}
+
