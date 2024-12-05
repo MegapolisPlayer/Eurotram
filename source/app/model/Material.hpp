@@ -2,27 +2,24 @@
 #define EUROTRAM_MATERIAL
 #include "../base/Base.hpp"
 
-struct Material {
-	float diffuse;
-	float specular;
-	float roughness;
-	float shininess;
+struct alignas(16) Material {
+	GLfloat diffuse = 1.0f;
+	GLfloat specular = 1.0f;
+	GLfloat roughness = 1.0f;
+	GLfloat shininess = 1.0f;
 
-	glm::vec3 color;
-	float transparency;
+	GLfloat textureAmount = 1.0f; //1.0 texture only, 0.0 color only
+	GLint textureSlot = 0;
+	float transparency = 1.0f;
+	float brightness = 0.0f; //below this brightness render as normal, above it is brighter
+	glm::vec3 color = glm::vec3(1.0f);
 };
 
-class UniformMaterial {
+class UniformMaterial : public StructUniform<Material> {
 public:
-	UniformMaterial(
-		const Shader* const aShader,
-		const uint64_t aValuesLocation,
-		const uint64_t aColorLocation
-	) noexcept;
-	void set(const Material& aValue) noexcept;
+	UniformMaterial(const uint64_t aLocation) noexcept;
+	virtual ~UniformMaterial() noexcept;
 private:
-	UniformVec4 mUValues;
-	UniformVec4 mUColor;
 };
 
 #endif

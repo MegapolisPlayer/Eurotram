@@ -79,6 +79,10 @@ glm::mat3 Transform::getNormalMatrix() const noexcept {
 	this->calculateMatrix();
 	return this->mPrecalcNormalMatrix;
 }
+bool Transform::isUpdated() const noexcept {
+	return this->mPrecalculated;
+}
+
 Transform::~Transform() noexcept {}
 
 void Transform::calculateMatrix() const noexcept {

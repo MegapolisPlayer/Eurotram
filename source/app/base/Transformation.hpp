@@ -30,6 +30,8 @@ public:
 	glm::mat4 getMatrix() const noexcept;
 	glm::mat3 getNormalMatrix() const noexcept;
 
+	bool isUpdated() const noexcept;
+
 	~Transform() noexcept;
 private:
 	glm::vec3 mPos;

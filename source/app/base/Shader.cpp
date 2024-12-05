@@ -36,7 +36,7 @@ Shader::Shader(const std::string_view aVertexSource, const std::string_view aFra
 		std::string message;
 		message.resize(success);
 		glGetShaderInfoLog(vertex, GL_INFO_LOG_LENGTH, NULL, &message[0]);
-		std::cout << LogLevel::ERROR << "Vertex shader compilation failed: " << message << '\n' << LogLevel::RESET;
+		std::cout << LogLevel::ERROR << aVertexSource << " - Vertex shader compilation failed: " << message << '\n' << LogLevel::RESET;
 	}
 	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 	if(success == GL_FALSE) {
@@ -45,7 +45,7 @@ Shader::Shader(const std::string_view aVertexSource, const std::string_view aFra
 		std::string message;
 		message.resize(success);
 		glGetShaderInfoLog(fragment, GL_INFO_LOG_LENGTH, NULL, &message[0]);
-		std::cout << LogLevel::ERROR << "Fragment shader compilation failed: " << message << '\n' << LogLevel::RESET;
+		std::cout << LogLevel::ERROR << aFragmentSource << " - Fragment shader compilation failed: " << message << '\n' << LogLevel::RESET;
 	}
 
 	if(failed) { std::exit(EXIT_FAILURE); }
@@ -70,14 +70,14 @@ Shader::~Shader() {
 	glDeleteProgram(this->mHandle);
 }
 
-ShaderBuffer::ShaderBuffer(void* const arData, const uint64_t aSizeBytes) noexcept {
+ShaderBuffer::ShaderBuffer(const void* const arData, const uint64_t aSizeBytes) noexcept {
 	glGenBuffers(1, &this->mHandle);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, aSizeBytes, arData, GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, aSizeBytes, arData, GL_DYNAMIC_DRAW);
 }
-void ShaderBuffer::update(void* const arData, const uint64_t aSizeBytes) noexcept {
+void ShaderBuffer::update(const void* const arData, const uint64_t aSizeBytes) noexcept {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
-	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, aSizeBytes, arData);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, aSizeBytes, arData);
 }
 void ShaderBuffer::bind(const uint64_t aBindLocation) noexcept {
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, aBindLocation, this->mHandle);

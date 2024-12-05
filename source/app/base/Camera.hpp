@@ -47,14 +47,16 @@ public:
 	float* getFOVPointer() noexcept;
 
 	//rebuild matrices
-	void update() noexcept;
+	void update() const noexcept;
+
+	bool isUpdated() const noexcept;
 
 	~Camera() noexcept;
 private:
 	Window* mWindow;
 
-	glm::mat4 mProjection;
-	glm::mat4 mView;
+	mutable glm::mat4 mProjection;
+	mutable glm::mat4 mView;
 
 	glm::vec3 mCameraPos;
 	float mFOV;
@@ -65,8 +67,10 @@ private:
 
 	bool mEnabled;
 
+	mutable bool mPrecalculated;
+
 	glm::vec3 calculateDeltas(const float aAmount, const bool aCalculateY) noexcept;
-	void updateInternal() noexcept;
+	void updateInternal() const noexcept;
 	void pitchLimiter() noexcept;
 };
 

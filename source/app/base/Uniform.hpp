@@ -13,6 +13,18 @@ protected:
 	GLint mHandle;
 };
 
+template<typename tType>
+class StructUniform {
+public:
+	StructUniform(const uint64_t aLocation) noexcept;
+	void update(const tType* const aValue) noexcept;
+	void set() noexcept;
+	virtual ~StructUniform() noexcept;
+private:
+	ShaderBuffer mBuffer;
+	uint64_t mLocation;
+};
+
 class UniformMat4 : public Uniform<const glm::mat4&> {
 public:
 	UniformMat4(const Shader* const aShader, const uint64_t aLocationOverride) noexcept;

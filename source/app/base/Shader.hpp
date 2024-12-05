@@ -18,9 +18,9 @@ private:
 
 class ShaderBuffer {
 public:
-	ShaderBuffer(void* const arData, const uint64_t aSizeBytes) noexcept;
+	ShaderBuffer(const void* const arData, const uint64_t aSizeBytes) noexcept;
 
-	void update(void* const arData, const uint64_t aSizeBytes) noexcept;
+	void update(const void* const arData, const uint64_t aSizeBytes) noexcept;
 
 	void bind(const uint64_t aBindLocation) noexcept;
 	void unbind() noexcept;

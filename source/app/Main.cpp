@@ -68,6 +68,8 @@ void MouseCallback(Window* aWindow, double aX, double aY) {
 }
 
 int main() {
+	static_assert(sizeof(glm::vec3) == sizeof(GLfloat)*3, "Test failed: glm::vec3 has wrong size!");
+
 	std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
 	float daylightIndex = 1.0f;
 
@@ -82,7 +84,6 @@ int main() {
 	uint32_t mouseClickHandle = mainWindow.registerClickCallback(MouseClick);
 	mainWindow.hideCursor();
 
-	//data 2
 	//flip X on opposite faces! (mirror of mirror is no mirror)
 	//posX, posY, posZ, texCoord, texCoord, normalX, normalY, normalZ
 	GLfloat vertices[] = {
@@ -138,36 +139,45 @@ int main() {
 	vbo.enableAttribute(&vao, 3); //normals
     IndexBuffer ibo(indices, 36);
 
-	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
-
 	Texture texture("image.jpg", 0);
 
-	glm::mat4 model = glm::mat4(1.0f);
-	glm::mat3 normalMatrix = glm::mat3(1.0f);
-
+	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 	shader.bind();
 
 	UniformMat4 matCameraUniform(&shader, 10);
 	matCameraUniform.set(mainWindow.getCamera()->getMatrix());
-
-	UniformVec3 cameraPosUniform(&shader, 105);
-
+	UniformVec3 cameraPosUniform(&shader, 110);
 	UniformMat4 matModelUniform(&shader, 11);
 	UniformMat3 matNormalUniform(&shader, 12);
 
-	UniformVec3 objectColor(&shader, 101);
-	UniformFloat ignoreTex(&shader, 102);
+	Material objectMaterial;
+	objectMaterial.specular = 1.0f;
+	objectMaterial.shininess = 0.25f;
+	objectMaterial.diffuse = 0.5f;
+	objectMaterial.textureSlot = 0;
+	objectMaterial.textureAmount = 1.0f;
+	objectMaterial.color = {0.0f, 0.0f, 1.0f};
 
-	UniformVec3 lightPos(&shader, 103);
+	Material lightMaterial;
+	lightMaterial.specular = 1.0f;
+	lightMaterial.shininess = 1.0f;
+	lightMaterial.diffuse = 1.0f;
+	lightMaterial.textureSlot = 0;
+	lightMaterial.textureAmount = 0.0f;
+	lightMaterial.color = {1.0f, 1.0f, 1.0f};
+	lightMaterial.brightness = 1.0f;
+
+	UniformFloat ambientLightStrength(&shader, 102);
+	ambientLightStrength.set(daylightIndex);
+
+	UniformMaterial uMaterial(0);
+
+	UniformVec3 lightPos(&shader, 100);
 	glm::vec3 lightPosVector = {0.0f, 5.0f, 10.0f};
 	lightPos.set(lightPosVector);
-	UniformVec3 lightColor(&shader, 104);
-	lightColor.set({208.0f/255.0f, 128.0f/255.0f, 0.0f});
 
-	UniformFloat ambientLightStrength(&shader, 110);
-	ambientLightStrength.set(0.1);
-	UniformFloat specularLightStrength(&shader, 111);
-	specularLightStrength.set(1.0);
+	UniformVec3 lightColor(&shader, 101);
+	lightColor.set({208.0f/255.0f, 128.0f/255.0f, 0.0f});
 
 	vao.bind();
 
@@ -193,9 +203,11 @@ int main() {
 
 		uniformTimer.start();
 
+		uMaterial.update(&objectMaterial);
+		uMaterial.set();
+
 		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
-		ignoreTex.set(0.0);
 
 		uniformTimer.end();
 
@@ -227,15 +239,15 @@ int main() {
 			sunAngle = 0.0f;
 		}
 
+		uMaterial.update(&lightMaterial);
+		uMaterial.set();
+
 		lightPosVector = glm::vec3(0.0f, sin(sunAngle)*2.0f, cos(sunAngle)*2.0f);
 		lightPos.set(lightPosVector);
 		t3.setPosition(lightPosVector);
 
 		matModelUniform.set(t3.getMatrix());
 		matNormalUniform.set(t3.getNormalMatrix());
-
-		ignoreTex.set(1.0);
-		objectColor.set({1.0f, 1.0f, 1.0f});
 
 		ibo.draw();
 

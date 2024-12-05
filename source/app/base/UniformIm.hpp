@@ -19,4 +19,20 @@ Uniform<tType>::Uniform(const Shader* const aShader, const uint64_t aLocationOve
 template<typename tType>
 GLint Uniform<tType>::getHandle() const noexcept { return this->mHandle; }
 
+template<typename tType>
+StructUniform<tType>::StructUniform(const uint64_t aLocation) noexcept
+	: mBuffer(NULL, sizeof(tType)), mLocation(aLocation) {
+	this->mBuffer.bind(this->mLocation);
+}
+template<typename tType>
+void StructUniform<tType>::update(const tType* const aValue) noexcept {
+	this->mBuffer.update(aValue, sizeof(tType));
+}
+template<typename tType>
+void StructUniform<tType>::set() noexcept {
+	this->mBuffer.bind(this->mLocation);
+}
+template<typename tType>
+StructUniform<tType>::~StructUniform() noexcept {}
+
 #endif
