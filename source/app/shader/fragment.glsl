@@ -2,12 +2,6 @@
 
 //Standard shader for all objects (except light sources)
 
-out vec4 oColor;
-
-in vec2 pTexCoord;
-in vec3 pNormals;
-in vec3 pFragmentPos;
-
 //NEVER EVER USE VEC3 IN SSBO-UBO LAYOUT!
 //STD140 AND STD430 LAYOUT PACKING IS IDIOTIC AND ALIGNS TO VEC4
 //https://stackoverflow.com/questions/38172696/should-i-ever-use-a-vec3-inside-of-a-uniform-buffer-or-shader-storage-buffer-o
@@ -38,59 +32,115 @@ struct Spotlight {
 	vec4 position;
 	vec4 direction;
 	vec4 color;
+	float radius;
 
 	float constant;
 	float linear;
 	float quadratic;
 };
 
-float calculateDirectional(vec3 aFragPos, vec3 aCameraPos, Material aMat, Dirlight aLight) {
-	return 0.0;
-}
-float calculatePoint(vec3 aFragPos, vec3 aCameraPos, Material aMat, Pointlight aLight) {
-	return 0.0;
-}
-float calculateSpot(vec3 aFragPos, vec3 aCameraPos, Material aMat, Spotlight aLight) {
-	return 0.0;
-}
+out vec4 oColor;
+in vec2 pTexCoord;
+in vec3 pNormals;
+in vec3 pFragmentPos;
 
-layout(std430, binding = 0) readonly buffer sMaterial {
-	layout(align = 16) Material mat1;
+layout(std430, binding = 50) readonly buffer sMaterial {
+	Material mat1;
+};
+layout(std430, binding = 51) readonly buffer sDirlight {
+	Dirlight dl;
+};
+layout(std430, binding = 52) readonly buffer sPointlights {
+	Pointlight pointlights[];
+};
+layout(std430, binding = 53) readonly buffer sSpotlights {
+	Spotlight spotlights[];
 };
 
-layout(location = 100) uniform vec3 uLightPos;
-layout(location = 101) uniform vec3 uLightColor;
-layout(location = 102) uniform float uAmbientLight;
+layout(location = 200) uniform float uAmbientLight;
+layout(location = 210) uniform vec3 uCameraPosition;
+layout(location = 232) uniform sampler2D uTextures[32];
 
-layout(location = 110) uniform vec3 uCameraPosition;
+float attenuation(float aDistance, float aConstant, float aLinear, float aQuadratic) {
+	return 1.0/(aConstant + aLinear*aDistance + aQuadratic*aDistance*aDistance);
+}
 
-layout(location = 200) uniform sampler2D uTextures[32];
+float diffuseComp(vec3 aNormalizedNormal, vec3 aLightDirection) {
+	return max(dot(aNormalizedNormal, aLightDirection), 0.0); //dot product - "how" much is vector in our aLightDirection
+}
+float specularComp(vec3 aNormalizedNormal, vec3 aLightDirection, vec3 aViewDirection, float aShininess) {
+	vec3 halfwayDir = normalize(aLightDirection + aViewDirection); //halfway direction - Blinn-Phong
+	return pow(max(dot(aNormalizedNormal, halfwayDir), 0.0), aShininess*128.0);
+}
+
+//calculate specular only if some diffuse present
+
+vec3 calculateDirectional(vec3 aNormalizedNormal, vec3 aViewDirection, Material aMat, Dirlight aLight) {
+	vec3 lightDirection = normalize(-aLight.direction.xyz); //vector from (NOT TO) the light
+	float diffuseValue = 0.5 * diffuseComp(aNormalizedNormal, lightDirection);
+	float specularValue = aMat.specular * specularComp(aNormalizedNormal, lightDirection, aViewDirection, aMat.shininess) * float(diffuseValue >= 0.01);
+	float lightingValue = diffuseValue + specularValue;
+
+	float override = float(aMat.brightness >= lightingValue);
+	return mix(lightingValue * aLight.color.xyz, vec3(aMat.brightness), vec3(override));
+}
+
+vec3 calculatePoint(vec3 aNormalizedNormal, vec3 aViewDirection, vec3 aFragPos, Material aMat, Pointlight aLight) {
+	float distanceFromLight = length(aLight.position.xyz - aFragPos);
+	vec3 lightPosDirection = normalize(aLight.position.xyz - aFragPos); //subtracting vectors
+
+	float diffuseValue = 0.5 * diffuseComp(aNormalizedNormal, lightPosDirection);
+	float specularValue = aMat.specular * specularComp(aNormalizedNormal, lightPosDirection, aViewDirection, aMat.shininess) * float(diffuseValue >= 0.01);
+	float lightingValue = (diffuseValue + specularValue) *
+	attenuation(distanceFromLight, aLight.constant, aLight.linear, aLight.quadratic);
+
+	float override = float(aMat.brightness >= lightingValue);
+	return mix(lightingValue * aLight.color.xyz, vec3(aMat.brightness), vec3(override));
+}
+
+vec3 calculateSpot(vec3 aNormalizedNormal, vec3 aViewDirection, vec3 aFragPos, Material aMat, Spotlight aLight) {
+	float distanceFromLight = length(aLight.position.xyz - aFragPos);
+	vec3 lightPosDirection = normalize(aLight.position.xyz - aFragPos);
+
+	//dot product returns cosine of angle
+	float theta = dot(lightPosDirection, normalize(-aLight.direction.xyz));
+	if(acos(theta) > radians(aLight.radius)) { return vec3(0.0); } //TODO benchmark
+
+	float diffuseValue = 0.5 * diffuseComp(aNormalizedNormal, lightPosDirection);
+	float specularValue = aMat.specular * specularComp(aNormalizedNormal, lightPosDirection, aViewDirection, aMat.shininess) * float(diffuseValue >= 0.01);
+	float lightingValue = (diffuseValue + specularValue) *
+	attenuation(distanceFromLight, aLight.constant, aLight.linear, aLight.quadratic);
+
+	float override = float(aMat.brightness >= lightingValue);
+	return mix(lightingValue * aLight.color.xyz, vec3(aMat.brightness), vec3(override));
+}
 
 void main() {
 	vec4 baseColor = mix(mat1.color, texture(uTextures[mat1.textureSlot], pTexCoord), vec4(mat1.textureAmount));
 
-	//lighting component
 	vec3 normalizedNormal = normalize(pNormals);
-	vec3 lightPosDirection = normalize(uLightPos - pFragmentPos); //subtracting vectors
-
-	//diffuse
-	float diffuseValue = max(dot(normalizedNormal, lightPosDirection), 0.0); //dot product - "how" much is vector in our lightPosDirection
-
-	//specular
 	vec3 viewDirection = normalize(uCameraPosition - pFragmentPos);
-	vec3 halfwayDir = normalize(lightPosDirection + viewDirection); //halfway direction - Blinn-Phong
-	float specularValue = mat1.specular * pow(max(dot(normalizedNormal, halfwayDir), 0.0), mat1.shininess*128.0);
 
-	//old Phong
-	//vec3 reflectionDirection = reflect(-lightPosDirection, normalizedNormal);
-	//float specularValue = mat1.specular * pow(max(dot(viewDirection, reflectionDirection), 0.0), mat1.shininess*128.0);
+	//calc dl - directional light
+	vec3 lighting = calculateDirectional(normalizedNormal, viewDirection, mat1, dl);
 
-	//weight lighting
-	float lightingValue = uAmbientLight + diffuseValue*0.5 + specularValue;
-	float override = float(mat1.brightness >= lightingValue);
+	//calculate point lights
+	for(int i = 0; i < pointlights.length(); i++) {
+		lighting += calculatePoint(
+			normalizedNormal, viewDirection, pFragmentPos,
+			mat1, pointlights[i]
+		);
+	}
 
-	vec3 lighting = mix(lightingValue * uLightColor, vec3(mat1.brightness), vec3(override));
+	//calculate spot lights
+	for(int i = 0; i < spotlights.length(); i++) {
+		lighting += calculateSpot(
+			normalizedNormal, viewDirection, pFragmentPos,
+			mat1, spotlights[i]
+		);
+	}
 
 	//putting together
-	oColor = baseColor * vec4(lighting, 1.0);
+	oColor = baseColor * vec4(max(lighting, vec3(uAmbientLight)), 1.0);
+	//oColor = vec4(vec3(float(pointlights.length())*0.5), 1.0); //debug line
 };

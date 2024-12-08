@@ -44,6 +44,7 @@ public:
 
 	glm::mat4 getMatrix() const noexcept;
 	glm::vec3 getPosition() const noexcept;
+	glm::vec3 getDirection() const noexcept;
 	float* getFOVPointer() noexcept;
 
 	//rebuild matrices
@@ -64,6 +65,8 @@ private:
 	float mPitch;
 	float mFarPlane;
 	float mSpeed;
+
+	mutable glm::vec3 mDirection;
 
 	bool mEnabled;
 

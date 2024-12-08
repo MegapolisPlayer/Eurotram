@@ -70,14 +70,20 @@ Shader::~Shader() {
 	glDeleteProgram(this->mHandle);
 }
 
-ShaderBuffer::ShaderBuffer(const void* const arData, const uint64_t aSizeBytes) noexcept {
+ShaderBuffer::ShaderBuffer(const void* const arData, const uint64_t aSizeBytes) noexcept
+	: mHandle(0), mSizeBytes(aSizeBytes) {
 	glGenBuffers(1, &this->mHandle);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, aSizeBytes, arData, GL_DYNAMIC_DRAW);
 }
-void ShaderBuffer::update(const void* const arData, const uint64_t aSizeBytes) noexcept {
+void ShaderBuffer::update(const void* const arData, const uint64_t aSizeBytes, const uint64_t aOffset) noexcept {
+	if(aOffset+aSizeBytes > this->mSizeBytes) {
+		std::cerr << LogLevel::ERROR << "SSBO read out of range!\n" << LogLevel::RESET;
+		std::exit(EXIT_FAILURE);
+	}
+
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
-	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, aSizeBytes, arData);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, aOffset, aSizeBytes-aOffset, arData);
 }
 void ShaderBuffer::bind(const uint64_t aBindLocation) noexcept {
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, aBindLocation, this->mHandle);

@@ -15,7 +15,7 @@ struct alignas(16) Material {
 
 class UniformMaterial : public StructUniform<Material> {
 public:
-	UniformMaterial(const uint64_t aLocation) noexcept;
+	UniformMaterial(const uint64_t aLocation, const uint64_t aAmount = 1) noexcept;
 	virtual ~UniformMaterial() noexcept;
 private:
 };

@@ -144,9 +144,11 @@ int main() {
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 	shader.bind();
 
+	vao.bind();
+
 	UniformMat4 matCameraUniform(&shader, 10);
 	matCameraUniform.set(mainWindow.getCamera()->getMatrix());
-	UniformVec3 cameraPosUniform(&shader, 110);
+	UniformVec3 cameraPosUniform(&shader, 210);
 	UniformMat4 matModelUniform(&shader, 11);
 	UniformMat3 matNormalUniform(&shader, 12);
 
@@ -167,24 +169,44 @@ int main() {
 	lightMaterial.color = {1.0f, 0.0f, 1.0f, 1.0f};
 	lightMaterial.brightness = 1.0f;
 
-	UniformFloat ambientLightStrength(&shader, 102);
+	Dirlight d;
+	d.color = {208.0f/255.0f, 128.0f/255.0f, 0.0f, 1.0f};
+	glm::mat4 rotationMatrix = glm::mat4(1.0);
+	d.direction = glm::vec4(0.0f, -1.0f, 0.0f, 1.0f);
+
+	UniformDirlight uDirlight(51);
+	uDirlight.update(&d);
+	uDirlight.set();
+
+	Pointlight p;
+	p.color = {1.0f, 0.0f, 1.0f, 1.0f};
+	p.position = {0.0f, 5.0f, 0.0f, 0.0f};
+	setAttenuation(AttenuationValues::DISTANCE_100, &p.constant, &p.linear, &p.quadratic);
+
+	Spotlight s;
+	s.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	s.radius = 20;
+	setAttenuation(AttenuationValues::DISTANCE_7, &s.constant, &s.linear, &s.quadratic);
+
+	UniformPointlight uPoints(52, 1);
+	uPoints.update(&p);
+	uPoints.set();
+
+	UniformSpotlight uSpots(53);
+	uSpots.update(&s);
+	uSpots.set();
+
+	UniformFloat ambientLightStrength(&shader, 200);
 	ambientLightStrength.set(daylightIndex);
 
-	UniformMaterial uMaterial(0);
-
-	UniformVec3 lightPos(&shader, 100);
-	glm::vec3 lightPosVector = {0.0f, 5.0f, 10.0f};
-	lightPos.set(lightPosVector);
-
-	UniformVec3 lightColor(&shader, 101);
-	lightColor.set({208.0f/255.0f, 128.0f/255.0f, 0.0f});
-
-	vao.bind();
+	UniformMaterial uMaterial(50);
 
 	Timer loopTimer;
 	Timer guiTimer;
 	Timer drawTimer;
 	Timer uniformTimer;
+
+	TimerAverage avgFrame;
 
 	float sunAngle = 0;
 
@@ -204,10 +226,14 @@ int main() {
 		uniformTimer.start();
 
 		uMaterial.update(&objectMaterial);
-		uMaterial.set();
 
 		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
+
+		s.position = glm::vec4(mainWindow.getCamera()->getPosition(), 1.0);
+		s.direction = glm::vec4(mainWindow.getCamera()->getDirection(), 1.0);
+		uSpots.update(&s);
+		uPoints.update(&p);
 
 		uniformTimer.end();
 
@@ -223,7 +249,6 @@ int main() {
 		//second cube
 
 		//glm::vec3(0.5f, 1.0f, 0.0f)
-
 		t2.setRotationX(20.0f*(float)glfwGetTime()*0.5f);
 		t2.setRotationY(20.0f*(float)glfwGetTime());
 
@@ -234,17 +259,12 @@ int main() {
 
 		//light cube
 
-		sunAngle += 0.0001f;
-		if(sunAngle >= 360.0f) {
-			sunAngle = 0.0f;
-		}
-
 		uMaterial.update(&lightMaterial);
-		uMaterial.set();
 
-		lightPosVector = glm::vec3(0.0f, sin(sunAngle)*2.0f, cos(sunAngle)*2.0f);
-		lightPos.set(lightPosVector);
-		t3.setPosition(lightPosVector);
+		//uSpots.update(&s);
+		uPoints.update(&p);
+
+		t3.setPosition(p.position);
 
 		matModelUniform.set(t3.getMatrix());
 		matNormalUniform.set(t3.getNormalMatrix());
@@ -265,6 +285,16 @@ int main() {
 		if(ImGui::SliderFloat("Daylight index",  &daylightIndex, 0.0, 1.0)) {
 			mainWindow.setBackgroundColor(daylightColor*daylightIndex);
 			ambientLightStrength.set(daylightIndex);
+		}
+		if(ImGui::SliderFloat("Sun angle",  &sunAngle, 0.0, 360.0)) {
+			rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(sunAngle), glm::vec3(1.0f, 0.0f, 0.0f));
+			d.direction = rotationMatrix * glm::vec4(0.0f, -1.0f, 0.0f, 1.0f);
+			uDirlight.update(&d);
+			uDirlight.set();
+		}
+		if(ImGui::SliderFloat3("Point light position", glm::value_ptr(p.position), -10.0, 10.0)) {
+			uPoints.update(&p);
+			uPoints.set();
 		}
 
 		ImGui::End();
@@ -318,7 +348,10 @@ int main() {
 		guiTimer.end();
 
         mainWindow.endFrame();
-		loopTimer.end();
+		loopTimer.end(avgFrame);
     }
+
+    std::cout << "Frametime average\n" << avgFrame.getAverageUSfloat() << "us\n";
+
     return 0;
 }

@@ -9,7 +9,7 @@ void Window::updateCamera() noexcept {
 
 //so we start oriented correctly: 0 is to the right (+X axis), 90 is back
 Camera::Camera(Window* aWindow, const glm::vec3& aCameraPos, const float aFOV, const float aFarPlane, const float aSpeed) noexcept
-	: mWindow(aWindow), mCameraPos(aCameraPos), mFOV(aFOV), mFarPlane(aFarPlane), mSpeed(aSpeed), mPitch(0.0), mYaw(-90.0), mEnabled(true), mPrecalculated(false) {
+	: mWindow(aWindow), mCameraPos(aCameraPos), mFOV(aFOV), mFarPlane(aFarPlane), mSpeed(aSpeed), mPitch(0.0), mYaw(-90.0), mDirection(1.0f), mEnabled(true), mPrecalculated(false) {
 	this->update();
 	this->mWindow->bindCamera(this);
 }
@@ -132,6 +132,10 @@ glm::mat4 Camera::getMatrix() const noexcept {
 glm::vec3 Camera::getPosition() const noexcept {
 	return this->mCameraPos;
 }
+glm::vec3 Camera::getDirection() const noexcept {
+	this->update();
+	return this->mDirection;
+}
 float* Camera::getFOVPointer() noexcept {
 	return &this->mFOV;
 }
@@ -142,15 +146,15 @@ void Camera::update() const noexcept {
 
 	if(this->mPrecalculated) return;
 
-	glm::vec3 Direction = glm::vec3();
+	this->mDirection = glm::vec3();
 	//first part - trigoniometry (where are we looking)
 	//multiplied because affected by Y movement
-	Direction.x = cos(glm::radians(this->mYaw)) * cos(glm::radians(this->mPitch));
-	Direction.y = sin(glm::radians(this->mPitch));
-	Direction.z = sin(glm::radians(this->mYaw)) * cos(glm::radians(this->mPitch));
-	Direction = glm::normalize(Direction);
+	this->mDirection.x = cos(glm::radians(this->mYaw)) * cos(glm::radians(this->mPitch));
+	this->mDirection.y = sin(glm::radians(this->mPitch));
+	this->mDirection.z = sin(glm::radians(this->mYaw)) * cos(glm::radians(this->mPitch));
+	this->mDirection = glm::normalize(this->mDirection);
 
-	this->mView = glm::lookAt(this->mCameraPos, this->mCameraPos + Direction, glm::vec3(0.0, 1.0, 0.0));
+	this->mView = glm::lookAt(this->mCameraPos, this->mCameraPos + this->mDirection, glm::vec3(0.0, 1.0, 0.0));
 
 	this->mPrecalculated = true;
 }

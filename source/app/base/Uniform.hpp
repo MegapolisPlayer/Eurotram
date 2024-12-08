@@ -13,16 +13,20 @@ protected:
 	GLint mHandle;
 };
 
+//TODO make set take args and rename update to bind()
+
 template<typename tType>
 class StructUniform {
 public:
-	StructUniform(const uint64_t aLocation) noexcept;
-	void update(const tType* const aValue) noexcept;
+	StructUniform(const uint64_t aLocation, const uint64_t aAmount) noexcept;
+	//last element NON inclusive
+	void update(const tType* const aValue, const uint64_t aFirstElem = 0, const uint64_t aLastElem = 0) noexcept;
 	void set() noexcept;
 	virtual ~StructUniform() noexcept;
 private:
 	ShaderBuffer mBuffer;
 	uint64_t mLocation;
+	uint64_t mAmount;
 };
 
 class UniformMat4 : public Uniform<const glm::mat4&> {

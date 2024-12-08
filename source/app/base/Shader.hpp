@@ -20,7 +20,7 @@ class ShaderBuffer {
 public:
 	ShaderBuffer(const void* const arData, const uint64_t aSizeBytes) noexcept;
 
-	void update(const void* const arData, const uint64_t aSizeBytes) noexcept;
+	void update(const void* const arData, const uint64_t aSizeBytes, const uint64_t aOffset = 0) noexcept;
 
 	void bind(const uint64_t aBindLocation) noexcept;
 	void unbind() noexcept;
@@ -30,6 +30,7 @@ public:
 	~ShaderBuffer() noexcept;
 private:
 	GLuint mHandle;
+	uint64_t mSizeBytes;
 };
 
 #endif

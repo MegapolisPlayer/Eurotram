@@ -67,6 +67,11 @@ void Timer::start() noexcept {
 void Timer::end() noexcept {
 	this->mDuration = std::chrono::duration_cast<std::chrono::nanoseconds>((std::chrono::system_clock::now() - this->mStart));
 }
+void Timer::end(TimerAverage& aAvg) noexcept {
+	this->mDuration = std::chrono::duration_cast<std::chrono::nanoseconds>((std::chrono::system_clock::now() - this->mStart));
+	aAvg.mMicroseconds += this->getUS();
+	aAvg.mAmount++;
+}
 
 uint64_t Timer::getMS() const noexcept {
 	return this->mDuration.count()/1000000;
@@ -86,3 +91,27 @@ float Timer::getUSfloat() const noexcept {
 }
 
 Timer::~Timer() noexcept {}
+
+TimerAverage::TimerAverage() noexcept
+	:mMicroseconds(0), mAmount(0) {}
+
+void TimerAverage::addTimer(const Timer& aTimer) noexcept {
+	this->mMicroseconds += aTimer.getUS();
+	this->mAmount++;
+}
+
+uint64_t TimerAverage::getAverageMS() const noexcept {
+	return (this->mMicroseconds/1000)/this->mAmount;
+}
+float TimerAverage::getAverageMSfloat() const noexcept {
+	return float(this->mMicroseconds/1000.0f)/float(this->mAmount);
+}
+
+uint64_t TimerAverage::getAverageUS() const noexcept {
+	return this->mMicroseconds/this->mAmount;
+}
+float TimerAverage::getAverageUSfloat() const noexcept {
+	return float(this->mMicroseconds)/float(this->mAmount);
+}
+
+TimerAverage::~TimerAverage() noexcept {}

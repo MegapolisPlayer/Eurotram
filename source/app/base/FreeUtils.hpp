@@ -67,12 +67,15 @@ typedef std::chrono::system_clock::time_point TimerType;
 
 // TIME UTILITIES
 
+class TimerAverage;
+
 class Timer {
 public:
 	Timer() noexcept;
 
 	void start() noexcept;
 	void end() noexcept;
+	void end(TimerAverage& aAvg) noexcept; //saves time to TimerAverage
 
 	uint64_t getMS() const noexcept;
 	uint64_t getUS() const noexcept;
@@ -85,6 +88,25 @@ public:
 private:
 	std::chrono::system_clock::time_point mStart;
 	std::chrono::system_clock::duration mDuration;
+};
+
+class TimerAverage {
+	friend class Timer;
+public:
+	TimerAverage() noexcept;
+
+	void addTimer(const Timer& aTimer) noexcept;
+
+	uint64_t getAverageMS() const noexcept;
+	float getAverageMSfloat() const noexcept;
+
+	uint64_t getAverageUS() const noexcept;
+	float getAverageUSfloat() const noexcept;
+
+	~TimerAverage() noexcept;
+private:
+	uint64_t mMicroseconds;
+	uint64_t mAmount;
 };
 
 // OTHER

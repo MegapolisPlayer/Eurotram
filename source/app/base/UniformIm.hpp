@@ -19,13 +19,20 @@ template<typename tType>
 GLint Uniform<tType>::getHandle() const noexcept { return this->mHandle; }
 
 template<typename tType>
-StructUniform<tType>::StructUniform(const uint64_t aLocation) noexcept
-	: mBuffer(NULL, sizeof(tType)), mLocation(aLocation) {
+StructUniform<tType>::StructUniform(const uint64_t aLocation, const uint64_t aAmount) noexcept
+	: mBuffer(NULL, sizeof(tType)*aAmount), mLocation(aLocation), mAmount(aAmount) {
 	this->mBuffer.bind(this->mLocation);
 }
 template<typename tType>
-void StructUniform<tType>::update(const tType* const aValue) noexcept {
-	this->mBuffer.update(aValue, sizeof(tType));
+void StructUniform<tType>::update(const tType* const aValue, const uint64_t aFirstElem, const uint64_t aLastElem) noexcept {
+	this->mBuffer.bind(this->mLocation);
+	if(aLastElem == 0) {
+		//whole buffer
+		this->mBuffer.update(aValue, sizeof(tType)*(this->mAmount-aFirstElem), sizeof(tType)*aFirstElem);
+	}
+	else {
+		this->mBuffer.update(aValue, sizeof(tType)*(aLastElem-aFirstElem), sizeof(tType)*aFirstElem);
+	}
 }
 template<typename tType>
 void StructUniform<tType>::set() noexcept {
