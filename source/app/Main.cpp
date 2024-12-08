@@ -151,20 +151,20 @@ int main() {
 	UniformMat3 matNormalUniform(&shader, 12);
 
 	Material objectMaterial;
-	objectMaterial.specular = 1.0f;
-	objectMaterial.shininess = 0.25f;
+	objectMaterial.shininess = 1.0f;
+	objectMaterial.specular = 0.5f;
 	objectMaterial.diffuse = 0.5f;
 	objectMaterial.textureSlot = 0;
 	objectMaterial.textureAmount = 1.0f;
-	objectMaterial.color = {0.0f, 0.0f, 1.0f};
+	objectMaterial.color = {0.0f, 0.0f, 0.0f, 1.0f};
 
 	Material lightMaterial;
-	lightMaterial.specular = 1.0f;
 	lightMaterial.shininess = 1.0f;
+	lightMaterial.specular = 1.0f;
 	lightMaterial.diffuse = 1.0f;
 	lightMaterial.textureSlot = 0;
 	lightMaterial.textureAmount = 0.0f;
-	lightMaterial.color = {1.0f, 1.0f, 1.0f};
+	lightMaterial.color = {1.0f, 0.0f, 1.0f, 1.0f};
 	lightMaterial.brightness = 1.0f;
 
 	UniformFloat ambientLightStrength(&shader, 102);
@@ -259,13 +259,9 @@ int main() {
 
 		ImGui::Begin("Settings");
 
-		ImGui::Text("FOV: %f", *windowCamera.getFOVPointer());
 		if(ImGui::SliderFloat("FOV", windowCamera.getFOVPointer(), 30.0, 90.0)) {
-			//if changed
 			windowCamera.update();
 		}
-
-		ImGui::Text("Daylight index: %f", daylightIndex);
 		if(ImGui::SliderFloat("Daylight index",  &daylightIndex, 0.0, 1.0)) {
 			mainWindow.setBackgroundColor(daylightColor*daylightIndex);
 			ambientLightStrength.set(daylightIndex);

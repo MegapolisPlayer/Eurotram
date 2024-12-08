@@ -15,7 +15,6 @@ Uniform<tType>::Uniform(const Shader* const aShader, const uint64_t aLocationOve
 	this->mHandle = aLocationOverride;
 }
 
-
 template<typename tType>
 GLint Uniform<tType>::getHandle() const noexcept { return this->mHandle; }
 

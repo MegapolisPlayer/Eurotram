@@ -17,7 +17,7 @@ jobs:
         id: scc
         uses: Adapt-API/scc-docker-action@master
         with:
-          args: ${{ env.workspace }} -i h,cpp,inl,hpp,c,cc,ino,bat,sh --exclude-dir depend,testproj
+          args: ${{ env.workspace }} -i h,cpp,inl,hpp,c,cc,ino,bat,sh,glsl,js,css,html --exclude-dir depend,assets
       - name: Output
         run: |
           echo

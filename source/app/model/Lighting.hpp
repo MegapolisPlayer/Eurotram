@@ -2,18 +2,18 @@
 #define EUROTRAM_LIGHTING
 #include "Material.hpp"
 
+//we cannot use vec3 since OpenGL's std140 and std430 packings are completely idiotic and pass it as a vec4
+
 //uses: sun
 struct Dirlight {
-	glm::vec3 direction;
-	glm::vec3 color;
-	float ambient;
+	glm::vec4 direction; //last param ignored
+	glm::vec4 color; //last param strength
 };
 
 //uses: lights inside vehicle(s)
 struct Pointlight {
-	glm::vec3 position;
-	glm::vec3 color;
-	float ambient;
+	glm::vec4 position; //last param ignored
+	glm::vec4 color; //last param strength
 
 	float constant;
 	float linear;
@@ -22,10 +22,9 @@ struct Pointlight {
 
 //uses: street lamps, headlights...
 struct Spotlight {
-	glm::vec3 position;
-	glm::vec3 direction;
-	glm::vec3 color;
-	float ambient;
+	glm::vec4 position; //last param ignored
+	glm::vec4 direction; //last param ignored
+	glm::vec4 color; //last param strength
 
 	float constant;
 	float linear;

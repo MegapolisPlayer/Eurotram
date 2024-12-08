@@ -8,18 +8,51 @@ in vec2 pTexCoord;
 in vec3 pNormals;
 in vec3 pFragmentPos;
 
+//NEVER EVER USE VEC3 IN SSBO-UBO LAYOUT!
+//STD140 AND STD430 LAYOUT PACKING IS IDIOTIC AND ALIGNS TO VEC4
+//https://stackoverflow.com/questions/38172696/should-i-ever-use-a-vec3-inside-of-a-uniform-buffer-or-shader-storage-buffer-o
 struct Material {
+	vec4 color;
 	float diffuse;
 	float specular;
-	float roughness;
 	float shininess;
 
 	float textureAmount;
 	int textureSlot;
-	float transparency;
 	float brightness;
-	vec3 color;
 };
+
+struct Dirlight {
+	vec4 direction;
+	vec4 color;
+};
+struct Pointlight {
+	vec4 position;
+	vec4 color;
+
+	float constant;
+	float linear;
+	float quadratic;
+};
+struct Spotlight {
+	vec4 position;
+	vec4 direction;
+	vec4 color;
+
+	float constant;
+	float linear;
+	float quadratic;
+};
+
+float calculateDirectional(vec3 aFragPos, vec3 aCameraPos, Material aMat, Dirlight aLight) {
+	return 0.0;
+}
+float calculatePoint(vec3 aFragPos, vec3 aCameraPos, Material aMat, Pointlight aLight) {
+	return 0.0;
+}
+float calculateSpot(vec3 aFragPos, vec3 aCameraPos, Material aMat, Spotlight aLight) {
+	return 0.0;
+}
 
 layout(std430, binding = 0) readonly buffer sMaterial {
 	layout(align = 16) Material mat1;
@@ -34,7 +67,7 @@ layout(location = 110) uniform vec3 uCameraPosition;
 layout(location = 200) uniform sampler2D uTextures[32];
 
 void main() {
-	vec4 baseColor = mix(vec4(mat1.color, mat1.transparency), texture(uTextures[mat1.textureSlot], pTexCoord), vec4(mat1.textureAmount));
+	vec4 baseColor = mix(mat1.color, texture(uTextures[mat1.textureSlot], pTexCoord), vec4(mat1.textureAmount));
 
 	//lighting component
 	vec3 normalizedNormal = normalize(pNormals);
