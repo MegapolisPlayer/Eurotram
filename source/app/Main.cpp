@@ -219,6 +219,13 @@ int main() {
 	Transform t3;
 	t3.setScale(0.2f);
 
+	// model loading - TODO abstract
+
+	Assimp::Importer modelLoader;
+	const aiScene* scene = modelLoader.ReadFile("T3.gltf", aiProcess_Triangulate | aiProcess_FlipUVs);
+
+	// model loading end
+
     while (mainWindow.isOpen()) {
 		loopTimer.start();
         mainWindow.beginFrame();

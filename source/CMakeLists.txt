@@ -70,9 +70,10 @@ target_include_directories(eurotram PUBLIC
 "depend/"
 "depend/imgui/"
 "depend/imgui/backends/"
+"depend/assimp/"
 )
 target_link_directories(eurotram PUBLIC "depend/")
-target_link_libraries(eurotram PUBLIC -lGL -lglfw -lGLEW)
+target_link_libraries(eurotram PUBLIC -lGL -lglfw -lGLEW -lassimp)
 
 
 

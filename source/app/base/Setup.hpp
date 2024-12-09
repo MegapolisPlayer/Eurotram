@@ -28,6 +28,10 @@ r Raw Arrays
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include <iostream>
 #include <fstream>
 #include <array>
@@ -36,7 +40,7 @@ r Raw Arrays
 
 #define FILE_READ_BLOCK_SIZE 8192
 
-#ifdef _WIN32 //Windows-only
+#ifdef _WIN32 //Win./eurotrdows-only
 	#define WIN32_LEAN_AND_MEAN //save on size
 	#include <windows.h> //color changing on windows
 	#include <tchar.h>   //console title

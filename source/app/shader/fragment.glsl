@@ -103,13 +103,16 @@ vec3 calculateSpot(vec3 aNormalizedNormal, vec3 aViewDirection, vec3 aFragPos, M
 	vec3 lightPosDirection = normalize(aLight.position.xyz - aFragPos);
 
 	//dot product returns cosine of angle
-	float theta = dot(lightPosDirection, normalize(-aLight.direction.xyz));
-	if(acos(theta) > radians(aLight.radius)) { return vec3(0.0); } //TODO benchmark
+	float theta = acos(dot(lightPosDirection, normalize(-aLight.direction.xyz)));
+	float epsilon = -5.0; //extra cutoff angle
+
+	//divide difference between outer angle and our angle by outer angle
+	float strength = clamp((theta - (aLight.radius + 5.0)) / -5.0, 0.0, 1.0);
 
 	float diffuseValue = 0.5 * diffuseComp(aNormalizedNormal, lightPosDirection);
 	float specularValue = aMat.specular * specularComp(aNormalizedNormal, lightPosDirection, aViewDirection, aMat.shininess) * float(diffuseValue >= 0.01);
 	float lightingValue = (diffuseValue + specularValue) *
-	attenuation(distanceFromLight, aLight.constant, aLight.linear, aLight.quadratic);
+	attenuation(distanceFromLight, aLight.constant, aLight.linear, aLight.quadratic) * strength;
 
 	float override = float(aMat.brightness >= lightingValue);
 	return mix(lightingValue * aLight.color.xyz, vec3(aMat.brightness), vec3(override));

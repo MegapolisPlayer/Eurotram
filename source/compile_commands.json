@@ -1,199 +1,277 @@
 [
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/audio/Announcements.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/audio/Announcements.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/audio/Announcements.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/audio/Announcements.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/audio/Announcements.cpp",
   "output": "CMakeFiles/eurotram.dir/app/audio/Announcements.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/audio/Dispatcher.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/audio/Dispatcher.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/audio/Dispatcher.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/audio/Dispatcher.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/audio/Dispatcher.cpp",
   "output": "CMakeFiles/eurotram.dir/app/audio/Dispatcher.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/audio/SFX.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/audio/SFX.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/audio/SFX.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/audio/SFX.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/audio/SFX.cpp",
   "output": "CMakeFiles/eurotram.dir/app/audio/SFX.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Batcher.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Batcher.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Batcher.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Batcher.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Batcher.cpp",
   "output": "CMakeFiles/eurotram.dir/app/base/Batcher.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Buffer.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Buffer.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Buffer.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Buffer.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Buffer.cpp",
   "output": "CMakeFiles/eurotram.dir/app/base/Buffer.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Shader.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Shader.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Shader.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Shader.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Shader.cpp",
   "output": "CMakeFiles/eurotram.dir/app/base/Shader.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Texture.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Texture.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Texture.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Texture.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Texture.cpp",
   "output": "CMakeFiles/eurotram.dir/app/base/Texture.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/FrustumCulling.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/FrustumCulling.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/FrustumCulling.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/FrustumCulling.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/FrustumCulling.cpp",
   "output": "CMakeFiles/eurotram.dir/app/base/FrustumCulling.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Window.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Window.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Window.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Window.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Window.cpp",
   "output": "CMakeFiles/eurotram.dir/app/base/Window.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Lighting.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Lighting.cpp",
-  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Lighting.cpp",
-  "output": "CMakeFiles/eurotram.dir/app/base/Lighting.cpp.o"
-},
-{
-  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/FreeUtils.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/FreeUtils.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/FreeUtils.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/FreeUtils.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/FreeUtils.cpp",
   "output": "CMakeFiles/eurotram.dir/app/base/FreeUtils.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Camera.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Camera.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Camera.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Camera.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Camera.cpp",
   "output": "CMakeFiles/eurotram.dir/app/base/Camera.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Uniform.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Uniform.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Uniform.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Uniform.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Uniform.cpp",
   "output": "CMakeFiles/eurotram.dir/app/base/Uniform.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/model/ModelLoading.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/ModelLoading.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/base/Transformation.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Transformation.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/base/Transformation.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/base/Transformation.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/model/Lighting.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Lighting.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Lighting.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/model/Lighting.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/model/Sky.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Sky.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Sky.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/model/Sky.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/model/Material.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Material.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Material.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/model/Material.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/model/ModelLoading.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/ModelLoading.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/ModelLoading.cpp",
   "output": "CMakeFiles/eurotram.dir/app/model/ModelLoading.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/model/Mesh.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Mesh.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/model/Mesh.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Mesh.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Mesh.cpp",
   "output": "CMakeFiles/eurotram.dir/app/model/Mesh.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/objects/Object.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Object.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/model/Bones.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Bones.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/model/Bones.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/model/Bones.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/objects/Button.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Button.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Button.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/objects/Button.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/objects/Object.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Object.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Object.cpp",
   "output": "CMakeFiles/eurotram.dir/app/objects/Object.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/Force.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Force.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/objects/Station.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Station.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Station.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/objects/Station.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/objects/Vehicle.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Vehicle.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Vehicle.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/objects/Vehicle.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/objects/Trigger.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Trigger.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Trigger.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/objects/Trigger.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/objects/Track.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Track.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/Track.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/objects/Track.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/objects/vehicles/T3RP.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/vehicles/T3RP.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/objects/vehicles/T3RP.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/objects/vehicles/T3RP.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/Force.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Force.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Force.cpp",
   "output": "CMakeFiles/eurotram.dir/app/physics/Force.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/Friction.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Friction.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/Friction.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Friction.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Friction.cpp",
   "output": "CMakeFiles/eurotram.dir/app/physics/Friction.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/Simulation.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Simulation.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/Simulation.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Simulation.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Simulation.cpp",
   "output": "CMakeFiles/eurotram.dir/app/physics/Simulation.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/ElectricalCircuit.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/ElectricalCircuit.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/ElectricalCircuit.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/ElectricalCircuit.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/ElectricalCircuit.cpp",
   "output": "CMakeFiles/eurotram.dir/app/physics/ElectricalCircuit.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/Weather.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Weather.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/Weather.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Weather.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/Weather.cpp",
   "output": "CMakeFiles/eurotram.dir/app/physics/Weather.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/track/Bezier.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/track/Bezier.cpp",
-  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/track/Bezier.cpp",
-  "output": "CMakeFiles/eurotram.dir/app/track/Bezier.cpp.o"
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/physics/FlangeClimbing.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/FlangeClimbing.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/physics/FlangeClimbing.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/physics/FlangeClimbing.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/track/TrackGenerator.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/track/TrackGenerator.cpp",
-  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/track/TrackGenerator.cpp",
-  "output": "CMakeFiles/eurotram.dir/app/track/TrackGenerator.cpp.o"
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/area/Bezier.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/area/Bezier.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/area/Bezier.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/area/Bezier.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/track/TrackLoader.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/track/TrackLoader.cpp",
-  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/track/TrackLoader.cpp",
-  "output": "CMakeFiles/eurotram.dir/app/track/TrackLoader.cpp.o"
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/area/TrackGenerator.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/area/TrackGenerator.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/area/TrackGenerator.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/area/TrackGenerator.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/ui/HUD.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/ui/HUD.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/area/TrackLoader.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/area/TrackLoader.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/area/TrackLoader.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/area/TrackLoader.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/area/Building.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/area/Building.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/area/Building.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/area/Building.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/area/Chunking.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/area/Chunking.cpp",
+  "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/area/Chunking.cpp",
+  "output": "CMakeFiles/eurotram.dir/app/area/Chunking.cpp.o"
+},
+{
+  "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/ui/HUD.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/ui/HUD.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/ui/HUD.cpp",
   "output": "CMakeFiles/eurotram.dir/app/ui/HUD.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/ui/MainMenu.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/ui/MainMenu.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/ui/MainMenu.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/ui/MainMenu.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/ui/MainMenu.cpp",
   "output": "CMakeFiles/eurotram.dir/app/ui/MainMenu.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/app/Main.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/Main.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/app/Main.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/Main.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/app/Main.cpp",
   "output": "CMakeFiles/eurotram.dir/app/Main.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/imgui.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/imgui.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui.cpp",
   "output": "CMakeFiles/eurotram.dir/depend/imgui/imgui.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/imgui_tables.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui_tables.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/imgui_tables.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui_tables.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui_tables.cpp",
   "output": "CMakeFiles/eurotram.dir/depend/imgui/imgui_tables.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/imgui_widgets.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui_widgets.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/imgui_widgets.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui_widgets.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui_widgets.cpp",
   "output": "CMakeFiles/eurotram.dir/depend/imgui/imgui_widgets.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/imgui_draw.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui_draw.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/imgui_draw.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui_draw.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/imgui_draw.cpp",
   "output": "CMakeFiles/eurotram.dir/depend/imgui/imgui_draw.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/backends/imgui_impl_opengl3.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends/imgui_impl_opengl3.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/backends/imgui_impl_opengl3.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends/imgui_impl_opengl3.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends/imgui_impl_opengl3.cpp",
   "output": "CMakeFiles/eurotram.dir/depend/imgui/backends/imgui_impl_opengl3.cpp.o"
 },
 {
   "directory": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/build",
-  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/backends/imgui_impl_glfw.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends/imgui_impl_glfw.cpp",
+  "command": "/usr/bin/clang++ -DGLEW_NO_GLU -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends -I/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/assimp -std=gnu++20 -o CMakeFiles/eurotram.dir/depend/imgui/backends/imgui_impl_glfw.cpp.o -c /mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends/imgui_impl_glfw.cpp",
   "file": "/mnt/dev/YearWorks/2025-IOC/Eurotram/source/depend/imgui/backends/imgui_impl_glfw.cpp",
   "output": "CMakeFiles/eurotram.dir/depend/imgui/backends/imgui_impl_glfw.cpp.o"
 }
