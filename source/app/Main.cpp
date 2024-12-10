@@ -154,16 +154,16 @@ int main() {
 
 	Material objectMaterial;
 	objectMaterial.shininess = 1.0f;
-	objectMaterial.specular = 0.5f;
-	objectMaterial.diffuse = 0.5f;
+	objectMaterial.specular = glm::vec4(0.5f);
+	objectMaterial.diffuse = glm::vec4(0.5f);
 	objectMaterial.textureSlot = 0;
 	objectMaterial.textureAmount = 1.0f;
 	objectMaterial.color = {0.0f, 0.0f, 0.0f, 1.0f};
 
 	Material lightMaterial;
 	lightMaterial.shininess = 1.0f;
-	lightMaterial.specular = 1.0f;
-	lightMaterial.diffuse = 1.0f;
+	lightMaterial.specular = glm::vec4(1.0f);
+	lightMaterial.diffuse = glm::vec4(1.0f);
 	lightMaterial.textureSlot = 0;
 	lightMaterial.textureAmount = 0.0f;
 	lightMaterial.color = {1.0f, 0.0f, 1.0f, 1.0f};

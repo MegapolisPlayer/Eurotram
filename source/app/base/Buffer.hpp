@@ -55,4 +55,12 @@ private:
 	uint64_t mSize;
 };
 
+//used for implementing mirrors
+class Framebuffer {
+public:
+private:
+	GLuint mHandle;
+
+};
+
 #endif
