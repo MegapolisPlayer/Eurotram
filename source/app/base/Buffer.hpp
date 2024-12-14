@@ -21,11 +21,18 @@ private:
 class VertexBuffer {
 public:
 	VertexBuffer(GLfloat* const arData, const uint64_t aVertices, const uint64_t aVerticesSize) noexcept;
+	VertexBuffer(VertexBuffer&& aOther) noexcept;
+	VertexBuffer& operator=(VertexBuffer&& aOther) noexcept;
+	VertexBuffer(VertexBuffer& aOther) noexcept = delete;
+	VertexBuffer& operator=(VertexBuffer& aOther) noexcept = delete;
 
 	void enableAttribute(VertexArray* const apVAO, const uint64_t aAmount) noexcept;
+	void enableAttribute(VertexArray* const apVAO, const uint64_t aAmount, const uint64_t aOverrideCounter, const uint64_t aHandledOverride) noexcept;
 
 	void bind() noexcept;
 	void unbind() noexcept;
+
+	void drawArrays() noexcept;
 
 	uint64_t getVerticesAmount() const noexcept;
 	uint64_t getVertexSize() const noexcept;
@@ -41,6 +48,10 @@ private:
 class IndexBuffer {
 public:
 	IndexBuffer(GLuint* const arData, const uint64_t aSize) noexcept;
+	IndexBuffer(IndexBuffer&& aOther) noexcept;
+	IndexBuffer& operator=(IndexBuffer&& aOther) noexcept;
+	IndexBuffer(IndexBuffer& aOther) noexcept = delete;
+	IndexBuffer& operator=(IndexBuffer& aOther) noexcept = delete;
 
 	void bind() noexcept;
 	void unbind() noexcept;

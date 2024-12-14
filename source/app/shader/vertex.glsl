@@ -1,8 +1,8 @@
 #version 450 core
 
 layout(location = 0) in vec3 iPosition;
-layout(location = 1) in vec2 iTexCoord;
-layout(location = 2) in vec3 iNormals;
+layout(location = 1) in vec3 iNormals;
+layout(location = 2) in vec2 iTexCoord;
 
 layout(location = 10) uniform mat4 uCamera;
 layout(location = 11) uniform mat4 uMatrixModel;
@@ -17,5 +17,6 @@ void main() {
 	pNormals = uMatrixNormal * iNormals;
 	pFragmentPos = vec3(uMatrixModel * vec4(iPosition, 1.0));
 
-	gl_Position = uCamera * vec4(pFragmentPos, 1.0);
+	//gl_Position = uCamera * vec4(pFragmentPos, 1.0);
+	gl_Position = uCamera * uMatrixModel * vec4(iPosition, 1.0);
 };

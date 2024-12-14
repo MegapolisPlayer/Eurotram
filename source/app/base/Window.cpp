@@ -1,7 +1,7 @@
 #include "Window.hpp"
 
 Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, const bool aFullscreen, const bool aDebug) noexcept
-	: mBackgroundColor({1.0f, 0.0f, 1.0f, 1.0f}), mDebugEnabled(aDebug), mExitOverride(false), mCursorHidden(false),
+	: mpHandle(nullptr), mBackgroundColor({1.0f, 0.0f, 1.0f, 1.0f}), mDebugEnabled(aDebug), mExitOverride(false), mCursorHidden(false),
 	mWidth(aWidth), mHeight(aHeight), mReferencedCamera(NULL) {
 	if(glfwInit() != GLFW_TRUE) {
 		std::cerr << LogLevel::ERROR << "GLFW failed to initialize." << LogLevel::RESET;
@@ -11,13 +11,16 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, this->mDebugEnabled);
-
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, this->mDebugEnabled);
+
 	glfwWindowHint(GLFW_SAMPLES, 4);
+
+	glfwSetErrorCallback([](int aCode, const char* aString) {
+		std::cerr << LogLevel::ERROR << "GLFW error " << aCode << ": " << aString << "\n" << LogLevel::RESET;
+	});
 
 	GLFWmonitor* monitor = aFullscreen ? glfwGetPrimaryMonitor() : NULL;
 	this->mpHandle = glfwCreateWindow(aWidth, aHeight, aTitle, monitor, NULL);
@@ -27,10 +30,6 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	glfwSetMouseButtonCallback(this->mpHandle, Window::ClickCallback);
 	glfwSetCursorPosCallback(this->mpHandle, Window::MouseCallback);
 	glfwSetWindowUserPointer(this->mpHandle, this);
-
-	glfwSetErrorCallback([](int aCode, const char* aString) {
-		std::cerr << LogLevel::ERROR << "GLFW error " << aCode << ": " << aString << "\n" << LogLevel::RESET;
-	});
 
 	glfwMakeContextCurrent(this->mpHandle);
 	glfwSwapInterval(0); //disable VSYNC
@@ -46,18 +45,20 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	}
 
+	/*
 	glEnable(GL_BLEND); //texture blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_DEPTH_TEST); //depth testing
 
-	glEnable(GL_CULL_FACE); //backface culling
+	glEnable(GL_CULL_FACE); //backface culling TODO
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CW);
 
 	glEnable(GL_MULTISAMPLE); //anti aliasing
 
 	glEnable(GL_FRAMEBUFFER_SRGB); //gamma correction
+	*/
 
 	glDebugMessageCallback(Window::GLCallback, nullptr);
 

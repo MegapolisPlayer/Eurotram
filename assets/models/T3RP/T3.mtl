@@ -1,26 +1,6 @@
 # Blender 4.2.3 LTS MTL File: 'T3.blend'
 # www.blender.org
 
-newmtl Door
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 2
-map_Kd Door.png
-map_d Door.png
-
-newmtl FireExtingusher
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 2
-map_Kd FireExtingusher.png
-map_d FireExtingusher.png
-
 newmtl Material.black
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
@@ -41,16 +21,6 @@ illum 2
 map_Kd ButtonTexture.png
 map_d ButtonTexture.png
 
-newmtl Material.connector
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 2
-map_Kd metal.png
-map_d metal.png
-
 newmtl Material.darkRedReflect
 Ns 1000.000000
 Ka 0.200000 0.200000 0.200000
@@ -68,16 +38,6 @@ Kd 0.164521 0.164521 0.164521
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.000000
-d 1.000000
-illum 2
-
-newmtl Material.floorBoard
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
 d 1.000000
 illum 2
 
@@ -212,11 +172,11 @@ d 1.000000
 illum 3
 
 newmtl Material.paint
-Ns 0.000000
+Ns 250.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
-Ni 1.300000
+Ni 1.500000
 illum 2
 map_Kd PaintTexture.png
 map_d PaintTexture.png
@@ -241,16 +201,6 @@ Ni 1.500000
 d 1.000000
 illum 2
 
-newmtl Material.vents
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 2
-map_Kd ventTexture.png
-map_d ventTexture.png
-
 newmtl Material.white
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
@@ -260,63 +210,3 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-
-newmtl Neblokujte
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 2
-map_Kd Neblokujte.png
-map_d Neblokujte.png
-
-newmtl Nevyhybejte
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 2
-map_Kd Nevyhybejte.png
-map_d Nevyhybejte.png
-
-newmtl OTZ
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 2
-map_Kd OTZ.png
-map_d OTZ.png
-
-newmtl PozorElektrika
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 2
-map_Kd PozorElektrika.png
-map_d PozorElektrika.png
-
-newmtl Smoke
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 2
-map_Kd Smoke.png
-map_d Smoke.png
-
-newmtl Vystraha
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 2
-map_Kd Vystraha.png
-map_d Vystraha.png

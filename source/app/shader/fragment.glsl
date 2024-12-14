@@ -146,4 +146,5 @@ void main() {
 	//putting together
 	oColor = baseColor * vec4(max(lighting, vec3(uAmbientLight)), 1.0);
 	//oColor = vec4(vec3(float(pointlights.length())*0.5), 1.0); //debug line
+	oColor = vec4(1.0, 0.0, 1.0, 1.0);
 };

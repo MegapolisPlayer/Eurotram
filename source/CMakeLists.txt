@@ -7,6 +7,9 @@ set(CMAKE_C_STANDARD_REQUIRED TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall")
+set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall")
+
 project(eurotram VERSION 0.1.0)
 add_compile_definitions(GLEW_NO_GLU)
 add_executable(eurotram

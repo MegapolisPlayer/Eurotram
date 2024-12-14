@@ -37,6 +37,7 @@ r Raw Arrays
 #include <array>
 #include <vector>
 #include <chrono>
+#include <csignal> //extra helpful to raise interrupts when debugging
 
 #define FILE_READ_BLOCK_SIZE 8192
 

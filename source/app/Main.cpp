@@ -76,7 +76,7 @@ int main() {
     Window mainWindow("Eurotram", 1000, 1000, false, true);
 	mainWindow.setBackgroundColor(daylightColor);
 
-	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 0.0f, 5.0f), 45.0f, 100.0, 0.05f);
+	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 0.0f, 5.0f), 45.0f, 10000.0f, 0.05f);
 
 	uint32_t mouseCallbackHandle = mainWindow.registerMouseCallback(MouseCallback);
 	mainWindow.registerKeyCallback(GLFW_KEY_ESCAPE, KeyEsc);
@@ -84,67 +84,17 @@ int main() {
 	uint32_t mouseClickHandle = mainWindow.registerClickCallback(MouseClick);
 	mainWindow.hideCursor();
 
-	//flip X on opposite faces! (mirror of mirror is no mirror)
-	//posX, posY, posZ, texCoord, texCoord, normalX, normalY, normalZ
-	GLfloat vertices[] = {
-		//upper square
-		-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-		0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-
-		//lower square
-		0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-		-0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-		0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-
-		//front
-		-0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-		0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-		0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-
-		//back
-		0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-		-0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-		-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-		0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-
-		//left
-		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-		-0.5f, 0.5f, 0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-
-		//right
-		0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-		0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-		0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-	};
-	GLuint indices[] = {
-		0, 1, 2, 2, 3, 0,
-		4, 5, 6, 6, 7, 4,
-		8, 9, 10, 10, 11, 8,
-		12, 13, 14, 14, 15, 12,
-		16, 17, 18, 18, 19, 16,
-		20, 21, 22, 22, 23, 20,
-	};
-
 	VertexArray vao;
-	VertexBuffer vbo(vertices, 24, 8);
-	vbo.enableAttribute(&vao, 3); //pos
-	vbo.enableAttribute(&vao, 2); //texCoord
-	vbo.enableAttribute(&vao, 3); //normals
-    IndexBuffer ibo(indices, 36);
 
-	Texture texture("image.jpg", 0);
+	std::cout << "Loading model...\n";
+	Model t3rp("T3.obj", vao);
+	std::cout << "Model loaded!\n";
+
+	Texture texture("image.jpg");
+	texture.bind(0);
 
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 	shader.bind();
-
-	vao.bind();
 
 	UniformMat4 matCameraUniform(&shader, 10);
 	matCameraUniform.set(mainWindow.getCamera()->getMatrix());
@@ -219,10 +169,10 @@ int main() {
 	Transform t3;
 	t3.setScale(0.2f);
 
-	// model loading - TODO abstract
-	Model t3rp("T3.obj");
-
 	// model loading end
+
+	vao.bind();
+	t3rp.draw(shader);
 
     while (mainWindow.isOpen()) {
 		loopTimer.start();
@@ -249,6 +199,9 @@ int main() {
 		matModelUniform.set(t1.getMatrix());
 		matNormalUniform.set(t1.getNormalMatrix());
 
+		t3rp.draw(shader);
+
+		/*
 		ibo.draw();
 
 		//second cube
@@ -275,6 +228,7 @@ int main() {
 		matNormalUniform.set(t3.getNormalMatrix());
 
 		ibo.draw();
+		*/
 
 		drawTimer.end();
 
@@ -360,3 +314,53 @@ int main() {
 
     return 0;
 }
+
+/*
+ // flip X on opposite faces! (mirror of mirror is no mirror)
+ //posX, posY, posZ, texCoord, texCoord, normalX, normalY, normalZ
+ GLfloat vertices[] = {
+ //upper square
+ -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,  1.0f, 1.0f,
+-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+
+//lower square
+0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+-0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+
+//front
+-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+
+//back
+0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,  0.0f, 1.0f,
+-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
+0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,  0.0f, 0.0f,
+
+//left
+-0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+-0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+
+//right
+0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+};
+GLuint indices[] = {
+0, 1, 2, 2, 3, 0,
+4, 5, 6, 6, 7, 4,
+8, 9, 10, 10, 11, 8,
+12, 13, 14, 14, 15, 12,
+16, 17, 18, 18, 19, 16,
+20, 21, 22, 22, 23, 20,
+};
+*/
