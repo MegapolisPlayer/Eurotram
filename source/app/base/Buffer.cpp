@@ -5,6 +5,18 @@ VertexArray::VertexArray() noexcept
 	glGenVertexArrays(1, &this->mHandle);
 	glBindVertexArray(this->mHandle);
 }
+VertexArray::VertexArray(VertexArray&& aOther) noexcept
+	: mHandle(aOther.mHandle), mAttributeCounter(aOther.mAttributeCounter) {
+	aOther.mHandle = 0;
+}
+VertexArray& VertexArray::operator=(VertexArray&& aOther) noexcept {
+	this->mHandle = aOther.mHandle;
+	this->mAttributeCounter = aOther.mAttributeCounter;
+
+	aOther.mHandle = 0;
+
+	return *this;
+}
 void VertexArray::bind() noexcept {
 	glBindVertexArray(this->mHandle);
 }
@@ -61,8 +73,7 @@ void VertexBuffer::bind() noexcept {
 void VertexBuffer::unbind() noexcept {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
-void VertexBuffer::drawArrays() noexcept {
-	glPointSize(10);
+void VertexBuffer::drawPoints() noexcept {
 	glDrawArrays(GL_POINTS, 0, this->mVertices);
 }
 uint64_t VertexBuffer::getVerticesAmount() const noexcept {

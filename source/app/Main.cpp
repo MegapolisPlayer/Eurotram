@@ -84,10 +84,8 @@ int main() {
 	uint32_t mouseClickHandle = mainWindow.registerClickCallback(MouseClick);
 	mainWindow.hideCursor();
 
-	VertexArray vao;
-
-	std::cout << "Loading model...\n";
-	Model t3rp("T3.obj", vao);
+	std::cout << "Loading T3R.P model...\n";
+	Model t3rp("T3.obj");
 	std::cout << "Model loaded!\n";
 
 	Texture texture("image.jpg");
@@ -108,16 +106,7 @@ int main() {
 	objectMaterial.diffuse = glm::vec4(0.5f);
 	objectMaterial.textureSlot = 0;
 	objectMaterial.textureAmount = 1.0f;
-	objectMaterial.color = {0.0f, 0.0f, 0.0f, 1.0f};
-
-	Material lightMaterial;
-	lightMaterial.shininess = 1.0f;
-	lightMaterial.specular = glm::vec4(1.0f);
-	lightMaterial.diffuse = glm::vec4(1.0f);
-	lightMaterial.textureSlot = 0;
-	lightMaterial.textureAmount = 0.0f;
-	lightMaterial.color = {1.0f, 0.0f, 1.0f, 1.0f};
-	lightMaterial.brightness = 1.0f;
+	objectMaterial.ambient = {0.0f, 0.0f, 0.0f, 1.0f};
 
 	Dirlight d;
 	d.color = {208.0f/255.0f, 128.0f/255.0f, 0.0f, 1.0f};
@@ -128,19 +117,19 @@ int main() {
 	uDirlight.update(&d);
 	uDirlight.set();
 
-	Pointlight p;
-	p.color = {1.0f, 0.0f, 1.0f, 1.0f};
-	p.position = {0.0f, 5.0f, 0.0f, 0.0f};
-	setAttenuation(AttenuationValues::DISTANCE_100, &p.constant, &p.linear, &p.quadratic);
+	//Pointlight p;
+	//p.color = {1.0f, 0.0f, 1.0f, 1.0f};
+	//p.position = {0.0f, 5.0f, 0.0f, 0.0f};
+	//setAttenuation(AttenuationValues::DISTANCE_100, &p.constant, &p.linear, &p.quadratic);
 
 	Spotlight s;
 	s.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	s.radius = 20;
+	s.radius = 1;
 	setAttenuation(AttenuationValues::DISTANCE_7, &s.constant, &s.linear, &s.quadratic);
 
-	UniformPointlight uPoints(52, 1);
-	uPoints.update(&p);
-	uPoints.set();
+	UniformPointlight uPoints(52, 0);
+	//uPoints.update(&p);
+	//uPoints.set();
 
 	UniformSpotlight uSpots(53);
 	uSpots.update(&s);
@@ -171,9 +160,6 @@ int main() {
 
 	// model loading end
 
-	vao.bind();
-	t3rp.draw(shader);
-
     while (mainWindow.isOpen()) {
 		loopTimer.start();
         mainWindow.beginFrame();
@@ -188,47 +174,16 @@ int main() {
 		s.position = glm::vec4(mainWindow.getCamera()->getPosition(), 1.0);
 		s.direction = glm::vec4(mainWindow.getCamera()->getDirection(), 1.0);
 		uSpots.update(&s);
-		uPoints.update(&p);
+		matModelUniform.set(t1.getMatrix());
+		matNormalUniform.set(t1.getNormalMatrix());
 
 		uniformTimer.end();
 
 		drawTimer.start();
 
-		//first cube
 
-		matModelUniform.set(t1.getMatrix());
-		matNormalUniform.set(t1.getNormalMatrix());
-
-		t3rp.draw(shader);
-
-		/*
-		ibo.draw();
-
-		//second cube
-
-		//glm::vec3(0.5f, 1.0f, 0.0f)
-		t2.setRotationX(20.0f*(float)glfwGetTime()*0.5f);
-		t2.setRotationY(20.0f*(float)glfwGetTime());
-
-		matModelUniform.set(t2.getMatrix());
-		matNormalUniform.set(t2.getNormalMatrix());
-
-		ibo.draw();
-
-		//light cube
-
-		uMaterial.update(&lightMaterial);
-
-		//uSpots.update(&s);
-		uPoints.update(&p);
-
-		t3.setPosition(p.position);
-
-		matModelUniform.set(t3.getMatrix());
-		matNormalUniform.set(t3.getNormalMatrix());
-
-		ibo.draw();
-		*/
+		shader.bind();
+		t3rp.draw(uMaterial);
 
 		drawTimer.end();
 
@@ -250,10 +205,6 @@ int main() {
 			d.direction = rotationMatrix * glm::vec4(0.0f, -1.0f, 0.0f, 1.0f);
 			uDirlight.update(&d);
 			uDirlight.set();
-		}
-		if(ImGui::SliderFloat3("Point light position", glm::value_ptr(p.position), -10.0, 10.0)) {
-			uPoints.update(&p);
-			uPoints.set();
 		}
 
 		ImGui::End();

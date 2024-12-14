@@ -6,6 +6,10 @@ class VertexArray {
 	friend class VertexBuffer;
 public:
 	VertexArray() noexcept;
+	VertexArray(VertexArray&& aOther) noexcept;
+	VertexArray& operator=(VertexArray&& aOther) noexcept;
+	VertexArray(VertexArray& aOther) noexcept = delete;
+	VertexArray& operator=(VertexArray& aOther) noexcept = delete;
 
 	void bind() noexcept;
 	void unbind() noexcept;
@@ -32,7 +36,8 @@ public:
 	void bind() noexcept;
 	void unbind() noexcept;
 
-	void drawArrays() noexcept;
+	//use as debug
+	void drawPoints() noexcept;
 
 	uint64_t getVerticesAmount() const noexcept;
 	uint64_t getVertexSize() const noexcept;

@@ -6,13 +6,14 @@
 //STD140 AND STD430 LAYOUT PACKING IS IDIOTIC AND ALIGNS TO VEC4
 //https://stackoverflow.com/questions/38172696/should-i-ever-use-a-vec3-inside-of-a-uniform-buffer-or-shader-storage-buffer-o
 struct Material {
-	vec4 color;
+	vec4 ambient;
 	vec4 diffuse;
 	vec4 specular;
 	float shininess;
 
 	float textureAmount;
 	int textureSlot;
+	float textureOpacity;
 	float brightness;
 };
 
@@ -45,7 +46,7 @@ in vec3 pNormals;
 in vec3 pFragmentPos;
 
 layout(std430, binding = 50) readonly buffer sMaterial {
-	Material mat1;
+	layout(align = 16) Material mat1;
 };
 layout(std430, binding = 51) readonly buffer sDirlight {
 	Dirlight dl;
@@ -70,18 +71,18 @@ float diffuseComp(vec3 aNormalizedNormal, vec3 aLightDirection) {
 }
 float specularComp(vec3 aNormalizedNormal, vec3 aLightDirection, vec3 aViewDirection, float aShininess) {
 	vec3 halfwayDir = normalize(aLightDirection + aViewDirection); //halfway direction - Blinn-Phong
-	return pow(max(dot(aNormalizedNormal, halfwayDir), 0.0), aShininess*128.0);
+	return pow(max(dot(aNormalizedNormal, halfwayDir), 0.0), aShininess);
 }
 
 //calculate specular only if some diffuse present
 
 vec3 calculateDirectional(vec3 aNormalizedNormal, vec3 aViewDirection, Material aMat, Dirlight aLight) {
 	vec3 lightDirection = normalize(-aLight.direction.xyz); //vector from (NOT TO) the light
-	float diffuseValue = 0.5 * diffuseComp(aNormalizedNormal, lightDirection);
+	float diffuseValue = diffuseComp(aNormalizedNormal, lightDirection);
 	float specularValue = specularComp(aNormalizedNormal, lightDirection, aViewDirection, aMat.shininess) * float(diffuseValue >= 0.01);
 	float lightingValue = diffuseValue + specularValue;
 
-	float override = float(aMat.brightness >= lightingValue);
+	float override = float(aMat.brightness >= lightingValue + uAmbientLight);
 	return mix((diffuseValue * aMat.diffuse.xyz + specularValue * aMat.specular.xyz) * aLight.color.xyz, vec3(aMat.brightness), vec3(override));
 }
 
@@ -89,12 +90,11 @@ vec3 calculatePoint(vec3 aNormalizedNormal, vec3 aViewDirection, vec3 aFragPos, 
 	float distanceFromLight = length(aLight.position.xyz - aFragPos);
 	vec3 lightPosDirection = normalize(aLight.position.xyz - aFragPos); //subtracting vectors
 
-	float diffuseValue = 0.5 * diffuseComp(aNormalizedNormal, lightPosDirection);
+	float diffuseValue = diffuseComp(aNormalizedNormal, lightPosDirection);
 	float specularValue = specularComp(aNormalizedNormal, lightPosDirection, aViewDirection, aMat.shininess) * float(diffuseValue >= 0.01);
-	float lightingValue = (diffuseValue + specularValue) *
-	attenuation(distanceFromLight, aLight.constant, aLight.linear, aLight.quadratic);
+	float lightingValue = (diffuseValue + specularValue) * attenuation(distanceFromLight, aLight.constant, aLight.linear, aLight.quadratic);
 
-	float override = float(aMat.brightness >= lightingValue);
+	float override = float(aMat.brightness >= lightingValue + uAmbientLight);
 	return mix((diffuseValue * aMat.diffuse.xyz + specularValue * aMat.specular.xyz) * aLight.color.xyz, vec3(aMat.brightness), vec3(override));
 }
 
@@ -109,17 +109,16 @@ vec3 calculateSpot(vec3 aNormalizedNormal, vec3 aViewDirection, vec3 aFragPos, M
 	//divide difference between outer angle and our angle by outer angle
 	float strength = clamp((theta - (aLight.radius + 5.0)) / -5.0, 0.0, 1.0);
 
-	float diffuseValue = 0.5 * diffuseComp(aNormalizedNormal, lightPosDirection);
+	float diffuseValue = diffuseComp(aNormalizedNormal, lightPosDirection);
 	float specularValue = specularComp(aNormalizedNormal, lightPosDirection, aViewDirection, aMat.shininess) * float(diffuseValue >= 0.01);
-	float lightingValue = (diffuseValue + specularValue) *
-	attenuation(distanceFromLight, aLight.constant, aLight.linear, aLight.quadratic) * strength;
+	float lightingValue = (diffuseValue + specularValue) * attenuation(distanceFromLight, aLight.constant, aLight.linear, aLight.quadratic) * strength;
 
-	float override = float(aMat.brightness >= lightingValue);
+	float override = float(aMat.brightness >= lightingValue + uAmbientLight);
 	return mix((diffuseValue * aMat.diffuse.xyz + specularValue * aMat.specular.xyz) * aLight.color.xyz, vec3(aMat.brightness), vec3(override));
 }
 
 void main() {
-	vec4 baseColor = mix(mat1.color, texture(uTextures[mat1.textureSlot], pTexCoord), vec4(mat1.textureAmount));
+	vec4 baseColor = mix(mat1.ambient, texture(uTextures[mat1.textureSlot], pTexCoord)*vec4(mat1.textureOpacity), vec4(mat1.textureAmount));
 
 	vec3 normalizedNormal = normalize(pNormals);
 	vec3 viewDirection = normalize(uCameraPosition - pFragmentPos);
@@ -144,7 +143,5 @@ void main() {
 	}
 
 	//putting together
-	oColor = baseColor * vec4(max(lighting, vec3(uAmbientLight)), 1.0);
-	//oColor = vec4(vec3(float(pointlights.length())*0.5), 1.0); //debug line
-	oColor = vec4(1.0, 0.0, 1.0, 1.0);
+	oColor = baseColor;// * vec4(max(lighting, vec3(uAmbientLight)), 1.0); //normal calc
 };

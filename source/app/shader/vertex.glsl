@@ -17,6 +17,5 @@ void main() {
 	pNormals = uMatrixNormal * iNormals;
 	pFragmentPos = vec3(uMatrixModel * vec4(iPosition, 1.0));
 
-	//gl_Position = uCamera * vec4(pFragmentPos, 1.0);
-	gl_Position = uCamera * uMatrixModel * vec4(iPosition, 1.0);
+	gl_Position = uCamera * vec4(pFragmentPos, 1.0);
 };

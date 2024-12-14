@@ -8,37 +8,40 @@ std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept 
 	return aStream;
 }
 
-Mesh::Mesh(VertexArray& aVAO, std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds) noexcept
-	: mVBO((GLfloat*)&aVerts[0], aVerts.size(), STANDARD_MODEL_VERTEX_FLOAT_AMOUNT),
-	mIBO((GLuint*)&aInds[0], aInds.size())
+Mesh::Mesh(std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, std::string_view aTexturePath) noexcept
+	: mVBO((GLfloat*)aVerts.data(), aVerts.size(), STANDARD_MODEL_VERTEX_FLOAT_AMOUNT),
+	mIBO((GLuint*)aInds.data(), aInds.size()), mTexture(aTexturePath)
 	{
 
-	std::cout << aVerts.size() << " verts, " << aInds.size() << " inds\n";
-
-	aVAO.bind();
+	this->mVAO.bind();
 	this->mVBO.bind();
+	this->mVBO.enableAttribute(&this->mVAO, 3);
+	this->mVBO.enableAttribute(&this->mVAO, 3);
+	this->mVBO.enableAttribute(&this->mVAO, 2);
 	this->mIBO.bind();
-
-	this->mVBO.enableAttribute(&aVAO, 3, 0, 0);
-	this->mVBO.enableAttribute(&aVAO, 3, 1, 3);
-	this->mVBO.enableAttribute(&aVAO, 2, 2, 6);
 }
 
 Mesh::Mesh(Mesh&& aOther) noexcept
-	: mVBO(std::move(aOther.mVBO)), mIBO(std::move(aOther.mIBO)) {}
+	: mVAO(std::move(aOther.mVAO)), mVBO(std::move(aOther.mVBO)), mIBO(std::move(aOther.mIBO)),
+	mTexture(std::move(aOther.mTexture)), mMaterial(std::move(aOther.mMaterial)) {}
+
 Mesh& Mesh::operator=(Mesh&& aOther) noexcept {
+	this->mVAO = std::move(aOther.mVAO);
 	this->mVBO = std::move(aOther.mVBO);
 	this->mIBO = std::move(aOther.mIBO);
+	this->mTexture = std::move(aOther.mTexture);
+	this->mMaterial = std::move(aOther.mMaterial);
 
 	return *this;
 }
 
-void Mesh::draw(Shader& aShader) noexcept {
-	aShader.bind();
-	this->mVBO.bind();
-	this->mIBO.bind();
+void Mesh::draw(UniformMaterial& aUniform) noexcept {
+	this->mVAO.bind();
+	aUniform.update(&this->mMaterial);
+	aUniform.set();
+	this->mTexture.bind(0);
 	this->mIBO.draw();
-	//this->mVBO.drawArrays(); //debug
+	this->mVAO.unbind();
 }
 
 Mesh::~Mesh() noexcept {}

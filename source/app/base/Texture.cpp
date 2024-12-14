@@ -2,7 +2,11 @@
 #include "Texture.hpp"
 
 Texture::Texture(std::string_view aFilename) noexcept
-	: mpData(nullptr), mPath(aFilename) {
+	: mHandle(0), mpData(nullptr), mPath(aFilename), mWidth(0), mHeight(0), mChannels(0) {
+	if(this->mPath.empty()) {
+		return;
+	}
+
 	glGenTextures(1, &this->mHandle);
 	glBindTexture(GL_TEXTURE_2D, this->mHandle);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -20,8 +24,27 @@ Texture::Texture(std::string_view aFilename) noexcept
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->mWidth, this->mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, this->mpData);
 	glGenerateMipmap(GL_TEXTURE_2D);
 }
+Texture::Texture(Texture&& aOther) noexcept
+	: mPath(std::move(aOther.mPath)), mHandle(aOther.mHandle), mpData(aOther.mpData),
+	mWidth(aOther.mWidth), mHeight(aOther.mHeight), mChannels(aOther.mChannels) {
+	aOther.mHandle = 0;
+	aOther.mpData = nullptr;
+}
+Texture& Texture::operator=(Texture&& aOther) noexcept {
+	this->mPath = std::move(aOther.mPath);
+	this->mHandle = aOther.mHandle;
+	this->mpData = aOther.mpData;
+	this->mWidth = aOther.mWidth;
+	this->mHeight = aOther.mHeight;
+	this->mChannels = aOther.mChannels;
+
+	aOther.mHandle = 0;
+	aOther.mpData = nullptr;
+	return *this;
+}
 
 void Texture::bind(const uint64_t aId) noexcept {
+	if(this->mHandle == 0) return;
 	glActiveTexture(GL_TEXTURE0 + aId);
 	glBindTexture(GL_TEXTURE_2D, this->mHandle);
 }

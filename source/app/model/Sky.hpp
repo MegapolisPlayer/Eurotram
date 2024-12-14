@@ -8,4 +8,9 @@
 #define EUROTRAM_SKY
 #include "Lighting.hpp"
 
+class CloudGenerator {
+public:
+private:
+};
+
 #endif

@@ -6,6 +6,10 @@
 class Texture {
 public:
 	Texture(std::string_view aFilename) noexcept;
+	Texture(Texture&& aOther) noexcept;
+	Texture& operator=(Texture&& aOther) noexcept;
+	Texture(Texture& aOther) noexcept = delete;
+	Texture& operator=(Texture& aOther) noexcept = delete;
 
 	void bind(const uint64_t aId) noexcept;
 	void unbind() noexcept;

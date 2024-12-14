@@ -15,19 +15,23 @@ std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept;
 class Mesh {
 	friend class Model;
 public:
-	Mesh(VertexArray& aVAO, std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds) noexcept;
+	Mesh(std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, std::string_view aTexturePath) noexcept;
 	Mesh(Mesh&& aOther) noexcept;
 	Mesh& operator=(Mesh&& aOther) noexcept;
 	Mesh(Mesh& aOther) noexcept = delete;
 	Mesh& operator=(Mesh& aOther) noexcept = delete;
 
-	void draw(Shader& aShader) noexcept;
+	void draw(UniformMaterial& aUniform) noexcept;
 
 	~Mesh() noexcept;
 private:
 	//vao 1 per model
+	VertexArray mVAO;
 	VertexBuffer mVBO;
 	IndexBuffer mIBO;
+
+	Material mMaterial;
+	Texture mTexture; //we only expect one - combined diffuse + opacity
 };
 
 #endif

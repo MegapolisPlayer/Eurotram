@@ -17,7 +17,7 @@ add_executable(eurotram
 "app/audio/Dispatcher.cpp"
 "app/audio/SFX.cpp"
 
-"app/base/Batcher.cpp"
+"app/base/Instancer.cpp"
 "app/base/Buffer.cpp"
 "app/base/Shader.cpp"
 "app/base/Texture.cpp"
@@ -29,6 +29,7 @@ add_executable(eurotram
 "app/base/Transformation.cpp"
 
 "app/model/Lighting.cpp"
+"app/model/Shadows.cpp"
 "app/model/Sky.cpp"
 "app/model/Material.cpp"
 "app/model/ModelLoading.cpp"

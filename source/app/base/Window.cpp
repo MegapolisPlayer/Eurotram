@@ -45,20 +45,21 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	}
 
-	/*
+	glPointSize(10); //set size of points
+
 	glEnable(GL_BLEND); //texture blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_DEPTH_TEST); //depth testing
+	glDepthMask(true);
 
-	glEnable(GL_CULL_FACE); //backface culling TODO
+	glEnable(GL_CULL_FACE); //backface culling
 	glCullFace(GL_BACK);
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 
 	glEnable(GL_MULTISAMPLE); //anti aliasing
 
 	glEnable(GL_FRAMEBUFFER_SRGB); //gamma correction
-	*/
 
 	glDebugMessageCallback(Window::GLCallback, nullptr);
 
