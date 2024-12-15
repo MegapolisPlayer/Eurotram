@@ -3,9 +3,9 @@
 #include "../base/Base.hpp"
 
 struct alignas(16) Material {
-	glm::vec4 ambient = glm::vec4(1.0f);
-	glm::vec4 diffuse = glm::vec4(1.0f);
+	glm::vec4 color = glm::vec4(1.0f);
 	glm::vec4 specular = glm::vec4(1.0f);
+	GLfloat ior = 1.0f;
 	GLfloat shininess = 1.0f;
 
 	GLfloat textureAmount = 1.0f; //1.0 texture only, 0.0 color only

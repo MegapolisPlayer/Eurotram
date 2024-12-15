@@ -94,31 +94,25 @@ void Model::processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiS
 		mat->Get(AI_MATKEY_OPACITY, opacity);
 		apMesh->back().mMaterial.textureOpacity = opacity;
 
-		mat->Get(AI_MATKEY_COLOR_AMBIENT, tempValue);
-		apMesh->back().mMaterial.ambient.x = tempValue.r;
-		apMesh->back().mMaterial.ambient.y = tempValue.g;
-		apMesh->back().mMaterial.ambient.z = tempValue.b;
-		apMesh->back().mMaterial.ambient.w = opacity;
-
 		mat->Get(AI_MATKEY_COLOR_DIFFUSE, tempValue);
-		apMesh->back().mMaterial.diffuse.x = 0.5f;
-		apMesh->back().mMaterial.diffuse.y = 0.5f;
-		apMesh->back().mMaterial.diffuse.z = 0.5f;
-		apMesh->back().mMaterial.diffuse.w = 0.5f;
+		apMesh->back().mMaterial.color.x = tempValue.r;
+		apMesh->back().mMaterial.color.y = tempValue.g;
+		apMesh->back().mMaterial.color.z = tempValue.b;
+		apMesh->back().mMaterial.color.w = 1.0;
 
 		mat->Get(AI_MATKEY_COLOR_SPECULAR, tempValue);
+		apMesh->back().mMaterial.specular.x = tempValue.r;
+		apMesh->back().mMaterial.specular.y = tempValue.g;
+		apMesh->back().mMaterial.specular.z = tempValue.b;
+		apMesh->back().mMaterial.specular.w = 1.0;
 
-		apMesh->back().mMaterial.specular.x = 0.5f;
-		apMesh->back().mMaterial.specular.y = 0.5f;
-		apMesh->back().mMaterial.specular.z = 0.5f;
-		apMesh->back().mMaterial.specular.w = 0.5f;
+		mat->Get(AI_MATKEY_REFRACTI,  apMesh->back().mMaterial.ior);
+		std::cout << "IOR " << apMesh->back().mMaterial.ior << '\n';
 
 		mat->Get(AI_MATKEY_SHININESS, apMesh->back().mMaterial.shininess);
 
 		apMesh->back().mMaterial.textureSlot = 0;
-
-		apMesh->back().mMaterial.textureAmount = (GLfloat)hasTexture;
-
+		apMesh->back().mMaterial.textureAmount = (float)hasTexture;
 		mat->Get(AI_MATKEY_COLOR_EMISSIVE, tempValue);
 		apMesh->back().mMaterial.brightness =
 			std::max(std::max(tempValue.r, tempValue.g), tempValue.b);
@@ -130,10 +124,10 @@ void Model::processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiS
 		std::cout << "Setting...\n";
 
 		//material properties
-		apMesh->back().mMaterial.ambient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-		apMesh->back().mMaterial.diffuse = glm::vec4(0.5f);
+		apMesh->back().mMaterial.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 		apMesh->back().mMaterial.specular = glm::vec4(0.5f);
 		apMesh->back().mMaterial.shininess = 0.0f;
+		apMesh->back().mMaterial.ior = 1.0f;
 		apMesh->back().mMaterial.textureAmount = 0.0f; //1.0 texture only, 0.0 color only
 		apMesh->back().mMaterial.textureSlot = 0;
 		apMesh->back().mMaterial.textureOpacity = 1.0f;

@@ -100,14 +100,6 @@ int main() {
 	UniformMat4 matModelUniform(&shader, 11);
 	UniformMat3 matNormalUniform(&shader, 12);
 
-	Material objectMaterial;
-	objectMaterial.shininess = 1.0f;
-	objectMaterial.specular = glm::vec4(0.5f);
-	objectMaterial.diffuse = glm::vec4(0.5f);
-	objectMaterial.textureSlot = 0;
-	objectMaterial.textureAmount = 1.0f;
-	objectMaterial.ambient = {0.0f, 0.0f, 0.0f, 1.0f};
-
 	Dirlight d;
 	d.color = {208.0f/255.0f, 128.0f/255.0f, 0.0f, 1.0f};
 	glm::mat4 rotationMatrix = glm::mat4(1.0);
@@ -165,8 +157,6 @@ int main() {
         mainWindow.beginFrame();
 
 		uniformTimer.start();
-
-		uMaterial.update(&objectMaterial);
 
 		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
