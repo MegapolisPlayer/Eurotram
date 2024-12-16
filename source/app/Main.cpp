@@ -84,10 +84,6 @@ int main() {
 	uint32_t mouseClickHandle = mainWindow.registerClickCallback(MouseClick);
 	mainWindow.hideCursor();
 
-	std::cout << "Loading T3R.P model...\n";
-	Model t3rp("T3.obj");
-	std::cout << "Model loaded!\n";
-
 	Texture texture("image.jpg");
 	texture.bind(0);
 
@@ -109,19 +105,19 @@ int main() {
 	uDirlight.update(&d);
 	uDirlight.set();
 
-	//Pointlight p;
-	//p.color = {1.0f, 0.0f, 1.0f, 1.0f};
-	//p.position = {0.0f, 5.0f, 0.0f, 0.0f};
-	//setAttenuation(AttenuationValues::DISTANCE_100, &p.constant, &p.linear, &p.quadratic);
+	Pointlight p;
+	p.color = {1.0f, 0.0f, 1.0f, 1.0f};
+	p.position = {0.0f, 5.0f, 0.0f, 0.0f};
+	setAttenuation(AttenuationValues::DISTANCE_100, &p.constant, &p.linear, &p.quadratic);
 
 	Spotlight s;
 	s.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	s.radius = 1;
 	setAttenuation(AttenuationValues::DISTANCE_7, &s.constant, &s.linear, &s.quadratic);
 
-	UniformPointlight uPoints(52, 0);
-	//uPoints.update(&p);
-	//uPoints.set();
+	UniformPointlight uPoints(52, 1);
+	uPoints.update(&p);
+	uPoints.set();
 
 	UniformSpotlight uSpots(53);
 	uSpots.update(&s);
@@ -150,7 +146,9 @@ int main() {
 	Transform t3;
 	t3.setScale(0.2f);
 
-	// model loading end
+	std::cout << "Loading T3R.P model...\n";
+	Model t3rp("T3.obj");
+	std::cout << "Model loaded!\n";
 
     while (mainWindow.isOpen()) {
 		loopTimer.start();
@@ -195,6 +193,10 @@ int main() {
 			d.direction = rotationMatrix * glm::vec4(0.0f, -1.0f, 0.0f, 1.0f);
 			uDirlight.update(&d);
 			uDirlight.set();
+		}
+		if(ImGui::SliderFloat3("Point light position", glm::value_ptr(p.position), -10.0, 10.0)) {
+			uPoints.update(&p);
+			uPoints.set();
 		}
 
 		ImGui::End();
