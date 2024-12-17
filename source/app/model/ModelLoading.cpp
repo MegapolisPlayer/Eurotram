@@ -107,7 +107,6 @@ void Model::processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiS
 		apMesh->back().mMaterial.specular.w = 1.0;
 
 		mat->Get(AI_MATKEY_REFRACTI,  apMesh->back().mMaterial.ior);
-		std::cout << "IOR " << apMesh->back().mMaterial.ior << '\n';
 
 		mat->Get(AI_MATKEY_SHININESS, apMesh->back().mMaterial.shininess);
 
@@ -121,7 +120,6 @@ void Model::processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiS
 	else {
 		//setup mesh from data
 		apMesh->emplace_back(vertices, indices, "");
-		std::cout << "Setting...\n";
 
 		//material properties
 		apMesh->back().mMaterial.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);

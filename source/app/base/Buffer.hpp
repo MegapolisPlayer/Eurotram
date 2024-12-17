@@ -63,6 +63,7 @@ public:
 
 	void draw() noexcept;
 
+	uint64_t getHandle() const noexcept;
 	uint64_t getSize() const noexcept;
 
 	~IndexBuffer() noexcept;
@@ -74,9 +75,23 @@ private:
 //used for implementing mirrors
 class Framebuffer {
 public:
+	Framebuffer() noexcept;
+	Framebuffer(Framebuffer&& aOther) noexcept;
+	Framebuffer& operator=(Framebuffer&& aOther) noexcept;
+	Framebuffer(Framebuffer& aOther) noexcept = delete;
+	Framebuffer& operator=(Framebuffer& aOther) noexcept = delete;
+
+	void bind() noexcept;
+	void unbind() noexcept;
+
+	uint64_t getHandle() const noexcept;
+	uint64_t getWidth() const noexcept;
+	uint64_t getHeight() const noexcept;
+
+	~Framebuffer() noexcept;
 private:
 	GLuint mHandle;
-
+	uint64_t mWidth, mHeight;
 };
 
 #endif

@@ -29,6 +29,7 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	glfwSetKeyCallback(this->mpHandle, Window::KeyCallback);
 	glfwSetMouseButtonCallback(this->mpHandle, Window::ClickCallback);
 	glfwSetCursorPosCallback(this->mpHandle, Window::MouseCallback);
+	glfwSetWindowSizeCallback(this->mpHandle, Window::ResizeCallback);
 	glfwSetWindowUserPointer(this->mpHandle, this);
 
 	glfwMakeContextCurrent(this->mpHandle);
@@ -217,4 +218,10 @@ void Window::GLCallback(GLenum source, GLenum type, GLuint id, GLenum severity, 
 			std::cerr << "Unknown (" << type << ")";
 	}
 	std::cerr << ": " << message << " (" << id << ")" << LogLevel::RESET << std::endl;
+}
+void Window::ResizeCallback(GLFWwindow* aWindow, int aNewX, int aNewY) noexcept {
+	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
+	ClassPointer->mWidth = aNewX;
+	ClassPointer->mHeight = aNewY;
+	glViewport(0, 0, ClassPointer->mWidth, ClassPointer->mHeight);
 }

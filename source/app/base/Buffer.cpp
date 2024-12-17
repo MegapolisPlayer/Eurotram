@@ -115,6 +115,9 @@ void IndexBuffer::unbind() noexcept {
 void IndexBuffer::draw() noexcept {
 	glDrawElements(GL_TRIANGLES, this->mSize, GL_UNSIGNED_INT, nullptr);
 }
+uint64_t IndexBuffer::getHandle() const noexcept {
+	return this->mHandle;
+}
 uint64_t IndexBuffer::getSize() const noexcept {
 	return this->mSize;
 }

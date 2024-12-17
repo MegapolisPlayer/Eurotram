@@ -68,6 +68,7 @@ private:
 	static void KeyCallback(GLFWwindow* aWindow, int aKey, int aScancode, int aAction, int aModifiers) noexcept;
 	static void ClickCallback(GLFWwindow* aWindow, int aKey, int aAction, int aModifiers) noexcept;
 	static void GLCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) noexcept;
+	static void ResizeCallback(GLFWwindow* aWindow, int aNewX, int aNewY) noexcept;
 
 	//defined in Camera.cpp
 	void updateCamera() noexcept;

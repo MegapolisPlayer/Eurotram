@@ -66,6 +66,7 @@ float attenuation(float aDistance, float aConstant, float aLinear, float aQuadra
 	return 1.0/(aConstant + aLinear*aDistance + aQuadratic*aDistance*aDistance);
 }
 
+//reflectivity
 float specularFromIOR(float aIOR) {
 	return clamp((((aIOR - 1)/(aIOR + 1))*((aIOR - 1)/(aIOR + 1)))*12.5, 0.0, 1.0);
 }
@@ -73,6 +74,7 @@ float specularFromIOR(float aIOR) {
 float diffuseComp(vec3 aNormalizedNormal, vec3 aLightDirection) {
 	return max(dot(aNormalizedNormal, aLightDirection), 0.0); //dot product - "how" much is vector in our aLightDirection
 }
+//shininess
 float specularComp(vec3 aNormalizedNormal, vec3 aLightDirection, vec3 aViewDirection, float aShininess) {
 	vec3 halfwayDir = normalize(aLightDirection + aViewDirection); //halfway direction - Blinn-Phong
 	return pow(max(dot(aNormalizedNormal, halfwayDir), 0.0), aShininess);
