@@ -12,7 +12,7 @@ r Raw Arrays
 #ifndef EUROTRAM_BASE_SETUP
 #define EUROTRAM_BASE_SETUP
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
 

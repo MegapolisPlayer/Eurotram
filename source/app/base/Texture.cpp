@@ -17,7 +17,7 @@ Texture::Texture(std::string_view aFilename) noexcept
 	stbi_set_flip_vertically_on_load(true);
 	this->mpData = stbi_load(mPath.data(), &this->mWidth, &this->mHeight, &this->mChannels, 4);
 	if(!this->mpData) {
-		std::cerr << LogLevel::ERROR << "STBI failed to load image!\n" << LogLevel::RESET;
+		std::cerr << LogLevel::ERROR << "STBI failed to load image " << aFilename << "!\n" << LogLevel::RESET;
 		return;
 	}
 

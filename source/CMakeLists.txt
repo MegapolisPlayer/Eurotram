@@ -62,6 +62,8 @@ add_executable(eurotram
 
 "app/Main.cpp"
 
+"depend/glad/src/glad.c"
+
 "depend/imgui/imgui.cpp"
 "depend/imgui/imgui_tables.cpp"
 "depend/imgui/imgui_widgets.cpp"
@@ -75,9 +77,10 @@ target_include_directories(eurotram PUBLIC
 "depend/imgui/"
 "depend/imgui/backends/"
 "depend/assimp/"
+"depend/glad/include/"
 )
 target_link_directories(eurotram PUBLIC "depend/")
-target_link_libraries(eurotram PUBLIC -lGL -lglfw -lGLEW -lassimp)
+target_link_libraries(eurotram PUBLIC -lGL -lglfw -lassimp)
 
 
 

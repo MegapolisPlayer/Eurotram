@@ -35,11 +35,12 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	glfwMakeContextCurrent(this->mpHandle);
 	glfwSwapInterval(0); //disable VSYNC
 
-	int result = glewInit();
-	if(result != GLEW_OK) {
-		std::cerr << LogLevel::ERROR << "GLEW failed to initialize. " << glewGetErrorString(result) << " (" << result << ")\n" << LogLevel::RESET;
+	if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		std::cerr << LogLevel::ERROR << "GLAD failed to initialize. \n" << LogLevel::RESET;
 		std::exit(EXIT_FAILURE);
 	}
+
+	glViewport(0, 0, this->mWidth, this->mHeight);
 
 	if(this->mDebugEnabled) {
 		glEnable(GL_DEBUG_OUTPUT);

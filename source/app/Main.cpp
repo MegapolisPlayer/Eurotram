@@ -84,8 +84,8 @@ int main() {
 	uint32_t mouseClickHandle = mainWindow.registerClickCallback(MouseClick);
 	mainWindow.hideCursor();
 
-	Texture texture("image.jpg");
-	texture.bind(0);
+	//Texture texture("image.jpg");
+	//texture.bind(0);
 
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 	shader.bind();
