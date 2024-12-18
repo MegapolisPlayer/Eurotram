@@ -124,3 +124,41 @@ uint64_t IndexBuffer::getSize() const noexcept {
 IndexBuffer::~IndexBuffer() noexcept {
 	glDeleteBuffers(1, &this->mHandle);
 }
+
+Framebuffer::Framebuffer() noexcept {
+
+}
+Framebuffer::Framebuffer(Framebuffer&& aOther) noexcept
+	: mHandle(aOther.mHandle), mWidth(aOther.mWidth), mHeight(aOther.mHeight) {
+	aOther.mHandle = 0;
+}
+Framebuffer& Framebuffer::operator=(Framebuffer&& aOther) noexcept {
+	this->mHandle = aOther.mHandle;
+	this->mWidth = aOther.mWidth;
+	this->mHeight = aOther.mHeight;
+
+	aOther.mHandle = 0;
+
+	return *this;
+}
+
+void Framebuffer::bind() noexcept {
+
+}
+void Framebuffer::unbind() noexcept {
+
+}
+
+uint64_t Framebuffer::getHandle() const noexcept {
+	return this->mHandle;
+}
+uint64_t Framebuffer::getWidth() const noexcept {
+	return this->mWidth;
+}
+uint64_t Framebuffer::getHeight() const noexcept {
+	return this->mHeight;
+}
+
+Framebuffer::~Framebuffer() noexcept {
+	glDeleteBuffers(1, &this->mHandle);
+}

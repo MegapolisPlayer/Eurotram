@@ -40,7 +40,7 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 		std::exit(EXIT_FAILURE);
 	}
 
-	glViewport(0, 0, this->mWidth, this->mHeight);
+	//glViewport(0, 0, this->mWidth, this->mHeight);
 
 	if(this->mDebugEnabled) {
 		glEnable(GL_DEBUG_OUTPUT);

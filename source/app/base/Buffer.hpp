@@ -72,7 +72,7 @@ private:
 	uint64_t mSize;
 };
 
-//used for implementing mirrors
+//used for implementing mirrors and shadows
 class Framebuffer {
 public:
 	Framebuffer() noexcept;

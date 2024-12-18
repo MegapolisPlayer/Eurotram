@@ -91,7 +91,6 @@ vec3 getSpecular(
 }
 
 vec3 calculateDirectional(vec3 aColor, vec3 aNormalizedNormal, vec3 aViewDirection, Material aMat, Dirlight aLight) {
-
 	vec3 diffuseValue = aLight.color.xyz * (diffuseComp(aNormalizedNormal, aLight.direction.xyz));
 
 	return diffuseValue;
@@ -107,13 +106,13 @@ vec3 calculateSpot(float aDst, vec3 aNormalizedNormal, vec3 aLightDirection, vec
 	//dot product returns cosine of angle
 	float theta = acos(dot(aLightDirection, normalize(-aLight.direction.xyz)));
 	float epsilon = -5.0; //extra cutoff angle
-
 	//divide difference between outer angle and our angle by outer angle
 	float strength = clamp((theta - (aLight.radius + 5.0)) / -5.0, 0.0, 1.0);
 
-	float diffuseValue = attenuation(aDst, aLight.constant, aLight.linear, aLight.quadratic) * diffuseComp(aNormalizedNormal, aLightDirection);
+	float diffuseValue = attenuation(aDst, aLight.constant, aLight.linear, aLight.quadratic) * diffuseComp(aNormalizedNormal, aLightDirection) * strength;
 
-	return aLight.color.xyz * strength * diffuseValue;
+	//return aLight.color.xyz * diffuseValue;
+	return vec3(strength);
 }
 
 void main() {
@@ -122,12 +121,12 @@ void main() {
 	vec3 normalizedNormal = normalize(pNormals);
 	vec3 viewDirection = normalize(uCameraPosition - pFragmentPos);
 
-	vec3 lighting = calculateDirectional(dl.color.xyz, normalizedNormal, viewDirection, mat1, dl);
+	//vec3 lighting = calculateDirectional(dl.color.xyz, normalizedNormal, viewDirection, mat1, dl);
+	vec3 lighting = vec3(0.0);
 	vec3 directionalLightDirection = normalize(-dl.direction.xyz); //vector from (NOT TO) the light
 	vec3 lightingSpecular = getSpecular(dl.color.xyz, 0.0, 1.0, 0.0, 0.0, normalizedNormal, directionalLightDirection, viewDirection, mat1);
-	//vec3 lighting = vec3(0.0);
-	//vec3 lightingSpecular = vec3(0.0);
 
+	/*
 	//putting together
 	for(int i = 0; i < pointlights.length(); i++) {
 		vec3 lightDirection = normalize(pointlights[i].position.xyz - pFragmentPos);
@@ -140,20 +139,21 @@ void main() {
 			normalizedNormal, lightDirection, viewDirection, mat1
 		);
 	}
+	*/
 	for(int i = 0; i < spotlights.length(); i++) {
 		vec3 lightDirection = normalize(spotlights[i].position.xyz - pFragmentPos);
 		float dst = length(spotlights[i].position.xyz - pFragmentPos);
 
-		lighting += calculateSpot(dst, normalizedNormal, lightDirection, viewDirection, mat1, spotlights[i]);
-		lightingSpecular += getSpecular(
-			spotlights[i].color.xyz, dst,
-			spotlights[i].constant, spotlights[i].linear, spotlights[i].quadratic,
-			normalizedNormal, lightDirection, viewDirection, mat1
-		);
+		lighting = calculateSpot(dst, normalizedNormal, lightDirection, viewDirection, mat1, spotlights[i]);
+		//lightingSpecular += getSpecular(
+		//	spotlights[i].color.xyz, dst,
+		//	spotlights[i].constant, spotlights[i].linear, spotlights[i].quadratic,
+		//	normalizedNormal, lightDirection, viewDirection, mat1
+		//);
 	}
 
-	float dst = length(spotlights[0].position.xyz - pFragmentPos);
-	oColor = vec4(
-		baseColor.xyz * max(vec3(uAmbientLight), lighting + lightingSpecular),
-		mat1.textureOpacity); //normal calc
+	//oColor = vec4(
+	//	baseColor.xyz * max(vec3(uAmbientLight), lighting + lightingSpecular),
+	//	mat1.textureOpacity); //normal calc
+	oColor = vec4(lighting, 1.0);
 };
