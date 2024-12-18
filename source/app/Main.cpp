@@ -112,8 +112,9 @@ int main() {
 
 	Spotlight s;
 	s.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	s.radius = 45;
+
 	setAttenuation(AttenuationValues::DISTANCE_20, &s.constant, &s.linear, &s.quadratic);
+	setSpotlightRadius(&s, 45.0, 10.0);
 
 	UniformPointlight uPoints(52, 1);
 	uPoints.update(&p);

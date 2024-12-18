@@ -1,5 +1,11 @@
 #include "Lighting.hpp"
 
+void setSpotlightRadius(Spotlight* aSpotlight, const float aRadius, const float aCutoffRange) noexcept {
+	aSpotlight->radius = glm::cos(glm::radians(aRadius));
+	aSpotlight->inner = glm::cos(glm::radians(aRadius-(aCutoffRange/2.0)));
+	aSpotlight->outer = glm::cos(glm::radians(aRadius+(aCutoffRange/2.0)));
+}
+
 void setAttenuation(const AttenuationValues aDistance, float* aConstant, float* aLinear, float* aQuadratic) noexcept {
 	*aConstant = 1.0;
 	switch(aDistance) {

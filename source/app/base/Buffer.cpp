@@ -126,7 +126,7 @@ IndexBuffer::~IndexBuffer() noexcept {
 }
 
 Framebuffer::Framebuffer() noexcept {
-
+	glGenFramebuffers(1, &this->mHandle);
 }
 Framebuffer::Framebuffer(Framebuffer&& aOther) noexcept
 	: mHandle(aOther.mHandle), mWidth(aOther.mWidth), mHeight(aOther.mHeight) {
@@ -143,10 +143,10 @@ Framebuffer& Framebuffer::operator=(Framebuffer&& aOther) noexcept {
 }
 
 void Framebuffer::bind() noexcept {
-
+	glBindFramebuffer(GL_FRAMEBUFFER, this->mHandle);
 }
 void Framebuffer::unbind() noexcept {
-
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 uint64_t Framebuffer::getHandle() const noexcept {
@@ -160,5 +160,5 @@ uint64_t Framebuffer::getHeight() const noexcept {
 }
 
 Framebuffer::~Framebuffer() noexcept {
-	glDeleteBuffers(1, &this->mHandle);
+	glDeleteFramebuffers(1, &this->mHandle);
 }

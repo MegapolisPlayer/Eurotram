@@ -25,12 +25,16 @@ struct alignas(16) Spotlight {
 	glm::vec4 position; //last param ignored
 	glm::vec4 direction; //last param ignored
 	glm::vec4 color; //last param strength
-	GLfloat radius; //as angle in degrees
+	GLfloat radius; //as cosine value of angle in radians
+	GLfloat inner; //as cosine value of angle in radians
+	GLfloat outer; //as cosine value of angle in radians
 
 	GLfloat constant;
 	GLfloat linear;
 	GLfloat quadratic;
 };
+
+void setSpotlightRadius(Spotlight* aSpotlight, const float aRadius, const float aCutoffRange) noexcept;
 
 //set attenuation values (and therefore, distance) for light
 enum class AttenuationValues : uint8_t {

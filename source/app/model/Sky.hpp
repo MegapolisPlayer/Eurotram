@@ -6,7 +6,7 @@
 
 #ifndef EUROTRAM_SKY
 #define EUROTRAM_SKY
-#include "Lighting.hpp"
+#include "Shadows.hpp"
 
 class CloudGenerator {
 public:

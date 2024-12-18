@@ -3,6 +3,8 @@
 #include "Uniform.hpp"
 #include "UniformIm.hpp"
 
+//TODO add option to generate blank texture
+
 class Texture {
 public:
 	Texture(std::string_view aFilename) noexcept;
