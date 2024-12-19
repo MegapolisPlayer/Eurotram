@@ -7,6 +7,7 @@ class Uniform {
 public:
 	Uniform(const Shader* const aShader, const uint64_t aLocationOverride) noexcept;
 	Uniform(const Shader* const aShader, const char* aUniformName) noexcept;
+
 	virtual void set(tType aValue) noexcept = 0;
 	GLint getHandle() const noexcept;
 protected:

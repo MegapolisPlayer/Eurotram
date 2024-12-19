@@ -85,13 +85,10 @@ public:
 	void unbind() noexcept;
 
 	uint64_t getHandle() const noexcept;
-	uint64_t getWidth() const noexcept;
-	uint64_t getHeight() const noexcept;
 
 	~Framebuffer() noexcept;
 private:
 	GLuint mHandle;
-	uint64_t mWidth, mHeight;
 };
 
 #endif

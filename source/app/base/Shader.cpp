@@ -57,6 +57,17 @@ Shader::Shader(const std::string_view aVertexSource, const std::string_view aFra
 
 	glUseProgram(this->mHandle);
 }
+
+Shader::Shader(Shader&& aOther) noexcept {
+	this->mHandle = aOther.mHandle;
+	aOther.mHandle = 0;
+}
+Shader& Shader::operator=(Shader&& aOther) noexcept {
+	this->mHandle = aOther.mHandle;
+	aOther.mHandle = 0;
+	return *this;
+}
+
 void Shader::bind() noexcept {
 	glUseProgram(this->mHandle);
 }
@@ -76,6 +87,20 @@ ShaderBuffer::ShaderBuffer(const void* const arData, const uint64_t aSizeBytes) 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, aSizeBytes, arData, GL_DYNAMIC_DRAW);
 }
+
+ShaderBuffer::ShaderBuffer(ShaderBuffer&& aOther) noexcept
+	: mHandle(aOther.mHandle), mSizeBytes(aOther.mSizeBytes) {
+	aOther.mHandle = 0;
+}
+ShaderBuffer& ShaderBuffer::operator=(ShaderBuffer&& aOther) noexcept {
+	this->mHandle = aOther.mHandle;
+	this->mSizeBytes = aOther.mSizeBytes;
+
+	aOther.mHandle = 0;
+
+	return *this;
+}
+
 void ShaderBuffer::update(const void* const arData, const uint64_t aSizeBytes, const uint64_t aOffset) noexcept {
 	if(aOffset+aSizeBytes > this->mSizeBytes) {
 		std::cerr << LogLevel::ERROR << "SSBO read out of range!\n" << LogLevel::RESET;

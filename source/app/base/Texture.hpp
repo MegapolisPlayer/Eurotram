@@ -3,10 +3,9 @@
 #include "Uniform.hpp"
 #include "UniformIm.hpp"
 
-//TODO add option to generate blank texture
-
 class Texture {
 public:
+	//channels = bits per pixel
 	Texture(std::string_view aFilename) noexcept;
 	Texture(Texture&& aOther) noexcept;
 	Texture& operator=(Texture&& aOther) noexcept;

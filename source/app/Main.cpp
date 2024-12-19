@@ -38,6 +38,9 @@ void KeyWASDRFQ(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModi
 		case GLFW_KEY_Q:
 			aWindow->getCamera()->moveTo({0.0f, 0.0f, 0.0f});
 			break;
+		case GLFW_KEY_C:
+			aWindow->getCamera()->moveTo({10.0f, 10.0f, 10.0f});
+			break;
 		case GLFW_KEY_X:
 			aWindow->close();
 			break;
@@ -76,7 +79,7 @@ int main() {
     Window mainWindow("Eurotram", 1000, 1000, false, true);
 	mainWindow.setBackgroundColor(daylightColor);
 
-	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 0.0f, 5.0f), 45.0f, 10000.0f, 0.05f);
+	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 10000.0f, 0.05f);
 
 	uint32_t mouseCallbackHandle = mainWindow.registerMouseCallback(MouseCallback);
 	mainWindow.registerKeyCallback(GLFW_KEY_ESCAPE, KeyEsc);
@@ -84,8 +87,9 @@ int main() {
 	uint32_t mouseClickHandle = mainWindow.registerClickCallback(MouseClick);
 	mainWindow.hideCursor();
 
-	//Texture texture("image.jpg");
-	//texture.bind(0);
+	Shader lss("shader/shadowVertex.glsl", "shader/shadowFragment.glsl");
+	LightShadow ls(lss);
+	UniformMat4 lssMatModel(&lss, 70);
 
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 	shader.bind();
@@ -95,6 +99,7 @@ int main() {
 	UniformVec3 cameraPosUniform(&shader, 210);
 	UniformMat4 matModelUniform(&shader, 11);
 	UniformMat3 matNormalUniform(&shader, 12);
+	UniformMat4 matLightUniform(&shader, 13);
 
 	Dirlight d;
 	d.color = {208.0f/255.0f, 128.0f/255.0f, 0.0f, 1.0f};
@@ -113,14 +118,14 @@ int main() {
 	Spotlight s;
 	s.color = {1.0f, 1.0f, 1.0f, 1.0f};
 
-	setAttenuation(AttenuationValues::DISTANCE_20, &s.constant, &s.linear, &s.quadratic);
-	setSpotlightRadius(&s, 45.0, 10.0);
+	setAttenuation(AttenuationValues::DISTANCE_100, &s.constant, &s.linear, &s.quadratic);
+	setSpotlightRadius(&s, 15.0, 10.0);
 
-	UniformPointlight uPoints(52, 1);
+	UniformPointlight uPoints(52, 0);
 	uPoints.update(&p);
 	uPoints.set();
 
-	UniformSpotlight uSpots(53);
+	UniformSpotlight uSpots(53, 1);
 	uSpots.update(&s);
 	uSpots.set();
 
@@ -132,20 +137,19 @@ int main() {
 	Timer loopTimer;
 	Timer guiTimer;
 	Timer drawTimer;
-	Timer uniformTimer;
 
 	TimerAverage avgFrame;
 
 	float sunAngle = 0;
 
 	Transform t1;
-	t1.setRotationY(45.0f);
+	//t1.setRotationY(45.0f);
 
-	Transform t2;
-	t2.setPosition(glm::vec3(2.0f));
+	//Transform t2;
+	//t2.setPosition(glm::vec3(2.0f));
 
-	Transform t3;
-	t3.setScale(0.2f);
+	//Transform t3;
+	//t3.setScale(0.2f);
 
 	std::cout << "Loading T3R.P model...\n";
 	Model t3rp("T3.obj");
@@ -153,25 +157,32 @@ int main() {
 
     while (mainWindow.isOpen()) {
 		loopTimer.start();
-        mainWindow.beginFrame();
 
-		uniformTimer.start();
+		glClear(GL_DEPTH_BUFFER_BIT);
+		ls.bind(mainWindow, d);
+		lssMatModel.set(glm::mat4(1.0f));
+		t3rp.draw(uMaterial);
+		ls.unbind(mainWindow);
 
-		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
-		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
+		mainWindow.beginFrame();
+
+		shader.bind();
 
 		s.position = glm::vec4(mainWindow.getCamera()->getPosition(), 1.0);
 		s.direction = glm::vec4(mainWindow.getCamera()->getDirection(), 1.0);
 		uSpots.update(&s);
+
+		ls.bindMap(1);
+		matLightUniform.set(ls.getMatrix());
+
+		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
+		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
+
 		matModelUniform.set(t1.getMatrix());
 		matNormalUniform.set(t1.getNormalMatrix());
 
-		uniformTimer.end();
-
 		drawTimer.start();
 
-
-		shader.bind();
 		t3rp.draw(uMaterial);
 
 		drawTimer.end();
@@ -208,7 +219,6 @@ int main() {
 		ImGui::Text("FPS: %f", 1000.0/loopTimer.getMSfloat());
 		ImGui::Text("Draw time: %fms / %fus", drawTimer.getMSfloat(), drawTimer.getUSfloat());
 		ImGui::Text("GUI draw time: %fms / %fus", guiTimer.getMSfloat(), guiTimer.getUSfloat());
-		ImGui::Text("Uniform setup time: %fms / %fus", uniformTimer.getMSfloat(), uniformTimer.getUSfloat());
 
 		ImGui::End();
 

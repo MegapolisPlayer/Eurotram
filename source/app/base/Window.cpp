@@ -53,6 +53,7 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_DEPTH_TEST); //depth testing
+	glDepthFunc(GL_LESS);
 	glDepthMask(true);
 
 	glEnable(GL_CULL_FACE); //backface culling
@@ -74,6 +75,15 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 
 void Window::setBackgroundColor(const std::array<float, 4>& aArray) noexcept {
 	this->mBackgroundColor = aArray;
+}
+
+void Window::setViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept {
+	glViewport(0, 0, aWidth, aHeight);
+	this->updateCamera();
+}
+void Window::resetViewport() noexcept {
+	glViewport(0, 0, this->mWidth, this->mHeight);
+	this->updateCamera();
 }
 
 void Window::bindContext() noexcept {

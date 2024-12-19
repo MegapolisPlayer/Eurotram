@@ -5,6 +5,10 @@
 class Shader {
 public:
 	Shader(const std::string_view aVertexSource, const std::string_view aFragmentSource) noexcept;
+	Shader(Shader&& aOther) noexcept;
+	Shader& operator=(Shader&& aOther) noexcept;
+	Shader(Shader& aOther) noexcept = delete;
+	Shader& operator=(Shader& aOther) noexcept = delete;
 
 	void bind() noexcept;
 	void unbind() noexcept;
@@ -19,6 +23,10 @@ private:
 class ShaderBuffer {
 public:
 	ShaderBuffer(const void* const arData, const uint64_t aSizeBytes) noexcept;
+	ShaderBuffer(ShaderBuffer&& aOther) noexcept;
+	ShaderBuffer& operator=(ShaderBuffer&& aOther) noexcept;
+	ShaderBuffer(ShaderBuffer& aOther) noexcept = delete;
+	ShaderBuffer& operator=(ShaderBuffer& aOther) noexcept = delete;
 
 	void update(const void* const arData, const uint64_t aSizeBytes, const uint64_t aOffset = 0) noexcept;
 
