@@ -6,25 +6,67 @@
 	</head>
 	<body>
 		<h1>Eurotram track and scenario editor</h1>
+		<em>(c) Martin/MegapolisPlayer 2024-2025</em>
 		<hr>
 		<strong>File</strong>
-		<button>New</button>
-		<button>Load</button>
-		<button>Save</button>
-		<button>Empty</button>
-		<em>Scenario file operations</em>
+		<button onclick="fileLoad()">Load</button>
+		<button onclick="fileSave()">Save</button>
+		<em>File operations</em>
 		<br>
 		<strong>Scenario</strong>
-		<button>Make</button>
-		<em>Line numbers, stations, timetables</em>
+		<button onclick="scenarioClear()">Clear everything</button>
+		<button onclick="scenarioNewLine()">Make new line</button>
+		<em>Scenario operations</em>
 		<br>
 		<strong>Add</strong>
-		<button>Node</button>
-		<button>Track</button>
-		<button>Building</button>
-		<button>Tree</button>
+		<button onclick="nodeAdd()">Node</button>
+		<button onclick="trackAdd()">Track</button>
+		<button onclick="buildingAdd()">Building</button>
+		<button onclick="treeAdd()">Tree</button>
+		<button onclick="lightAdd()">Light pole</button>
+		<strong>Edit or remove</strong>
+		<button onclick="edit()">Edit/Remove</button>
 		<em>Objects on map</em>
+		<br>
+
+		<strong>Move map</strong>
+		<button onclick="viewMode()">View mode</button>
+		<button onclick="canvasPosReset()">Reset map position</button>
+
+		<br>
+		<em>Current mode: </em><span id="curmode">View</span>
 		<hr>
-		<canvas id="main"></canvas>
+		<div id="container">
+			<canvas id="main">
+				Canvas is not supported.
+			</canvas>
+			<div id="editmenu">
+				<button onclick="canvasZoomIn()">Zoom in</button>
+				<button onclick="canvasZoomOut()">Zoom out</button>
+				<button onclick="canvasZoomReset()">Reset zoom</button>
+				<h2>Edit menu</h2>
+				<span id="editoptions">
+
+				</span>
+			</div>
+		</div>
+		<hr>
+
+		<script src="js/ModeSet.js"></script>
+
+		<script src="js/Nodes.js"></script>
+		<script src="js/Track.js"></script>
+		<script src="js/Buildings.js"></script>
+		<script src="js/Light.js"></script>
+		<script src="js/Tree.js"></script>
+
+		<script src="js/Switch.js"></script>
+		<script src="js/Scenario.js"></script>
+
+		<script src="js/FileSave.js"></script>
+		<script src="js/CanvasLib.js"></script>
+		<script>
+			canvasInit();
+		</script>
 	</body>
 </html>
