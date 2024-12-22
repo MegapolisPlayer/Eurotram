@@ -6,7 +6,7 @@
 
 const NODE_SIZE = 20;
 
-class Node {
+class TNode {
 	xpos = 0;
 	ypos = 0;
 	stationCode = "";
@@ -18,10 +18,12 @@ class Node {
 		this.ypos = aypos;
 		this.stationCode = astationCode;
 		this.bordersWith = abordersWith;
-		this.height = 0;
+		this.height = height;
 	}
 
 	draw(style = "#000000") {
+		if(!this.willRender()) { return; }
+		console.log("node draw");
 		canvasData.context.fillStyle = style;
 		canvasData.context.fillRect(
 			canvasData.shiftX+this.xpos - NODE_SIZE/2,
@@ -35,11 +37,19 @@ class Node {
 			(ay >= this.ypos-NODE_SIZE) &&
 			(ay <= this.ypos+NODE_SIZE);
 	}
+
+	willRender() {
+		return canvasIsInFrustum(
+			canvasData.shiftX + this.xpos - NODE_SIZE/2,
+			canvasData.shiftY + this.ypos - NODE_SIZE/2, 
+			NODE_SIZE, NODE_SIZE)
+	}
 };
 
+//switches also in node list
 let nodeList = [];
 
-function getCollidingNode(ax, ay) {
+function getCollidingTNode(ax, ay) {
 	for(let i = 0; i < nodeList.length; i++) {
 		if(nodeList[i].collision(ax, ay)) {
 			return i;
@@ -58,9 +68,10 @@ function nodeEditMenu(aid) {
 	canvasData.edit.innerHTML += "Y:<input type='number' id='edityinput' name='edityinput' value="+nodeList[aid].ypos+"><br>";
 	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+nodeList[aid].height+"><br>";
 
-	canvasData.edit.innerHTML += "Node station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+nodeList[aid].stationCode+"><br>";
-	canvasData.edit.innerHTML += "Node 2nd code:<input type='text' id='editcodetwoinput' name='editcodetwoinput' placeholder='XXXX' value="+nodeList[aid].bordersWith+"><br>";
+	canvasData.edit.innerHTML += "TNode station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+nodeList[aid].stationCode+"><br>";
+	canvasData.edit.innerHTML += "TNode 2nd code:<input type='text' id='editcodetwoinput' name='editcodetwoinput' placeholder='XXXX' value="+nodeList[aid].bordersWith+"><br>";
 	canvasData.edit.innerHTML += "<button type='' onclick='nodeUpdate()'>Update</button>";
+	canvasData.edit.innerHTML += "<button type='' onclick='nodeRemove()'>Remove node</button>";
 }
 
 function nodeUpdate() {
@@ -72,6 +83,26 @@ function nodeUpdate() {
 	nodeList[nodeId].height = Number(document.getElementById("editheightinput").value);
 	nodeList[nodeId].stationCode = String(document.getElementById("editcodeinput").value);
 	nodeList[nodeId].bordersWith = String(document.getElementById("editcodetwoinput").value);
+
+	canvasRedraw();
+}
+
+function nodeRemove() {
+	console.log("Removing node and connected track");
+
+	let nodeId =  Number(document.getElementById("idinput").value);
+	nodeList.splice(nodeId, 1);
+
+	for(let i = 0; i < trackList.length; i++) {
+		if(
+			trackList[i].nodeIdFirst == nodeId ||
+			trackList[i].nodeIdSecond == nodeId
+		) {
+			trackList.splice(i, 1);
+		}
+	}
+
+	canvasData.edit.innerHTML = "";
 
 	canvasRedraw();
 }

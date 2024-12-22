@@ -20,13 +20,19 @@
 		<br>
 		<strong>Add</strong>
 		<button onclick="nodeAdd()">Node</button>
+		<button onclick="switchAdd()">Switch</button>
+		<button onclick="radioAdd()">Radiobox</button>
 		<button onclick="trackAdd()">Track</button>
 		<button onclick="buildingAdd()">Building</button>
 		<button onclick="treeAdd()">Tree</button>
 		<button onclick="lightAdd()">Light pole</button>
+		<button onclick="">Landmark</button>
+		<em>Add new objects</em>
+		<br>
 		<strong>Edit or remove</strong>
-		<button onclick="edit()">Edit/Remove</button>
-		<em>Objects on map</em>
+		<button onclick="edit()">Edit</button>
+		<button onclick="editTrack()">Edit/Remove track</button>
+		<em>Adjust existing objects</em>
 		<br>
 
 		<strong>Move map</strong>
@@ -51,15 +57,50 @@
 			</div>
 		</div>
 		<hr>
+		<h3>Scenario statistics</h3>
+		<ul>
+			<li>
+				Node+switch amount:
+				<span id="amountnode">0</span>
+			</li>
+			<li>
+				Radiobox amount:
+				<span id="amountradio">0</span>
+			</li>
+			<li>
+				Track amount:
+				<span id="amounttrack">0</span>
+			</li>
+			<li>
+				Building amount:
+				<span id="amountbuild">0</span>
+			</li>
+			<li>
+				Tree amount:
+				<span id="amounttree">0</span>
+			</li>
+			<li>
+				Light pole amount:
+				<span id="amountlight">0</span>
+			</li>
+			<li>
+				Landmark amount:
+				<span id="amountlandmark">0</span>
+			</li>
+		</ul>
+		<hr>
 
 		<script src="js/ModeSet.js"></script>
 
 		<script src="js/Nodes.js"></script>
+		<script src="js/RadioBox.js"></script>
 		<script src="js/Track.js"></script>
 		<script src="js/Buildings.js"></script>
 		<script src="js/Light.js"></script>
 		<script src="js/Tree.js"></script>
+		<script src="js/Landmark.js"></script>
 
+		<script src="js/Statistics.js"></script>
 		<script src="js/Switch.js"></script>
 		<script src="js/Scenario.js"></script>
 

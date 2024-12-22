@@ -35,3 +35,10 @@ let lineList = [];
 function scenarioNewLine() {
 
 }
+
+function scenarioSerialize() {
+
+}
+function scenarioLoad() {
+	
+}

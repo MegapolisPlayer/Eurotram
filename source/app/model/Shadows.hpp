@@ -6,6 +6,8 @@
 //Pointlights - only used in internal tram lighting or blinkers
 //This will save performance
 
+//TODO add spotlight shadows!
+
 class LightShadow {
 public:
 	//shader MUST have uLightingShadowMatrix uniform

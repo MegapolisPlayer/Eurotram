@@ -4,7 +4,8 @@ let canvasData = {
 	edit: null,
 	scale: 1.0,
 	shiftX: 0,
-	shiftY: 0
+	shiftY: 0,
+	mode: null,
 };
 
 function onclickHandler(event) {
@@ -14,27 +15,37 @@ function onclickHandler(event) {
 
 	console.log("Click "+x+" "+y);
 	switch(currentMode) {
-		case(mode.VIEW): break;
+		case(mode.VIEW):
+			break;
 		case(mode.SCENARIO_NEW):
-			//open mode where we click stations and switches of line
+			onclickNewScenarioHandler(x, y);
 			break;
 		case(mode.NODE_ADD):
-			onclickNodeAddHandler(x, y);
+			onclickTNodeAddHandler(x, y);
+			break;
+		case(mode.SWITCH_ADD):
+			onclickSwitchAddHandler(x, y);
+			break;
+		case(mode.RADIO_ADD):
+			onclickRadioAddHandler(x, y);
 			break;
 		case(mode.TRACK_ADD):
 			onclickTrackAddHandler(x, y);
 			break;
 		case(mode.BUILDING_ADD):
-			//add building - type to choose from
+			onclickBuildingAddHandler(x, y);
 			break;
 		case(mode.TREE_ADD):
-			//add tree - just circle (handled in sim itself - random)
+			onclicktreeAddHandler(x, y);
 			break;
 		case(mode.LIGHT_ADD):
-			//just add streetlamp
+			onclicklightAddHandler(x, y);
 			break;
 		case(mode.EDIT):
 			onclickEditHandler(x, y);
+			break;
+		case(mode.EDIT_TRACK):
+			onclickEditTrackHandler(x, y);
 			break;
 	}
 }
@@ -123,28 +134,39 @@ function dragEndHandler(event) {
 	dragEnabled = false;
 }
 
-function canvasDrawNodes() {
+//and switches
+function canvasDrawTNodes() {
 	nodeList.forEach((v) => {
 		v.draw();
 	});
 }
-
 function canvasDrawTrack() {
 	trackList.forEach((v) => {
+		v.draw();
+	});
+}
+function canvasDrawRadioboxes() {
+	radioList.forEach((v) => {
 		v.draw();
 	});
 }
 
 function canvasRedraw() {
 	canvasClear();
-	canvasDrawNodes();
+	canvasDrawTNodes();
 	canvasDrawTrack();
+	canvasDrawRadioboxes();
 }
 
 //params: x,y pos + x,y size
 //returns false if outside frustum (therefore shouldnt be rendered)
 function canvasIsInFrustum(ax, ay, asx, asy) {
-	//TODO add frustum culling (dont draw if outside of canvas)
+	return !(
+		(ax+asx < 0) ||
+		(ay+asy < 0) ||
+		(ax > canvasData.element.width) ||
+		(ay > canvasData.element.height)
+	);
 }
 
 function canvasInit() {
@@ -158,4 +180,7 @@ function canvasInit() {
 	canvasData.element.addEventListener("mouseup", dragEndHandler);
 	canvasData.element.addEventListener("wheel", mouseScrollHandler);
 	canvasData.edit = document.getElementById("editoptions");
+	canvasData.mode = document.getElementById("curmode");
+
+	statInit();
 }
