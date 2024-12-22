@@ -21,6 +21,7 @@ function viewMode() {
 	currentMode = mode.VIEW;
 	canvasData.mode.innerHTML = "View";
 	canvasData.edit.innerHTML = "";
+	canvasRedraw(); //get rid of temporary markings
 }
 
 function scenarioNew() {

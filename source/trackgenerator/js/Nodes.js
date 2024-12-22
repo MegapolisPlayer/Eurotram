@@ -88,19 +88,19 @@ function nodeUpdate() {
 }
 
 function nodeRemove() {
-	console.log("Removing node and connected track");
+	console.log("Removing node/switch and connected track");
 
-	let nodeId =  Number(document.getElementById("idinput").value);
+	let nodeId = Number(document.getElementById("idinput").value);
+
+	console.log(trackList.length);
+
+	trackList = trackList.filter((v, i) => {
+		return !(v.nodeIdFirst === nodeId || v.nodeIdSecond === nodeId);
+	});
+
+	console.log(trackList.length);
+
 	nodeList.splice(nodeId, 1);
-
-	for(let i = 0; i < trackList.length; i++) {
-		if(
-			trackList[i].nodeIdFirst == nodeId ||
-			trackList[i].nodeIdSecond == nodeId
-		) {
-			trackList.splice(i, 1);
-		}
-	}
 
 	canvasData.edit.innerHTML = "";
 

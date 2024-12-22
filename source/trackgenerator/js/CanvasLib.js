@@ -153,6 +153,7 @@ function canvasDrawRadioboxes() {
 
 function canvasRedraw() {
 	canvasClear();
+	
 	canvasDrawTNodes();
 	canvasDrawTrack();
 	canvasDrawRadioboxes();

@@ -55,6 +55,7 @@ function switchEditMenu(aid) {
 	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+nodeList[aid].height+"><br>";
 
 	canvasData.edit.innerHTML += "Switch station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+nodeList[aid].stationCode+"><br>";
+	
 	canvasData.edit.innerHTML += "Before node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editbefinput' name='editbefinput' value="+nodeList[aid].beforeId+"><br>";
 	canvasData.edit.innerHTML += "Front node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editfroinput' name='editfroinput' value="+nodeList[aid].frontId+"><br>";
 	canvasData.edit.innerHTML += "Left node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editlefinput' name='editlefinput' value="+nodeList[aid].leftId+"><br>";
@@ -64,13 +65,27 @@ function switchEditMenu(aid) {
 	canvasData.edit.innerHTML += "<hr><em>A junction is a split - the track from the 'before' node splits into the 'front', 'left' and 'right' tracks. Enter value of -1 if switch does not turn to that direction.</em><hr>";
 
 	canvasData.edit.innerHTML += "<button type='' onclick='switchUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='switchRemove()'>Remove switch</button>";
+	canvasData.edit.innerHTML += "<button type='' onclick='nodeRemove()'>Remove switch</button>";
 }
 
 function switchUpdate() {
+	console.log("Updating switch...");
 
+	let switchId =  Number(document.getElementById("idinput").value);
+
+	nodeList[switchId].xpos = Number(document.getElementById("editxinput").value);
+	nodeList[switchId].ypos = Number(document.getElementById("edityinput").value);
+	nodeList[switchId].height = Number(document.getElementById("editheightinput").value);
+	
+	nodeList[switchId].stationCode = String(document.getElementById("editcodeinput").value);
+
+	nodeList[switchId].beforeId = Number(document.getElementById("editbefinput").value);
+	nodeList[switchId].frontId = Number(document.getElementById("editfroinput").value);
+	nodeList[switchId].leftId = Number(document.getElementById("editlefinput").value);
+	nodeList[switchId].rightId = Number(document.getElementById("editriginput").value);
+	nodeList[switchId].radioBoxId = Number(document.getElementById("editradinput").value);
+
+	canvasRedraw();
 }
 
-function switchRemove() {
-
-}
+//removal same as node
