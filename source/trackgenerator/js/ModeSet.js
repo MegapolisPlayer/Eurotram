@@ -123,7 +123,8 @@ function treeAdd() {
 	canvasData.mode.innerHTML = "Add tree";
 }
 function onclicktreeAddHandler(ax, ay) {
-	//add tree - just circle (handled in sim itself - random)
+	treeList.push(new Tree(ax, ay));
+	treeList.at(-1).draw();
 }
 
 function lightAdd() {

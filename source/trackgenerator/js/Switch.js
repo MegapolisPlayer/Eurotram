@@ -1,6 +1,7 @@
 class Switch {
 	xpos = 0; //same as node, interchangable
 	ypos = 0;
+	height = 0;
 	stationCode = "";
 	//switch cannot border 2 stations
 
@@ -17,7 +18,7 @@ class Switch {
 		this.stationCode = astationCode;	
 	}
 
-	draw(style = "#00ff00") {
+	draw(style = "#aa6600") {
 		if(!this.willRender()) { return; }
 		console.log("switch draw");
 		canvasData.context.fillStyle = style;

@@ -134,29 +134,14 @@ function dragEndHandler(event) {
 	dragEnabled = false;
 }
 
-//and switches
-function canvasDrawTNodes() {
-	nodeList.forEach((v) => {
-		v.draw();
-	});
-}
-function canvasDrawTrack() {
-	trackList.forEach((v) => {
-		v.draw();
-	});
-}
-function canvasDrawRadioboxes() {
-	radioList.forEach((v) => {
-		v.draw();
-	});
-}
-
 function canvasRedraw() {
 	canvasClear();
 	
-	canvasDrawTNodes();
-	canvasDrawTrack();
-	canvasDrawRadioboxes();
+	[nodeList, trackList, radioList, treeList].forEach((v) => {
+		v.forEach((w) => {
+			w.draw();
+		});
+	})
 }
 
 //params: x,y pos + x,y size
