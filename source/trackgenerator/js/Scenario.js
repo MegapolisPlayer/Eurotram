@@ -1,6 +1,7 @@
 function scenarioClear() {
 	nodeList.length = 0;
 	trackList.length = 0;
+	//TODO add trees, light, etc...
 	canvasClear();
 }
 

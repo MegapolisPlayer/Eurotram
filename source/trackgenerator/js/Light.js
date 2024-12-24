@@ -11,7 +11,14 @@ class Light {
 		this.ypos = aypos;
 	}
 
-	draw(style = "#ffff00") {
+	draw(style = "#aaaaaa") {
+		if(!this.willRender()) { return; }
+
+		canvasData.context.fillStyle = style;
+		canvasData.context.strokeStyle = style;
+
+
+
 
 	}
 };
