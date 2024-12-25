@@ -10,10 +10,12 @@ let mode = {
 	BUILDING_ADD: 14,
 	TREE_ADD: 15,
 	LIGHT_ADD: 16,
+	LANDMARK_ADD: 17,
 
 	EDIT: 20,
 	EDIT_TRACK: 21,
 };
+
 
 let currentMode = mode.VIEW;
 
@@ -69,7 +71,7 @@ let tahFirst = -1;
 
 function onclickTrackAddHandler(ax, ay) {
 	if(tahFirst === -1) {
-		tahFirst = getCollidingTNode(ax, ay);
+		tahFirst = getColliding(nodeList, ax, ay);
 		//first node - returns -1 if fails
 		if(tahFirst !== -1) {
 			//if found first node
@@ -77,7 +79,7 @@ function onclickTrackAddHandler(ax, ay) {
 		}
 	}
 	else {
-		let secondTNode = getCollidingTNode(ax, ay);
+		let secondTNode = getColliding(nodeList, ax, ay);
 		nodeList[tahFirst].draw();
 		if(secondTNode == -1) {
 			tahFirst = -1; //reset selection
@@ -132,7 +134,16 @@ function lightAdd() {
 	canvasData.mode.innerHTML = "Add light pole";
 }
 function onclicklightAddHandler(ax, ay) {
-	//just add streetlamp
+	lightList.push(new Light(ax, ay));
+	lightList.at(-1).draw();
+}
+
+function landmarkAdd() {
+	currentMode = mode.LANDMARK_ADD;
+	canvasData.mode.innerHTML = "Add landmark";
+}
+function onclicklandmarkAddHandler(ax, ay) {
+	
 }
 
 function edit() {
@@ -140,21 +151,28 @@ function edit() {
 	canvasData.mode.innerHTML = "Edit";
 }
 function onclickEditHandler(ax, ay) {
-	let node = getCollidingTNode(ax, ay);
-	if(node === -1) {
-		console.log("Node not clicked");
+	let node = getColliding(nodeList, ax, ay);
+	if(node !== -1) {
+		if(nodeList[node] instanceof TNode) {
+			nodeEditMenu(node);
+		}
+		else if(nodeList[node] instanceof Switch) {
+			switchEditMenu(node);
+		}
+		else {
+			canvasData.edit.innerHTML = "";
+		}
+
 		return;
 	}
 
-	if(nodeList[node] instanceof TNode) {
-		nodeEditMenu(node);
+	let light = getColliding(lightList, ax, ay);
+	if(light !== -1) {
+		lightEditMenu(light);
+		return;
 	}
-	else if(nodeList[node] instanceof Switch) {
-		switchEditMenu(node);
-	}
-	else {
-		canvasData.edit.innerHTML = "";
-	}
+
+	console.log("Nothing clicked!");
 }
 
 function editTrack() {
@@ -167,7 +185,7 @@ let ethFirst = -1;
 //select 2 nodes, selects track between them
 function onclickEditTrackHandler(ax, ay) {
 	if(ethFirst === -1) {
-		ethFirst = getCollidingTNode(ax, ay);
+		ethFirst = getColliding(nodeList, ax, ay);
 		//first node - returns -1 if fails
 		if(ethFirst !== -1) {
 			//if found first node
@@ -175,7 +193,7 @@ function onclickEditTrackHandler(ax, ay) {
 		}
 	}
 	else {
-		let secondTNode = getCollidingTNode(ax, ay);
+		let secondTNode = getColliding(nodeList, ax, ay);
 		nodeList[ethFirst].draw();
 		if(secondTNode == -1) {
 			ethFirst = -1; //reset selection

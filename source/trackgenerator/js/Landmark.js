@@ -13,9 +13,36 @@
 class Landmark {
 	xpos = 0;
 	ypos = 0;
+	height = 0;
+
+	constructor(axpos, aypos) {
+
+	}
+
+	draw(style = "#00ff00") {
+		
+	}
+
+	collision(ax, ay) {
+		return (ax >= this.xpos-NODE_SIZE) &&
+			(ax <= this.xpos+NODE_SIZE) &&
+			(ay >= this.ypos-NODE_SIZE) &&
+			(ay <= this.ypos+NODE_SIZE);
+	}
+
+	willRender() {
+		return canvasIsInFrustum(
+			canvasData.shiftX + this.xpos - NODE_SIZE/2,
+			canvasData.shiftY + this.ypos - NODE_SIZE/2, 
+			NODE_SIZE, NODE_SIZE)
+	}
 };
 
 landmarkList = [];
+
+function landmarkEditMenu() {
+
+}
 
 function landmarkUpdate() {
 

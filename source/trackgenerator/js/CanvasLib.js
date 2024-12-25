@@ -41,6 +41,9 @@ function onclickHandler(event) {
 		case(mode.LIGHT_ADD):
 			onclicklightAddHandler(x, y);
 			break;
+		case(mode.LANDMARK_ADD):
+			onclicklandmarkAddHandler(x, y);
+			break;	
 		case(mode.EDIT):
 			onclickEditHandler(x, y);
 			break;
@@ -137,11 +140,20 @@ function dragEndHandler(event) {
 function canvasRedraw() {
 	canvasClear();
 	
-	[nodeList, trackList, radioList, treeList].forEach((v) => {
+	[nodeList, trackList, radioList, treeList, lightList].forEach((v) => {
 		v.forEach((w) => {
 			w.draw();
 		});
 	})
+}
+
+function getColliding(alist, ax, ay) {
+	for(let i = 0; i < alist.length; i++) {
+		if(alist[i].collision(ax, ay)) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 //params: x,y pos + x,y size
@@ -150,8 +162,8 @@ function canvasIsInFrustum(ax, ay, asx, asy) {
 	return !(
 		(ax+asx < 0) ||
 		(ay+asy < 0) ||
-		(ax > canvasData.element.width) ||
-		(ay > canvasData.element.height)
+		(ax > canvasData.element.width * (1.0/canvasData.scale)) ||
+		(ay > canvasData.element.height * (1.0/canvasData.scale))
 	);
 }
 

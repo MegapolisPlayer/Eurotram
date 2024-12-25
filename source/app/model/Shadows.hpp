@@ -8,6 +8,9 @@
 
 //TODO add spotlight shadows!
 
+//TODO add LightShadowManager class - stores 3D array texture (array of 2D) where each layer corresponds to light
+//in shader - just take minimum value (shadow only if is in all maps)
+
 class LightShadow {
 public:
 	//shader MUST have uLightingShadowMatrix uniform

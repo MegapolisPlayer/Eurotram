@@ -40,15 +40,6 @@ class RadioBox {
 
 let radioList = [];
 
-function getCollidingRadiobox(ax, ay) {
-	for(let i = 0; i < radioList.length; i++) {
-		if(radioList[i].collision()) {
-			return i;
-		}
-	}
-	return -1;
-}
-
 function radioEditMenu(aid) {
 	canvasData.edit.innerHTML = "";
 

@@ -1,7 +1,12 @@
 function scenarioClear() {
 	nodeList.length = 0;
+	radioList.length = 0;
 	trackList.length = 0;
-	//TODO add trees, light, etc...
+	buildingList.length = 0;
+	treeList.length = 0;
+	lightList.length = 0;
+	landmarkList.length = 0;
+
 	canvasClear();
 }
 

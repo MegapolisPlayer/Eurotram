@@ -1,9 +1,5 @@
 //nodes dont have to be in order - will be loaded into chunks
 
-//---------------------------------------------------------------------------------------
-// NODE
-//---------------------------------------------------------------------------------------
-
 const NODE_SIZE = 20;
 
 class TNode {
@@ -48,15 +44,6 @@ class TNode {
 
 //switches also in node list
 let nodeList = [];
-
-function getCollidingTNode(ax, ay) {
-	for(let i = 0; i < nodeList.length; i++) {
-		if(nodeList[i].collision(ax, ay)) {
-			return i;
-		}
-	}
-	return -1;
-}
 
 function nodeEditMenu(aid) {
 	canvasData.edit.innerHTML = "";
