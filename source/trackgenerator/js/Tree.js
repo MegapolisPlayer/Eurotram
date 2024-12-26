@@ -16,8 +16,8 @@ class Tree {
 		canvasData.context.fillStyle = style;
 		canvasData.context.beginPath();
 		canvasData.context.arc(
-			canvasData.shiftX + this.xpos,
-			canvasData.shiftY + this.ypos,
+			this.xpos,
+			this.ypos,
 			TREE_RADIUS, 0, 2*Math.PI
 		);
 		canvasData.context.fill();
@@ -32,8 +32,8 @@ class Tree {
 
 	willRender() {
 		return canvasIsInFrustum(
-			canvasData.shiftX + this.xpos - TREE_RADIUS,
-			canvasData.shiftY + this.ypos - TREE_RADIUS, 
+			this.xpos - TREE_RADIUS,
+			this.ypos - TREE_RADIUS, 
 			TREE_RADIUS*2, TREE_RADIUS*2)
 	}
 };

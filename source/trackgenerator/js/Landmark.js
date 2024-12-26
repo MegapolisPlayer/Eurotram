@@ -16,7 +16,8 @@ class Landmark {
 	height = 0;
 
 	constructor(axpos, aypos) {
-
+		this.xpos = axpos;
+		this.ypos = aypos;
 	}
 
 	draw(style = "#00ff00") {
@@ -41,13 +42,15 @@ class Landmark {
 landmarkList = [];
 
 function landmarkEditMenu() {
-
+	canvasData.edit.innerHTML = "";
 }
 
 function landmarkUpdate() {
-
+	console.log("Updating landmark");
 }
 
 function landmarkRemove() {
+	console.log("Removing landmark");
+
 
 }

@@ -22,8 +22,8 @@ class TNode {
 		console.log("node draw");
 		canvasData.context.fillStyle = style;
 		canvasData.context.fillRect(
-			canvasData.shiftX+this.xpos - NODE_SIZE/2,
-			canvasData.shiftY+this.ypos - NODE_SIZE/2,
+			this.xpos - NODE_SIZE/2,
+			this.ypos - NODE_SIZE/2,
 		NODE_SIZE, NODE_SIZE);
 	}
 
@@ -36,8 +36,8 @@ class TNode {
 
 	willRender() {
 		return canvasIsInFrustum(
-			canvasData.shiftX + this.xpos - NODE_SIZE/2,
-			canvasData.shiftY + this.ypos - NODE_SIZE/2, 
+			this.xpos - NODE_SIZE/2,
+			this.ypos - NODE_SIZE/2, 
 			NODE_SIZE, NODE_SIZE)
 	}
 };

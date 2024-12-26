@@ -36,12 +36,14 @@ add_executable(eurotram
 "app/model/Mesh.cpp"
 "app/model/Bones.cpp"
 
+"app/objects/Building.cpp"
 "app/objects/Button.cpp"
 "app/objects/Object.cpp"
 "app/objects/Station.cpp"
 "app/objects/Vehicle.cpp"
 "app/objects/Trigger.cpp"
 "app/objects/Track.cpp"
+"app/objects/vehicles/APEX.cpp"
 "app/objects/vehicles/T3RP.cpp"
 
 "app/physics/Force.cpp"

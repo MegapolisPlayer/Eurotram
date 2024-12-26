@@ -36,27 +36,27 @@ class Track {
 			canvasData.context.fillStyle = style;
 			canvasData.context.beginPath();
 			canvasData.context.moveTo(
-				canvasData.shiftX+nodeList[this.nodeIdFirst].xpos, 
-				canvasData.shiftY+nodeList[this.nodeIdFirst].ypos);
+				nodeList[this.nodeIdFirst].xpos, 
+				nodeList[this.nodeIdFirst].ypos);
 
 			if(this.bezier) {
 				canvasData.context.bezierCurveTo(
 					//cp1
-					canvasData.shiftX+this.controlPoint1.x,
-					canvasData.shiftY+this.controlPoint1.y,
+					this.controlPoint1.x,
+					this.controlPoint1.y,
 					//cp2
-					canvasData.shiftX+this.controlPoint2.x,
-					canvasData.shiftY+this.controlPoint2.y,
+					this.controlPoint2.x,
+					this.controlPoint2.y,
 					//end point
-					canvasData.shiftX+nodeList[this.nodeIdSecond].xpos, 
-					canvasData.shiftY+nodeList[this.nodeIdSecond].ypos
+					nodeList[this.nodeIdSecond].xpos, 
+					nodeList[this.nodeIdSecond].ypos
 				);
 				canvasData.context.stroke();
 			}
 			else {
 				canvasData.context.lineTo(
-					canvasData.shiftX+nodeList[this.nodeIdSecond].xpos, 
-					canvasData.shiftY+nodeList[this.nodeIdSecond].ypos);
+					nodeList[this.nodeIdSecond].xpos, 
+					nodeList[this.nodeIdSecond].ypos);
 				canvasData.context.stroke();
 			}
 		}
@@ -69,12 +69,12 @@ class Track {
 			canvasData.context.fillStyle = style;
 
 			canvasData.context.fillRect(
-				canvasData.shiftX+this.controlPoint1.x - NODE_SIZE/2,
-				canvasData.shiftY+this.controlPoint1.y - NODE_SIZE/2,
+				this.controlPoint1.x - NODE_SIZE/2,
+				this.controlPoint1.y - NODE_SIZE/2,
 			NODE_SIZE, NODE_SIZE);
 			canvasData.context.fillRect(
-				canvasData.shiftX+this.controlPoint2.x - NODE_SIZE/2,
-				canvasData.shiftY+this.controlPoint2.y - NODE_SIZE/2,
+				this.controlPoint2.x - NODE_SIZE/2,
+				this.controlPoint2.y - NODE_SIZE/2,
 			NODE_SIZE, NODE_SIZE);
 		}
 	}

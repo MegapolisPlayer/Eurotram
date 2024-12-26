@@ -13,13 +13,13 @@ class RadioBox {
 		this.height = aheight;
 	}
 
-	draw(style = "#ff0000") {
+	draw(style = "#800000") {
 		if(!this.willRender()) { return; }
 		console.log("radiobox draw");
 		canvasData.context.fillStyle = style;
 		canvasData.context.fillRect(
-			canvasData.shiftX+this.xpos - NODE_SIZE/2,
-			canvasData.shiftY+this.ypos - NODE_SIZE/2,
+			this.xpos - NODE_SIZE/2,
+			this.ypos - NODE_SIZE/2,
 		NODE_SIZE, NODE_SIZE);
 	}
 
@@ -32,8 +32,8 @@ class RadioBox {
 
 	willRender() {
 		return canvasIsInFrustum(
-			canvasData.shiftX + this.xpos - NODE_SIZE/2,
-			canvasData.shiftY + this.ypos - NODE_SIZE/2, 
+			this.xpos - NODE_SIZE/2,
+			this.ypos - NODE_SIZE/2, 
 			NODE_SIZE, NODE_SIZE)
 	}
 }

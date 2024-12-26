@@ -1,4 +1,4 @@
-const LIGHT_LENGTH = 40;
+const LIGHT_LENGTH = 20;
 
 function toRadians(degrees) {
 	return degrees * Math.PI / 180.0;
@@ -25,12 +25,12 @@ class Light {
 		canvasData.context.beginPath();
 
 		canvasData.context.moveTo(
-			canvasData.shiftX + this.xpos,
-			canvasData.shiftY + this.ypos
+			this.xpos,
+			this.ypos
 		);
 
-		let endX = canvasData.shiftX + this.xpos + (LIGHT_LENGTH * Math.sin(toRadians(this.rotation)));
-		let endY = canvasData.shiftY + this.ypos + (LIGHT_LENGTH * Math.cos(toRadians(this.rotation)));
+		let endX = this.xpos + (LIGHT_LENGTH * Math.sin(toRadians(this.rotation)));
+		let endY = this.ypos + (LIGHT_LENGTH * Math.cos(toRadians(this.rotation)));
 
 		canvasData.context.lineTo(endX, endY);
 
@@ -63,13 +63,13 @@ class Light {
 	willRender() {
 		//check rectangle around lamp
 
-		let minX = canvasData.shiftX + this.xpos;
-		let minY = canvasData.shiftY + this.ypos;
+		let minX = this.xpos;
+		let minY = this.ypos;
 
 		let sizeX = (LIGHT_LENGTH * Math.sin(toRadians(this.rotation)));
 		let sizeY = (LIGHT_LENGTH * Math.cos(toRadians(this.rotation)));
 
-		//move top left corner
+		//move to top left corner
 		if(sizeX < 0) {
 			minX += sizeX;
 		}

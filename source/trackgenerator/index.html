@@ -3,6 +3,8 @@
 	<head>
 		<title>Eurotram Track Editor</title>
 		<link rel="stylesheet" href="./style.css">
+		<!-- ignore no icon error -->
+		<link rel="icon" href="#">
 	</head>
 	<body>
 		<h1>Eurotram track and scenario editor</h1>
@@ -47,6 +49,7 @@
 				Canvas is not supported.
 			</canvas>
 			<div id="editmenu">
+				<span id="permeter"></span> units = 1 meter<br>
 				<button onclick="canvasZoomIn()">Zoom in</button>
 				<button onclick="canvasZoomOut()">Zoom out</button>
 				<button onclick="canvasZoomReset()">Reset zoom</button>

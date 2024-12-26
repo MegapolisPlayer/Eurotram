@@ -10,8 +10,8 @@ let canvasData = {
 
 function onclickHandler(event) {
 	//here inverse since if scene moved to right we move to left
-    let x = -canvasData.shiftX + Math.trunc((event.pageX - event.target.offsetLeft)) * (1.0/canvasData.scale);
-    let y = -canvasData.shiftY + Math.trunc((event.pageY - event.target.offsetTop)) * (1.0/canvasData.scale);
+    let x = -canvasData.shiftX + (Math.trunc(event.pageX - event.target.offsetLeft) * (1.0/canvasData.scale));
+    let y = -canvasData.shiftY + (Math.trunc(event.pageY - event.target.offsetTop) * (1.0/canvasData.scale));
 
 	console.log("Click "+x+" "+y);
 	switch(currentMode) {
@@ -54,12 +54,15 @@ function onclickHandler(event) {
 }
 
 function canvasClear() {
+	canvasData.context.save();
+	canvasData.context.resetTransform();
 	canvasData.context.fillStyle = "#ffffff";
 	canvasData.context.fillRect(
 		0, 0, 
-		canvasData.element.width*(1.0/canvasData.scale),
-		canvasData.element.height*(1.0/canvasData.scale)
+		canvasData.element.width,
+		canvasData.element.height
 	);
+	canvasData.context.restore();
 }
 
 const SCALE_MULTIPLIER = 1.2;
@@ -68,6 +71,7 @@ function canvasZoomIn() {
 	canvasData.context.resetTransform(); //scale matrices multiply, reset them
 	canvasData.scale *= SCALE_MULTIPLIER;
 	canvasData.context.scale(canvasData.scale, canvasData.scale);
+	canvasData.context.translate(canvasData.shiftX, canvasData.shiftY);
 	canvasRedraw();
 	console.log(canvasData.scale);
 }
@@ -75,11 +79,13 @@ function canvasZoomOut() {
 	canvasData.context.resetTransform();
 	canvasData.scale /= SCALE_MULTIPLIER;
 	canvasData.context.scale(canvasData.scale, canvasData.scale);
+	canvasData.context.translate(canvasData.shiftX, canvasData.shiftY);
 	canvasRedraw();
 	console.log(canvasData.scale);
 }
 function canvasZoomReset() {
 	canvasData.context.resetTransform();
+	canvasData.context.translate(canvasData.shiftX, canvasData.shiftY);
 	canvasData.scale = 1.0;
 	canvasRedraw();
 }
@@ -103,6 +109,7 @@ function mouseScrollHandler(event) {
 		canvasData.scale /= SCALE_MULTIPLIER;
 	}
 	canvasData.context.scale(canvasData.scale, canvasData.scale);
+	canvasData.context.translate(canvasData.shiftX, canvasData.shiftY);
 	canvasRedraw();
 }
 
@@ -123,9 +130,17 @@ function dragStartHandler(event) {
 function dragHandler(event) {
 	if(!dragEnabled) return;
 
-	canvasData.shiftX += (Math.trunc((event.pageX - event.target.offsetLeft))-dragStartX) * (1.0/canvasData.scale);
-	canvasData.shiftY += (Math.trunc((event.pageY - event.target.offsetTop))-dragStartY) * (1.0/canvasData.scale);
+	let dx = (Math.trunc((event.pageX - event.target.offsetLeft))-dragStartX) * (1.0/canvasData.scale);
+	let dy = (Math.trunc((event.pageY - event.target.offsetTop))-dragStartY) * (1.0/canvasData.scale);
+
+	canvasData.context.translate(dx, dy);
+
+	canvasData.shiftX += dx;
+	canvasData.shiftY += dy;
+
 	console.log("Drag "+canvasData.shiftX+" "+canvasData.shiftY);
+
+	
 	dragStartX = Math.trunc(event.pageX - event.target.offsetLeft);
 	dragStartY = Math.trunc(event.pageY - event.target.offsetTop);
 	canvasRedraw();
@@ -140,7 +155,7 @@ function dragEndHandler(event) {
 function canvasRedraw() {
 	canvasClear();
 	
-	[nodeList, trackList, radioList, treeList, lightList].forEach((v) => {
+	[nodeList, trackList, radioList, treeList, lightList, buildingList].forEach((v) => {
 		v.forEach((w) => {
 			w.draw();
 		});
@@ -160,12 +175,14 @@ function getColliding(alist, ax, ay) {
 //returns false if outside frustum (therefore shouldnt be rendered)
 function canvasIsInFrustum(ax, ay, asx, asy) {
 	return !(
-		(ax+asx < 0) ||
-		(ay+asy < 0) ||
-		(ax > canvasData.element.width * (1.0/canvasData.scale)) ||
-		(ay > canvasData.element.height * (1.0/canvasData.scale))
+		(ax + canvasData.shiftX + asx < 0) ||
+		(ay + canvasData.shiftY + asy < 0) ||
+		(canvasData.shiftX + ax > (canvasData.element.width * (1.0/canvasData.scale))) ||
+		(canvasData.shiftY + ay > (canvasData.element.height * (1.0/canvasData.scale)))
 	);
 }
+
+const UNITS_PER_METER = 20;
 
 function canvasInit() {
     canvasData.element = document.getElementById("main");
@@ -179,6 +196,10 @@ function canvasInit() {
 	canvasData.element.addEventListener("wheel", mouseScrollHandler);
 	canvasData.edit = document.getElementById("editoptions");
 	canvasData.mode = document.getElementById("curmode");
+
+	canvasData.context.lineWidth = 10;
+
+	document.getElementById("permeter").innerHTML = UNITS_PER_METER;
 
 	statInit();
 }

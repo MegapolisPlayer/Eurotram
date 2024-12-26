@@ -16,7 +16,6 @@ let mode = {
 	EDIT_TRACK: 21,
 };
 
-
 let currentMode = mode.VIEW;
 
 function viewMode() {
@@ -117,7 +116,7 @@ function buildingAdd() {
 	canvasData.mode.innerHTML = "Add building";
 }
 function onclickBuildingAddHandler(ax, ay) {
-	//add building - type to choose from
+	buildingSelectMenu(ax, ay);
 }
 
 function treeAdd() {
@@ -169,6 +168,30 @@ function onclickEditHandler(ax, ay) {
 	let light = getColliding(lightList, ax, ay);
 	if(light !== -1) {
 		lightEditMenu(light);
+		return;
+	}
+
+	let tree = getColliding(treeList, ax, ay);
+	if(tree !== -1) {
+		treeEditMenu(tree);
+		return;
+	}
+
+	let radio = getColliding(radioList, ax, ay);
+	if(radio !== -1) {
+		radioEditMenu(radio);
+		return;
+	}
+
+	let building = getColliding(buildingList, ax, ay);
+	if(building !== -1) {
+		buildingEditMenu(building);
+		return;
+	}
+
+	let landmark = getColliding(landmarkList, ax, ay);
+	if(landmark !== -1) {
+		landmarkEditMenu(landmark);
 		return;
 	}
 
