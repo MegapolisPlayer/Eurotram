@@ -5,15 +5,21 @@ let mode = {
 
 	NODE_ADD: 10,
 	SWITCH_ADD: 11,
-	RADIO_ADD: 12,
-	TRACK_ADD: 13,
-	BUILDING_ADD: 14,
-	TREE_ADD: 15,
-	LIGHT_ADD: 16,
-	LANDMARK_ADD: 17,
+	SWITCH_SIG_ADD: 12,
+	SIGNAL_ADD: 13,
+	RADIO_ADD: 14,
+	TRACK_ADD: 15,
+	BUILDING_ADD: 16,
+	TREE_ADD: 17,
+	LIGHT_ADD: 18,
+	LANDMARK_ADD: 19,
 
-	EDIT: 20,
-	EDIT_TRACK: 21,
+	STATION_PLATFORM_ADD: 20,
+	STATION_PILLAR_ADD: 21,
+
+	EDIT: 30,
+	EDIT_TRACK: 31,
+	EDIT_STATION_TRACK: 32,
 };
 
 let currentMode = mode.VIEW;
@@ -50,6 +56,22 @@ function onclickSwitchAddHandler(ax, ay) {
 	//switches also in node list
 	nodeList.push(new Switch(ax, ay, "", "", 0));
 	nodeList.at(-1).draw();
+}
+
+function switchSignalAdd() {
+	currentMode = mode.SWITCH_SIG_ADD;
+	canvasData.mode.innerHTML = "Add switch signal";
+}
+function onclickSwitchSignalAddHandler(ax, ay) {
+
+}
+
+function signalAdd() {
+	currentMode = mode.SIGNAL_ADD;
+	canvasData.mode.innerHTML = "Add signal";
+}
+function onclickSignalAddHandler(ax, ay) {
+	
 }
 
 function radioAdd() {
@@ -142,6 +164,20 @@ function landmarkAdd() {
 	canvasData.mode.innerHTML = "Add landmark";
 }
 function onclicklandmarkAddHandler(ax, ay) {
+	
+}
+
+function stationPlatformAdd() {
+
+}
+function onclickStationPlatformAddHandler(ax, ay) {
+	
+}
+
+function stationPillarAdd() {
+
+}
+function onclickStationPillarAddHandler(ax, ay) {
 	
 }
 
@@ -241,4 +277,12 @@ function onclickEditTrackHandler(ax, ay) {
 			}
 		}
 	}
+}
+
+function editStationTrack() {
+
+}
+
+function onclickEditStationTrackHandler(ax, ay) {
+
 }

@@ -14,6 +14,7 @@ class Landmark {
 	xpos = 0;
 	ypos = 0;
 	height = 0;
+	//no station code - always rendered
 
 	constructor(axpos, aypos) {
 		this.xpos = axpos;

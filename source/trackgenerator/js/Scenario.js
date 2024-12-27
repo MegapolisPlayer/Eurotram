@@ -45,6 +45,11 @@ function scenarioNewLine() {
 function scenarioSerialize() {
 
 }
-function scenarioLoad() {
+
+function scenarionDeserialize() {
+
+}
+
+function lineSerialize() {
 	
 }

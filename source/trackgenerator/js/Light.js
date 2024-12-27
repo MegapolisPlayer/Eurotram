@@ -9,6 +9,7 @@ class Light {
 	ypos = 0;
 	height = 0;
 	rotation = 0;	
+	stationCode = "";
 
 	constructor(axpos, aypos) {
 		this.xpos = axpos;
@@ -97,6 +98,7 @@ function lightEditMenu(aid) {
 	canvasData.edit.innerHTML += "Y:<input type='number' id='edityinput' name='edityinput' value="+lightList[aid].ypos+"><br>";
 	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+lightList[aid].height+"><br>";
 	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+lightList[aid].rotation+"><br>";
+	canvasData.edit.innerHTML += "Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+lightList[aid].stationCode+"><br>";
 
 	canvasData.edit.innerHTML += "<button type='' onclick='lightUpdate()'>Update</button>";
 	canvasData.edit.innerHTML += "<button type='' onclick='lightRemove()'>Remove light</button>";
@@ -111,6 +113,7 @@ function lightUpdate() {
 	lightList[lightId].ypos = Number(document.getElementById("edityinput").value);
 	lightList[lightId].height = Number(document.getElementById("editheightinput").value);
 	lightList[lightId].rotation = Number(document.getElementById("editrotinput").value);
+	lightList[lightId].stationCode = Number(document.getElementById("editcodeinput").value);
 
 	canvasRedraw();
 }

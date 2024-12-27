@@ -2,6 +2,7 @@ class RadioBox {
 	xpos = 0;
 	ypos = 0;
 	height = 0;
+	stationCode = "";
 
 	//we dont store value of switch - switch stores our value
 	//in simulator - when tram in 1-2 meter radius - sends signal
@@ -48,10 +49,10 @@ function radioEditMenu(aid) {
 	canvasData.edit.innerHTML += "X:<input type='number' id='editxinput' name='editxinput' value="+radioList[aid].xpos+"><br>";
 	canvasData.edit.innerHTML += "Y:<input type='number' id='edityinput' name='edityinput' value="+radioList[aid].ypos+"><br>";
 	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+radioList[aid].height+"><br>";
+	canvasData.edit.innerHTML += "Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+radioList[aid].stationCode+"><br>";
 
 	canvasData.edit.innerHTML += "<button type='' onclick='radioUpdate()'>Update</button>";
 	canvasData.edit.innerHTML += "<button type='' onclick='radioRemove()'>Remove radio</button>";
-
 }
 
 function radioUpdate() {
@@ -62,6 +63,7 @@ function radioUpdate() {
 	radioList[radioId].xpos = Number(document.getElementById("editxinput").value);
 	radioList[radioId].ypos = Number(document.getElementById("edityinput").value);
 	radioList[radioId].height = Number(document.getElementById("editheightinput").value);
+	radioList[radioId].stationCode = Number(document.getElementById("editcodeinput").value);
 
 	canvasRedraw();
 }

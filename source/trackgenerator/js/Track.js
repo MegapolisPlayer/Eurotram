@@ -30,10 +30,10 @@ class Track {
 		this.recalculateHeightpoints();	
 	}
 
-	draw(style = "#000000") {
+	draw(style = "#aaaaaa") {
 		if(nodeList[this.nodeIdFirst].willRender() || nodeList[this.nodeIdSecond].willRender()) {
 			console.log("track draw");
-			canvasData.context.fillStyle = style;
+			canvasData.context.strokeStyle = style;
 			canvasData.context.beginPath();
 			canvasData.context.moveTo(
 				nodeList[this.nodeIdFirst].xpos, 
@@ -100,6 +100,12 @@ class Track {
 };
 
 let trackList = [];
+
+function trackRecalcAllHeightpoints() {
+	trackList.forEach((v) => {
+		v.recalculateHeightpoints();
+	});
+}
 
 function trackEditMenu(aid) {
 	canvasData.edit.innerHTML = "";

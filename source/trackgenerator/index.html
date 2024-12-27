@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Eurotram Track Editor</title>
+		<title>Edit Eurotram map,scenario</title>
 		<link rel="stylesheet" href="./style.css">
 		<!-- ignore no icon error -->
 		<link rel="icon" href="#">
 	</head>
 	<body>
-		<h1>Eurotram track and scenario editor</h1>
+		<h1>Eurotram map and scenario editor</h1>
 		<em>(c) Martin/MegapolisPlayer 2024-2025</em>
 		<hr>
 		<strong>File</strong>
@@ -23,8 +23,13 @@
 		<strong>Add</strong>
 		<button onclick="nodeAdd()">Node</button>
 		<button onclick="switchAdd()">Switch</button>
+		<button onclick="switchSignalAdd()">Switch signal</button>
+		<button onclick="signalAdd()">Signal</button>
 		<button onclick="radioAdd()">Radiobox</button>
 		<button onclick="trackAdd()">Track</button>
+		<button onclick="stationTrackAdd()">Station track</button>
+		<button onclick="stationPlatformAdd()">Station platform</button>
+		<button onclick="stationPillarAdd()">Station pillar</button>
 		<button onclick="buildingAdd()">Building</button>
 		<button onclick="treeAdd()">Tree</button>
 		<button onclick="lightAdd()">Light pole</button>
@@ -36,11 +41,14 @@
 		<button onclick="editTrack()">Edit/Remove track</button>
 		<em>Adjust existing objects</em>
 		<br>
-
 		<strong>Move map</strong>
 		<button onclick="viewMode()">View mode</button>
 		<button onclick="canvasPosReset()">Reset map position</button>
-
+		<em>Move viewport</em>
+		<br>
+		<strong>Global operations</strong>
+		<button onclick="trackRecalcAllHeightpoints()">Recalculate all track heights</button>
+		<em>Quick operations</em>
 		<br>
 		<em>Current mode: </em><span id="curmode">View</span>
 		<hr>
@@ -50,9 +58,22 @@
 			</canvas>
 			<div id="editmenu">
 				<span id="permeter"></span> units = 1 meter<br>
+
+				X offset = <span id="shiftx">0</span><br>
+				Y offset = <span id="shifty">0</span><br>
+				Scale = <span id="scale">1</span>x<br>
+
 				<button onclick="canvasZoomIn()">Zoom in</button>
 				<button onclick="canvasZoomOut()">Zoom out</button>
 				<button onclick="canvasZoomReset()">Reset zoom</button>
+
+				<br>
+
+				<input type="checkbox" id="hidegrid" name="hidegrid">
+				<label for="hidegrid">Hide grid</label>
+
+				<hr>
+
 				<h2>Edit menu</h2>
 				<span id="editoptions">
 
@@ -91,6 +112,7 @@
 				<span id="amountlandmark">0</span>
 			</li>
 		</ul>
+		Eurotram format version:<span id="fmtversion">??</span>
 		<hr>
 
 		<script src="js/ModeSet.js"></script>
@@ -103,11 +125,14 @@
 		<script src="js/Light.js"></script>
 		<script src="js/Tree.js"></script>
 		<script src="js/Landmark.js"></script>
+		<script src="js/Signal.js"></script>
+		<script src="js/Station.js"></script>
 
 		<script src="js/Statistics.js"></script>
 		<script src="js/Scenario.js"></script>
 
 		<script src="js/FileSave.js"></script>
+		<script src="js/Grid.js"></script>
 		<script src="js/CanvasLib.js"></script>
 		<script>
 			canvasInit();
