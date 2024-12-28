@@ -20,9 +20,9 @@ class Track {
 	//10 evenly spaced out points with height information
 	heightpoints = [];
 
-	constructor(aTNodeIdFirst, aTNodeIdSecond) {
-		this.nodeIdFirst = aTNodeIdFirst;
-		this.nodeIdSecond = aTNodeIdSecond;
+	constructor(anodeIdFirst, anodeIdSecond) {
+		this.nodeIdFirst = anodeIdFirst;
+		this.nodeIdSecond = anodeIdSecond;
 		this.bezier = false;
 
 		this.recalculateCP();
@@ -113,7 +113,6 @@ function trackEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing track "+aid+" between nodes "+trackList[aid].nodeIdFirst+" and "+trackList[aid].nodeIdSecond+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	//TODO add checkbox bezier/linear
 	canvasData.edit.innerHTML += "Bezier:<input type='checkbox' id='editbezinput' name='editbezinput' "+(trackList[aid].bezier?"checked":"")+"><br>";
 	
 	canvasData.edit.innerHTML += "<hr><em>Control point values have no effect if Bezier curves are disabled.</em><hr>";
@@ -167,15 +166,7 @@ function trackUpdate() {
 
 	let trackId = Number(document.getElementById("idinput").value);
 
-	trackList[trackId].bezier = document.getElementById("editbezinput").checked;
-	trackList[trackId].controlPoint1.x = Number(document.getElementById("editcp1xinput").value);
-	trackList[trackId].controlPoint1.y = Number(document.getElementById("editcp1yinput").value);
-	trackList[trackId].controlPoint2.x = Number(document.getElementById("editcp2xinput").value);
-	trackList[trackId].controlPoint2.y = Number(document.getElementById("editcp2yinput").value);
-
-	for(let i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
-		trackList[trackId].heightpoints[i] = Number(document.getElementById("edithght"+i).value);
-	}
+	getDataFromTrackInputs(trackList[trackId]);
 
 	canvasRedraw();
 

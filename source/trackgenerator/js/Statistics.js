@@ -5,7 +5,10 @@ let statInfo = {
 	build: null,
 	tree: null,
 	light: null,
-	landmark: null
+	landmark: null,
+	pillar: null,
+	signal: null,
+	swsignal: null,
 };
 
 function statUpdate() {
@@ -16,6 +19,9 @@ function statUpdate() {
 	statInfo.tree.innerHTML = treeList.length;
 	statInfo.light.innerHTML = lightList.length;
 	statInfo.landmark.innerHTML = landmarkList.length;
+	statInfo.pillar.innerHTML = stationPillarList.length;
+	statInfo.signal.innerHTML = signalList.length;
+	statInfo.swsignal.innerHTML = switchSignalList.length;
 }
 
 function statInit() {
@@ -26,6 +32,9 @@ function statInit() {
 	statInfo.tree = document.getElementById("amounttree");
 	statInfo.light = document.getElementById("amountlight");
 	statInfo.landmark = document.getElementById("amountlandmark");
+	statInfo.pillar = document.getElementById("amountpillar");
+	statInfo.signal = document.getElementById("amountsignal");
+	statInfo.swsignal = document.getElementById("amountswsignal");
 
 	window.setInterval(statUpdate, 2000);
 }

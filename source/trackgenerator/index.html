@@ -28,7 +28,6 @@
 		<button onclick="radioAdd()">Radiobox</button>
 		<button onclick="trackAdd()">Track</button>
 		<button onclick="stationTrackAdd()">Station track</button>
-		<button onclick="stationPlatformAdd()">Station platform</button>
 		<button onclick="stationPillarAdd()">Station pillar</button>
 		<button onclick="buildingAdd()">Building</button>
 		<button onclick="treeAdd()">Tree</button>
@@ -50,11 +49,16 @@
 		<button onclick="trackRecalcAllHeightpoints()">Recalculate all track heights</button>
 		<em>Quick operations</em>
 		<br>
+		<strong>Texture parcels</strong>
+		<button onclick="textureParcelAdd()">Add</button>
+		<button onclick="textureParcelEdit()">Edit</button>
+		<em>Texture parcels</em>
+		<br>
 		<em>Current mode: </em><span id="curmode">View</span>
 		<hr>
 		<div id="container">
 			<canvas id="main">
-				Canvas is not supported.
+				Canvas is not supported. Please use a different, newer browser.
 			</canvas>
 			<div id="editmenu">
 				<span id="permeter"></span> units = 1 meter<br>
@@ -69,8 +73,8 @@
 
 				<br>
 
-				<input type="checkbox" id="hidegrid" name="hidegrid">
-				<label for="hidegrid">Hide grid</label>
+				<input type="checkbox" id="hideter" name="hideter">
+				<label for="hideter">Hide texture parcels</label>
 
 				<hr>
 
@@ -111,8 +115,20 @@
 				Landmark amount:
 				<span id="amountlandmark">0</span>
 			</li>
+			<li>
+				Station pillar amount:
+				<span id="amountpillar">0</span>
+			</li>
+			<li>
+				Signal amount:
+				<span id="amountsignal">0</span>
+			</li>
+			<li>
+				Switch signal amount:
+				<span id="amountswsignal">0</span>
+			</li>
 		</ul>
-		Eurotram format version:<span id="fmtversion">??</span>
+		Eurotram format version: <span id="fmtversion">??</span>
 		<hr>
 
 		<script src="js/ModeSet.js"></script>
@@ -132,7 +148,7 @@
 		<script src="js/Scenario.js"></script>
 
 		<script src="js/FileSave.js"></script>
-		<script src="js/Grid.js"></script>
+		<script src="js/Texparcels.js"></script>
 		<script src="js/CanvasLib.js"></script>
 		<script>
 			canvasInit();

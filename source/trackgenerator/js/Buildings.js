@@ -65,7 +65,7 @@ class Building {
 		canvasData.context.fillStyle = style;
 		canvasData.context.fillRect(0, 0, this.xsize, this.ysize);
 
-		canvasData.context.strokeStyle = "#ff00ff";
+		canvasData.context.strokeStyle = SELECT_COLOR;
 		canvasData.context.beginPath();
 		canvasData.context.moveTo(0, this.ysize-LINE_WIDTH/2);
 		canvasData.context.lineTo(this.xsize, this.ysize-LINE_WIDTH/2);
@@ -146,11 +146,8 @@ function buildingEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing buidling "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += "X:<input type='number' id='editxinput' name='editxinput' value="+buildingList[aid].xpos+"><br>";
-	canvasData.edit.innerHTML += "Y:<input type='number' id='edityinput' name='edityinput' value="+buildingList[aid].ypos+"><br>";
-	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+buildingList[aid].height+"><br>";
+	canvasData.edit.innerHTML += addBasicEditInputs(buildingList[aid]);
 	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+buildingList[aid].rotation+"><br>";
-	canvasData.edit.innerHTML += "Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+buildingList[aid].stationCode+"><br>";
 
 	canvasData.edit.innerHTML += buildingTypeSelector;
 
@@ -162,12 +159,9 @@ function buildingUpdate() {
 	console.log("Updating building..");
 
 	let buildId = Number(document.getElementById("idinput").value);
-	buildingList[buildId].xpos = Number(document.getElementById("editxinput").value);
-	buildingList[buildId].ypos = Number(document.getElementById("edityinput").value);
-	buildingList[buildId].height = Number(document.getElementById("editheightinput").value);
+	getDataFromBasicInputs(buildingList[buildId]);
 	buildingList[buildId].rotation = Number(document.getElementById("editrotinput").value);
 	buildingList[buildId].type = Number(document.getElementById("buildtypeinput").value);
-	buildingList[buildId].stationCode = Number(document.getElementById("editcodeinput").value);
 	buildingList[buildId].updateFromType();
 
 	canvasRedraw();

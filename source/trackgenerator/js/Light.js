@@ -1,4 +1,4 @@
-const LIGHT_LENGTH = 20;
+const LIGHT_LENGTH = 40;
 
 function toRadians(degrees) {
 	return degrees * Math.PI / 180.0;
@@ -38,9 +38,9 @@ class Light {
 		canvasData.context.stroke();
 
 		canvasData.context.fillRect(
-			endX - NODE_SIZE/4,
-			endY - NODE_SIZE/4,
-		NODE_SIZE/2, NODE_SIZE/2);
+			endX - NODE_SIZE/2,
+			endY - NODE_SIZE/2,
+		NODE_SIZE, NODE_SIZE);
 	}
 
 	collision(ax, ay) {
@@ -94,11 +94,8 @@ function lightEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing light "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += "X:<input type='number' id='editxinput' name='editxinput' value="+lightList[aid].xpos+"><br>";
-	canvasData.edit.innerHTML += "Y:<input type='number' id='edityinput' name='edityinput' value="+lightList[aid].ypos+"><br>";
-	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+lightList[aid].height+"><br>";
+	canvasData.edit.innerHTML += addBasicEditInputs(lightList[aid]);
 	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+lightList[aid].rotation+"><br>";
-	canvasData.edit.innerHTML += "Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+lightList[aid].stationCode+"><br>";
 
 	canvasData.edit.innerHTML += "<button type='' onclick='lightUpdate()'>Update</button>";
 	canvasData.edit.innerHTML += "<button type='' onclick='lightRemove()'>Remove light</button>";
@@ -109,11 +106,8 @@ function lightUpdate() {
 
 	let lightId = Number(document.getElementById("idinput").value);
 
-	lightList[lightId].xpos = Number(document.getElementById("editxinput").value);
-	lightList[lightId].ypos = Number(document.getElementById("edityinput").value);
-	lightList[lightId].height = Number(document.getElementById("editheightinput").value);
+	getDataFromBasicInputs(lightList[lightId]);
 	lightList[lightId].rotation = Number(document.getElementById("editrotinput").value);
-	lightList[lightId].stationCode = Number(document.getElementById("editcodeinput").value);
 
 	canvasRedraw();
 }

@@ -1,4 +1,4 @@
-const TREE_RADIUS = 10;
+const TREE_RADIUS = 25;
 
 class Tree {
 	xpos = 0;
@@ -47,10 +47,7 @@ function treeEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing tree no. "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += "X:<input type='number' id='editxinput' name='editxinput' value="+treeList[aid].xpos+"><br>";
-	canvasData.edit.innerHTML += "Y:<input type='number' id='edityinput' name='edityinput' value="+treeList[aid].ypos+"><br>";
-	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+treeList[aid].height+"><br>";
-	canvasData.edit.innerHTML += "Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+treeList[aid].stationCode+"><br>";
+	canvasData.edit.innerHTML += addBasicEditInputs(treeList[aid]);
 
 	canvasData.edit.innerHTML += "<button type='' onclick='treeUpdate()'>Update</button>";
 	canvasData.edit.innerHTML += "<button type='' onclick='treeRemove()'>Remove tree</button>";
@@ -59,12 +56,8 @@ function treeEditMenu(aid) {
 function treeUpdate() {
 	console.log("Updating tree...");
 
-	let treeId =  Number(document.getElementById("idinput").value);
-
-	treeList[treeId].xpos = Number(document.getElementById("editxinput").value);
-	treeList[treeId].ypos = Number(document.getElementById("edityinput").value);
-	treeList[treeId].height = Number(document.getElementById("editheightinput").value);
-	treeList[treeId].stationCode = Number(document.getElementById("editcodeinput").value);
+	let treeId = Number(document.getElementById("idinput").value);
+	getDataFromBasicInputs(treeList[treeId]);
 
 	canvasRedraw();
 }

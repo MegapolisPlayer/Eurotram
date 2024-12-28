@@ -51,11 +51,7 @@ function switchEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing switch (node no. "+aid+")<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += "X:<input type='number' id='editxinput' name='editxinput' value="+nodeList[aid].xpos+"><br>";
-	canvasData.edit.innerHTML += "Y:<input type='number' id='edityinput' name='edityinput' value="+nodeList[aid].ypos+"><br>";
-	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+nodeList[aid].height+"><br>";
-
-	canvasData.edit.innerHTML += "Switch station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+nodeList[aid].stationCode+"><br>";
+	canvasData.edit.innerHTML += addBasicEditInputs(nodeList[aid]);
 	
 	canvasData.edit.innerHTML += "Before node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editbefinput' name='editbefinput' value="+nodeList[aid].beforeId+"><br>";
 	canvasData.edit.innerHTML += "Front node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editfroinput' name='editfroinput' value="+nodeList[aid].frontId+"><br>";
@@ -74,11 +70,7 @@ function switchUpdate() {
 
 	let switchId =  Number(document.getElementById("idinput").value);
 
-	nodeList[switchId].xpos = Number(document.getElementById("editxinput").value);
-	nodeList[switchId].ypos = Number(document.getElementById("edityinput").value);
-	nodeList[switchId].height = Number(document.getElementById("editheightinput").value);
-	
-	nodeList[switchId].stationCode = String(document.getElementById("editcodeinput").value);
+	getDataFromBasicInputs(nodeList[switchId]);
 
 	nodeList[switchId].beforeId = Number(document.getElementById("editbefinput").value);
 	nodeList[switchId].frontId = Number(document.getElementById("editfroinput").value);

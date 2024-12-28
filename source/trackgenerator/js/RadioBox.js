@@ -46,10 +46,7 @@ function radioEditMenu(aid) {
 
 	canvasData.edit.innerHTML += "Editing radiobox "+aid+"<br>";
 
-	canvasData.edit.innerHTML += "X:<input type='number' id='editxinput' name='editxinput' value="+radioList[aid].xpos+"><br>";
-	canvasData.edit.innerHTML += "Y:<input type='number' id='edityinput' name='edityinput' value="+radioList[aid].ypos+"><br>";
-	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+radioList[aid].height+"><br>";
-	canvasData.edit.innerHTML += "Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+radioList[aid].stationCode+"><br>";
+	canvasData.edit.innerHTML += addBasicEditInputs(radioList[aid]);
 
 	canvasData.edit.innerHTML += "<button type='' onclick='radioUpdate()'>Update</button>";
 	canvasData.edit.innerHTML += "<button type='' onclick='radioRemove()'>Remove radio</button>";
@@ -60,10 +57,7 @@ function radioUpdate() {
 
 	let radioId =  Number(document.getElementById("idinput").value);
 
-	radioList[radioId].xpos = Number(document.getElementById("editxinput").value);
-	radioList[radioId].ypos = Number(document.getElementById("edityinput").value);
-	radioList[radioId].height = Number(document.getElementById("editheightinput").value);
-	radioList[radioId].stationCode = Number(document.getElementById("editcodeinput").value);
+	getDataFromBasicInputs(radioList[radioId]);
 
 	canvasRedraw();
 }

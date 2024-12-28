@@ -2,7 +2,10 @@ const UNITS_PER_METER = 20;
 const METERS_PER_GRID = 100;
 
 const GRID_SIZE = UNITS_PER_METER*METERS_PER_GRID;
-const LINE_WIDTH = UNITS_PER_METER*(1.435+0.20); //track gauge + 20cm bonus
+const TRACK_WIDTH = UNITS_PER_METER*(1.435+0.20); //track gauge + 20cm bonus
+const LINE_WIDTH = 10;
+
+const SELECT_COLOR = "#ff00ff";
 
 let canvasData = {
     element: null,
@@ -15,7 +18,7 @@ let canvasData = {
 	shiftXOut: null,
 	shiftYOut: null,
 	scaleOut: null,
-	hideGridElem: null,
+	hideTPElem: null,
 };
 
 function onclickHandler(event) {
@@ -31,7 +34,7 @@ function onclickHandler(event) {
 	switch(currentMode) {
 		case(mode.VIEW):
 			break;
-		case(mode.SCENARIO_NEW):
+		case(mode.SCENARIO_NEW_LINE):
 			onclickNewScenarioHandler(x, y);
 			break;
 		case(mode.NODE_ADD):
@@ -50,7 +53,10 @@ function onclickHandler(event) {
 			onclickRadioAddHandler(x, y);
 			break;
 		case(mode.TRACK_ADD):
-			onclickTrackAddHandler(x, y);
+			onclickTrackAddHandler(x, y, false);
+			break;
+		case(mode.STATION_TRACK_ADD):
+			onclickTrackAddHandler(x, y, true);
 			break;
 		case(mode.BUILDING_ADD):
 			onclickBuildingAddHandler(x, y);
@@ -64,17 +70,20 @@ function onclickHandler(event) {
 		case(mode.LANDMARK_ADD):
 			onclicklandmarkAddHandler(x, y);
 			break;	
-		case(mode.STATION_PLATFORM_ADD):
-			onclickStationPlatformAddHandler(x, y);
-			break;	
 		case(mode.STATION_PILLAR_ADD):
 			onclickStationPillarAddHandler(x, y);
 			break;	
+		case(mode.TEXTURE_PARCEL_ADD):
+			onclickTextureParcelAddHandler(x, y);
+			break;
 		case(mode.EDIT):
 			onclickEditHandler(x, y);
 			break;
 		case(mode.EDIT_TRACK):
 			onclickEditTrackHandler(x, y);
+			break;
+		case(mode.EDIT_TEXTURE_PARCEL):
+			onclickTextureParcelEditHandler(x, y);
 			break;
 	}
 }
@@ -178,38 +187,37 @@ function dragEndHandler(event) {
 	dragEnabled = false;
 }
 
-function canvasRedraw() {
+function canvasRedraw(aNoTPOverride = false) {
 	canvasClear();
 
 	//draw texture parcelling  grid
 
-	if(!canvasData.hideGridElem.checked) {
-		let xAmountToDraw = Math.trunc((1.0/canvasData.scale)*canvasData.element.width/GRID_SIZE)+1;
-		let yAmountToDraw = Math.trunc((1.0/canvasData.scale)*canvasData.element.height/GRID_SIZE)+1;
-
-		let xStart = Math.floor(-canvasData.shiftX / GRID_SIZE) * GRID_SIZE;
-		let yStart = Math.floor(-canvasData.shiftY / GRID_SIZE) * GRID_SIZE;
-
-		canvasData.context.fillStyle = "#ff0000";
-		canvasData.context.globalAlpha = 0.5;
-
-		for(let i = 0; i < yAmountToDraw; i++) {
-			for(let j = 0; j < xAmountToDraw; j++) {
-				if((j % 2) == (i % 2 == 0)) {
-					canvasData.context.fillRect(
-						xStart+(j*GRID_SIZE),
-						yStart+(i*GRID_SIZE),
-						GRID_SIZE, GRID_SIZE
-					);
-				}
-			}
-		}
-
-		canvasData.context.globalAlpha = 1;
+	if(!canvasData.hideTPElem.checked && !aNoTPOverride) {
+		renderTextureParcels();
 	}
 	
 	//render tracks and buildings first so they dont block other (smaller) stuff
-	[trackList, buildingList, landmarkList, nodeList, radioList, treeList, lightList].forEach((v) => {
+
+	for(let i = 0; i < trackList.length; i++) {
+		if(trackFirst == i) {
+			trackList[i].draw(SELECT_COLOR);
+		}
+		else {
+			trackList[i].draw();
+		}
+	}
+
+	[
+		buildingList, 
+		landmarkList, 
+		nodeList, 
+		radioList, 
+		treeList, 
+		lightList,
+		stationPillarList,
+		signalList,
+		switchSignalList
+	].forEach((v) => {
 		v.forEach((w) => {
 			w.draw();
 		});
@@ -257,11 +265,14 @@ function canvasInit() {
 	canvasData.shiftXOut = document.getElementById("shiftx");
 	canvasData.shiftYOut = document.getElementById("shifty");
 	canvasData.scaleOut = document.getElementById("scale");
-	canvasData.hideGridElem = document.getElementById("hidegrid");
+	canvasData.hideTPElem = document.getElementById("hideter");
 
 	canvasData.context.lineWidth = LINE_WIDTH;
+	canvasData.context.textAlign = "center";
+	canvasData.context.textBaseline = "middle";
 
 	document.getElementById("permeter").innerHTML = UNITS_PER_METER;
+	document.getElementById("fmtversion").innerHTML = fileFormatVersion;
 
 	statInit();
 

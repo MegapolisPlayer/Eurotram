@@ -51,12 +51,8 @@ function nodeEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing node "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += "X:<input type='number' id='editxinput' name='editxinput' value="+nodeList[aid].xpos+"><br>";
-	canvasData.edit.innerHTML += "Y:<input type='number' id='edityinput' name='edityinput' value="+nodeList[aid].ypos+"><br>";
-	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+nodeList[aid].height+"><br>";
-
-	canvasData.edit.innerHTML += "TNode station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+nodeList[aid].stationCode+"><br>";
-	canvasData.edit.innerHTML += "TNode 2nd code:<input type='text' id='editcodetwoinput' name='editcodetwoinput' placeholder='XXXX' value="+nodeList[aid].bordersWith+"><br>";
+	canvasData.edit.innerHTML += addBasicEditInputs(nodeList[aid]);
+	canvasData.edit.innerHTML += "2nd code:<input type='text' id='editcodetwoinput' name='editcodetwoinput' placeholder='XXXX' value="+nodeList[aid].bordersWith+"><br>";
 	canvasData.edit.innerHTML += "<button type='' onclick='nodeUpdate()'>Update</button>";
 	canvasData.edit.innerHTML += "<button type='' onclick='nodeRemove()'>Remove node</button>";
 }
@@ -65,10 +61,8 @@ function nodeUpdate() {
 	console.log("Updating node...");
 
 	let nodeId =  Number(document.getElementById("idinput").value);
-	nodeList[nodeId].xpos = Number(document.getElementById("editxinput").value);
-	nodeList[nodeId].ypos = Number(document.getElementById("edityinput").value);
-	nodeList[nodeId].height = Number(document.getElementById("editheightinput").value);
-	nodeList[nodeId].stationCode = String(document.getElementById("editcodeinput").value);
+
+	getDataFromBasicInputs(nodeList[nodeId]);
 	nodeList[nodeId].bordersWith = String(document.getElementById("editcodetwoinput").value);
 
 	canvasRedraw();
