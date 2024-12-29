@@ -140,6 +140,12 @@ function trackAdd() {
 	canvasData.mode.innerHTML = "Add track";
 }
 
+//also calls onclickTrackAddHandler
+function stationTrackAdd() {
+	currentMode = mode.STATION_TRACK_ADD;
+	canvasData.mode.innerHTML = "Add station track";
+}
+
 let trackFirst = -1;
 
 function onclickTrackAddHandler(ax, ay, aisStation) {
@@ -222,6 +228,16 @@ function landmarkAdd() {
 }
 function onclicklandmarkAddHandler(ax, ay) {
 	
+}
+
+function stationPillarAdd() {
+	currentMode = mode.STATION_PILLAR_ADD;
+	canvasData.mode.innerHTML = "Add station pillar";
+}
+
+function onclickStationPillarAddHandler(ax, ay) {
+	stationPillarList.push(new StationPillar(ax, ay));
+	stationPillarList.at(-1).draw();
 }
 
 function edit() {
@@ -343,26 +359,6 @@ function onclickEditTrackHandler(ax, ay) {
 	}
 }
 
-function stationPillarAdd() {
-	currentMode = mode.STATION_PILLAR_ADD;
-	canvasData.mode.innerHTML = "Add station pillar";
-}
-
-function onclickStationPillarAddHandler(ax, ay) {
-	stationPillarList.push(new StationPillar(ax, ay));
-	stationPillarList.at(-1).draw();
-}
-
-function stationTrackAdd() {
-	currentMode = mode.STATION_TRACK_ADD;
-	canvasData.mode.innerHTML = "Add station track";
-}
-
-function onclickStationTrackAddHandler(ax, ay) {
-
-}
-
-
 function textureParcelAdd() {
 	currentMode = mode.TEXTURE_PARCEL_ADD;
 	canvasData.mode.innerHTML = "Add texture parcel";
@@ -378,5 +374,7 @@ function textureParcelEdit() {
 }
 
 function onclickTextureParcelEditHandler(ax, ay) {
-
+	for(let i = 0; i < texparcelList.length; i++) {
+		
+	}
 }

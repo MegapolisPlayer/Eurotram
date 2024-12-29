@@ -11,6 +11,7 @@ class Switch {
 	rightId = -1;
 
 	radioBoxId = -1;
+	signalId = -1;
 
 	constructor(axpos, aypos, astationCode) {
 		this.xpos = axpos;
@@ -58,6 +59,7 @@ function switchEditMenu(aid) {
 	canvasData.edit.innerHTML += "Left node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editlefinput' name='editlefinput' value="+nodeList[aid].leftId+"><br>";
 	canvasData.edit.innerHTML += "Right node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editriginput' name='editriginput' value="+nodeList[aid].rightId+"><br>";
 	canvasData.edit.innerHTML += "Radio box id: <input type='number' min='-1' max='"+(radioList.length-1)+"' id='editradinput' name='editradinput' value="+nodeList[aid].radioBoxId+"><br>";
+	canvasData.edit.innerHTML += "Switch signal id: <input type='number' min='-1' max='"+(switchSignalList.length-1)+"' id='editsiginput' name='editsiginput' value="+nodeList[aid].signalId+"><br>";
 
 	canvasData.edit.innerHTML += "<hr><em>A junction is a split - the track from the 'before' node splits into the 'front', 'left' and 'right' tracks. Enter value of -1 if switch does not turn to that direction.</em><hr>";
 
@@ -77,6 +79,7 @@ function switchUpdate() {
 	nodeList[switchId].leftId = Number(document.getElementById("editlefinput").value);
 	nodeList[switchId].rightId = Number(document.getElementById("editriginput").value);
 	nodeList[switchId].radioBoxId = Number(document.getElementById("editradinput").value);
+	nodeList[switchId].signalId = Number(document.getElementById("editsiginput").value);
 
 	canvasRedraw();
 }

@@ -5,22 +5,39 @@ class StationPillar {
 	rotation = 0;
 	stationCode = "";
 
-	//TODO support more types of pillars in the future
+	//TODO support more types of pillars in the future release
 
 	constructor(axpos, aypos) {
 		this.xpos = axpos;
 		this.ypos = aypos;
 	}
 
-	draw(style = "#ffff00") {
+	draw(style = "#aaaa00") {
 		if(!this.willRender()) { return; }
 		console.log("station pillar draw");
 
+		canvasData.context.translate(this.xpos, this.ypos);
+		canvasData.context.rotate(toRadians(this.rotation));
+		canvasData.context.translate(-NODE_SIZE/2,-NODE_SIZE/4);
+		
 		canvasData.context.fillStyle = style;
-		canvasData.context.fillRect(
-			this.xpos - NODE_SIZE/2,
-			this.ypos - NODE_SIZE/2,
-		NODE_SIZE, NODE_SIZE);
+		canvasData.context.strokeStyle = SELECT_COLOR;
+
+		canvasData.context.fillRect(0, 0, NODE_SIZE, NODE_SIZE/2);
+
+		canvasData.context.lineWidth = LINE_WIDTH/2;
+		canvasData.context.beginPath();
+		canvasData.context.moveTo(0, NODE_SIZE/2-LINE_WIDTH/4);
+		canvasData.context.lineTo(NODE_SIZE, NODE_SIZE/2-LINE_WIDTH/4);
+		canvasData.context.stroke();
+		canvasData.context.lineWidth = LINE_WIDTH;
+
+		canvasData.context.translate(NODE_SIZE/2,NODE_SIZE/4);
+		canvasData.context.rotate(-toRadians(this.rotation));
+		canvasData.context.translate(
+			-this.xpos,
+			-this.ypos,
+		);
 	}
 
 	collision(ax, ay) {
@@ -41,7 +58,36 @@ class StationPillar {
 let stationPillarList = [];
 
 function stationPillarEditMenu(aid) {
-	
+	canvasData.edit.innerHTML = "";
+
+	canvasData.edit.innerHTML += "Editing station pillar "+aid+"<br>";
+	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+
+	canvasData.edit.innerHTML += addBasicEditInputs(stationPillarList[aid]);
+	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+stationPillarList[aid].rotation+"><br>";
+
+	canvasData.edit.innerHTML += "<button type='' onclick='stationPillarUpdate()'>Update</button>";
+	canvasData.edit.innerHTML += "<button type='' onclick='stationPillarRemove()'>Remove</button>";
+}
+
+function stationPillarUpdate() {
+	console.log("Updating station pillar...");
+
+	let spId =  Number(document.getElementById("idinput").value);
+
+	getDataFromBasicInputs(stationPillarList[spId]);
+	stationPillarList[spId].rotation = Number(document.getElementById("editrotinput").value);
+
+	canvasRedraw();
+}
+function stationPillarRemove() {
+	console.log("Removing station pillar...");
+
+	let spId =  Number(document.getElementById("idinput").value);
+	stationPillarList.splice(spId, 1);
+	canvasData.edit.innerHTML = "";
+
+	canvasRedraw();
 }
 
 //uses some elements of track
@@ -82,7 +128,7 @@ function stationTrackUpdate() {
 	getDataFromTrackInputs(trackList[trackId]);
 
 	canvasRedraw();
-	
+
 	if(trackList[trackId].bezier) {
 		trackList[trackId].drawControlPts(); //draw only for edited track
 	}

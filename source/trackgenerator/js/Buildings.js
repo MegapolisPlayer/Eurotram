@@ -56,11 +56,9 @@ class Building {
 		if(!this.willRender()) { return; }
 		console.log("building draw");
 
-		canvasData.context.translate(
-			this.xpos-this.xsize/2,
-			this.ypos-this.ysize/2,
-		);
+		canvasData.context.translate(this.xpos, this.ypos);
 		canvasData.context.rotate(toRadians(this.rotation));
+		canvasData.context.translate(-this.xsize/2,-this.ysize/2);
 
 		canvasData.context.fillStyle = style;
 		canvasData.context.fillRect(0, 0, this.xsize, this.ysize);
@@ -80,12 +78,12 @@ class Building {
 		}
 
 		//reset back
+		canvasData.context.translate(this.xsize/2,this.ysize/2);
 		canvasData.context.rotate(-toRadians(this.rotation));
 		canvasData.context.translate(
-			-this.xpos+this.xsize/2,
-			-this.ypos+this.ysize/2,
+			-this.xpos,
+			-this.ypos,
 		);
-
 	}
 
 	collision(ax, ay) {
@@ -125,7 +123,7 @@ function buildingSelectMenu(ax, ay) {
 
 	canvasData.edit.innerHTML += buildingTypeSelector;
 
-	canvasData.edit.innerHTML += "<button onclick='buildingMake()'>Make building</button>";
+	canvasData.edit.innerHTML += "<button onclick='buildingMake()'>Add building</button>";
 }
 
 function buildingMake() {
@@ -156,7 +154,7 @@ function buildingEditMenu(aid) {
 }
 
 function buildingUpdate() {
-	console.log("Updating building..");
+	console.log("Updating building...");
 
 	let buildId = Number(document.getElementById("idinput").value);
 	getDataFromBasicInputs(buildingList[buildId]);

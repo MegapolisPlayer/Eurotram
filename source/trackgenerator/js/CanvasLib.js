@@ -166,8 +166,8 @@ function dragStartHandler(event) {
 function dragHandler(event) {
 	if(!dragEnabled) return;
 
-	let dx = (Math.trunc((event.pageX - event.target.offsetLeft))-dragStartX) * (1.0/canvasData.scale);
-	let dy = (Math.trunc((event.pageY - event.target.offsetTop))-dragStartY) * (1.0/canvasData.scale);
+	let dx = Math.trunc((Math.trunc((event.pageX - event.target.offsetLeft))-dragStartX) * (1.0/canvasData.scale));
+	let dy = Math.trunc((Math.trunc((event.pageY - event.target.offsetTop))-dragStartY) * (1.0/canvasData.scale));
 
 	canvasData.context.translate(dx, dy);
 
@@ -190,7 +190,7 @@ function dragEndHandler(event) {
 function canvasRedraw(aNoTPOverride = false) {
 	canvasClear();
 
-	//draw texture parcelling  grid
+	//draw texture parcelling before nodes
 
 	if(!canvasData.hideTPElem.checked && !aNoTPOverride) {
 		renderTextureParcels();
@@ -224,8 +224,8 @@ function canvasRedraw(aNoTPOverride = false) {
 	})
 
 	//update values
-	canvasData.shiftXOut.innerHTML = canvasData.shiftX;
-	canvasData.shiftYOut.innerHTML = canvasData.shiftY;
+	canvasData.shiftXOut.innerHTML = canvasData.shiftX + " (" + Math.trunc(canvasData.shiftX/UNITS_PER_METER) + "m)";
+	canvasData.shiftYOut.innerHTML = canvasData.shiftY + " (" + Math.trunc(canvasData.shiftY/UNITS_PER_METER) + "m)";
 	canvasData.scaleOut.innerHTML = canvasData.scale;
 }
 
@@ -253,7 +253,8 @@ function canvasInit() {
     canvasData.element = document.getElementById("main");
     canvasData.element.width = 1000;
     canvasData.element.height = 800;
-    canvasData.context = canvasData.element.getContext("2d");
+	//doesnt disable drawing of transparent objects ON canvas, only disables transparent canvas (MDN)
+    canvasData.context = canvasData.element.getContext("2d", { alpha: false });
     canvasData.element.addEventListener("click", onclickHandler);
 	canvasData.element.addEventListener("mousedown", dragStartHandler);
 	canvasData.element.addEventListener("mousemove", dragHandler);
