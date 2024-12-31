@@ -3,6 +3,8 @@
 //canvas performance is the larger bottleneck here (and we do optimize it)
 //speed data: https://stackoverflow.com/questions/7327056/appending-html-string-to-the-dom
 
+//TODO for future release - rewriting of this to the createElement and appendChild syntax
+
 function addBasicEditInputs(object) {
 	return ""+
 	"X:<input type='number' id='editxinput' name='editxinput' value="+object.xpos+"><br>"+
@@ -365,7 +367,7 @@ function textureParcelAdd() {
 }
 
 function onclickTextureParcelAddHandler(ax, ay) {
-
+	texparcelAddMenu(ax, ay);
 }
 
 function textureParcelEdit() {
@@ -375,6 +377,9 @@ function textureParcelEdit() {
 
 function onclickTextureParcelEditHandler(ax, ay) {
 	for(let i = 0; i < texparcelList.length; i++) {
-		
+		if(texparcelList[i].collision(ax, ay)) {
+			texparcelEditMenu(i);
+			break;
+		}
 	}
 }

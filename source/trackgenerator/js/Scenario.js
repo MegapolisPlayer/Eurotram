@@ -43,7 +43,9 @@ function scenarioNewLine() {
 }
 
 function scenarioSerialize() {
-
+	//TODO check if switch doesnt self-reference
+	//TODO check for erroneous input
+	//TODO ADD SERIALIZATION
 }
 
 function scenarionDeserialize() {

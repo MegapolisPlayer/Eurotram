@@ -33,6 +33,7 @@ class Landmark {
 	xpos = 0;
 	ypos = 0;
 	height = 0;
+	rotation = 0;
 	//no station code - always rendered
 	landmarkCode = 0;
 

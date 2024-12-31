@@ -1,0 +1,5 @@
+DONE: E. Kastner (1)
+
++get contacts from Zahradka
++try contact Rezistor
++contact E. Kastner for testing

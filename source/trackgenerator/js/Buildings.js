@@ -80,10 +80,7 @@ class Building {
 		//reset back
 		canvasData.context.translate(this.xsize/2,this.ysize/2);
 		canvasData.context.rotate(-toRadians(this.rotation));
-		canvasData.context.translate(
-			-this.xpos,
-			-this.ypos,
-		);
+		canvasData.context.translate(-this.xpos, -this.ypos);
 	}
 
 	collision(ax, ay) {
@@ -119,7 +116,7 @@ function buildingSelectMenu(ax, ay) {
 	canvasData.edit.innerHTML += "<input type='hidden' id='buildxinput' value="+ax+"><br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='buildyinput' value="+ay+"><br>";
 
-	canvasData.edit.innerHTML += "Station code:<input type='text' id='buildcodeinput' name='editcodeinput' placeholder='XXXX'><br>";
+	canvasData.edit.innerHTML += "Station code:<input type='text' id='buildcodeinput' name='buildcodeinput' placeholder='XXXX'><br>";
 
 	canvasData.edit.innerHTML += buildingTypeSelector;
 
