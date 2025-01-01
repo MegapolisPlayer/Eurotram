@@ -1,8 +1,11 @@
-let fileFormatVersion = 0;
-
 function fileLoad() {
-	
+	console.log("Loading scenario");
+
 }
 function fileSave() {
-	
+	console.log("Saving scenario");
+
+	let scenario = scenarioSerialize();
+
+	console.log(scenario);
 }

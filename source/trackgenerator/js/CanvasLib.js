@@ -277,5 +277,7 @@ function canvasInit() {
 
 	statInit();
 
+	makeLandmarkSelector();
+
 	canvasClear();
 }

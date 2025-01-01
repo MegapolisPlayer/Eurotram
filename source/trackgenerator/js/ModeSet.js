@@ -5,49 +5,49 @@
 
 //TODO for future release - rewriting of this to the createElement and appendChild syntax
 
-function addBasicEditInputs(object) {
+function addBasicEditInputs(aobject) {
 	return ""+
-	"X:<input type='number' id='editxinput' name='editxinput' value="+object.xpos+"><br>"+
-	"Y:<input type='number' id='edityinput' name='edityinput' value="+object.ypos+"><br>"+
-	"Height:<input type='number' id='editheightinput' name='editheightinput' value="+object.height+"><br>"+
-	"Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+object.stationCode+"><br>";
+	"X:<input type='number' id='editxinput' name='editxinput' value="+aobject.xpos+"><br>"+
+	"Y:<input type='number' id='edityinput' name='edityinput' value="+aobject.ypos+"><br>"+
+	"Height:<input type='number' id='editheightinput' name='editheightinput' value="+aobject.height+"><br>"+
+	"Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+aobject.stationCode+"><br>";
 }
 
-function getDataFromBasicInputs(object) {
-	object.xpos = Number(document.getElementById("editxinput").value);
-	object.ypos = Number(document.getElementById("edityinput").value);
-	object.height = Number(document.getElementById("editheightinput").value);
-	object.stationCode = String(document.getElementById("editcodeinput").value);
+function getDataFromBasicInputs(aobject) {
+	aobject.xpos = Number(document.getElementById("editxinput").value);
+	aobject.ypos = Number(document.getElementById("edityinput").value);
+	aobject.height = Number(document.getElementById("editheightinput").value);
+	aobject.stationCode = String(document.getElementById("editcodeinput").value);
 }
 
-function addTrackEditInputs(object, id) {
-	let temp = "Bezier:<input type='checkbox' id='editbezinput' name='editbezinput' "+(object.bezier?"checked":"")+"><br>"+
+function addTrackEditInputs(aobject, id) {
+	let temp = "Bezier:<input type='checkbox' id='editbezinput' name='editbezinput' "+(aobject.bezier?"checked":"")+"><br>"+
 	"<hr><em>Control point values have no effect if Bezier curves are disabled.</em><hr>"+
-	"CP1,X:<input type='number' id='editcp1xinput' name='editcp1xinput' value="+object.controlPoint1.x+"><br>"+
-	"CP1,Y:<input type='number' id='editcp1yinput' name='editcp1yinput' value="+object.controlPoint1.y+"><br>"+
-	"CP2,X:<input type='number' id='editcp2xinput' name='editcp2xinput' value="+object.controlPoint2.x+"><br>"+
-	"CP2,Y:<input type='number' id='editcp2yinput' name='editcp2yinput' value="+object.controlPoint2.y+"><br>"+
+	"CP1,X:<input type='number' id='editcp1xinput' name='editcp1xinput' value="+aobject.controlPoint1.x+"><br>"+
+	"CP1,Y:<input type='number' id='editcp1yinput' name='editcp1yinput' value="+aobject.controlPoint1.y+"><br>"+
+	"CP2,X:<input type='number' id='editcp2xinput' name='editcp2xinput' value="+aobject.controlPoint2.x+"><br>"+
+	"CP2,Y:<input type='number' id='editcp2yinput' name='editcp2yinput' value="+aobject.controlPoint2.y+"><br>"+
 	"<button type='' onclick='trackEditMoveCP2toCP1("+id+")'>Move CP2 to CP1</button><br>"+
 	"<button type='' onclick='trackEditRecalcHeight("+id+")'>Recalculate height points</button><br>"+
 	"<button type='' onclick='trackEditRecalcCP("+id+")'>Reset control points</button><br>"+
 	"<hr><h4>Edit heightpoints manually</h4>";
 
 	for(let i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
-		temp += "HgPt"+i+":<input type='number' id='edithght"+i+"' name='edithght"+i+"' value="+object.heightpoints[i]+"><br>";
+		temp += "HgPt"+i+":<input type='number' id='edithght"+i+"' name='edithght"+i+"' value="+aobject.heightpoints[i]+"><br>";
 	}
 
 	return temp;
 }
 
-function getDataFromTrackInputs(object) {
-	object.bezier = document.getElementById("editbezinput").checked;
-	object.controlPoint1.x = Number(document.getElementById("editcp1xinput").value);
-	object.controlPoint1.y = Number(document.getElementById("editcp1yinput").value);
-	object.controlPoint2.x = Number(document.getElementById("editcp2xinput").value);
-	object.controlPoint2.y = Number(document.getElementById("editcp2yinput").value);
+function getDataFromTrackInputs(aobject) {
+	aobject.bezier = document.getElementById("editbezinput").checked;
+	aobject.controlPoint1.x = Number(document.getElementById("editcp1xinput").value);
+	aobject.controlPoint1.y = Number(document.getElementById("editcp1yinput").value);
+	aobject.controlPoint2.x = Number(document.getElementById("editcp2xinput").value);
+	aobject.controlPoint2.y = Number(document.getElementById("editcp2yinput").value);
 
 	for(let i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
-		object.heightpoints[i] = Number(document.getElementById("edithght"+i).value);
+		aobject.heightpoints[i] = Number(document.getElementById("edithght"+i).value);
 	}
 }
 
@@ -229,7 +229,7 @@ function landmarkAdd() {
 	canvasData.mode.innerHTML = "Add landmark";
 }
 function onclicklandmarkAddHandler(ax, ay) {
-	
+	landmarkSelectMenu(ax, ay);
 }
 
 function stationPillarAdd() {

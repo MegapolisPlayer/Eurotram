@@ -147,7 +147,7 @@ function buildingEditMenu(aid) {
 	canvasData.edit.innerHTML += buildingTypeSelector;
 
 	canvasData.edit.innerHTML += "<button type='' onclick='buildingUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='buildingRemove()'>Remove buidling</button>";
+	canvasData.edit.innerHTML += "<button type='' onclick='buildingRemove()'>Remove building</button>";
 }
 
 function buildingUpdate() {
