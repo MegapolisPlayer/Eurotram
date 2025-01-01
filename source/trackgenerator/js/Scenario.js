@@ -47,28 +47,19 @@ function clamp(anum, min, max) {
 }
 
 function numberToByteArray(anum, bits) {
-	let byteArray = new Array(Math.trunc(bits/8)).fill(0);
+	let bytes = Math.trunc(bits/8);
 
-	let binary = BigInt(anum).toString(2);
+	let byteArray = new Array(bytes).fill(0);
 
-	if(binary[0] == '-') {
-		binary = binary.split(''); //split here so we can use padStart in second branch
-		binary[0] = 0; //delete minus
-		binary = binary.map((v) => { return Number(v); }); //remove chars
-		binary = [...new Array(bits-byteArray.length).fill(0), ...binary];
-		binary[0] = 1; //twos complement
-	}
-	else {
-		binary = binary.padStart(bits, "0").split('');
-	}
-	
+	let binary = BigInt(anum).toString(16).padStart(bytes*2, '0');
 	console.log(binary);
 
-	for(let i = 0; i < bits; i++) {
-		if(binary[i] == '1') {
-			byteArray[Math.trunc(i/8)] |= (1 << 7-(i%8));
-		}
+	//flip to little endian
+	for(let i = 0; i < byteArray.length; i++) {
+		byteArray[i] = Number("0x"+binary[binary.length-1-1-2*i]+binary[binary.length-1-2*i]);
 	}
+
+	console.log(byteArray);
 
 	return byteArray;
 }
@@ -85,63 +76,96 @@ function scenarioNewLine() {
 }
 
 function scenarioSerialize() {
-	//TODO check if switch doesnt self-reference
-	//TODO check for erroneous input
-
 	let numberValuesArray = [];
 
 	//file signature
-	numberValuesArray.push("ETSC".split('').map((v, i) => {
-		return v.charCodeAt(0);
-	}));
-
-	//header numbers
-
-	numberValuesArray.push(numberToByteArray(fileFormatVersion, 16)); //V
-	numberValuesArray.push(numberToByteArray(Date.now(), 64)); //D - unix time in ms
-	
-	//N - node+switch amount
-
-	//T - track amount
-
-	//W - sw signal amount
-
-	//S - signal amount
-
-	//R - radioboxes amount
-
-	//P - station pillars amount
-
-	//L - lampposts amount
-
-	//G - trees amount
-
-	//B - buildings amount
-
-	//M - monuments/landmarks amount
-
-	//X - texparcels amount
-
-	//J - scenario name
-	numberValuesArray.push(0); //null terminator
-
-	//A - scenario author
-	numberValuesArray.push(0); //null terminator
-
-	//E - units per meter
-
-
-	numberValuesArray.push(0b11111111);
+	numberValuesArray.push(...("ETSC".split('').map((v) => { return v.charCodeAt(0); })));
 
 	console.log(numberValuesArray);
 
+	//header numbers
+
+	numberValuesArray.push(...numberToByteArray(fileFormatVersion, 16)); //V
+	numberValuesArray.push(...numberToByteArray(Math.trunc(Date.now()/1000), 64)); //D - unix time in ms
+	
+	console.log(numberValuesArray);
+
+	//N - node+switch amount
+	numberValuesArray.push(...numberToByteArray(nodeList.length, 64));
+
+	//T - track amount
+	numberValuesArray.push(...numberToByteArray(trackList.length, 64));
+
+	//W - sw signal amount
+	numberValuesArray.push(...numberToByteArray(switchSignalList.length, 64));
+
+	//S - signal amount
+	numberValuesArray.push(...numberToByteArray(signalList.length, 64));
+
+	//R - radioboxes amount
+	numberValuesArray.push(...numberToByteArray(radioList.length, 64));
+
+	//P - station pillars amount
+	numberValuesArray.push(...numberToByteArray(stationPillarList.length, 64));
+
+	//L - lampposts amount
+	numberValuesArray.push(...numberToByteArray(lightList.length, 64));
+
+	//G - trees amount
+	numberValuesArray.push(...numberToByteArray(treeList.length, 64));
+
+	//B - buildings amount
+	numberValuesArray.push(...numberToByteArray(buildingList.length, 64));
+
+	//M - monuments/landmarks amount
+	numberValuesArray.push(...numberToByteArray(landmarkList.length, 64));
+
+	//X - texparcels amount
+	numberValuesArray.push(...numberToByteArray(texparcelList.length, 64));
+
+	//J - scenario name
+	numberValuesArray.push(...document.getElementById("scenarioname").value.split('').map((v) => { return v.charCodeAt(0); }));
+	numberValuesArray.push(0); //null terminator
+
+	//A - scenario author
+	numberValuesArray.push(...document.getElementById("authorname").value.split('').map((v) => { return v.charCodeAt(0); }));
+	numberValuesArray.push(0); //null terminator
+
+	//E - units per meter
+	numberValuesArray.push(...numberToByteArray(UNITS_PER_METER, 8));
+
+	numberValuesArray.push(0b11111111);
+
 	//serialize lists
 
+	//nodes
+	let nodeBytes = "PT".split('').map((v) => { return v.charCodeAt(0); });
+
+	nodeList.forEach((v) => {
+		//TODO test
+		numberValuesArray.push(...nodeBytes);
+		numberValuesArray.push(...numberToByteArray(v.xpos, 64));
+		numberValuesArray.push(...numberToByteArray(v.ypos, 64));
+		numberValuesArray.push(...numberToByteArray(v.height, 64));
+		numberValuesArray.push((v.statiooCode.split('').map((v) => { return v.charCodeAt(0); })));
+		numberValuesArray.push(0b11111111);
+	});
+
+	//TODO check if switch doesnt self-reference
+	//TODO trunate values
+	//convert to blob
+
 	let binaryArray = new Uint8Array(numberValuesArray.length);
+	for(let i = 0; i < binaryArray.length; i++) {
+		binaryArray[i] = numberValuesArray[i];
+	}
+
+	console.log(binaryArray);
 
 	//blobs are immutable
-	let blob = new Blob(binaryArray, {type: "application/octet-stream"}); //arbitrary binary data
+	let blob = new Blob([binaryArray], {type: "application/octet-stream"}); //arbitrary binary data
 
+	return blob;
 }
 
 function scenarionDeserialize() {
