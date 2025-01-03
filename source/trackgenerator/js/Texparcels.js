@@ -19,7 +19,7 @@ class Texparcel {
 
 	depthOffset = 0.0; //to prevent z-fighting
 	
-	constructor(axpos, aypos, axsize, aysize, arotation, astationCode1, astationCode2) {
+	constructor(axpos = 0, aypos = 0, axsize = 0, aysize = 0, arotation = 0, astationCode1 = "", astationCode2 = "") {
 		this.xpos = axpos;
 		this.ypos = aypos;
 		this.xsize = axsize;
@@ -75,7 +75,8 @@ class Texparcel {
 	}
 
 	willRender() {
-		//TODO
+		//we dont check precise borders, but if the central point is further than the size of rectangle
+
 	}
 };
 

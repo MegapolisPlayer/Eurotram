@@ -55,7 +55,7 @@ class Landmark {
 	//no station code - always rendered
 	landmarkCode = 0;
 
-	constructor(axpos, aypos, acode) {
+	constructor(axpos = 0, aypos = 0, acode = 0) {
 		this.xpos = axpos;
 		this.ypos = aypos;
 		this.landmarkCode = acode;

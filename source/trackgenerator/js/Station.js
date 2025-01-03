@@ -7,7 +7,7 @@ class StationPillar {
 
 	//TODO support more types of pillars in the future release
 
-	constructor(axpos, aypos) {
+	constructor(axpos = 0, aypos = 0) {
 		this.xpos = axpos;
 		this.ypos = aypos;
 	}
@@ -95,8 +95,8 @@ function stationPillarRemove() {
 class StationTrack extends Track {
 	stationCode = "";
 
-	constructor(anodeIdFirst, anodeIdSecond) {
-		super(anodeIdFirst, anodeIdSecond);
+	constructor(anodeIdFirst = 0, anodeIdSecond = 0, aswitchFirst = false, aswitchSecond = false) {
+		super(anodeIdFirst, anodeIdSecond, aswitchFirst, aswitchSecond);
 	}
 
 	draw(style = "#ff0000") {
@@ -109,7 +109,16 @@ class StationTrack extends Track {
 function stationTrackEditMenu(aid) {
 	canvasData.edit.innerHTML = "";
 	
-	canvasData.edit.innerHTML += "Editing station track "+aid+" between nodes "+trackList[aid].nodeIdFirst+" and "+trackList[aid].nodeIdSecond+"<br>";
+	canvasData.edit.innerHTML += "Editing track "+aid+" between";
+
+	canvasData.edit.innerHTML += trackList[aid].firstIsSwitch ? " switch " : " node ";
+	canvasData.edit.innerHTML += trackList[aid].nodeIdFirst;
+
+	canvasData.edit.innerHTML += trackList[aid].secondIsSwitch ? " switch " : " node ";
+	canvasData.edit.innerHTML += trackList[aid].nodeIdSecond;
+
+	canvasData.edit.innerHTML += "<br>";
+
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
 	canvasData.edit.innerHTML += "Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+trackList[aid].stationCode+"><br>";

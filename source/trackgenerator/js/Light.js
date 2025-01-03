@@ -11,7 +11,7 @@ class Light {
 	rotation = 0;	
 	stationCode = "";
 
-	constructor(axpos, aypos) {
+	constructor(axpos = 0, aypos = 0) {
 		this.xpos = axpos;
 		this.ypos = aypos;
 	}

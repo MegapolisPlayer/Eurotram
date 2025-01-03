@@ -1,13 +1,12 @@
-//---------------------------------------------------------------------------------------
-// TRACK
-//---------------------------------------------------------------------------------------
-
 const TRACK_HEIGHTPOINTS_AMOUNT = 10;
 
 //track between 2 nodes
 class Track {
 	nodeIdFirst = 0;
 	nodeIdSecond = 0;
+
+	firstIsSwitch = false;
+	secondIsSwitch = false;
 
 	bezier = false; //if bezier or straight line
 	controlPoint1 = {
@@ -20,24 +19,25 @@ class Track {
 	//10 evenly spaced out points with height information
 	heightpoints = [];
 
-	constructor(anodeIdFirst, anodeIdSecond) {
+	constructor(anodeIdFirst = 0, anodeIdSecond = 0, aswitchFirst = false, aswitchSecond = false) {
 		this.nodeIdFirst = anodeIdFirst;
 		this.nodeIdSecond = anodeIdSecond;
-		this.bezier = false;
+		this.firstIsSwitch = aswitchFirst;
+		this.secondIsSwitch = aswitchSecond;
 
 		this.recalculateCP();
-
 		this.recalculateHeightpoints();	
 	}
 
 	draw(style = "#aaaaaa") {
-		if(nodeList[this.nodeIdFirst].willRender() || nodeList[this.nodeIdSecond].willRender()) {
+		let point1 = this.firstIsSwitch ? switchList[this.nodeIdFirst] : nodeList[this.nodeIdFirst];
+		let point2 = this.secondIsSwitch ? switchList[this.nodeIdSecond] : nodeList[this.nodeIdSecond];
+
+		if(point1.willRender() || point2.willRender()) {
 			console.log("track draw");
 			canvasData.context.strokeStyle = style;
 			canvasData.context.beginPath();
-			canvasData.context.moveTo(
-				nodeList[this.nodeIdFirst].xpos, 
-				nodeList[this.nodeIdFirst].ypos);
+			canvasData.context.moveTo(point1.xpos, point1.ypos);
 
 			if(this.bezier) {
 				canvasData.context.bezierCurveTo(
@@ -48,15 +48,16 @@ class Track {
 					this.controlPoint2.x,
 					this.controlPoint2.y,
 					//end point
-					nodeList[this.nodeIdSecond].xpos, 
-					nodeList[this.nodeIdSecond].ypos
+					point2.xpos,
+					point2.ypos
 				);
 				canvasData.context.stroke();
 			}
 			else {
 				canvasData.context.lineTo(
-					nodeList[this.nodeIdSecond].xpos, 
-					nodeList[this.nodeIdSecond].ypos);
+					point2.xpos,
+					point2.ypos
+				);
 				canvasData.context.stroke();
 			}
 		}
@@ -81,18 +82,29 @@ class Track {
 
 	recalculateHeightpoints() {
 		this.heightpoints.length = 0;
-		let stepHeightDelta = (nodeList[this.nodeIdSecond].height-nodeList[this.nodeIdFirst].height)/TRACK_HEIGHTPOINTS_AMOUNT;
+
+		let point1 = this.firstIsSwitch ? switchList[this.nodeIdFirst] : nodeList[this.nodeIdFirst];
+		let point2 = this.secondIsSwitch ? switchList[this.nodeIdSecond] : nodeList[this.nodeIdSecond];
+
+		console.log(point1, point2);
+
+		let stepHeightDelta = (point2.height-point1.height)/TRACK_HEIGHTPOINTS_AMOUNT;
 		for(let i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
 			//divide by delta for each p
-			this.heightpoints.push(nodeList[this.nodeIdFirst].height + stepHeightDelta*i);
+			this.heightpoints.push(point1.height + stepHeightDelta*i);
 		}
 		console.log("HghtPts "+this.heightpoints);
 	}
 
 	recalculateCP() {
 		//set control points to middle
-		this.controlPoint1.x = (nodeList[this.nodeIdFirst].xpos+nodeList[this.nodeIdSecond].xpos)/2;
-		this.controlPoint1.y = (nodeList[this.nodeIdFirst].ypos+nodeList[this.nodeIdSecond].ypos)/2;
+
+		//get points (may be in switch list or node list)
+		let point1 = this.firstIsSwitch ? switchList[this.nodeIdFirst] : nodeList[this.nodeIdFirst];
+		let point2 = this.secondIsSwitch ? switchList[this.nodeIdSecond] : nodeList[this.nodeIdSecond];
+
+		this.controlPoint1.x = (point1.xpos+point2.xpos)/2;
+		this.controlPoint1.y = (point1.ypos+point2.ypos)/2;
 
 		this.controlPoint2.x = this.controlPoint1.x;
 		this.controlPoint2.y = this.controlPoint1.y;
@@ -110,7 +122,16 @@ function trackRecalcAllHeightpoints() {
 function trackEditMenu(aid) {
 	canvasData.edit.innerHTML = "";
 
-	canvasData.edit.innerHTML += "Editing track "+aid+" between nodes "+trackList[aid].nodeIdFirst+" and "+trackList[aid].nodeIdSecond+"<br>";
+	canvasData.edit.innerHTML += "Editing track "+aid+" between";
+
+	canvasData.edit.innerHTML += trackList[aid].firstIsSwitch ? " switch " : " node ";
+	canvasData.edit.innerHTML += trackList[aid].nodeIdFirst;
+
+	canvasData.edit.innerHTML += trackList[aid].secondIsSwitch ? " switch " : " node ";
+	canvasData.edit.innerHTML += trackList[aid].nodeIdSecond;
+
+	canvasData.edit.innerHTML += "<br>";
+
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
 	canvasData.edit.innerHTML += "Bezier:<input type='checkbox' id='editbezinput' name='editbezinput' "+(trackList[aid].bezier?"checked":"")+"><br>";

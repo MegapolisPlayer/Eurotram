@@ -9,12 +9,11 @@ class TNode {
 	bordersWith = ""; //node can be in 2 stations (will be duplicated on save)
 	height = 0;
 
-	constructor(axpos, aypos, astationCode, abordersWith, height) {
+	constructor(axpos = 0, aypos = 0, astationCode = "", abordersWith = "") {
 		this.xpos = axpos;
 		this.ypos = aypos;
 		this.stationCode = astationCode;
 		this.bordersWith = abordersWith;
-		this.height = height;
 	}
 
 	draw(style = "#000000") {
@@ -69,17 +68,13 @@ function nodeUpdate() {
 }
 
 function nodeRemove() {
-	console.log("Removing node/switch and connected track");
+	console.log("Removing node and connected track");
 
 	let nodeId = Number(document.getElementById("idinput").value);
 
-	console.log(trackList.length);
-
 	trackList = trackList.filter((v, i) => {
-		return !(v.nodeIdFirst === nodeId || v.nodeIdSecond === nodeId);
+		return !((v.nodeIdFirst === nodeId && !v.firstIsSwitch) || (v.nodeIdSecond === nodeId && !v.secondIsSwitch));
 	});
-
-	console.log(trackList.length);
 
 	nodeList.splice(nodeId, 1);
 

@@ -15,7 +15,7 @@ class Building {
 	type = 0;
 	stationCode = "";
 
-	constructor(axpos, aypos, atype, astationCode) {
+	constructor(axpos = 0, aypos = 0, atype = 0, astationCode = "") {
 		this.xpos = axpos;
 		this.ypos = aypos;
 		this.type = atype;
@@ -45,6 +45,8 @@ class Building {
 			break;
 			default:
 				console.error("Type invalid!");
+				this.xsize = 0;
+				this.ysize = 0;
 				break;
 		}
 
@@ -127,7 +129,7 @@ function buildingMake() {
 	let x = Number(document.getElementById("buildxinput").value);
 	let y = Number(document.getElementById("buildyinput").value);
 	let type = Number(document.getElementById("buildtypeinput").value);
-	let stationCode = Number(document.getElementById("buildcodeinput").value);
+	let stationCode = document.getElementById("buildcodeinput").value;
 
 	buildingList.push(new Building(x, y, type, stationCode));
 	buildingList.at(-1).draw();

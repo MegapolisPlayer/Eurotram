@@ -1,7 +1,5 @@
-const UNITS_PER_METER = 20;
-const METERS_PER_GRID = 100;
+let UNITS_PER_METER = 20;
 
-const GRID_SIZE = UNITS_PER_METER*METERS_PER_GRID;
 const TRACK_WIDTH = UNITS_PER_METER*(1.435+0.20); //track gauge + 20cm bonus
 const LINE_WIDTH = 10;
 
@@ -198,19 +196,12 @@ function canvasRedraw(aNoTPOverride = false) {
 	
 	//render tracks and buildings first so they dont block other (smaller) stuff
 
-	for(let i = 0; i < trackList.length; i++) {
-		if(trackFirst == i) {
-			trackList[i].draw(SELECT_COLOR);
-		}
-		else {
-			trackList[i].draw();
-		}
-	}
-
 	[
+		trackList,
 		buildingList, 
 		landmarkList, 
 		nodeList, 
+		switchList,
 		radioList, 
 		treeList, 
 		lightList,

@@ -8,10 +8,9 @@ class RadioBox {
 	//in simulator - when tram in 1-2 meter radius - sends signal
 	//1 radiobox may control multiple switches
 
-	constructor(axpos, aypos, aheight) {
+	constructor(axpos = 0, aypos = 0) {
 		this.xpos = axpos;
 		this.ypos = aypos;
-		this.height = aheight;
 	}
 
 	draw(style = "#800000") {
@@ -45,6 +44,7 @@ function radioEditMenu(aid) {
 	canvasData.edit.innerHTML = "";
 
 	canvasData.edit.innerHTML += "Editing radiobox "+aid+"<br>";
+	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
 	canvasData.edit.innerHTML += addBasicEditInputs(radioList[aid]);
 
@@ -55,7 +55,7 @@ function radioEditMenu(aid) {
 function radioUpdate() {
 	console.log("Updating radio...");
 
-	let radioId =  Number(document.getElementById("idinput").value);
+	let radioId = Number(document.getElementById("idinput").value);
 
 	getDataFromBasicInputs(radioList[radioId]);
 

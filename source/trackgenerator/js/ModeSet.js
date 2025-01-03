@@ -97,7 +97,7 @@ function nodeAdd() {
 	canvasData.mode.innerHTML = "Add node";
 }
 function onclickTNodeAddHandler(ax, ay) {
-	nodeList.push(new TNode(ax, ay, "", "", 0));
+	nodeList.push(new TNode(ax, ay, "", ""));
 	nodeList.at(-1).draw();
 }
 
@@ -106,9 +106,8 @@ function switchAdd() {
 	canvasData.mode.innerHTML = "Add switch";
 }
 function onclickSwitchAddHandler(ax, ay) {
-	//switches also in node list
-	nodeList.push(new Switch(ax, ay, "", "", 0));
-	nodeList.at(-1).draw();
+	switchList.push(new Switch(ax, ay, "", "", 0));
+	switchList.at(-1).draw();
 }
 
 function switchSignalAdd() {
@@ -149,6 +148,16 @@ function stationTrackAdd() {
 }
 
 let trackFirst = -1;
+let trackFirstIsSwitch = false;
+
+function redrawTrackFirst() {
+	if(trackFirstIsSwitch) {
+		switchList[trackFirst].draw();
+	} 
+	else {
+		nodeList[trackFirst].draw();
+	}
+}
 
 function onclickTrackAddHandler(ax, ay, aisStation) {
 	if(trackFirst === -1) {
@@ -157,43 +166,80 @@ function onclickTrackAddHandler(ax, ay, aisStation) {
 		if(trackFirst !== -1) {
 			//if found first node
 			nodeList[trackFirst].draw(SELECT_COLOR);
+			trackFirstIsSwitch = false;
+		}
+		else {
+			trackFirst = getColliding(switchList, ax, ay);
+			if(trackFirst !== -1) {
+				//if found first node - is switch
+				switchList[trackFirst].draw(SELECT_COLOR);
+				trackFirstIsSwitch = true;
+			}
 		}
 	}
 	else {
 		let secondTNode = getColliding(nodeList, ax, ay);
-		nodeList[trackFirst].draw();
-		if(secondTNode == -1) {
+		let secondSwitch = false;
+		if(secondTNode === trackFirst && !trackFirstIsSwitch) {
+			redrawTrackFirst();
 			trackFirst = -1; //reset selection
-			return;
-		}
-		if(secondTNode == trackFirst) {
-			trackFirst = -1; //reset selection
+			trackFirstIsSwitch = false;
 			alert("Error: second node same as first.");
 			return;
+		}
+		else if(secondTNode == -1) {
+			//check if switch
+			secondTNode = getColliding(switchList, ax, ay);
+			if(secondTNode === trackFirst && trackFirstIsSwitch) {
+				redrawTrackFirst();
+				trackFirst = -1; //reset selection
+				trackFirstIsSwitch = false;
+				alert("Error: second switch same as first.");
+				return;
+			}
+			else if(secondTNode === -1) {
+				redrawTrackFirst();
+				//reset selection
+				trackFirst = -1; //reset selection
+				trackFirstIsSwitch = false;
+				return; //nothing clicked
+			}
+			else {
+				secondSwitch = true;
+			}
 		}
 
 		//check if such track already exists (popup alert and ignore it)
 		for(let i = 0; i < trackList.length; i++) {
 			//if first and second node link to each other
 			if(
-				(trackList[i].nodeIdFirst == trackFirst ||
-				trackList[i].nodeIdFirst == secondTNode) &&
-				(trackList[i].nodeIdSecond == trackFirst ||
-				trackList[i].nodeIdSecond == secondTNode) 
+				(
+				(trackList[i].nodeIdFirst == trackFirst && trackList[i].firstIsSwitch == trackFirstIsSwitch) ||
+				(trackList[i].nodeIdFirst == secondTNode && trackList[i].firstIsSwitch == secondSwitch)
+			) &&
+				(
+				(trackList[i].nodeIdSecond == trackFirst && trackList[i].secondIsSwitch == trackFirstIsSwitch) ||
+				(trackList[i].nodeIdSecond == secondTNode && trackList[i].secondIsSwitch == secondSwitch)
+			) 
 			) {
 				alert("Error: track already exists.");
+				redrawTrackFirst();
 				trackFirst = -1;
+				trackFirstIsSwitch = false;
 				return;
 			}
 		}
 
+		redrawTrackFirst();
+
 		if(aisStation) {
-			trackList.push(new StationTrack(trackFirst, secondTNode))
+			trackList.push(new StationTrack(trackFirst, secondTNode, trackFirstIsSwitch, secondSwitch))
 		}
 		else {
-			trackList.push(new Track(trackFirst, secondTNode))
+			trackList.push(new Track(trackFirst, secondTNode, trackFirstIsSwitch, secondSwitch))
 		}
 		trackFirst = -1;
+		trackFirstIsSwitch = false;
 		trackList.at(-1).draw();
 	}
 }
@@ -249,16 +295,13 @@ function edit() {
 function onclickEditHandler(ax, ay) {
 	let node = getColliding(nodeList, ax, ay);
 	if(node !== -1) {
-		if(nodeList[node] instanceof TNode) {
-			nodeEditMenu(node);
-		}
-		else if(nodeList[node] instanceof Switch) {
-			switchEditMenu(node);
-		}
-		else {
-			canvasData.edit.innerHTML = "";
-		}
+		nodeEditMenu(node);
+		return;
+	}
 
+	let sw = getColliding(switchList, ax, ay);
+	if(sw !== -1) {
+		switchEditMenu(sw);
 		return;
 	}
 
@@ -327,37 +370,75 @@ function onclickEditTrackHandler(ax, ay) {
 			//if found first node
 			nodeList[trackFirst].draw(SELECT_COLOR);
 		}
+		else {
+			trackFirst = getColliding(switchList, ax, ay);
+			if(trackFirst !== -1) {
+				//if found first node - is switch
+				switchList[trackFirst].draw(SELECT_COLOR);
+				trackFirstIsSwitch = true;
+			}
+		}
 	}
 	else {
 		let secondTNode = getColliding(nodeList, ax, ay);
-		nodeList[trackFirst].draw();
-		if(secondTNode == -1) {
+		let secondSwitch = false;
+		if(secondTNode === trackFirst && !trackFirstIsSwitch) {
+			redrawTrackFirst();
 			trackFirst = -1; //reset selection
-			return;
-		}
-		if(secondTNode == trackFirst) {
-			trackFirst = -1; //reset selection
+			trackFirstIsSwitch = false;
 			alert("Error: second node same as first.");
 			return;
 		}
+		if(secondTNode == -1) {
+			//check if switch
+			secondTNode = getColliding(switchList, ax, ay);
+			if(secondTNode === trackFirst && trackFirstIsSwitch) {
+				redrawTrackFirst();
+				trackFirst = -1; //reset selection
+				trackFirstIsSwitch = false;
+				alert("Error: second switch same as first.");
+				return;
+			}
+			else if(secondTNode === -1) {
+				redrawTrackFirst();
+				//reset selection
+				trackFirst = -1; //reset selection
+				trackFirstIsSwitch = false;
+				return; //nothing clicked
+			}
+			else {
+				secondSwitch = true;
+			}
+		}
 
+
+		//check if such track already exists (popup alert and ignore it)
 		for(let i = 0; i < trackList.length; i++) {
-			if((
-				trackList[i].nodeIdFirst == trackFirst ||
-				trackList[i].nodeIdFirst == secondTNode) &&
-				(trackList[i].nodeIdSecond == trackFirst ||
-				trackList[i].nodeIdSecond == secondTNode)
+			//if first and second node link to each other
+			if(
+				(
+				(trackList[i].nodeIdFirst == trackFirst && trackList[i].firstIsSwitch == trackFirstIsSwitch) ||
+				(trackList[i].nodeIdFirst == secondTNode && trackList[i].firstIsSwitch == secondSwitch)
+			) &&
+				(
+				(trackList[i].nodeIdSecond == trackFirst && trackList[i].secondIsSwitch == trackFirstIsSwitch) ||
+				(trackList[i].nodeIdSecond == secondTNode && trackList[i].secondIsSwitch == secondSwitch)
+			) 
 			) {
-				if(trackList[i] instanceof StationTrack) {
+				redrawTrackFirst();
+
+				if(trackList instanceof StationTrack) {
 					stationTrackEditMenu(i);
 				}
 				else {
 					trackEditMenu(i);
 				}
-				trackFirst = -1;
-				return;
 			}
 		}
+
+		trackFirst = -1;
+		trackFirstIsSwitch = false;
+		return;
 	}
 }
 

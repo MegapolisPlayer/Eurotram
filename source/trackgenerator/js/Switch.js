@@ -12,8 +12,9 @@ class Switch {
 
 	radioBoxId = -1;
 	signalId = -1;
+	signalLetter = '-';
 
-	constructor(axpos, aypos, astationCode) {
+	constructor(axpos = 0, aypos = 0, astationCode = "") {
 		this.xpos = axpos;
 		this.ypos = aypos;
 		this.stationCode = astationCode;	
@@ -44,27 +45,30 @@ class Switch {
 	}
 };
 
-//switches also in node list
+let switchList = [];
 
 function switchEditMenu(aid) {
 	canvasData.edit.innerHTML = "";
 
-	canvasData.edit.innerHTML += "Editing switch (node no. "+aid+")<br>";
+	canvasData.edit.innerHTML += "Editing switch no. "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += addBasicEditInputs(nodeList[aid]);
+	canvasData.edit.innerHTML += addBasicEditInputs(switchList[aid]);
 	
-	canvasData.edit.innerHTML += "Before node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editbefinput' name='editbefinput' value="+nodeList[aid].beforeId+"><br>";
-	canvasData.edit.innerHTML += "Front node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editfroinput' name='editfroinput' value="+nodeList[aid].frontId+"><br>";
-	canvasData.edit.innerHTML += "Left node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editlefinput' name='editlefinput' value="+nodeList[aid].leftId+"><br>";
-	canvasData.edit.innerHTML += "Right node id: <input type='number' min='-1' max='"+(nodeList.length-1)+"' id='editriginput' name='editriginput' value="+nodeList[aid].rightId+"><br>";
-	canvasData.edit.innerHTML += "Radio box id: <input type='number' min='-1' max='"+(radioList.length-1)+"' id='editradinput' name='editradinput' value="+nodeList[aid].radioBoxId+"><br>";
-	canvasData.edit.innerHTML += "Switch signal id: <input type='number' min='-1' max='"+(switchSignalList.length-1)+"' id='editsiginput' name='editsiginput' value="+nodeList[aid].signalId+"><br>";
+	canvasData.edit.innerHTML += "Before node id: <input type='number' min='-1' max='"+(switchList.length-1)+"' id='editbefinput' name='editbefinput' value="+switchList[aid].beforeId+"><br>";
+	canvasData.edit.innerHTML += "Front node id: <input type='number' min='-1' max='"+(switchList.length-1)+"' id='editfroinput' name='editfroinput' value="+switchList[aid].frontId+"><br>";
+	canvasData.edit.innerHTML += "Left node id: <input type='number' min='-1' max='"+(switchList.length-1)+"' id='editlefinput' name='editlefinput' value="+switchList[aid].leftId+"><br>";
+	canvasData.edit.innerHTML += "Right node id: <input type='number' min='-1' max='"+(switchList.length-1)+"' id='editriginput' name='editriginput' value="+switchList[aid].rightId+"><br>";
+	canvasData.edit.innerHTML += "Radio box id: <input type='number' min='-1' max='"+(radioList.length-1)+"' id='editradinput' name='editradinput' value="+switchList[aid].radioBoxId+"><br>";
+	canvasData.edit.innerHTML += "Switch signal id: <input type='number' min='-1' max='"+(switchSignalList.length-1)+"' id='editsiginput' name='editsiginput' value="+switchList[aid].signalId+"><br>";
+	canvasData.edit.innerHTML += "Switch signal letter: <input type='text' maxlength='1' id='editsiglinput' name='editsiglinput' value="+switchList[aid].signalLetter+"><br>";
 
 	canvasData.edit.innerHTML += "<hr><em>A junction is a split - the track from the 'before' node splits into the 'front', 'left' and 'right' tracks. Enter value of -1 if switch does not turn to that direction.</em><hr>";
 
+	canvasData.edit.innerHTML += "<hr><em>If the switch signal letter is equal to '-' or the switch signal id is -1, the switch does not have a signal attached to it.</em><hr>";
+
 	canvasData.edit.innerHTML += "<button type='' onclick='switchUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='nodeRemove()'>Remove switch</button>";
+	canvasData.edit.innerHTML += "<button type='' onclick='switchRemove()'>Remove switch</button>";
 }
 
 function switchUpdate() {
@@ -72,16 +76,33 @@ function switchUpdate() {
 
 	let switchId =  Number(document.getElementById("idinput").value);
 
-	getDataFromBasicInputs(nodeList[switchId]);
+	getDataFromBasicInputs(switchList[switchId]);
 
-	nodeList[switchId].beforeId = Number(document.getElementById("editbefinput").value);
-	nodeList[switchId].frontId = Number(document.getElementById("editfroinput").value);
-	nodeList[switchId].leftId = Number(document.getElementById("editlefinput").value);
-	nodeList[switchId].rightId = Number(document.getElementById("editriginput").value);
-	nodeList[switchId].radioBoxId = Number(document.getElementById("editradinput").value);
-	nodeList[switchId].signalId = Number(document.getElementById("editsiginput").value);
+	//TODO check if switch doesnt self-reference
+
+	switchList[switchId].beforeId = Number(document.getElementById("editbefinput").value);
+	switchList[switchId].frontId = Number(document.getElementById("editfroinput").value);
+	switchList[switchId].leftId = Number(document.getElementById("editlefinput").value);
+	switchList[switchId].rightId = Number(document.getElementById("editriginput").value);
+	switchList[switchId].radioBoxId = Number(document.getElementById("editradinput").value);
+	switchList[switchId].signalId = Number(document.getElementById("editsiginput").value);
+	switchList[switchId].signalLetter = document.getElementById("editsiglinput").value;
 
 	canvasRedraw();
 }
 
-//removal same as node
+function switchRemove() {
+	console.log("Removing switch and connected track");
+
+	let switchId = Number(document.getElementById("idinput").value);
+
+	trackList = trackList.filter((v, i) => {
+		return !((v.nodeIdFirst === switchId && v.firstIsSwitch) || (v.nodeIdSecond === switchId && v.secondIsSwitch));
+	});
+
+	switchList.splice(switchId, 1);
+
+	canvasData.edit.innerHTML = "";
+
+	canvasRedraw();
+}

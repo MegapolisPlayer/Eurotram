@@ -7,7 +7,7 @@ class Signal {
 	rotation = 0;
 	stationCode = "";
 
-	constructor(axpos, aypos) {
+	constructor(axpos = 0, aypos = 0) {
 		this.xpos = axpos;
 		this.ypos = aypos;
 	}
@@ -93,12 +93,6 @@ function signalRemove() {
 
 //----------
 
-class SwitchStateSignalUnit {
-	letter = ""; //letter shown near signal
-}
-
-let signalUnits = []; //switches write here
-
 //switch semaphore - shows
 //can show state of multiple switches - every switch has letter
 class SwitchStateSignal {
@@ -108,7 +102,7 @@ class SwitchStateSignal {
 	stationCode = "";
 	rotation = 0;
 
-	unitIds = [];
+	unitIds = []; //stores array of letters, id in switch references to this obj
 
 	constructor(axpos, aypos) {
 		this.xpos = axpos;

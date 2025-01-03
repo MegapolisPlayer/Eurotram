@@ -1,6 +1,20 @@
 function fileLoad() {
 	console.log("Loading scenario");
 
+	let input = document.createElement("input");
+	input.id = "fileupload";
+	input.type = "file";
+	input.accept = ".etmap";
+
+	input.addEventListener("change", (e) => {
+		let fileread = new FileReader();
+		fileread.addEventListener("loadend", (e) => {
+			scenarioDeserialize(e.target.result);
+		});
+		fileread.readAsArrayBuffer(input.files[0]);
+	});
+
+	input.click();
 }
 function fileSave() {
 	console.log("Saving scenario");
