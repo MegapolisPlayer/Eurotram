@@ -1,5 +1,8 @@
-//when saving - set different depth to each to avoid z-fighting
-//add button - "download texture preps" - saves into zip file with station name
+//TODO rewrite texparcels
+
+//TODO rewrite serialization of this, add material selection
+//every texparcel has material - texcoords dynamically in sim
+//assign material to each parcel
 
 class Texparcel {
 	xpos = 0; //original top left corner
