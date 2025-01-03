@@ -52,7 +52,8 @@ class Signal {
 		return canvasIsInFrustum(
 			this.xpos - NODE_SIZE/2,
 			this.ypos - NODE_SIZE/2, 
-			NODE_SIZE, NODE_SIZE)
+			NODE_SIZE, NODE_SIZE
+		);
 	}
 }
 

@@ -1,4 +1,6 @@
 let statInfo = {
+	units: null,
+
 	node: null,
 	switch: null,
 	radio: null,
@@ -15,6 +17,7 @@ let statInfo = {
 //TODO also update units per meter
 
 function statUpdate() {
+	statInfo.units = UNITS_PER_METER;
 	statInfo.node.innerHTML = nodeList.length;
 	statInfo.switch.innerHTML = switchList.length;
 	statInfo.radio.innerHTML = radioList.length;
@@ -26,9 +29,13 @@ function statUpdate() {
 	statInfo.pillar.innerHTML = stationPillarList.length;
 	statInfo.signal.innerHTML = signalList.length;
 	statInfo.swsignal.innerHTML = switchSignalList.length;
+	document.getElementById("permeter").innerHTML = UNITS_PER_METER;
+
+
 }
 
 function statInit() {
+	statInfo.units = UNITS_PER_METER;
 	statInfo.node = document.getElementById("amountnode");
 	statInfo.switch = document.getElementById("amountswitch");
 	statInfo.radio = document.getElementById("amountradio");

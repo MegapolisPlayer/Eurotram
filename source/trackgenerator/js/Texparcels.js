@@ -31,7 +31,8 @@ class Texparcel {
 	}
 
 	draw() {
-		//if(!this.willRender()) { return; }
+		if(!this.willRender()) { return; }
+		console.log("texparcel draw");
 
 		canvasData.context.translate(this.xpos, this.ypos);
 		canvasData.context.rotate(toRadians(this.rotation));
@@ -75,8 +76,17 @@ class Texparcel {
 	}
 
 	willRender() {
-		//we dont check precise borders, but if the central point is further than the size of rectangle
+		//we dont check precise borders, but top left and bottom right corner
 
+		return canvasIsInFrustum(
+			this.xpos + this.xsize/2,
+			this.ypos + this.ysize/2,
+			NODE_SIZE*2, NODE_SIZE*2
+		) || canvasIsInFrustum(
+			this.xpos - this.xsize/2,
+			this.ypos - this.ysize/2,
+			NODE_SIZE*2, NODE_SIZE*2
+		);
 	}
 };
 

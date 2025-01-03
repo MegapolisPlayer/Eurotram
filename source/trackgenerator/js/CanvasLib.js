@@ -241,6 +241,8 @@ function canvasIsInFrustum(ax, ay, asx, asy) {
 }
 
 function canvasInit() {
+	statInit();
+
     canvasData.element = document.getElementById("main");
     canvasData.element.width = 1000;
     canvasData.element.height = 800;
@@ -263,10 +265,7 @@ function canvasInit() {
 	canvasData.context.textAlign = "center";
 	canvasData.context.textBaseline = "middle";
 
-	document.getElementById("permeter").innerHTML = UNITS_PER_METER;
 	document.getElementById("fmtversion").innerHTML = fileFormatVersion;
-
-	statInit();
 
 	makeLandmarkSelector();
 
