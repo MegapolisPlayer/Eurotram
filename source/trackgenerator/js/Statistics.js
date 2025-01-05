@@ -12,6 +12,7 @@ let statInfo = {
 	pillar: null,
 	signal: null,
 	swsignal: null,
+	wall: null,
 };
 
 //TODO also update units per meter
@@ -29,9 +30,9 @@ function statUpdate() {
 	statInfo.pillar.innerHTML = stationPillarList.length;
 	statInfo.signal.innerHTML = signalList.length;
 	statInfo.swsignal.innerHTML = switchSignalList.length;
+	statInfo.wall.innerHTML = wallList.length;
+
 	document.getElementById("permeter").innerHTML = UNITS_PER_METER;
-
-
 }
 
 function statInit() {
@@ -47,6 +48,7 @@ function statInit() {
 	statInfo.pillar = document.getElementById("amountpillar");
 	statInfo.signal = document.getElementById("amountsignal");
 	statInfo.swsignal = document.getElementById("amountswsignal");
+	statInfo.wall = document.getElementById("amountwall");
 
 	window.setInterval(statUpdate, 2000);
 }

@@ -1,6 +1,6 @@
 //nodes dont have to be in order - will be loaded into chunks
 
-const NODE_SIZE = 20;
+const NODE_SIZE = 40;
 
 class TNode {
 	xpos = 0;

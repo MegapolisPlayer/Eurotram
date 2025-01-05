@@ -20,18 +20,31 @@ let canvasData = {
 };
 
 function onclickHandler(event) {
-	//here inverse since if scene moved to right we move to left
-    let x = Math.trunc(
-		-canvasData.shiftX + (Math.trunc(event.pageX - event.target.offsetLeft) * (1.0/canvasData.scale))
-	);
-    let y = Math.trunc(
-		-canvasData.shiftY + (Math.trunc(event.pageY - event.target.offsetTop) * (1.0/canvasData.scale))
-	);
+	//early exit
+	if(currentMode === mode.VIEW) { return; }
+
+	//here inverse since if scene moved to right we move to left (and same with Y axis)
+	//also this is easier than calculating transformations by hand (again)
+	let p = canvasData.context.getTransform().invertSelf().transformPoint(new DOMPoint(
+		Math.trunc(event.pageX - event.target.offsetLeft),
+		Math.trunc(event.pageY - event.target.offsetTop)
+	));
+
+    let x = p.x;
+    let y = p.y;
+
+	/*
+	canvasData.context.fillStyle = SELECT_COLOR;
+	canvasData.context.fillRect(
+		x - NODE_SIZE/2,
+		y - NODE_SIZE/2,
+	NODE_SIZE, NODE_SIZE);
+	*/
 
 	console.log("Click "+x+" "+y);
 	switch(currentMode) {
 		case(mode.VIEW):
-			break;
+			break; //handled in early exit, here for completeness sake
 		case(mode.SCENARIO_NEW_LINE):
 			onclickNewScenarioHandler(x, y);
 			break;
@@ -60,13 +73,16 @@ function onclickHandler(event) {
 			onclickBuildingAddHandler(x, y);
 			break;
 		case(mode.TREE_ADD):
-			onclicktreeAddHandler(x, y);
+			onclickTreeAddHandler(x, y);
 			break;
 		case(mode.LIGHT_ADD):
-			onclicklightAddHandler(x, y);
+			onclickLightAddHandler(x, y);
 			break;
 		case(mode.LANDMARK_ADD):
-			onclicklandmarkAddHandler(x, y);
+			onclickLandmarkAddHandler(x, y);
+			break;
+		case(mode.WALL_ADD):
+			onclickWallAddHandler(x, y);
 			break;	
 		case(mode.STATION_PILLAR_ADD):
 			onclickStationPillarAddHandler(x, y);
@@ -83,15 +99,17 @@ function onclickHandler(event) {
 		case(mode.EDIT_TEXTURE_PARCEL):
 			onclickTextureParcelEditHandler(x, y);
 			break;
+		default:
+			console.error("Unregistered onclick event!");
+			break;
 	}
 }
 
 function canvasClear() {
 	canvasData.context.save();
 	canvasData.context.resetTransform();
-	canvasData.context.fillStyle = "#ffffff";
 	canvasData.context.globalAlpha = 1.0;
-	canvasData.context.fillRect(
+	canvasData.context.clearRect(
 		0, 0, 
 		canvasData.element.width,
 		canvasData.element.height
@@ -101,27 +119,50 @@ function canvasClear() {
 
 const SCALE_MULTIPLIER = 1.2;
 
+function canvasApplyScale(anewscale) {
+	canvasData.context.resetTransform();
+
+	canvasData.context.translate(
+		(canvasData.element.width/2),
+		(canvasData.element.height/2)
+	);
+
+	canvasData.context.scale(anewscale, anewscale);
+
+	canvasData.context.translate(
+		-(canvasData.element.width/2),
+		-(canvasData.element.height/2)
+	);
+
+	canvasData.context.translate(
+		canvasData.shiftX,
+		canvasData.shiftY
+	);
+
+	canvasData.scale = anewscale;
+}
+
 function canvasZoomIn() {
-	canvasData.context.resetTransform(); //scale matrices multiply, reset them
-	canvasData.scale *= SCALE_MULTIPLIER;
-	canvasData.context.scale(canvasData.scale, canvasData.scale);
-	canvasData.context.translate(canvasData.shiftX, canvasData.shiftY);
+	canvasApplyScale(canvasData.scale *= SCALE_MULTIPLIER);
+
 	canvasRedraw();
-	console.log(canvasData.scale);
+
+	mapLayerUpdate();
 }
 function canvasZoomOut() {
-	canvasData.context.resetTransform();
-	canvasData.scale /= SCALE_MULTIPLIER;
-	canvasData.context.scale(canvasData.scale, canvasData.scale);
-	canvasData.context.translate(canvasData.shiftX, canvasData.shiftY);
+	canvasApplyScale(canvasData.scale /= SCALE_MULTIPLIER);
+
 	canvasRedraw();
-	console.log(canvasData.scale);
+
+	mapLayerUpdate();
 }
 function canvasZoomReset() {
 	canvasData.context.resetTransform();
 	canvasData.context.translate(canvasData.shiftX, canvasData.shiftY);
 	canvasData.scale = 1.0;
 	canvasRedraw();
+
+	mapLayerUpdate();
 }
 function canvasPosReset() {
 	canvasData.context.resetTransform();
@@ -129,22 +170,25 @@ function canvasPosReset() {
 	canvasData.shiftY = 0;
 	canvasData.scale = 1.0;
 	canvasRedraw();
+
+	mapLayerReset();
 }
 
 function mouseScrollHandler(event) {
 	event.preventDefault(event);
-	canvasData.context.resetTransform();
+
 	if(Math.sign(event.deltaY) <= 0) {
 		//zoom in - scroll wheel up
-		canvasData.scale *= SCALE_MULTIPLIER;
+		canvasApplyScale(canvasData.scale *= SCALE_MULTIPLIER);
 	}
 	else {
 		//zoom out - scroll wheel down
-		canvasData.scale /= SCALE_MULTIPLIER;
+		canvasApplyScale(canvasData.scale /= SCALE_MULTIPLIER);
 	}
-	canvasData.context.scale(canvasData.scale, canvasData.scale);
-	canvasData.context.translate(canvasData.shiftX, canvasData.shiftY);
+
 	canvasRedraw();
+
+	mapLayerUpdate();
 }
 
 let dragStartX = 0;
@@ -164,8 +208,13 @@ function dragStartHandler(event) {
 function dragHandler(event) {
 	if(!dragEnabled) return;
 
-	let dx = Math.trunc((Math.trunc((event.pageX - event.target.offsetLeft))-dragStartX) * (1.0/canvasData.scale));
-	let dy = Math.trunc((Math.trunc((event.pageY - event.target.offsetTop))-dragStartY) * (1.0/canvasData.scale));
+	let dx = Math.trunc((event.pageX - event.target.offsetLeft))-dragStartX;
+	let dy = Math.trunc((event.pageY - event.target.offsetTop))-dragStartY;
+
+	mapLayerUpdate(dx, dy); //send clean data here
+
+	dx = Math.trunc(dx * (1.0/canvasData.scale));
+	dy = Math.trunc(dy * (1.0/canvasData.scale));
 
 	canvasData.context.translate(dx, dy);
 
@@ -187,7 +236,7 @@ function dragEndHandler(event) {
 
 function canvasRedraw(aNoTPOverride = false) {
 	canvasClear();
-
+	
 	//draw texture parcelling before nodes
 
 	if(!canvasData.hideTPElem.checked && !aNoTPOverride) {
@@ -195,7 +244,6 @@ function canvasRedraw(aNoTPOverride = false) {
 	}
 	
 	//render tracks and buildings first so they dont block other (smaller) stuff
-
 	[
 		trackList,
 		buildingList, 
@@ -207,7 +255,8 @@ function canvasRedraw(aNoTPOverride = false) {
 		lightList,
 		stationPillarList,
 		signalList,
-		switchSignalList
+		switchSignalList,
+		wallList
 	].forEach((v) => {
 		v.forEach((w) => {
 			w.draw();
@@ -231,13 +280,17 @@ function getColliding(alist, ax, ay) {
 
 //params: x,y pos + x,y size
 //returns false if outside frustum (therefore shouldnt be rendered)
+//scale offset * scale - why does this work?
 function canvasIsInFrustum(ax, ay, asx, asy) {
+	return true;
+	/*
 	return !(
 		(ax + canvasData.shiftX + asx < 0) ||
 		(ay + canvasData.shiftY + asy < 0) ||
 		(canvasData.shiftX + ax > (canvasData.element.width * (1.0/canvasData.scale))) ||
 		(canvasData.shiftY + ay > (canvasData.element.height * (1.0/canvasData.scale)))
 	);
+	*/
 }
 
 function canvasInit() {
@@ -245,9 +298,9 @@ function canvasInit() {
 
     canvasData.element = document.getElementById("main");
     canvasData.element.width = 1000;
-    canvasData.element.height = 800;
-	//doesnt disable drawing of transparent objects ON canvas, only disables transparent canvas (MDN)
-    canvasData.context = canvasData.element.getContext("2d", { alpha: false });
+    canvasData.element.height = 1000;
+    canvasData.context = canvasData.element.getContext("2d");
+
     canvasData.element.addEventListener("click", onclickHandler);
 	canvasData.element.addEventListener("mousedown", dragStartHandler);
 	canvasData.element.addEventListener("mousemove", dragHandler);
@@ -268,6 +321,8 @@ function canvasInit() {
 	document.getElementById("fmtversion").innerHTML = fileFormatVersion;
 
 	makeLandmarkSelector();
+
+	mapLayerInit();
 
 	canvasClear();
 }

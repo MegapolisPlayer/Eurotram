@@ -5,6 +5,11 @@
 		<link rel="stylesheet" href="./style.css">
 		<!-- ignore no icon error -->
 		<link rel="icon" href="#">
+
+		<!-- leaflet -->
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+		integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+		crossorigin=""/>
 	</head>
 	<body>
 		<h1>Eurotram map and scenario editor</h1>
@@ -32,7 +37,7 @@
 		<button onclick="buildingAdd()">Building</button>
 		<button onclick="treeAdd()">Tree</button>
 		<button onclick="lightAdd()">Light pole</button>
-		<button onclick="">Wall</button>
+		<button onclick="wallAdd()">Wall</button>
 		<button onclick="landmarkAdd()">Landmark</button>
 		<em>Add new objects</em>
 		<br>
@@ -58,6 +63,9 @@
 		<em>Current mode: </em><span id="curmode">View</span>
 		<hr>
 		<div id="container">
+			<!-- under canvas -->
+			<div id="lowerbg"></div>
+			<div id="map"></div>
 			<canvas id="main">
 				Canvas is not supported. Please use a different, newer browser.
 			</canvas>
@@ -83,6 +91,10 @@
 
 				<input type="checkbox" id="hideter" name="hideter">
 				<label for="hideter">Hide texture parcels</label>
+				<br>
+				<input type="checkbox" id="hidemap" name="hidemap" onchange="toggleMap()">
+				<label for="hidemap">Hide map</label>
+				<br>
 
 				<hr>
 
@@ -139,9 +151,18 @@
 				Switch signal amount:
 				<span id="amountswsignal">0</span>
 			</li>
+			<li>
+				Wall amount:
+				<span id="amountwall">0</span>
+			</li>
 		</ul>
 		Eurotram format version: <span id="fmtversion">??</span>
 		<hr>
+
+		<!-- leaflet -->
+		<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+		integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+		crossorigin=""></script>
 
 		<script src="js/ModeSet.js"></script>
 
@@ -155,14 +176,17 @@
 		<script src="js/Landmark.js"></script>
 		<script src="js/Signal.js"></script>
 		<script src="js/Station.js"></script>
+		<script src="js/Texparcels.js"></script>
+		<script src="js/Wall.js"></script>
 
 		<script src="js/Statistics.js"></script>
 		<script src="js/Map.js"></script>
 		<script src="js/Line.js"></script>
 
 		<script src="js/FileSave.js"></script>
-		<script src="js/Texparcels.js"></script>
 		<script src="js/CanvasLib.js"></script>
+
+		<script src="js/MapLayer.js"></script>
 		<script>
 			canvasInit();
 		</script>

@@ -67,8 +67,9 @@ let mode = {
 	LIGHT_ADD: 18,
 	LANDMARK_ADD: 19,
 	STATION_PILLAR_ADD: 20,
-	STATION_TRACK_ADD: 21,
-	TEXTURE_PARCEL_ADD: 22,
+	WALL_ADD: 21,
+	STATION_TRACK_ADD: 22,
+	TEXTURE_PARCEL_ADD: 23,
 
 	EDIT: 30,
 	EDIT_TRACK: 31,
@@ -256,7 +257,7 @@ function treeAdd() {
 	currentMode = mode.TREE_ADD;
 	canvasData.mode.innerHTML = "Add tree";
 }
-function onclicktreeAddHandler(ax, ay) {
+function onclickTreeAddHandler(ax, ay) {
 	treeList.push(new Tree(ax, ay));
 	treeList.at(-1).draw();
 }
@@ -265,16 +266,24 @@ function lightAdd() {
 	currentMode = mode.LIGHT_ADD;
 	canvasData.mode.innerHTML = "Add light pole";
 }
-function onclicklightAddHandler(ax, ay) {
+function onclickLightAddHandler(ax, ay) {
 	lightList.push(new Light(ax, ay));
 	lightList.at(-1).draw();
+}
+
+function wallAdd() {
+	currentMode = mode.WALL_ADD;
+	canvasData.mode.innerHTML = "Add wall";
+}
+function onclickWallAddHandler(ax, ay) {
+	wallAddMenu(ax, ay);
 }
 
 function landmarkAdd() {
 	currentMode = mode.LANDMARK_ADD;
 	canvasData.mode.innerHTML = "Add landmark";
 }
-function onclicklandmarkAddHandler(ax, ay) {
+function onclickLandmarkAddHandler(ax, ay) {
 	landmarkSelectMenu(ax, ay);
 }
 
@@ -293,63 +302,69 @@ function edit() {
 	canvasData.mode.innerHTML = "Edit";
 }
 function onclickEditHandler(ax, ay) {
-	let node = getColliding(nodeList, ax, ay);
-	if(node !== -1) {
-		nodeEditMenu(node);
+	let value = getColliding(wallList, ax, ay);
+	if(value !== -1) {
+		wallEditMenu(value);
 		return;
 	}
 
-	let sw = getColliding(switchList, ax, ay);
-	if(sw !== -1) {
-		switchEditMenu(sw);
+	value = getColliding(nodeList, ax, ay);
+	if(value !== -1) {
+		nodeEditMenu(value);
 		return;
 	}
 
-	let pillar = getColliding(stationPillarList, ax, ay);
-	if(pillar !== -1) {
-		stationPillarEditMenu(pillar);
+	value = getColliding(switchList, ax, ay);
+	if(value !== -1) {
+		switchEditMenu(value);
 		return;
 	}
 
-	let signal = getColliding(signalList, ax, ay);
-	if(signal !== -1) {
-		signalEditMenu(signal);
+	value = getColliding(stationPillarList, ax, ay);
+	if(value !== -1) {
+		stationPillarEditMenu(value);
 		return;
 	}
 
-	let swsignal = getColliding(switchSignalList, ax, ay);
-	if(swsignal !== -1) {
-		switchSignalEditMenu(swsignal);
+	value = getColliding(signalList, ax, ay);
+	if(value !== -1) {
+		signalEditMenu(value);
 		return;
 	}
 
-	let light = getColliding(lightList, ax, ay);
-	if(light !== -1) {
-		lightEditMenu(light);
+	value = getColliding(switchSignalList, ax, ay);
+	if(value !== -1) {
+		switchSignalEditMenu(value);
 		return;
 	}
 
-	let tree = getColliding(treeList, ax, ay);
-	if(tree !== -1) {
-		treeEditMenu(tree);
+	value = getColliding(lightList, ax, ay);
+	if(value !== -1) {
+		lightEditMenu(value);
 		return;
 	}
 
-	let radio = getColliding(radioList, ax, ay);
-	if(radio !== -1) {
-		radioEditMenu(radio);
+	value = getColliding(treeList, ax, ay);
+	if(value !== -1) {
+		treeEditMenu(value);
 		return;
 	}
 
-	let building = getColliding(buildingList, ax, ay);
-	if(building !== -1) {
-		buildingEditMenu(building);
+	value = getColliding(radioList, ax, ay);
+	if(value !== -1) {
+		radioEditMenu(value);
 		return;
 	}
 
-	let landmark = getColliding(landmarkList, ax, ay);
-	if(landmark !== -1) {
-		landmarkEditMenu(landmark);
+	value = getColliding(buildingList, ax, ay);
+	if(value !== -1) {
+		buildingEditMenu(value);
+		return;
+	}
+
+	value = getColliding(landmarkList, ax, ay);
+	if(value !== -1) {
+		landmarkEditMenu(value);
 		return;
 	}
 

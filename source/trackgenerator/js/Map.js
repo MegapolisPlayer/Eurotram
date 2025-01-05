@@ -7,6 +7,8 @@ function scenarioClear() {
 	treeList.length = 0;
 	lightList.length = 0;
 	landmarkList.length = 0;
+	texparcelList.length = 0;
+	wallList.length = 0;
 
 	canvasClear();
 }
@@ -81,7 +83,7 @@ function scenarioSerialize() {
 	//T - track amount
 	numberValuesArray.push(...numberToByteArray(trackList.length, 4));
 
-	//W - sw signal amount
+	//Y - sw signal amount
 	numberValuesArray.push(...numberToByteArray(switchSignalList.length, 4));
 
 	//S - signal amount
@@ -105,6 +107,9 @@ function scenarioSerialize() {
 	//M - monuments/landmarks amount
 	numberValuesArray.push(...numberToByteArray(landmarkList.length, 4));
 
+	//W - wall amount
+	numberValuesArray.push(...numberToByteArray(wallList.length, 4));
+
 	//X - texparcels amount
 	numberValuesArray.push(...numberToByteArray(texparcelList.length, 4));
 
@@ -126,8 +131,8 @@ function scenarioSerialize() {
 		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
 		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
-		numberValuesArray.push(...stationCodeToArray(v.stationCode));
 
+		numberValuesArray.push(...stationCodeToArray(v.stationCode));
 		numberValuesArray.push(...stationCodeToArray(v.bordersWith));
 	});
 
@@ -144,7 +149,7 @@ function scenarioSerialize() {
 		numberValuesArray.push(...numberToByteArray(v.rightId, 4));
 		numberValuesArray.push(...numberToByteArray(v.radioBoxId, 4));
 		numberValuesArray.push(...numberToByteArray(v.signalId, 4));
-		numberValuesArray.push(v.signalLetter.length == 0 ? "" : v.signalLetter.charCodeAt(0));
+		numberValuesArray.push(v.signalLetter.length == 0 ? " " : v.signalLetter.charCodeAt(0));
 	});
 
 	//tracks
@@ -262,27 +267,46 @@ function scenarioSerialize() {
 		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
+	});
+
+	//walls
+	wallList.forEach((v) => {
+		numberValuesArray.push(...numberToByteArray(v.x1, 4));
+		numberValuesArray.push(...numberToByteArray(v.y1, 4));
+		numberValuesArray.push(...numberToByteArray(v.h1, 4));
+		numberValuesArray.push(...numberToByteArray(v.x2, 4));
+		numberValuesArray.push(...numberToByteArray(v.y2, 4));
+		numberValuesArray.push(...numberToByteArray(v.h2, 4));
+		numberValuesArray.push(...numberToByteArray(v.height, 2));
+
 		numberValuesArray.push(...stationCodeToArray(v.stationCode));
+
+		numberValuesArray.push(...(v.materialName.split('').map((v) => { return v.charCodeAt(0); })));
+		numberValuesArray.push(0); //null terminator
 	});
 
 	//texparcels
 	texparcelList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
-		numberValuesArray.push(...numberToByteArray(v.xsize, 4));
-		numberValuesArray.push(...numberToByteArray(v.ysize, 4));
+		numberValuesArray.push(...numberToByteArray(v.x1, 4));
+		numberValuesArray.push(...numberToByteArray(v.x2, 4));
+		numberValuesArray.push(...numberToByteArray(v.x3, 4));
+		numberValuesArray.push(...numberToByteArray(v.x4, 4));
 
-		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
-
-		numberValuesArray.push(...numberToByteArray(v.heightPointTL, 4));
-		numberValuesArray.push(...numberToByteArray(v.heightPointTR, 4));
-		numberValuesArray.push(...numberToByteArray(v.heightPointBL, 4));
-		numberValuesArray.push(...numberToByteArray(v.heightPointBR, 4));
+		numberValuesArray.push(...numberToByteArray(v.y1, 4));
+		numberValuesArray.push(...numberToByteArray(v.y2, 4));
+		numberValuesArray.push(...numberToByteArray(v.y3, 4));
+		numberValuesArray.push(...numberToByteArray(v.y4, 4));
+		
+		numberValuesArray.push(...numberToByteArray(v.h1, 4));
+		numberValuesArray.push(...numberToByteArray(v.h2, 4));
+		numberValuesArray.push(...numberToByteArray(v.h3, 4));
+		numberValuesArray.push(...numberToByteArray(v.h4, 4));
 
 		numberValuesArray.push(...stationCodeToArray(v.stationCode1));
 		numberValuesArray.push(...stationCodeToArray(v.stationCode2));
 
-		numberValuesArray.push(...numberToByteArray(Math.trunc(v.depthOffset*1000), 4));
+		numberValuesArray.push(...(v.materialName.split('').map((v) => { return v.charCodeAt(0); })));
+		numberValuesArray.push(0); //null terminator
 	});
 
 	//convert to blob
@@ -344,7 +368,10 @@ function readBytesAsString(aarrayref, abytes) {
 //reads until null terminator found
 function readNullTerminatedString(aarrayref) {
 	let ntid = aarrayref.value.indexOf(0);
-	if(ntid <= 0) { return ""; } //empty string or no string
+	if(ntid <= 0) { 
+		aarrayref.value = aarrayref.value.slice(ntid+1);
+		return "";
+	} //empty string or no string
 
 	let string = aarrayref.value.slice(0, ntid);
 
@@ -391,9 +418,9 @@ function scenarioDeserialize(afiledata) {
 
 	console.log("Scenario date: ", new Date(readBytesAsNumber(numberArrayReference, 8)*1000)); //argument in milliseconds
 
-	//read amounts - 12 values
+	//read amounts - 13 values
 	
-	let amounts = new Array(12).fill(0);
+	let amounts = new Array(13).fill(0);
 	
 	amounts.forEach((v, i, a) => {
 		a[i] = readBytesAsNumber(numberArrayReference, 4);
@@ -447,6 +474,7 @@ function scenarioDeserialize(afiledata) {
 			trackList.push(new StationTrack());
 		}
 		else {
+			console.log(numberArrayReference);
 			alert("Invalid corrupt file - track type identificator invalid! ("+type+")");
 			window.location.href = window.location.href; //reload webpage
 			return;
@@ -547,22 +575,42 @@ function scenarioDeserialize(afiledata) {
 		landmarkList[i].updateFromLandmarkCode();
 	}
 
+	//walls
+	wallList.length = 0;
+	for(let i = 0; i < amounts[11]; i++) {
+		wallList.push(new Wall());
+		wallList[i].x1 = readBytesAsNumber(numberArrayReference, 4);
+		wallList[i].y1 = readBytesAsNumber(numberArrayReference, 4);
+		wallList[i].h1 = readBytesAsNumber(numberArrayReference, 4);
+		wallList[i].x2 = readBytesAsNumber(numberArrayReference, 4);
+		wallList[i].y2 = readBytesAsNumber(numberArrayReference, 4);
+		wallList[i].h2 = readBytesAsNumber(numberArrayReference, 4);
+		wallList[i].height = readBytesAsNumber(numberArrayReference, 2);
+
+		wallList[i].stationCode = readStationCode(numberArrayReference);
+		wallList[i].materialName = readNullTerminatedString(numberArrayReference);
+	}
+
 	//texparcels
 	texparcelList.length = 0;
-	for(let i = 0; i < amounts[11]; i++) {
+	for(let i = 0; i < amounts[12]; i++) {
 		texparcelList.push(new Texparcel());
-		texparcelList[i].xpos = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].ypos = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].xsize = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].ysize = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].rotation = readBytesAsNumber(numberArrayReference, 2);
-		texparcelList[i].heightPointTL = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].heightPointTR = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].heightPointBL = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].heightPointBR = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].x1 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].x2 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].x3 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].x4 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].y1 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].y2 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].y3 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].y4 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].h1 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].h2 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].h3 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].h4 = readBytesAsNumber(numberArrayReference, 4);
+
 		texparcelList[i].stationCode1 = readStationCode(numberArrayReference);
 		texparcelList[i].stationCode2 = readStationCode(numberArrayReference);
-		texparcelList[i].depthOffset = readBytesAsNumber(numberArrayReference, 4)/1000.0;
+		texparcelList[i].materialName = readNullTerminatedString(numberArrayReference);
 	}
 
 	canvasPosReset(); //reset to center

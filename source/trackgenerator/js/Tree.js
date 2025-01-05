@@ -1,4 +1,4 @@
-const TREE_RADIUS = 25;
+const TREE_RADIUS = 40;
 
 class Tree {
 	xpos = 0;
