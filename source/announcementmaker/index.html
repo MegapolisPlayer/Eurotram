@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Edit Eurotram annoucements</title>
+		<link rel="stylesheet" href="./style.css">
+		<!-- ignore no icon error -->
+		<link rel="icon" href="#">
+	</head>
+	<body>
+		<h1>Eurotram annunciator editor</h1>
+		<em>(c) Martin/MegapolisPlayer 2024-2025</em>
+		<hr>
+		<strong>File operations</strong>
+		<button>Load annunciator</button>
+		<button>Save annunciator</button>
+		<br>
+		<strong>Stations</strong>
+		<button onclick="resetList()">Reset</button>
+		<button onclick="newElement()">Add new</button>
+		<br>
+		<strong>Information</strong>
+		<input type='text' id='scenarioname' name='annunciatorname' placeholder='Name of annunciator'>
+		<input type='text' id='authorname' name='authorname' placeholder='Author of annunciator'>
+		<br>
+		<hr>
+
+		<div id="container">
+			<div id="list">
+
+			</div>
+		</div>
+
+		<script src="js/Element.js"></script>
+		<script src="js/AudioLoad.js"></script>
+		<script src="js/File.js"></script>
+	</body>
+</html>
