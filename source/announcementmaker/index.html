@@ -10,21 +10,70 @@
 		<h1>Eurotram annunciator editor</h1>
 		<em>(c) Martin/MegapolisPlayer 2024-2025</em>
 		<hr>
-		<strong>File operations</strong>
-		<button>Load annunciator</button>
-		<button>Save annunciator</button>
-		<br>
-		<strong>Stations</strong>
-		<button onclick="resetList()">Reset</button>
-		<button onclick="newElement()">Add new</button>
-		<br>
-		<strong>Information</strong>
-		<input type='text' id='scenarioname' name='annunciatorname' placeholder='Name of annunciator'>
-		<input type='text' id='authorname' name='authorname' placeholder='Author of annunciator'>
-		<br>
+		<p>
+			<strong>File operations</strong>
+			<button>Load annunciator</button>
+			<button>Save annunciator</button>
+			<br>
+			<strong>Stations</strong>
+			<button onclick="resetList()">Remove all</button>
+			<button onclick="newElement()">Add new</button>
+			<br>
+			<strong>Information</strong>
+			<input type='text' id='annunciatorname' name='annunciatorname' placeholder='Name of annunciator'>
+			<input type='text' id='authorname' name='authorname' placeholder='Author of annunciator'>
+			<br>
+
+			<strong>Statistics</strong>
+
+			Loaded audio files: 
+			<span id="loadedAudio">0</span>
+			| 
+			Amount stations: 
+			<span id="stationAmount">0</span>
+		</p>
+
 		<hr>
 
 		<div id="container">
+			<div id="static">
+				<strong>The .wav extension is added by default.</strong>
+				<br>
+				Next stop: <input type='text' id='nextstopf' name='nextstopf' placeholder='Filename, no extenstion'>
+				<br>
+				On request: <input type='text' id='onrequestf' name='onrequestf' placeholder='Filename, no extenstion'>
+				<br>
+				Exit to road:<input type='text' id='exitf' name='exitf' placeholder='Filename, no extenstion'>
+				<br>
+				Terminus: <input type='text' id='onrequestf' name='onrequestf' placeholder='Filename, no extenstion'>
+				<br>
+				Terminus/EN: <input type='text' id='onrequestf' name='onrequestf' placeholder='Filename, no extenstion'>
+				<br>
+				Transfer to metro: <input type='text' id='transmetrof' name='transmetrof' placeholder='Filename, no extenstion'>
+				<br>
+				Transfer to rail: <input type='text' id='transrailf' name='transrailf' placeholder='Filename, no extenstion'>
+				<br>
+				Warning: <input type='text' id='warningf' name='warningf' placeholder='Filename, no extenstion'>
+				<br>
+				The metro station...: <input type='text' id='metrof' name='metrof' placeholder='Filename, no extenstion'>
+				<br>
+				...is closed: <input type='text' id='closedf' name='closedf' placeholder='Filename, no extenstion'>
+				<br>
+				Train is going to the depot...: <input type='text' id='depotf' name='depotf' placeholder='Filename, no extenstion'>
+				<br>
+				Line change:<input type='text' id='linechangef' name='linechangef' placeholder='Filename, no extenstion'>
+				<br>
+				From the station...:<input type='text' id='fromstationf' name='fromstationf' placeholder='Filename, no extenstion'>
+				<br>
+				...is changed to line...:<input type='text' id='changef' name='changef' placeholder='Filename, no extenstion'>
+				<br>
+				Direction:<input type='text' id='directionf' name='directionf' placeholder='Filename, no extenstion'>
+				<br>
+				Cablecar closure: <input type='text' id='nocablef' name='nocablef' placeholder='Filename, no extenstion'>
+				<br>
+				<button>Reload base</button>
+				<hr>
+			</div>
 			<div id="list">
 
 			</div>

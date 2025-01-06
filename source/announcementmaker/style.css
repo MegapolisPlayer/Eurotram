@@ -9,12 +9,22 @@ html, body {
 	display: flex;
 	justify-content: center;
 	width: 100%;
+	flex-wrap: wrap;
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+#static {
+	border-left: 1px solid #000000;
+	border-right: 1px solid #000000;
+	min-height: 20vh;
+	width: 50vw;
+	text-align: center;
 }
 
 #list {
 	border-left: 1px solid #000000;
 	border-right: 1px solid #000000;
-	min-height: 80vh;
 	width: 50vw;
 	text-align: center;
 }
