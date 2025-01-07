@@ -15,8 +15,6 @@ let statInfo = {
 	wall: null,
 };
 
-//TODO also update units per meter
-
 function statUpdate() {
 	statInfo.units = UNITS_PER_METER;
 	statInfo.node.innerHTML = nodeList.length;

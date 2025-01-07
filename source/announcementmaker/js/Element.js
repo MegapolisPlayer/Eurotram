@@ -1,29 +1,47 @@
-const METRO_STATE = {
-	NONE: 0,
-	NORMAL: 1,
-	ISSUE: 2
-};
+const baseNames = [
+	"Next stop",
+	"On request",
+	"Exit to road",
+	"Terminus",
+	"Terminus/EN",
+	"Transfer to metro",
+	"Transfer to rail",
+	"Warning",
+	"The metro station...",
+	"...is closed",
+	"Train is going to the depot...",
+	"...is changed to line...",
+	"From the station...",
+	"Direction",
+	"Cablecar closure",
+];
 
-class StationEntry {
-	stationCode = "";
-	stationName = "";
-	stationAudioFile = "";
+const BASE_NAMES_AMOUNT = baseNames.length;
 
-	hasMetro = false;
-	metroClosed = false;
+function makeBase() {
+	let staticElem = document.getElementById("static");
+	baseNames.forEach((v, i, a) => {
+		let ielem = document.createElement("input");
+		ielem.type = "text";
+		ielem.name = "b"+String(i);
+		ielem.placeholder = "Filename (no extension)";
+		ielem.setAttribute("id", "b"+String(i));
 
-	railTransfer = false;
-
-	announceCablecarFail = false;
-
-	requestStop = false;
-};
+		staticElem.appendChild(document.createTextNode(baseNames[i]+": "));
+		staticElem.appendChild(ielem);
+		staticElem.appendChild(document.createElement("br"));
+	});
+	staticElem.appendChild(document.createElement("hr"));
+}
 
 //converted to list only when serializing
+
+let uniqueId = 0;
 
 function newElement() {
 	let container = document.createElement("div");
 	container.setAttribute("class", "element");
+	container.setAttribute("id", "e"+uniqueId);
 
 	let stationCodeField = document.createElement("input");
 	stationCodeField.class = "scode";
@@ -64,19 +82,17 @@ function newElement() {
 	labelHasRail.appendChild(document.createTextNode("Has rail?"));
 
 	let cablecarFail = document.createElement("input");
-	stationHasMetro.class = "scable";
-	stationHasMetro.type = "checkbox";
+	cablecarFail.class = "scable";
+	cablecarFail.type = "checkbox";
 
-	let labelcablecarFail = document.createElement("label");
-	labelHasMetro.appendChild(document.createTextNode("Announce cablecar closure?"));
-
-	let playButton = document.createElement("button");
-	playButton.appendChild(document.createTextNode("Current stop"));
-	
-	let nextButton = document.createElement("button");
-	nextButton.appendChild(document.createTextNode("Next stop"));
+	let labelCablecarFail = document.createElement("label");
+	labelCablecarFail.appendChild(document.createTextNode("Announce cablecar closure?"));
 	
 	let removeButton = document.createElement("button");
+	removeButton.setAttribute("id", "b"+uniqueId);
+	removeButton.addEventListener("click", (e) => {
+		removeElement(e.target.getAttribute("id").slice(1));
+	});
 	removeButton.appendChild(document.createTextNode("Remove"));
 	
 	container.appendChild(stationCodeField);
@@ -90,26 +106,24 @@ function newElement() {
 	container.appendChild(labelHasMetro);
 	container.appendChild(stationHasRail);
 	container.appendChild(labelHasRail);
+	container.appendChild(cablecarFail);
+	container.appendChild(labelCablecarFail);
 	container.appendChild(document.createElement("br"));
 	
-	container.appendChild(playButton);
-	container.appendChild(nextButton);
 	container.appendChild(removeButton);
 
 	container.appendChild(document.createElement("hr"));
 	document.getElementById("list").appendChild(container);
+
+	uniqueId++;
 }
 
 function removeElement(aid) {
-
+	console.debug("Removing "+aid);
+	document.getElementById("e"+aid).remove();
 }
 
-function resetElement() {
-
+function resetElements() {
+	uniqueId = 0;
+	document.getElementById("list").replaceChildren(); //replace with nothingness
 }
-
-function updateList() {
-
-}
-
-//TODO add "test announcement" and "test next stop announcement"

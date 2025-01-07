@@ -316,8 +316,6 @@ function scenarioSerialize() {
 		a[i] = numberValuesArray[i];
 	})
 
-	console.log(binaryArray);
-
 	//blobs are immutable
 	let blob = new Blob([binaryArray], {type: "application/octet-stream"}); //arbitrary binary data
 

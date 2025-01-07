@@ -85,14 +85,6 @@ function viewMode() {
 	canvasRedraw(); //get rid of temporary markings
 }
 
-function scenarioNew() {
-	currentMode = mode.SCENARIO_NEW;
-	canvasData.mode.innerHTML = "New scenario";
-}
-function onclickNewScenarioHandler(ax, ay) {
-	//open mode where we click stations and switches of line, then saves file
-}
-
 function nodeAdd() {
 	currentMode = mode.NODE_ADD;
 	canvasData.mode.innerHTML = "Add node";
@@ -208,6 +200,15 @@ function onclickTrackAddHandler(ax, ay, aisStation) {
 			else {
 				secondSwitch = true;
 			}
+		}
+
+		//track cannot lead between 2 switches
+		if(trackFirstIsSwitch && secondSwitch) {
+			alert("Error: track cannot lead between 2 switches.");
+			redrawTrackFirst();
+			trackFirst = -1;
+			trackFirstIsSwitch = false;
+			return;
 		}
 
 		//check if such track already exists (popup alert and ignore it)
