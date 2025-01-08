@@ -428,8 +428,8 @@ function scenarioDeserialize(afiledata) {
 
 	//read scenario and author name
 
-	document.getElementById("scenarioname").value = readNullTerminatedString(numberArrayReference);
-	document.getElementById("authorname").value = readNullTerminatedString(numberArrayReference);
+	document.getElementById("scenarioname").setAttribute("value", readNullTerminatedString(numberArrayReference));
+	document.getElementById("authorname").setAttribute("value", readNullTerminatedString(numberArrayReference));
 
 	//read units per meters
 

@@ -50,7 +50,7 @@ function nodeEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing node "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += addBasicEditInputs(nodeList[aid]);
+	addBasicEditInputs(nodeList[aid]);
 	canvasData.edit.innerHTML += "2nd code:<input type='text' id='editcodetwoinput' name='editcodetwoinput' placeholder='XXXX' value="+nodeList[aid].bordersWith+"><br>";
 	canvasData.edit.innerHTML += "<button type='' onclick='nodeUpdate()'>Update</button>";
 	canvasData.edit.innerHTML += "<button type='' onclick='nodeRemove()'>Remove node</button>";

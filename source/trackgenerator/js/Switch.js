@@ -53,7 +53,7 @@ function switchEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing switch no. "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += addBasicEditInputs(switchList[aid]);
+	addBasicEditInputs(switchList[aid]);
 	
 	canvasData.edit.innerHTML += "Before node id: <input type='number' min='-1' max='"+(switchList.length-1)+"' id='editbefinput' name='editbefinput' value="+switchList[aid].beforeId+"><br>";
 	canvasData.edit.innerHTML += "Front node id: <input type='number' min='-1' max='"+(switchList.length-1)+"' id='editfroinput' name='editfroinput' value="+switchList[aid].frontId+"><br>";

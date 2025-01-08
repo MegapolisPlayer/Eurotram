@@ -46,7 +46,7 @@ function radioEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing radiobox "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += addBasicEditInputs(radioList[aid]);
+	addBasicEditInputs(radioList[aid]);
 
 	canvasData.edit.innerHTML += "<button type='' onclick='radioUpdate()'>Update</button>";
 	canvasData.edit.innerHTML += "<button type='' onclick='radioRemove()'>Remove radio</button>";

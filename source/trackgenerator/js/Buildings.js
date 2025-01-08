@@ -117,7 +117,7 @@ function makeBuildingTypeSelector() {
 
 	for(let b in buildingType) {
 		let option = document.createElement("option");
-		option.value = buildingType[b]; //b is name of property, buildingType[b] is its value
+		option.setAttribute("value", buildingType[b]); //b is name of property, buildingType[b] is its value
 		option.appendChild(document.createTextNode(b));
 		select.appendChild(option);
 	}
@@ -136,11 +136,11 @@ function buildingSelectMenu(ax, ay) {
 	let buildxinput = document.createElement("input");
 	buildxinput.type = "hidden";
 	buildxinput.id = "buildxinput";
-	buildxinput.value = ax;
+	buildxinput.setAttribute("value", ax);
 	let buildyinput = document.createElement("input");
 	buildyinput.type = "hidden";
 	buildyinput.id = "buildyinput";
-	buildyinput.value = ay;
+	buildyinput.setAttribute("value", ay);
 
 	canvasData.edit.appendChild(buildxinput);
 	canvasData.edit.appendChild(buildyinput);
@@ -187,7 +187,7 @@ function buildingEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing buidling "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += addBasicEditInputs(buildingList[aid]);
+	addBasicEditInputs(buildingList[aid]);
 	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+buildingList[aid].rotation+"><br>";
 
 	canvasData.edit.innerHTML += buildingTypeSelector;

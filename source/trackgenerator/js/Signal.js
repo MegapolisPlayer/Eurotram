@@ -65,7 +65,7 @@ function signalEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing signal "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += addBasicEditInputs(signalList[aid]);
+	addBasicEditInputs(signalList[aid]);
 	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+signalList[aid].rotation+"><br>";
 
 	canvasData.edit.innerHTML +="<button type='' onclick='signalUpdate()'>Update signal track</button>";
@@ -177,7 +177,7 @@ function switchSignalEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing switch signal "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 	
-	canvasData.edit.innerHTML += addBasicEditInputs(switchSignalList[aid]);
+	addBasicEditInputs(switchSignalList[aid]);
 	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+switchSignalList[aid].rotation+"><br>";
 
 	canvasData.edit.innerHTML += "<button type='' onclick='switchSignalUpdate()'>Update</button>";

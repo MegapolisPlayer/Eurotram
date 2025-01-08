@@ -63,7 +63,7 @@ function stationPillarEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing station pillar "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += addBasicEditInputs(stationPillarList[aid]);
+	addBasicEditInputs(stationPillarList[aid]);
 	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+stationPillarList[aid].rotation+"><br>";
 
 	canvasData.edit.innerHTML += "<button type='' onclick='stationPillarUpdate()'>Update</button>";

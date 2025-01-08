@@ -1,16 +1,45 @@
-//this approach is MUCH slower than using createElement and such
-//here it is acceptable since we dont care about the performance of this part all that much
-//canvas performance is the larger bottleneck here (and we do optimize it)
-//speed data: https://stackoverflow.com/questions/7327056/appending-html-string-to-the-dom
-
-//TODO for future release - rewriting of this to the createElement and appendChild syntax
-
 function addBasicEditInputs(aobject) {
-	return ""+
-	"X:<input type='number' id='editxinput' name='editxinput' value="+aobject.xpos+"><br>"+
-	"Y:<input type='number' id='edityinput' name='edityinput' value="+aobject.ypos+"><br>"+
-	"Height:<input type='number' id='editheightinput' name='editheightinput' value="+aobject.height+"><br>"+
-	"Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+aobject.stationCode+"><br>";
+	let editxinput = document.createElement("input");
+	editxinput.type = "number";
+	editxinput.id = "editxinput";
+	editxinput.name = editxinput.id;
+	editxinput.setAttribute("value", aobject.xpos);
+
+	canvasData.edit.appendChild(document.createTextNode("X: "));
+	canvasData.edit.appendChild(editxinput);
+	canvasData.edit.appendChild(document.createElement("br"));
+	
+	let edityinput = document.createElement("input");
+	edityinput.type = "number";
+	edityinput.id = "edityinput";
+	edityinput.name = edityinput.id;
+	edityinput.setAttribute("value", aobject.ypos);
+	
+	canvasData.edit.appendChild(document.createTextNode("Y: "));
+	canvasData.edit.appendChild(edityinput);
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	let editheightinput = document.createElement("input");
+	editheightinput.type = "number";
+	editheightinput.id = "editheightinput";
+	editheightinput.name = editheightinput.id;
+	editheightinput.setAttribute("value", aobject.height);
+	
+	canvasData.edit.appendChild(document.createTextNode("Height: "));
+	canvasData.edit.appendChild(editheightinput);
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	let editcodeinput = document.createElement("input");
+	editcodeinput.type = "text";
+	editcodeinput.id = "editcodeinput";
+	editcodeinput.name = editcodeinput.id;
+	editcodeinput.placeholder = "XXXX";
+	editcodeinput.maxLength = 4;
+	editcodeinput.setAttribute("value", aobject.stationCode);
+
+	canvasData.edit.appendChild(document.createTextNode("Station code: "));
+	canvasData.edit.appendChild(editcodeinput);
+	canvasData.edit.appendChild(document.createElement("br"));
 }
 
 function getDataFromBasicInputs(aobject) {
@@ -21,6 +50,7 @@ function getDataFromBasicInputs(aobject) {
 }
 
 function addTrackEditInputs(aobject, id) {
+	//TODO remove innerHTMLs
 	let temp = "Bezier:<input type='checkbox' id='editbezinput' name='editbezinput' "+(aobject.bezier?"checked":"")+"><br>"+
 	"<hr><em>Control point values have no effect if Bezier curves are disabled.</em><hr>"+
 	"CP1,X:<input type='number' id='editcp1xinput' name='editcp1xinput' value="+aobject.controlPoint1.x+"><br>"+

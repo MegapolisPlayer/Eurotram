@@ -84,12 +84,12 @@ function wallAddMenu(ax, ay) {
 
 	let wxinput = document.createElement("input");
 	wxinput.type = "hidden";
-	wxinput.value = ax;
+	wxinput.setAttribute("value", ax);
 	canvasData.edit.appendChild(wxinput);
 
 	let wyinput = document.createElement("input");
 	wyinput.type = "hidden";
-	wyinput.value = ay;
+	wyinput.setAttribute("value", ay);
 	canvasData.edit.appendChild(wyinput);
 
 	let wx1input = document.createElement("input");

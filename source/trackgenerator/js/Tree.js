@@ -47,7 +47,7 @@ function treeEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing tree no. "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += addBasicEditInputs(treeList[aid]);
+	addBasicEditInputs(treeList[aid]);
 
 	canvasData.edit.innerHTML += "<button type='' onclick='treeUpdate()'>Update</button>";
 	canvasData.edit.innerHTML += "<button type='' onclick='treeRemove()'>Remove tree</button>";

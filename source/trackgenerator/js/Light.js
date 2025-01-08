@@ -94,7 +94,7 @@ function lightEditMenu(aid) {
 	canvasData.edit.innerHTML += "Editing light "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
-	canvasData.edit.innerHTML += addBasicEditInputs(lightList[aid]);
+	addBasicEditInputs(lightList[aid]);
 	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+lightList[aid].rotation+"><br>";
 
 	canvasData.edit.innerHTML += "<button type='' onclick='lightUpdate()'>Update</button>";
