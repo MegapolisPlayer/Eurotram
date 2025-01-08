@@ -103,32 +103,76 @@ class Building {
 
 let buildingList = [];
 
-//cannot add to DOM as strings - completes element (adds second tag) and breaks stuff
-const buildingTypeSelector = 
-	"<label for='buildtypeinput'>Select building type:</label>"+
-	"<select name='buildtypeinput' id='buildtypeinput'>"+
-	"<option value="+buildingType.NORMAL+">Normal</option>"+
-	"<option value="+buildingType.CORNER+">Corner</option>"+
-	"<option value="+buildingType.FAMILY+">Family</option>"+
-	"<option value="+buildingType.PREFAB+">Prefab</option>"+
-	"</select><br>"
+let buildingTypeSelector;
+
+function makeBuildingTypeSelector() {
+	buildingTypeSelector = document.createElement("span");
+
+	let label = document.createElement("label");
+	label.for = "Select building type";
+
+	let select = document.createElement("select");
+	select.name = "buildtypeinput";
+	select.id = select.name;
+
+	for(let b in buildingType) {
+		let option = document.createElement("option");
+		option.value = buildingType[b]; //b is name of property, buildingType[b] is its value
+		option.appendChild(document.createTextNode(b));
+		select.appendChild(option);
+	}
+
+	buildingTypeSelector.appendChild(label)
+	buildingTypeSelector.appendChild(select);
+	buildingTypeSelector.appendChild(document.createElement("br"));
+}
 
 function buildingSelectMenu(ax, ay) {
-	canvasData.edit.innerHTML = "Select building type at pos x = "+ax+", y = "+ay+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='buildxinput' value="+ax+"><br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='buildyinput' value="+ay+"><br>";
+	canvasData.edit.replaceChildren([]);
 
-	canvasData.edit.innerHTML += "Station code:<input type='text' id='buildcodeinput' name='buildcodeinput' placeholder='XXXX'><br>";
+	canvasData.edit.appendChild(document.createTextNode("Select building type at pos x = "+ax+", y = "+ay));
+	canvasData.edit.appendChild(document.createElement("br"));
 
-	canvasData.edit.innerHTML += buildingTypeSelector;
+	let buildxinput = document.createElement("input");
+	buildxinput.type = "hidden";
+	buildxinput.id = "buildxinput";
+	buildxinput.value = ax;
+	let buildyinput = document.createElement("input");
+	buildyinput.type = "hidden";
+	buildyinput.id = "buildyinput";
+	buildyinput.value = ay;
 
-	canvasData.edit.innerHTML += "<button onclick='buildingMake()'>Add building</button>";
+	canvasData.edit.appendChild(buildxinput);
+	canvasData.edit.appendChild(buildyinput);
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	canvasData.edit.appendChild(document.createTextNode("Station code:"));
+
+	let buildcodeinput = document.createElement("input");
+	buildcodeinput.id = "buildcodeinput";
+	buildcodeinput.name = buildcodeinput.id;
+	buildcodeinput.placeholder = "XXXX";
+	buildcodeinput.maxLength = 4;
+	buildcodeinput.size = 4;
+
+	canvasData.edit.appendChild(buildcodeinput);
+	canvasData.edit.appendChild(document.createElement("br"));	
+
+	canvasData.edit.appendChild(buildingTypeSelector);
+
+	let makeButton = document.createElement("button");
+	makeButton.appendChild(document.createTextNode("Make building"));
+	makeButton.addEventListener("click", (e) => {
+		buildingMake();
+	});
+	canvasData.edit.appendChild(makeButton);
 }
 
 function buildingMake() {
 	let x = Number(document.getElementById("buildxinput").value);
 	let y = Number(document.getElementById("buildyinput").value);
 	let type = Number(document.getElementById("buildtypeinput").value);
+	console.log(type, " and ", document.getElementById("buildtypeinput").value);
 	let stationCode = document.getElementById("buildcodeinput").value;
 
 	buildingList.push(new Building(x, y, type, stationCode));

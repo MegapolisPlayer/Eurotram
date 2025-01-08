@@ -77,11 +77,58 @@ class Wall {
 let wallList = [];
 
 function wallAddMenu(ax, ay) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren([]);
 
-	canvasData.edit.innerHTML = "Setup wall near x = "+ax+", y = "+ay+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='wxinput' value="+ax+"><br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='wyinput' value="+ay+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Setup wall near x = "+ax+", y = "+ay));
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	let wxinput = document.createElement("input");
+	wxinput.type = "hidden";
+	wxinput.value = ax;
+	canvasData.edit.appendChild(wxinput);
+
+	let wyinput = document.createElement("input");
+	wyinput.type = "hidden";
+	wyinput.value = ay;
+	canvasData.edit.appendChild(wyinput);
+
+	let wx1input = document.createElement("input");
+	wx1input.type = "number";
+	wx1input.id = "wx1input";
+	wx1input.name = "wx1input";
+	canvasData.edit.appendChild(wx1input)
+
+	let wy1input = document.createElement("input");
+	wy1input.type = "number";
+	wy1input.id = "wy1input";
+	wy1input.name = "wy1input";
+	canvasData.edit.appendChild(wy1input);
+
+	let wh1input = document.createElement("input");
+	wh1input.type = "number";
+	wh1input.id = "wh1input";
+	wh1input.name = "wh1input";
+	canvasData.edit.appendChild(wh1input);
+
+	let wx2input = document.createElement("input");
+	wx2input.type = "number";
+	wx2input.id = "wx2input";
+	wx2input.name = "wx2input";
+	canvasData.edit.appendChild(wx2input);
+
+	let wy2input = document.createElement("input");
+	wy2input.type = "number";
+	wy2input.id = "wy2input";
+	wy2input.name = "wy2input";
+	canvasData.edit.appendChild(wy2input);
+	
+	let wh2input = document.createElement("input");
+	wh2input.type = "number";
+	wh2input.id = "wh2input";
+	wh2input.name = "wh2input";
+	canvasData.edit.appendChild(wh2input);
+
+	
 
 	canvasData.edit.innerHTML += "X1:<input type='number' id='wx1input' name='wx1input' value="+(ax-200)+"><br>";
 	canvasData.edit.innerHTML += "Y1:<input type='number' id='wy1input' name='wy1input' value="+ay+"><br>";
@@ -96,7 +143,12 @@ function wallAddMenu(ax, ay) {
 	canvasData.edit.innerHTML += "Station code:<input type='text' id='wsinput' name='wsinput' placeholder='XXXX'><br>";
 	canvasData.edit.innerHTML += "Material name:<input type='text' id='wminput' name='wminput' placeholder='Name'><br>";
 
-	canvasData.edit.innerHTML += "<button onclick='wallMake()'>Add wall</button>";
+	let makeButton = document.createElement("button");
+	makeButton.addEventListener("click", () => {
+		wallMake();
+	})
+
+	canvasData.edit.appendChild(makeButton);
 }
 
 function wallMake() {

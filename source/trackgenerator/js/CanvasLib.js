@@ -320,6 +320,7 @@ function canvasInit() {
 
 	document.getElementById("fmtversion").innerHTML = fileFormatVersion;
 
+	makeBuildingTypeSelector();
 	makeLandmarkSelector();
 
 	mapLayerInit();
