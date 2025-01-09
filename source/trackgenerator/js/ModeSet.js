@@ -50,23 +50,91 @@ function getDataFromBasicInputs(aobject) {
 }
 
 function addTrackEditInputs(aobject, id) {
-	//TODO remove innerHTMLs
-	let temp = "Bezier:<input type='checkbox' id='editbezinput' name='editbezinput' "+(aobject.bezier?"checked":"")+"><br>"+
-	"<hr><em>Control point values have no effect if Bezier curves are disabled.</em><hr>"+
-	"CP1,X:<input type='number' id='editcp1xinput' name='editcp1xinput' value="+aobject.controlPoint1.x+"><br>"+
-	"CP1,Y:<input type='number' id='editcp1yinput' name='editcp1yinput' value="+aobject.controlPoint1.y+"><br>"+
-	"CP2,X:<input type='number' id='editcp2xinput' name='editcp2xinput' value="+aobject.controlPoint2.x+"><br>"+
-	"CP2,Y:<input type='number' id='editcp2yinput' name='editcp2yinput' value="+aobject.controlPoint2.y+"><br>"+
-	"<button type='' onclick='trackEditMoveCP2toCP1("+id+")'>Move CP2 to CP1</button><br>"+
-	"<button type='' onclick='trackEditRecalcHeight("+id+")'>Recalculate height points</button><br>"+
-	"<button type='' onclick='trackEditRecalcCP("+id+")'>Reset control points</button><br>"+
-	"<hr><h4>Edit heightpoints manually</h4>";
+	canvasData.edit.appendChild(document.createTextNode("Bezier: "));
 
-	for(let i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
-		temp += "HgPt"+i+":<input type='number' id='edithght"+i+"' name='edithght"+i+"' value="+aobject.heightpoints[i]+"><br>";
+	let editbezinput = document.createElement("input");
+	editbezinput.id = "editbezinput";
+	editbezinput.id = editbezinput.name;
+	if(aobject.bezier) {
+		editbezinput.setAttribute("checked", "");
 	}
 
-	return temp;
+	canvasData.edit.appendChild(document.createElement("<hr>"));
+
+	let em = document.createElement("<em>");
+	em.appendChild(document.createTextNode("Control point values have no effect if Bezier curves are disabled."));
+	canvasData.edit.appendChild(em);
+
+	canvasData.edit.appendChild(document.createElement("<hr>"));
+
+	canvasData.edit.appendChild(document.createTextNode("CP1;X: "));
+	let cp1x = document.createElement("input");
+	cp1x.type = "number";
+	cp1x.id = "editcp1xinput";
+	cp1x.name = cp1x.id;
+	cp1x.setAttribute("value", aobject.controlPoint1.x);
+	canvasData.edit.appendChild(cp1x);
+	canvasData.edit.appendChild(document.createElement("<br>"));
+
+	canvasData.edit.appendChild(document.createTextNode("CP1;Y: "));
+	let cp1y = document.createElement("input");
+	cp1y.type = "number";
+	cp1y.id = "editcp1yinput";
+	cp1y.name = cp1y.id;
+	cp1y.setAttribute("value", aobject.controlPoint1.y);
+	canvasData.edit.appendChild(cp1y);
+	canvasData.edit.appendChild(document.createElement("<br>"));
+
+	canvasData.edit.appendChild(document.createTextNode("CP2;X: "));
+	let cp2x = document.createElement("input");
+	cp2x.type = "number";
+	cp2x.id = "editcp2xinput";
+	cp2x.name = cp2x.id;
+	cp2x.setAttribute("value", aobject.controlPoint2.x);
+	canvasData.edit.appendChild(cp2x);
+	canvasData.edit.appendChild(document.createElement("<br>"));
+
+	canvasData.edit.appendChild(document.createTextNode("CP2;Y: "));
+	let cp2y = document.createElement("input");
+	cp2y.type = "number";
+	cp2y.id = "editcp2yinput";
+	cp2y.name = cp2y.id;
+	cp2y.setAttribute("value", aobject.controlPoint2.y);
+	canvasData.edit.appendChild(cp2y);
+	canvasData.edit.appendChild(document.createElement("<br>"));
+
+	let btnCP2CP1 = document.createElement("button");
+	btnCP2CP1.onclick = "trackEditMoveCP2toCP1("+id+")";
+	btnCP2CP1.appendChild(document.createTextNode("Move CP2 to CP1"));
+	canvasData.edit.appendChild(document.createElement("<br>"));
+
+	let btnHeight = document.createElement("button");
+	btnHeight.onclick = "trackEditRecalcHeight("+id+")";
+	btnHeight.appendChild(document.createTextNode("Recalculate height points"));
+	canvasData.edit.appendChild(document.createElement("<br>"));
+
+	let btnRecalc = document.createElement("button");
+	btnHeight.onclick = "trackEditRecalcCP("+id+")";
+	btnRecalc.appendChild(document.createTextNode("Reset control points"));
+	canvasData.edit.appendChild(document.createElement("<br>"));
+
+	canvasData.edit.appendChild(document.createElement("<hr>"));
+
+	let h4 = document.createElement("h4");
+	h4.appendChild(document.createTextNode("Edit heightpoints manually"));
+	canvasData.edit.appendChild(h4);
+
+	for(let i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
+		canvasData.edit.appendChild(document.createTextNode("HgPt"+i+": "));
+
+		let hpinput = document.createElement("input");
+		hpinput.type = "number";
+		hpinput.id = "edithght"+i;
+		hpinput.name = hpinput.id;
+		hpinput.setAttribute("value", aobject.heightpoints[i]);
+
+		canvasData.edit.appendChild(document.createElement("<br>"));
+	}
 }
 
 function getDataFromTrackInputs(aobject) {
