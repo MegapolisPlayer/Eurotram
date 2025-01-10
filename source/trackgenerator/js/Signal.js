@@ -60,12 +60,22 @@ class Signal {
 let signalList = [];
 
 function signalEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChldren();
 
-	canvasData.edit.innerHTML += "Editing signal "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Editing signal "+aid));
+
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	let idinput = document.createElement("input");
+	idinput.type = "hidden";
+	idinput.id = "idinput";
+	idinput.name = idinput.id;
+	idinput.setAttribute("value", aid);
+	canvasData.edit.appendChild(idinput);
 
 	addBasicEditInputs(signalList[aid]);
+
+	//TODO continue
 	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+signalList[aid].rotation+"><br>";
 
 	canvasData.edit.innerHTML +="<button type='' onclick='signalUpdate()'>Update signal track</button>";
@@ -87,7 +97,7 @@ function signalRemove() {
 
 	let signalId =  Number(document.getElementById("idinput").value);
 	signalList.splice(signalId, 1);
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChldren();
 
 	canvasRedraw();
 }
@@ -172,7 +182,7 @@ class SwitchStateSignal {
 let switchSignalList = [];
 
 function switchSignalEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChldren();
 
 	canvasData.edit.innerHTML += "Editing switch signal "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
@@ -198,7 +208,7 @@ function switchSignalRemove() {
 
 	let swsignalId =  Number(document.getElementById("idinput").value);
 	switchSignalList.splice(swsignalId, 1);
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChldren();
 
 	canvasRedraw();
 }

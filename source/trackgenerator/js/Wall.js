@@ -77,7 +77,7 @@ class Wall {
 let wallList = [];
 
 function wallAddMenu(ax, ay) {
-	canvasData.edit.replaceChildren([]);
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.appendChild(document.createTextNode("Setup wall near x = "+ax+", y = "+ay));
 	canvasData.edit.appendChild(document.createElement("br"));
@@ -168,11 +168,11 @@ function wallMake() {
 	wallList.push(new Wall(x1, y1, h1, x2, y2, h2, h, stationCode, materialName));
 	wallList.at(-1).draw();
 
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 }
 
 function wallEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.innerHTML += "Editing wall "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
@@ -216,7 +216,8 @@ function wallRemove() {
 
 	let wallId =  Number(document.getElementById("idinput").value);
 	wallList.splice(wallId, 1);
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
+
 
 	canvasRedraw();
 }

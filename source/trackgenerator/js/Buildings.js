@@ -118,7 +118,7 @@ function makeBuildingTypeSelector() {
 	for(let b in buildingType) {
 		let option = document.createElement("option");
 		option.setAttribute("value", buildingType[b]); //b is name of property, buildingType[b] is its value
-		option.appendChild(document.createTextNode(b));
+		option.textContent = b;
 		select.appendChild(option);
 	}
 
@@ -128,7 +128,7 @@ function makeBuildingTypeSelector() {
 }
 
 function buildingSelectMenu(ax, ay) {
-	canvasData.edit.replaceChildren([]);
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.appendChild(document.createTextNode("Select building type at pos x = "+ax+", y = "+ay));
 	canvasData.edit.appendChild(document.createElement("br"));
@@ -161,7 +161,7 @@ function buildingSelectMenu(ax, ay) {
 	canvasData.edit.appendChild(buildingTypeSelector);
 
 	let makeButton = document.createElement("button");
-	makeButton.appendChild(document.createTextNode("Make building"));
+	makeButton.textContent = "Make building";
 	makeButton.addEventListener("click", (e) => {
 		buildingMake();
 	});
@@ -178,22 +178,48 @@ function buildingMake() {
 	buildingList.push(new Building(x, y, type, stationCode));
 	buildingList.at(-1).draw();
 
-	canvasData.edit.innerHTML = ""; //clear AFTER getting values
+	canvasData.edit.replaceChildren();//clear AFTER getting values
 }
 
 function buildingEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
-	canvasData.edit.innerHTML += "Editing buidling "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Editing building "+aid));
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	let idinput = document.createElement("input");
+	idinput.type = "hidden";
+	idinput.setAttribute("value", aid);
+	canvasData.edit.appendChild(idinput);
+	canvasData.edit.appendChild(document.createElement("br"));
 
 	addBasicEditInputs(buildingList[aid]);
-	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+buildingList[aid].rotation+"><br>";
 
-	canvasData.edit.innerHTML += buildingTypeSelector;
+	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
 
-	canvasData.edit.innerHTML += "<button type='' onclick='buildingUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='buildingRemove()'>Remove building</button>";
+	let editrotinput = document.createElement("input");
+	editrotinput.type = "number";
+	editrotinput.id = "editrotinput";
+	editrotinput.name = editrotinput.id;
+	editrotinput.setAttribute("value", buildingList[aid].rotation);
+	canvasData.edit.appendChild(editrotinput);
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	canvasData.edit.appendChild(buildingTypeSelector);
+
+	let updateButton = document.createElement("button");
+	removeButton.appendChild(document.createTextNode("Update"));
+	buildingUpdate.addEventListener(() => {
+		buildingUpdate();
+	}).
+	canvasData.edit.appendChild(updateButton);
+	
+	let removeButton = document.createElement("button");
+	removeButton.appendChild(document.createTextNode("Remove"));
+	removeButton.addEventListener(() => {
+		buildingRemove();
+	})
+	canvasData.edit.appendChild(removeButton);
 }
 
 function buildingUpdate() {
@@ -213,7 +239,7 @@ function buildingRemove() {
 
 	let buildId =  Number(document.getElementById("idinput").value);
 	buildingList.splice(buildId, 1);
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }

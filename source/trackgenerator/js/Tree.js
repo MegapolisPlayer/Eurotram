@@ -42,7 +42,7 @@ class Tree {
 let treeList = [];
 
 function treeEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.innerHTML += "Editing tree no. "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
@@ -67,7 +67,7 @@ function treeRemove() {
 
 	let treeId = Number(document.getElementById("idinput").value);
 	treeList.splice(treeId, 1);
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }

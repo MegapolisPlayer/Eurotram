@@ -105,27 +105,27 @@ function addTrackEditInputs(aobject, id) {
 
 	let btnCP2CP1 = document.createElement("button");
 	btnCP2CP1.onclick = "trackEditMoveCP2toCP1("+id+")";
-	btnCP2CP1.appendChild(document.createTextNode("Move CP2 to CP1"));
+	btnCP2CP1.textContent = "Move CP2 to CP1";
 	canvasData.edit.appendChild(document.createElement("<br>"));
 
 	let btnHeight = document.createElement("button");
 	btnHeight.onclick = "trackEditRecalcHeight("+id+")";
-	btnHeight.appendChild(document.createTextNode("Recalculate height points"));
+	btnHeight.textContent = "Recalculate height points";
 	canvasData.edit.appendChild(document.createElement("<br>"));
 
 	let btnRecalc = document.createElement("button");
 	btnHeight.onclick = "trackEditRecalcCP("+id+")";
-	btnRecalc.appendChild(document.createTextNode("Reset control points"));
+	btnRecalc.textContent = "Reset control points";
 	canvasData.edit.appendChild(document.createElement("<br>"));
 
 	canvasData.edit.appendChild(document.createElement("<hr>"));
 
 	let h4 = document.createElement("h4");
-	h4.appendChild(document.createTextNode("Edit heightpoints manually"));
+	h4.textContent = "Edit heightpoints manually";
 	canvasData.edit.appendChild(h4);
 
 	for(let i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
-		canvasData.edit.appendChild(document.createTextNode("HgPt"+i+": "));
+		canvasData.edit.textContent = "HgPt"+i+": ";
 
 		let hpinput = document.createElement("input");
 		hpinput.type = "number";
@@ -178,14 +178,14 @@ let currentMode = mode.VIEW;
 
 function viewMode() {
 	currentMode = mode.VIEW;
-	canvasData.mode.innerHTML = "View";
-	canvasData.edit.innerHTML = "";
+	canvasData.mode.textContent = "View";
+	canvasData.edit.replaceChildren();
 	canvasRedraw(); //get rid of temporary markings
 }
 
 function nodeAdd() {
 	currentMode = mode.NODE_ADD;
-	canvasData.mode.innerHTML = "Add node";
+	canvasData.mode.textContent = "Add node";
 }
 function onclickTNodeAddHandler(ax, ay) {
 	nodeList.push(new TNode(ax, ay, "", ""));
@@ -194,7 +194,7 @@ function onclickTNodeAddHandler(ax, ay) {
 
 function switchAdd() {
 	currentMode = mode.SWITCH_ADD;
-	canvasData.mode.innerHTML = "Add switch";
+	canvasData.mode.textContent = "Add switch";
 }
 function onclickSwitchAddHandler(ax, ay) {
 	switchList.push(new Switch(ax, ay, "", "", 0));
@@ -203,7 +203,7 @@ function onclickSwitchAddHandler(ax, ay) {
 
 function switchSignalAdd() {
 	currentMode = mode.SWITCH_SIG_ADD;
-	canvasData.mode.innerHTML = "Add switch signal";
+	canvasData.mode.textContent = "Add switch signal";
 }
 function onclickSwitchSignalAddHandler(ax, ay) {
 	switchSignalList.push(new SwitchStateSignal(ax, ay));
@@ -212,7 +212,7 @@ function onclickSwitchSignalAddHandler(ax, ay) {
 
 function signalAdd() {
 	currentMode = mode.SIGNAL_ADD;
-	canvasData.mode.innerHTML = "Add signal";
+	canvasData.mode.textContent = "Add signal";
 }
 function onclickSignalAddHandler(ax, ay) {
 	signalList.push(new Signal(ax, ay));
@@ -220,7 +220,7 @@ function onclickSignalAddHandler(ax, ay) {
 }
 function radioAdd() {
 	currentMode = mode.RADIO_ADD;
-	canvasData.mode.innerHTML = "Add radiobox";
+	canvasData.mode.textContent = "Add radiobox";
 }
 function onclickRadioAddHandler(ax, ay) {
 	radioList.push(new RadioBox(ax, ay));
@@ -229,13 +229,13 @@ function onclickRadioAddHandler(ax, ay) {
 
 function trackAdd() {
 	currentMode = mode.TRACK_ADD;
-	canvasData.mode.innerHTML = "Add track";
+	canvasData.mode.textContent = "Add track";
 }
 
 //also calls onclickTrackAddHandler
 function stationTrackAdd() {
 	currentMode = mode.STATION_TRACK_ADD;
-	canvasData.mode.innerHTML = "Add station track";
+	canvasData.mode.textContent = "Add station track";
 }
 
 let trackFirst = -1;
@@ -346,7 +346,7 @@ function onclickTrackAddHandler(ax, ay, aisStation) {
 
 function buildingAdd() {
 	currentMode = mode.BUILDING_ADD;
-	canvasData.mode.innerHTML = "Add building";
+	canvasData.mode.textContent = "Add building";
 }
 function onclickBuildingAddHandler(ax, ay) {
 	buildingSelectMenu(ax, ay);
@@ -354,7 +354,7 @@ function onclickBuildingAddHandler(ax, ay) {
 
 function treeAdd() {
 	currentMode = mode.TREE_ADD;
-	canvasData.mode.innerHTML = "Add tree";
+	canvasData.mode.textContent = "Add tree";
 }
 function onclickTreeAddHandler(ax, ay) {
 	treeList.push(new Tree(ax, ay));
@@ -363,7 +363,7 @@ function onclickTreeAddHandler(ax, ay) {
 
 function lightAdd() {
 	currentMode = mode.LIGHT_ADD;
-	canvasData.mode.innerHTML = "Add light pole";
+	canvasData.mode.textContent = "Add light pole";
 }
 function onclickLightAddHandler(ax, ay) {
 	lightList.push(new Light(ax, ay));
@@ -372,7 +372,7 @@ function onclickLightAddHandler(ax, ay) {
 
 function wallAdd() {
 	currentMode = mode.WALL_ADD;
-	canvasData.mode.innerHTML = "Add wall";
+	canvasData.mode.textContent = "Add wall";
 }
 function onclickWallAddHandler(ax, ay) {
 	wallAddMenu(ax, ay);
@@ -380,7 +380,7 @@ function onclickWallAddHandler(ax, ay) {
 
 function landmarkAdd() {
 	currentMode = mode.LANDMARK_ADD;
-	canvasData.mode.innerHTML = "Add landmark";
+	canvasData.mode.textContent = "Add landmark";
 }
 function onclickLandmarkAddHandler(ax, ay) {
 	landmarkSelectMenu(ax, ay);
@@ -388,7 +388,7 @@ function onclickLandmarkAddHandler(ax, ay) {
 
 function stationPillarAdd() {
 	currentMode = mode.STATION_PILLAR_ADD;
-	canvasData.mode.innerHTML = "Add station pillar";
+	canvasData.mode.textContent = "Add station pillar";
 }
 
 function onclickStationPillarAddHandler(ax, ay) {
@@ -398,7 +398,7 @@ function onclickStationPillarAddHandler(ax, ay) {
 
 function edit() {
 	currentMode = mode.EDIT;
-	canvasData.mode.innerHTML = "Edit";
+	canvasData.mode.textContent = "Edit";
 }
 function onclickEditHandler(ax, ay) {
 	let value = getColliding(wallList, ax, ay);
@@ -472,7 +472,7 @@ function onclickEditHandler(ax, ay) {
 
 function editTrack() {
 	currentMode = mode.EDIT_TRACK;
-	canvasData.mode.innerHTML = "Edit track";
+	canvasData.mode.textContent = "Edit track";
 }
 
 //select 2 nodes, selects track between them
@@ -558,7 +558,7 @@ function onclickEditTrackHandler(ax, ay) {
 
 function textureParcelAdd() {
 	currentMode = mode.TEXTURE_PARCEL_ADD;
-	canvasData.mode.innerHTML = "Add texture parcel";
+	canvasData.mode.textContent = "Add texture parcel";
 }
 
 function onclickTextureParcelAddHandler(ax, ay) {
@@ -567,7 +567,7 @@ function onclickTextureParcelAddHandler(ax, ay) {
 
 function textureParcelEdit() {
 	currentMode = mode.EDIT_TEXTURE_PARCEL;
-	canvasData.mode.innerHTML = "Edit texture parcel";
+	canvasData.mode.textContent = "Edit texture parcel";
 }
 
 function onclickTextureParcelEditHandler(ax, ay) {

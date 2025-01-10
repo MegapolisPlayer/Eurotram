@@ -144,11 +144,11 @@ function texparcelMake() {
 	texparcelList.push(new Texparcel(x, y, sx, sy, stationCode1, stationCode2, materialName));
 	texparcelList.at(-1).draw();
 
-	canvasData.edit.innerHTML = ""; //clear AFTER getting values
+	canvasData.edit.replaceChildren(); //clear AFTER getting values
 }
 
 function texparcelEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.innerHTML += "Editing texture parcel "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
@@ -205,7 +205,7 @@ function texparcelRemove() {
 
 	let tpId =  Number(document.getElementById("idinput").value);
 	texparcelList.splice(tpId, 1);
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }

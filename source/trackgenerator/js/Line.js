@@ -37,14 +37,17 @@ function lineAddOnClick() {
 	document.getElementById("lineundo").disabled = false;
 }
 
-//TODO remove innerHTMLs!!!!
 function newLineCreate() {
 	currentMode = mode.VIEW;
-	canvasData.mode.innerHTML = "Adding new line...";
+	canvasData.mode.textContent = "Adding new line...";
 
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
+	
+	let em = document.createElement("em");
+	em.textContent = "Click on all of the nodes where the tram will go."
+	canvasData.edit.appendChild(em);
 
-	canvasData.edit.innerHTML += "<em>Click on all of the nodes where the tram will go.</em><br>";
+	canvasData.edit.appendChild(document.createElement("br"));
 	
 	let nlist = document.getElementsByClassName("menubtn");
 	for(let i = 0; i < nlist.length; i++) {
@@ -53,15 +56,27 @@ function newLineCreate() {
 
 	canvasData.element.addEventListener("click", lineAddOnClick);
 
-	canvasData.edit.innerHTML += "<button onclick='lineEnd()'>Exit</button>";
+	let lineButton = document.createElement("button");
+	lineButton.textContent = "Exit";
+	lineButton.addEventListener("click", () => {
+		lineEnd();
+	});
+	canvasData.edit.appendChild(lineButton);
 	
 	let undoButton = document.createElement("button");
 	undoButton.disabled = true;
-	undoButton.onclick = lineUndo;
-	undoButton.appendChild(document.createTextNode("Undo"));
+	serializeButton.addEventListener("click", () => {
+		lineUndo();
+	});
+	undoButton.textContent = "Undo";
 	canvasData.edit.appendChild(undoButton);
 
-	canvasData.edit.innerHTML += "<button onclick='lineSerialize()'>Done</button>";
+	let serializeButton = document.createElement("button");
+	undoButton.textContent = "Done";
+	serializeButton.addEventListener("click", () => {
+		lineSerialize();
+	});
+	canvasData.edit.appendChild(serializeButton);
 }
 
 function lineSerialize() {
@@ -90,5 +105,5 @@ function lineEnd() {
 	for(let i = 0; i < nlist.length; i++) {
 		nlist.item(i).disabled = false;
 	}
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 }

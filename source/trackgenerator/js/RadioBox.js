@@ -41,7 +41,7 @@ class RadioBox {
 let radioList = [];
 
 function radioEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.innerHTML += "Editing radiobox "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
@@ -77,8 +77,6 @@ function radioRemove() {
 	});
 
 	nodeList.splice(radioId, 1);
-
-	canvasData.edit.innerHTML = "";
-
+	canvasData.edit.replaceChildren();
 	canvasRedraw();
 }

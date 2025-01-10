@@ -264,9 +264,9 @@ function canvasRedraw(aNoTPOverride = false) {
 	})
 
 	//update values
-	canvasData.shiftXOut.innerHTML = canvasData.shiftX + " (" + Math.trunc(canvasData.shiftX/UNITS_PER_METER) + "m)";
-	canvasData.shiftYOut.innerHTML = canvasData.shiftY + " (" + Math.trunc(canvasData.shiftY/UNITS_PER_METER) + "m)";
-	canvasData.scaleOut.innerHTML = canvasData.scale;
+	canvasData.shiftXOut.replaceChildren(document.createTextNode(canvasData.shiftX + " (" + Math.trunc(canvasData.shiftX/UNITS_PER_METER) + "m)"));
+	canvasData.shiftYOut.replaceChildren(document.createTextNode(canvasData.shiftY + " (" + Math.trunc(canvasData.shiftY/UNITS_PER_METER) + "m)"));
+	canvasData.scaleOut.replaceChildren(document.createTextNode(canvasData.scale));
 }
 
 function getColliding(alist, ax, ay) {

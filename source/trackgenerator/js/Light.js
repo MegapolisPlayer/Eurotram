@@ -89,7 +89,7 @@ class Light {
 lightList = [];
 
 function lightEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.innerHTML += "Editing light "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
@@ -117,7 +117,7 @@ function lightRemove() {
 
 	let lightId = Number(document.getElementById("idinput").value);
 	lightList.splice(lightId, 1);
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }

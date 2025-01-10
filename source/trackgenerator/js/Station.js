@@ -58,7 +58,7 @@ class StationPillar {
 let stationPillarList = [];
 
 function stationPillarEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChldren();
 
 	canvasData.edit.innerHTML += "Editing station pillar "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
@@ -85,7 +85,7 @@ function stationPillarRemove() {
 
 	let spId =  Number(document.getElementById("idinput").value);
 	stationPillarList.splice(spId, 1);
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }
@@ -107,9 +107,9 @@ class StationTrack extends Track {
 //saved in track list
 
 function stationTrackEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 	
-	canvasData.edit.innerHTML += "Editing track "+aid+" between";
+	canvasData.edit.appendChild("Editing track "+aid+" between");
 
 	canvasData.edit.innerHTML += trackList[aid].firstIsSwitch ? " switch " : " node ";
 	canvasData.edit.innerHTML += trackList[aid].nodeIdFirst;
@@ -117,7 +117,7 @@ function stationTrackEditMenu(aid) {
 	canvasData.edit.innerHTML += trackList[aid].secondIsSwitch ? " switch " : " node ";
 	canvasData.edit.innerHTML += trackList[aid].nodeIdSecond;
 
-	canvasData.edit.innerHTML += "<br>";
+	canvasData.edit.appendChild(document.createElement("br"));
 
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 

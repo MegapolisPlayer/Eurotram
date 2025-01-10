@@ -120,7 +120,7 @@ function trackRecalcAllHeightpoints() {
 }
 
 function trackEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.innerHTML += "Editing track "+aid+" between";
 
@@ -130,7 +130,7 @@ function trackEditMenu(aid) {
 	canvasData.edit.innerHTML += trackList[aid].secondIsSwitch ? " switch " : " node ";
 	canvasData.edit.innerHTML += trackList[aid].nodeIdSecond;
 
-	canvasData.edit.innerHTML += "<br>";
+	canvasData.edit.appendChild(document.createElement("br"));
 
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
 
@@ -201,7 +201,7 @@ function trackRemove() {
 
 	let trackId = Number(document.getElementById("idinput").value);
 	trackList.splice(trackId, 1);
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }

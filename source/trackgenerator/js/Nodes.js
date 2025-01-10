@@ -45,7 +45,7 @@ class TNode {
 let nodeList = [];
 
 function nodeEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.innerHTML += "Editing node "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
@@ -77,8 +77,7 @@ function nodeRemove() {
 	});
 
 	nodeList.splice(nodeId, 1);
-
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }

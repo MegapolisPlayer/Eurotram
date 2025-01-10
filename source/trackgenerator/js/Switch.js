@@ -48,27 +48,115 @@ class Switch {
 let switchList = [];
 
 function switchEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
-	canvasData.edit.innerHTML += "Editing switch no. "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Editing switch no. "+aid));
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	let idinput = document.createElement("input");
+	idinput.type = "hidden";
+	idinput.id = "input";
+	idinput.name = idinput.id;
+	idinput.setAttribute("value", aid);
+	canvasData.edit.appendChild(idinput);
+	canvasData.edit.appendChild(document.createElement("br"));
 
 	addBasicEditInputs(switchList[aid]);
 	
-	canvasData.edit.innerHTML += "Before node id: <input type='number' min='-1' max='"+(switchList.length-1)+"' id='editbefinput' name='editbefinput' value="+switchList[aid].beforeId+"><br>";
-	canvasData.edit.innerHTML += "Front node id: <input type='number' min='-1' max='"+(switchList.length-1)+"' id='editfroinput' name='editfroinput' value="+switchList[aid].frontId+"><br>";
-	canvasData.edit.innerHTML += "Left node id: <input type='number' min='-1' max='"+(switchList.length-1)+"' id='editlefinput' name='editlefinput' value="+switchList[aid].leftId+"><br>";
-	canvasData.edit.innerHTML += "Right node id: <input type='number' min='-1' max='"+(switchList.length-1)+"' id='editriginput' name='editriginput' value="+switchList[aid].rightId+"><br>";
-	canvasData.edit.innerHTML += "Radio box id: <input type='number' min='-1' max='"+(radioList.length-1)+"' id='editradinput' name='editradinput' value="+switchList[aid].radioBoxId+"><br>";
-	canvasData.edit.innerHTML += "Switch signal id: <input type='number' min='-1' max='"+(switchSignalList.length-1)+"' id='editsiginput' name='editsiginput' value="+switchList[aid].signalId+"><br>";
-	canvasData.edit.innerHTML += "Switch signal letter: <input type='text' maxlength='1' id='editsiglinput' name='editsiglinput' value="+switchList[aid].signalLetter+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Before node id: "));
+	let editbefinput = document.createElement("input");
+	editbefinput.id = "editbefinput";
+	editbefinput.name = editbefinput.id;
+	editbefinput.setAttribute("value", switchList[aid].beforeId);
+	editbefinput.min = -1;
+	editbefinput.max = (switchList.length-1);
+	canvasData.edit.appendChild(editbefinput);
+	canvasData.edit.appendChild(document.createElement("br"));
 
-	canvasData.edit.innerHTML += "<hr><em>A junction is a split - the track from the 'before' node splits into the 'front', 'left' and 'right' tracks. Enter value of -1 if switch does not turn to that direction.</em><hr>";
+	canvasData.edit.appendChild(document.createTextNode("Front node id: "));
+	let editfroinput = document.createElement("input");
+	editfroinput.id = "editfroinput";
+	editfroinput.name = editfroinput.id;
+	editfroinput.setAttribute("value", switchList[aid].frontId);
+	editfroinput.min = -1;
+	editfroinput.max = (switchList.length-1);
+	canvasData.edit.appendChild(editfroinput);
+	canvasData.edit.appendChild(document.createElement("br"));
 
-	canvasData.edit.innerHTML += "<hr><em>If the switch signal letter is equal to '-' or the switch signal id is -1, the switch does not have a signal attached to it.</em><hr>";
+	canvasData.edit.appendChild(document.createTextNode("Left node id: "));
+	let editlefinput = document.createElement("input");
+	editlefinput.id = "editlefinput";
+	editlefinput.name = editlefinput.id;
+	editlefinput.setAttribute("value", switchList[aid].leftId);
+	editlefinput.min = -1;
+	editlefinput.max = (switchList.length-1);
+	canvasData.edit.appendChild(editlefinput);
+	canvasData.edit.appendChild(document.createElement("br"));
 
-	canvasData.edit.innerHTML += "<button type='' onclick='switchUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='switchRemove()'>Remove switch</button>";
+	canvasData.edit.appendChild(document.createTextNode("Right node id: "));
+	let editriginput = document.createElement("input");
+	editriginput.id = "editriginput";
+	editriginput.name = editriginput.id;
+	editriginput.setAttribute("value", switchList[aid].rightId);
+	editriginput.min = -1;
+	editriginput.max = (switchList.length-1);
+	canvasData.edit.appendChild(editriginput);
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	canvasData.edit.appendChild(document.createTextNode("Radio box id: "));
+	let editradinput = document.createElement("input");
+	editradinput.id = "editradinput";
+	editradinput.name = editradinput.id;
+	editradinput.setAttribute("value", switchList[aid].radioBoxId);
+	editradinput.min = -1;
+	editradinput.max = (switchList.length-1);
+	canvasData.edit.appendChild(editradinput);
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	canvasData.edit.appendChild(document.createTextNode("Switch signal id: "));
+	let editsiginput = document.createElement("input");
+	editsiginput.id = "editsiginput";
+	editsiginput.name = editsiginput.id;
+	editsiginput.setAttribute("value", switchList[aid].signalId);
+	editsiginput.min = -1;
+	editsiginput.max = (switchList.length-1);
+	canvasData.edit.appendChild(editsiginput);
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	canvasData.edit.appendChild(document.createTextNode("Switch signal letter: "));
+	let editsiglinput = document.createElement("input");
+	editsiglinput.id = "editsiglinput";
+	editsiglinput.name = editsiglinput.id;
+	editsiglinput.setAttribute("value", switchList[aid].signalLetter);
+	editsiglinput.min = -1;
+	editsiglinput.max = (switchList.length-1);
+	canvasData.edit.appendChild(editsiglinput);
+
+	canvasData.edit.appendChild(document.createElement("hr"));
+
+	let em1 = document.createElement("em");
+	em1.textContent = "A junction is a split - the track from the 'before' node splits into the 'front', 'left' and 'right' tracks. Enter value of -1 if switch does not turn to that direction.";
+	canvasData.edit.appendChild(em1);
+
+	canvasData.edit.appendChild(document.createElement("hr"));
+
+	let em2 = document.createElement("em");
+	em2.textContent = "If the switch signal letter is equal to '-' or the switch signal id is -1, the switch does not have a signal attached to it.";
+	canvasData.edit.appendChild(em2);
+
+	let updateButton = document.createElement("button");
+	updateButton.textContent = "Update";
+	updateButton.addEventListener("click", () => {
+		switchUpdate();
+	})
+	canvasData.edit.appendChild(updateButton);
+
+	let removeButton = document.createElement("button");
+	removeButton.textContent = "Remove switch";
+	removeButton.addEventListener("click", () => {
+		switchRemove();
+	})
+	canvasData.edit.appendChild(removeButton);
 }
 
 function switchUpdate() {
@@ -101,8 +189,7 @@ function switchRemove() {
 	});
 
 	switchList.splice(switchId, 1);
-
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }

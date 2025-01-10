@@ -30,19 +30,29 @@ const landmarkSizes = [
 	new makeLandmarkEntry("ZZTV", "Zizkov TV Tower", 0, 0),
 ];
 
-let landmarkTypeSelector = "";
+let landmarkTypeSelector;
 
 function makeLandmarkSelector() {
-	//TODO for future release - rewrite to createElement syntax (and textContent)
-	landmarkTypeSelector = 
-	"<label for='landmarktypeinput'>Select landmark type:</label>"+
-	"<select name='landmarktypeinput' id='landmarktypeinput'>";
+	landmarkTypeSelector = document.createElement("span");
+
+	let label = document.createElement("label");
+	label.setAttribute("for", "landmarktypeinput");
+	label.textContent = "Select landmark type: ";
+	landmarkTypeSelector.appendChild(label);
+
+	let select = document.createElement("select");
+	select.id = "landmarktypeinput";
+	select.name = select.id;
+	landmarkTypeSelector.appendChild(select);
 
 	landmarkSizes.forEach((v) => {
-		landmarkTypeSelector += "<option value="+v.code+">"+v.name+"</option>";
+		let option = document.createElement("option");
+		option.setAttribute("value", v.code);
+		option.textContent = v.name;
+		landmarkTypeSelector.appendChild(option);
 	});
 
-	landmarkTypeSelector += "</select><br>";
+	landmarkTypeSelector.appendChild(document.createElement("br"));
 }
 
 class Landmark {
@@ -113,13 +123,34 @@ class Landmark {
 landmarkList = [];
 
 function landmarkSelectMenu(ax, ay) {
-	canvasData.edit.innerHTML = "Select landmark at pos x = "+ax+", y = "+ay+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='landmarkxinput' value="+ax+"><br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='landmarkyinput' value="+ay+"><br>";
+	canvasData.edit.replaceChildren();
 
-	canvasData.edit.innerHTML += landmarkTypeSelector;
+	canvasData.edit.appendChild(document.createTextNode("Select landmark at pos x = "+ax+", y = "+ay));
 
-	canvasData.edit.innerHTML += "<button onclick='landmarkMake()'>Add landmark</button>";
+	let landmarkxinput = document.createElement("input");
+	landmarkxinput.id = "landmarkxinput";
+	landmarkxinput.name = landmarkxinput.id;
+	landmarkxinput.setAttribute("value", ax);
+	canvasData.edit.appendChild(landmarkxinput);
+
+	canvasData.edit.appendChild(document.createElement("br"));
+	
+	let landmarkyinput = document.createElement("input");
+	landmarkyinput.id = "landmarkyinput";
+	landmarkyinput.name = landmarkyinput.id;
+	landmarkxinput.setAttribute("value", ay);
+	canvasData.edit.appendChild(landmarkyinput);
+
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	canvasData.edit.appendChild(landmarkTypeSelector);
+
+	let make = document.createElement("button");
+	make.appendChild("Add landmark");
+	make.addEventListener(() => {
+		landmarkMake();
+	});
+	canvasData.edit.appendChild(make);
 }
 
 function landmarkMake() {
@@ -130,11 +161,11 @@ function landmarkMake() {
 	landmarkList.push(new Landmark(x, y, landmarkCode));
 	landmarkList.at(-1).draw();
 
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 }
 
 function landmarkEditMenu(aid) {
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.innerHTML += "Editing landmark "+aid+"<br>";
 	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
@@ -170,7 +201,7 @@ function landmarkRemove() {
 
 	let landmarkId = Number(document.getElementById("idinput").value);
 	landmarkList.splice(landmarkId, 1);
-	canvasData.edit.innerHTML = "";
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }
