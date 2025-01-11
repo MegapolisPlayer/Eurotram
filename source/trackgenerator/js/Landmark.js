@@ -33,25 +33,26 @@ const landmarkSizes = [
 let landmarkTypeSelector;
 
 function makeLandmarkSelector() {
-	landmarkTypeSelector = document.createElement("span");
+	landmarkTypeSelector = new DocumentFragment();
 
 	let label = document.createElement("label");
 	label.setAttribute("for", "landmarktypeinput");
 	label.textContent = "Select landmark type: ";
-	landmarkTypeSelector.appendChild(label);
 
 	let select = document.createElement("select");
 	select.id = "landmarktypeinput";
-	select.name = select.id;
-	landmarkTypeSelector.appendChild(select);
+	select.name = "landmarktypeinput";
 
 	landmarkSizes.forEach((v) => {
 		let option = document.createElement("option");
 		option.setAttribute("value", v.code);
 		option.textContent = v.name;
-		landmarkTypeSelector.appendChild(option);
+		select.appendChild(option);
 	});
 
+	landmarkTypeSelector.appendChild(label);
+	landmarkTypeSelector.appendChild(document.createElement("br"));
+	landmarkTypeSelector.appendChild(select);
 	landmarkTypeSelector.appendChild(document.createElement("br"));
 }
 
@@ -120,36 +121,23 @@ class Landmark {
 	}
 };
 
-landmarkList = [];
+let landmarkList = [];
 
 function landmarkSelectMenu(ax, ay) {
 	canvasData.edit.replaceChildren();
 
 	canvasData.edit.appendChild(document.createTextNode("Select landmark at pos x = "+ax+", y = "+ay));
-
-	let landmarkxinput = document.createElement("input");
-	landmarkxinput.id = "landmarkxinput";
-	landmarkxinput.name = landmarkxinput.id;
-	landmarkxinput.setAttribute("value", ax);
-	canvasData.edit.appendChild(landmarkxinput);
-
-	canvasData.edit.appendChild(document.createElement("br"));
-	
-	let landmarkyinput = document.createElement("input");
-	landmarkyinput.id = "landmarkyinput";
-	landmarkyinput.name = landmarkyinput.id;
-	landmarkxinput.setAttribute("value", ay);
-	canvasData.edit.appendChild(landmarkyinput);
-
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	canvasData.edit.appendChild(landmarkTypeSelector);
+	addHiddenInput("landmarkxinput", ax, "number");
+	addHiddenInput("landmarkyinput", ay, "number");
+
+	let dfcopy = landmarkTypeSelector.cloneNode(true);
+	canvasData.edit.append(dfcopy);
 
 	let make = document.createElement("button");
-	make.appendChild("Add landmark");
-	make.addEventListener(() => {
-		landmarkMake();
-	});
+	make.textContent = "Add landmark";
+	make.addEventListener("click", landmarkMake);
 	canvasData.edit.appendChild(make);
 }
 
@@ -167,18 +155,35 @@ function landmarkMake() {
 function landmarkEditMenu(aid) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.innerHTML += "Editing landmark "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Editing landmark "+aid));
+	canvasData.edit.appendChild(document.createElement("br"));
 
-	canvasData.edit.innerHTML += "X:<input type='number' id='editxinput' name='editxinput' value="+landmarkList[aid].xpos+"><br>";
-	canvasData.edit.innerHTML += "Y:<input type='number' id='edityinput' name='edityinput' value="+landmarkList[aid].ypos+"><br>";
-	canvasData.edit.innerHTML += "Height:<input type='number' id='editheightinput' name='editheightinput' value="+landmarkList[aid].height+"><br>";
-	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+landmarkList[aid].rotation+"><br>";
+	addHiddenIdInput(aid);
 
-	canvasData.edit.innerHTML += landmarkTypeSelector;
+	canvasData.edit.appendChild(document.createTextNode("X: "));
+	addInput("editxinput", landmarkList[aid].xpos, "number");
 
-	canvasData.edit.innerHTML += "<button type='' onclick='landmarkUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='landmarkRemove()'>Remove</button>";
+	canvasData.edit.appendChild(document.createTextNode("Y: "));
+	addInput("edityinput", landmarkList[aid].ypos, "number");
+
+	canvasData.edit.appendChild(document.createTextNode("Height: "));
+	addInput("editheightinput", landmarkList[aid].height, "number");
+
+	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
+	addInput("editrotinput", landmarkList[aid].rotation, "text");
+
+	let dfcopy = landmarkTypeSelector.cloneNode(true);
+	canvasData.edit.append(dfcopy);
+
+	let updateButton = document.createElement("button");
+	updateButton.textContent = "Update";
+	updateButton.addEventListener("click", landmarkUpdate);
+	canvasData.edit.appendChild(updateButton);
+
+	let removeButton = document.createElement("button");
+	removeButton.textContent = "Remove";
+	removeButton.addEventListener("click", landmarkRemove);
+	canvasData.edit.appendChild(removeButton);
 }
 
 function landmarkUpdate() {

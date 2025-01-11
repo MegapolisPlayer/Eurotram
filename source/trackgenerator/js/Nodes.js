@@ -47,19 +47,32 @@ let nodeList = [];
 function nodeEditMenu(aid) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.innerHTML += "Editing node "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Editing node "+aid));
+	addHiddenIdInput(aid);
+
+	canvasData.edit.appendChild(document.createElement("br"));
 
 	addBasicEditInputs(nodeList[aid]);
-	canvasData.edit.innerHTML += "2nd code:<input type='text' id='editcodetwoinput' name='editcodetwoinput' placeholder='XXXX' value="+nodeList[aid].bordersWith+"><br>";
-	canvasData.edit.innerHTML += "<button type='' onclick='nodeUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='nodeRemove()'>Remove node</button>";
+
+	canvasData.edit.appendChild(document.createTextNode("2nd code: "));
+
+	addInputPlaceholder("editcodetwoinput", nodeList[aid].bordersWith, "text", "XXXX");
+
+	let updateButton = document.createElement("button");
+	updateButton.textContent = "Update";
+	updateButton.addEventListener("click", nodeUpdate);
+	canvasData.edit.appendChild(updateButton);
+
+	let removeButton = document.createElement("button");
+	removeButton.textContent = "Remove";
+	removeButton.addEventListener("click", nodeRemove);
+	canvasData.edit.appendChild(removeButton);
 }
 
 function nodeUpdate() {
 	console.log("Updating node...");
 
-	let nodeId =  Number(document.getElementById("idinput").value);
+	let nodeId = Number(document.getElementById("idinput").value);
 
 	getDataFromBasicInputs(nodeList[nodeId]);
 	nodeList[nodeId].bordersWith = String(document.getElementById("editcodetwoinput").value);
@@ -74,6 +87,16 @@ function nodeRemove() {
 
 	trackList = trackList.filter((v, i) => {
 		return !((v.nodeIdFirst === nodeId && !v.firstIsSwitch) || (v.nodeIdSecond === nodeId && !v.secondIsSwitch));
+	});
+
+	//shift track
+	trackList.forEach((v, i, a) => {
+		if(v.nodeIdFirst >= nodeId) {
+			a[i].nodeIdFirst--;
+		}
+		if(v.nodeIdSecond >= nodeId) {
+			a[i].nodeIdSecond--;
+		}
 	});
 
 	nodeList.splice(nodeId, 1);

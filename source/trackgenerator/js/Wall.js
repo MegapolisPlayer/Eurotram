@@ -82,72 +82,36 @@ function wallAddMenu(ax, ay) {
 	canvasData.edit.appendChild(document.createTextNode("Setup wall near x = "+ax+", y = "+ay));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	let wxinput = document.createElement("input");
-	wxinput.type = "hidden";
-	wxinput.setAttribute("value", ax);
-	canvasData.edit.appendChild(wxinput);
+	canvasData.edit.appendChild(document.createTextNode("X1: "));
+	addInput("wx1input", ax-200, "number");
 
-	let wyinput = document.createElement("input");
-	wyinput.type = "hidden";
-	wyinput.setAttribute("value", ay);
-	canvasData.edit.appendChild(wyinput);
+	canvasData.edit.appendChild(document.createTextNode("Y1: "));
+	addInput("wy1input", ay-100, "number");
 
-	let wx1input = document.createElement("input");
-	wx1input.type = "number";
-	wx1input.id = "wx1input";
-	wx1input.name = "wx1input";
-	canvasData.edit.appendChild(wx1input)
+	canvasData.edit.appendChild(document.createTextNode("H1: "));
+	addInput("wh1input", 0, "number");
 
-	let wy1input = document.createElement("input");
-	wy1input.type = "number";
-	wy1input.id = "wy1input";
-	wy1input.name = "wy1input";
-	canvasData.edit.appendChild(wy1input);
+	canvasData.edit.appendChild(document.createTextNode("X2: "));
+	addInput("wx2input", ax+200, "number");
 
-	let wh1input = document.createElement("input");
-	wh1input.type = "number";
-	wh1input.id = "wh1input";
-	wh1input.name = "wh1input";
-	canvasData.edit.appendChild(wh1input);
-
-	let wx2input = document.createElement("input");
-	wx2input.type = "number";
-	wx2input.id = "wx2input";
-	wx2input.name = "wx2input";
-	canvasData.edit.appendChild(wx2input);
-
-	let wy2input = document.createElement("input");
-	wy2input.type = "number";
-	wy2input.id = "wy2input";
-	wy2input.name = "wy2input";
-	canvasData.edit.appendChild(wy2input);
+	canvasData.edit.appendChild(document.createTextNode("Y2: "));
+	addInput("wy2input", ax+100, "number");
 	
-	let wh2input = document.createElement("input");
-	wh2input.type = "number";
-	wh2input.id = "wh2input";
-	wh2input.name = "wh2input";
-	canvasData.edit.appendChild(wh2input);
+	canvasData.edit.appendChild(document.createTextNode("H2: "));
+	addInput("wh2input", 0, "number");
 
-	
+	canvasData.edit.appendChild(document.createTextNode("Height: "));
+	addInput("whinput", 3, "number");
 
-	canvasData.edit.innerHTML += "X1:<input type='number' id='wx1input' name='wx1input' value="+(ax-200)+"><br>";
-	canvasData.edit.innerHTML += "Y1:<input type='number' id='wy1input' name='wy1input' value="+ay+"><br>";
-	canvasData.edit.innerHTML += "H1:<input type='number' id='wh1input' name='wh1input' value='0'><br>";
+	canvasData.edit.appendChild(document.createTextNode("Station code: "));
+	addInputPlaceholder("wsinput", "", "text", "XXXX");
 
-	canvasData.edit.innerHTML += "X2:<input type='number' id='wx2input' name='wx2input' value="+(ax+200)+"><br>";
-	canvasData.edit.innerHTML += "Y2:<input type='number' id='wy2input' name='wy2input' value="+ay+"><br>";
-	canvasData.edit.innerHTML += "H2:<input type='number' id='wh2input' name='wh2input' value='0'><br>";
-
-	canvasData.edit.innerHTML += "Height:<input type='number' id='whinput' name='whinput' value='3'><br>";
-
-	canvasData.edit.innerHTML += "Station code:<input type='text' id='wsinput' name='wsinput' placeholder='XXXX'><br>";
-	canvasData.edit.innerHTML += "Material name:<input type='text' id='wminput' name='wminput' placeholder='Name'><br>";
+	canvasData.edit.appendChild(document.createTextNode("Material name: "));
+	addInputPlaceholder("wminput", "", "text", "Name of material");
 
 	let makeButton = document.createElement("button");
-	makeButton.addEventListener("click", () => {
-		wallMake();
-	})
-
+	makeButton.textContent = "Make";
+	makeButton.addEventListener("click", wallMake);
 	canvasData.edit.appendChild(makeButton);
 }
 
@@ -174,24 +138,46 @@ function wallMake() {
 function wallEditMenu(aid) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.innerHTML += "Editing wall "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Editing wall "+aid));
+	canvasData.edit.appendChild(document.createElement("br"));
+	addHiddenIdInput(aid);
 
-	canvasData.edit.innerHTML += "X1:<input type='number' id='editx1input' name='editx1input' value="+wallList[aid].x1+"><br>";
-	canvasData.edit.innerHTML += "Y1:<input type='number' id='edity1input' name='edity1input' value="+wallList[aid].y1+"><br>";
-	canvasData.edit.innerHTML += "H1:<input type='number' id='edith1input' name='edith1input' value="+wallList[aid].h1+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("X1: "));
+	addInput("editx1input", wallList[aid].x1, "number");
 
-	canvasData.edit.innerHTML += "X2:<input type='number' id='editx2input' name='editx2input' value="+wallList[aid].x2+"><br>";
-	canvasData.edit.innerHTML += "Y2:<input type='number' id='edity2input' name='edity2input' value="+wallList[aid].y2+"><br>";
-	canvasData.edit.innerHTML += "H2:<input type='number' id='edith2input' name='edith2input' value="+wallList[aid].h2+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Y1: "));
+	addInput("edity1input", wallList[aid].y1, "number");
 
-	canvasData.edit.innerHTML += "Height:<input type='number' id='edithinput' name='edithinput' value="+wallList[aid].height+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("H1: "));
+	addInput("edith1input", wallList[aid].h1, "number");
 
-	canvasData.edit.innerHTML += "Station code:<input type='text' id='editsinput' name='editsinput' placeholder='XXXX'><br>";
-	canvasData.edit.innerHTML += "Material name:<input type='text' id='editminput' name='editminput' placeholder='Name'><br>";
+	canvasData.edit.appendChild(document.createTextNode("X2: "));
+	addInput("editx2input", wallList[aid].x2, "number");
 
-	canvasData.edit.innerHTML += "<button type='' onclick='wallUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='wallRemove()'>Remove</button>";
+	canvasData.edit.appendChild(document.createTextNode("Y2: "));
+	addInput("edity2input", wallList[aid].y2, "number");
+	
+	canvasData.edit.appendChild(document.createTextNode("H2: "));
+	addInput("edith2input", wallList[aid].h2, "number");
+
+	canvasData.edit.appendChild(document.createTextNode("Height: "));
+	addInput("edithinput", wallList[aid].height, "number");
+
+	canvasData.edit.appendChild(document.createTextNode("Station code: "));
+	addInputPlaceholder("editsinput", wallList[aid].stationCode, "text", "XXXX");
+
+	canvasData.edit.appendChild(document.createTextNode("Material name: "));
+	addInputPlaceholder("editminput", wallList[aid].materialName, "text", "Name of material");
+
+	let updateButton = document.createElement("button");
+	updateButton.textContent = "Update";
+	updateButton.addEventListener("click", wallUpdate);
+	canvasData.edit.appendChild(updateButton);
+
+	let removeButton = document.createElement("button");
+	removeButton.textContent = "Remove";
+	removeButton.addEventListener("click", wallRemove);
+	canvasData.edit.appendChild(removeButton);
 }
 
 function wallUpdate() {
@@ -206,6 +192,7 @@ function wallUpdate() {
 	wallList[wallId].h1 = Number(document.getElementById("edith1input").value);
 	wallList[wallId].h2 = Number(document.getElementById("edith2input").value);
 	wallList[wallId].height = Number(document.getElementById("edithinput").value);
+	wallList[wallId].stationCode = document.getElementById("editsinput").value;
 	wallList[wallId].materialName = document.getElementById("editminput").value;
 	
 	canvasRedraw();

@@ -1,3 +1,53 @@
+function addHiddenInput(aid, avalue) {
+	let element = document.createElement("input");
+	element.type = "hidden";
+	element.id = aid;
+	element.name = aid;
+	element.setAttribute("value", avalue);
+	canvasData.edit.appendChild(element);
+}
+
+function addInput(aid, avalue, atype) {
+	let element = document.createElement("input");
+	element.type = atype;
+	element.id = aid;
+	element.name = aid;
+	element.setAttribute("value", avalue);
+	canvasData.edit.appendChild(element);
+	canvasData.edit.appendChild(document.createElement("br"));
+}
+
+function addInputPlaceholder(aid, avalue, atype, aplaceholder) {
+	let element = document.createElement("input");
+	element.type = atype;
+	element.id = aid;
+	element.name = aid;
+	element.placeholder = aplaceholder;
+	element.setAttribute("value", avalue);
+	canvasData.edit.appendChild(element);
+	canvasData.edit.appendChild(document.createElement("br"));
+}
+
+function addInputCheckbox(aid, achecked) {
+	let element = document.createElement("input");
+	element.type = "checkbox";
+	element.id = aid;
+	element.name = aid;
+	if(achecked) {
+		element.setAttribute("checked", "");
+	}
+	canvasData.edit.appendChild(element);
+	canvasData.edit.appendChild(document.createElement("br"));
+}
+
+function addHiddenIdInput(aid) {
+	let idinput = document.createElement("input");
+	idinput.type = "hidden";
+	idinput.id = "idinput";
+	idinput.setAttribute("value", aid);
+	canvasData.edit.appendChild(idinput);
+}
+
 function addBasicEditInputs(aobject) {
 	let editxinput = document.createElement("input");
 	editxinput.type = "number";

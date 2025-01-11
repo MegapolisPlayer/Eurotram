@@ -91,14 +91,26 @@ lightList = [];
 function lightEditMenu(aid) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.innerHTML += "Editing light "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Editing light "+aid));
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	addHiddenIdInput(aid);
 
 	addBasicEditInputs(lightList[aid]);
-	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+lightList[aid].rotation+"><br>";
 
-	canvasData.edit.innerHTML += "<button type='' onclick='lightUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='lightRemove()'>Remove light</button>";
+	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
+
+	addInput("editrotinput", buildingList[aid].rotation, "text");
+
+	let updateButton = document.createElement("button");
+	updateButton.textContent = "Update";
+	updateButton.addEventListener("click", lightUpdate);
+	canvasData.edit.appendChild(updateButton);
+
+	let removeButton = document.createElement("button");
+	removeButton.textContent = "Remove";
+	removeButton.addEventListener("click", lightRemove);
+	canvasData.edit.appendChild(removeButton);
 }
 
 function lightUpdate() {

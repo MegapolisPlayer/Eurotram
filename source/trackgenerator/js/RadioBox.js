@@ -43,13 +43,22 @@ let radioList = [];
 function radioEditMenu(aid) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.innerHTML += "Editing radiobox "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Editing radiobox "+aid));
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	addHiddenIdInput(aid);
 
 	addBasicEditInputs(radioList[aid]);
 
-	canvasData.edit.innerHTML += "<button type='' onclick='radioUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='radioRemove()'>Remove radio</button>";
+	let updateButton = document.createElement("button");
+	updateButton.appendChild(document.createTextNode("Update"));
+	updateButton.addEventListener("click", radioUpdate);
+	canvasData.edit.appendChild(updateButton);
+	
+	let removeButton = document.createElement("button");
+	removeButton.appendChild(document.createTextNode("Remove"));
+	removeButton.addEventListener("click", radioRemove);
+	canvasData.edit.appendChild(removeButton);
 }
 
 function radioUpdate() {

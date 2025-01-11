@@ -44,13 +44,22 @@ let treeList = [];
 function treeEditMenu(aid) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.innerHTML += "Editing tree no. "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Editing tree no. "+aid));
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	addHiddenIdInput(aid);
 
 	addBasicEditInputs(treeList[aid]);
 
-	canvasData.edit.innerHTML += "<button type='' onclick='treeUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='treeRemove()'>Remove tree</button>";
+	let updateButton = document.createElement("button");
+	updateButton.textContent = "Update";
+	updateButton.addEventListener("click", treeUpdate);
+	canvasData.edit.appendChild(updateButton);
+
+	let removeButton = document.createElement("button");
+	removeButton.textContent = "Remove";
+	removeButton.addEventListener("click", treeRemove);
+	canvasData.edit.appendChild(removeButton);
 }
 
 function treeUpdate() {

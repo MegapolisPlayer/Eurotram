@@ -60,14 +60,24 @@ let stationPillarList = [];
 function stationPillarEditMenu(aid) {
 	canvasData.edit.replaceChldren();
 
-	canvasData.edit.innerHTML += "Editing station pillar "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Editing station pillar "+aid));
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	addHiddenIdInput(aid);
 
 	addBasicEditInputs(stationPillarList[aid]);
-	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+stationPillarList[aid].rotation+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Rotation:"));
+	addInput("editrotinput", stationPillarList[aid].rotation, "number");
 
-	canvasData.edit.innerHTML += "<button type='' onclick='stationPillarUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='stationPillarRemove()'>Remove</button>";
+	let updateButton = document.createElement("button");
+	updateButton.textContent = "Update";
+	updateButton.addEventListener("click", stationPillarUpdate);
+	canvasData.edit.appendChild(updateButton);
+
+	let removeButton = document.createElement("button");
+	removeButton.textContent = "Remove";
+	removeButton.addEventListener("click", stationPillarRemove);
+	canvasData.edit.appendChild(removeButton);
 }
 
 function stationPillarUpdate() {
@@ -109,24 +119,34 @@ class StationTrack extends Track {
 function stationTrackEditMenu(aid) {
 	canvasData.edit.replaceChildren();
 	
-	canvasData.edit.appendChild("Editing track "+aid+" between");
+	canvasData.edit.appendChild(document.createTextNode("Editing track "+aid+" between"));
 
-	canvasData.edit.innerHTML += trackList[aid].firstIsSwitch ? " switch " : " node ";
-	canvasData.edit.innerHTML += trackList[aid].nodeIdFirst;
+	canvasData.edit.appendChild(document.createTextNode(
+		trackList[aid].firstIsSwitch ? " switch " : " node " + trackList[aid].nodeIdFirst
+	));
 
-	canvasData.edit.innerHTML += trackList[aid].secondIsSwitch ? " switch " : " node ";
-	canvasData.edit.innerHTML += trackList[aid].nodeIdSecond;
+	canvasData.edit.appendChild(document.createTextNode(
+		trackList[aid].secondIsSwitch ? " switch " : " node " + trackList[aid].nodeIdSecond
+	));
 
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
+	addHiddenInput("idinput", aid);
 
-	canvasData.edit.innerHTML += "Station code:<input type='text' id='editcodeinput' name='editcodeinput' placeholder='XXXX' value="+trackList[aid].stationCode+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Station code: "));
+	addInputPlaceholder("editcodeinput", trackList[aid].stationCode, "XXXX");
 
-	canvasData.edit.innerHTML += addTrackEditInputs(trackList[aid], aid);
+	canvasData.edit.appendChild(addTrackEditInputs(trackList[aid], aid));
 
-	canvasData.edit.innerHTML +="<button type='' onclick='stationTrackUpdate()'>Update station track</button>";
-	canvasData.edit.innerHTML +="<button type='' onclick='trackRemove()'>Remove track</button>";
+	let updateButton = document.createElement("button");
+	updateButton.textContent = "Update";
+	updateButton.addEventListener("click", stationTrackUpdate);
+	canvasData.edit.appendChild(updateButton);
+
+	let removeButton = document.createElement("button");
+	removeButton.textContent = "Remove";
+	removeButton.addEventListener("click", trackRemove);
+	canvasData.edit.appendChild(removeButton);
 }
 
 function stationTrackUpdate() {

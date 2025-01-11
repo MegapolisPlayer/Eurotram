@@ -66,20 +66,23 @@ function signalEditMenu(aid) {
 
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	let idinput = document.createElement("input");
-	idinput.type = "hidden";
-	idinput.id = "idinput";
-	idinput.name = idinput.id;
-	idinput.setAttribute("value", aid);
-	canvasData.edit.appendChild(idinput);
+	addHiddenIdInput(aid);
 
 	addBasicEditInputs(signalList[aid]);
 
-	//TODO continue
-	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+signalList[aid].rotation+"><br>";
+	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
 
-	canvasData.edit.innerHTML +="<button type='' onclick='signalUpdate()'>Update signal track</button>";
-	canvasData.edit.innerHTML +="<button type='' onclick='signalRemove()'>Remove signal</button>";
+	addInput("editrotinput", signalList[aid].rotation, "number");
+
+	let updateButton = document.createElement("button");
+	updateButton.addEventListener("click", signalUpdate);
+	updateButton.textContent = "Update signal track";
+	canvasData.edit.appendChild(updateButton);
+
+	let removeButton = document.createElement("button");
+	removeButton.addEventListener("click", signalRemove);
+	removeButton.textContent = "Remove signal";
+	canvasData.edit.appendChild(removeButton);
 }
 
 function signalUpdate() {
@@ -182,16 +185,26 @@ class SwitchStateSignal {
 let switchSignalList = [];
 
 function switchSignalEditMenu(aid) {
-	canvasData.edit.replaceChldren();
+	canvasData.edit.replaceChildren();
 
-	canvasData.edit.innerHTML += "Editing switch signal "+aid+"<br>";
-	canvasData.edit.innerHTML += "<input type='hidden' id='idinput' value="+aid+"><br>";
-	
+	canvasData.edit.appendChild(document.createTextNode("Editing switch signal "+aid));
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	addHiddenInput("idinput", aid, "number");
+
 	addBasicEditInputs(switchSignalList[aid]);
-	canvasData.edit.innerHTML += "Rotation:<input type='number' id='editrotinput' name='editrotinput' value="+switchSignalList[aid].rotation+"><br>";
 
-	canvasData.edit.innerHTML += "<button type='' onclick='switchSignalUpdate()'>Update</button>";
-	canvasData.edit.innerHTML += "<button type='' onclick='switchSignalRemove()'>Remove</button>";
+	addInput("editrotinput", switchSignalList[aid].rotation, "number");	
+
+	let updateButton = document.createElement("button");
+	updateButton.appendChild(document.createTextNode("Update"));
+	updateButton.addEventListener("click", switchSignalUpdate);
+	canvasData.edit.appendChild(updateButton);
+	
+	let removeButton = document.createElement("button");
+	removeButton.appendChild(document.createTextNode("Remove"));
+	removeButton.addEventListener("click", switchSignalRemove);
+	canvasData.edit.appendChild(removeButton);
 }
 
 function switchSignalUpdate() {

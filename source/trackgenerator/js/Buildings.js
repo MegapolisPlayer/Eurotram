@@ -106,14 +106,14 @@ let buildingList = [];
 let buildingTypeSelector;
 
 function makeBuildingTypeSelector() {
-	buildingTypeSelector = document.createElement("span");
+	buildingTypeSelector = new DocumentFragment();
 
 	let label = document.createElement("label");
 	label.for = "Select building type";
 
 	let select = document.createElement("select");
 	select.name = "buildtypeinput";
-	select.id = select.name;
+	select.id = "buildtypeinput";
 
 	for(let b in buildingType) {
 		let option = document.createElement("option");
@@ -133,38 +133,22 @@ function buildingSelectMenu(ax, ay) {
 	canvasData.edit.appendChild(document.createTextNode("Select building type at pos x = "+ax+", y = "+ay));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	let buildxinput = document.createElement("input");
-	buildxinput.type = "hidden";
-	buildxinput.id = "buildxinput";
-	buildxinput.setAttribute("value", ax);
-	let buildyinput = document.createElement("input");
-	buildyinput.type = "hidden";
-	buildyinput.id = "buildyinput";
-	buildyinput.setAttribute("value", ay);
-
-	canvasData.edit.appendChild(buildxinput);
-	canvasData.edit.appendChild(buildyinput);
-	canvasData.edit.appendChild(document.createElement("br"));
+	addHiddenInput("buildxinput", ax, "number");
+	addHiddenInput("buildyinput", ay, "number");
 
 	canvasData.edit.appendChild(document.createTextNode("Station code:"));
 
-	let buildcodeinput = document.createElement("input");
-	buildcodeinput.id = "buildcodeinput";
-	buildcodeinput.name = buildcodeinput.id;
-	buildcodeinput.placeholder = "XXXX";
-	buildcodeinput.maxLength = 4;
-	buildcodeinput.size = 4;
+	addInputPlaceholder("buildcodeinput", "", "text", "XXXX");
 
 	canvasData.edit.appendChild(buildcodeinput);
 	canvasData.edit.appendChild(document.createElement("br"));	
 
-	canvasData.edit.appendChild(buildingTypeSelector);
+	let dfcopy = buildingTypeSelector.cloneNode(true);
+	canvasData.edit.append(dfcopy);
 
 	let makeButton = document.createElement("button");
 	makeButton.textContent = "Make building";
-	makeButton.addEventListener("click", (e) => {
-		buildingMake();
-	});
+	makeButton.addEventListener("click", buildingMake);
 	canvasData.edit.appendChild(makeButton);
 }
 
@@ -187,38 +171,24 @@ function buildingEditMenu(aid) {
 	canvasData.edit.appendChild(document.createTextNode("Editing building "+aid));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	let idinput = document.createElement("input");
-	idinput.type = "hidden";
-	idinput.setAttribute("value", aid);
-	canvasData.edit.appendChild(idinput);
-	canvasData.edit.appendChild(document.createElement("br"));
+	addHiddenIdInput(aid);
 
 	addBasicEditInputs(buildingList[aid]);
 
 	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
+	addInput("editrotinput", buildingList[aid].rotation, "text");
 
-	let editrotinput = document.createElement("input");
-	editrotinput.type = "number";
-	editrotinput.id = "editrotinput";
-	editrotinput.name = editrotinput.id;
-	editrotinput.setAttribute("value", buildingList[aid].rotation);
-	canvasData.edit.appendChild(editrotinput);
-	canvasData.edit.appendChild(document.createElement("br"));
-
-	canvasData.edit.appendChild(buildingTypeSelector);
+	let dfcopy = buildingTypeSelector.cloneNode(true);
+	canvasData.edit.append(dfcopy);
 
 	let updateButton = document.createElement("button");
-	removeButton.appendChild(document.createTextNode("Update"));
-	buildingUpdate.addEventListener(() => {
-		buildingUpdate();
-	}).
+	updateButton.appendChild(document.createTextNode("Update"));
+	updateButton.addEventListener("click", buildingUpdate);
 	canvasData.edit.appendChild(updateButton);
 	
 	let removeButton = document.createElement("button");
 	removeButton.appendChild(document.createTextNode("Remove"));
-	removeButton.addEventListener(() => {
-		buildingRemove();
-	})
+	removeButton.addEventListener("click", buildingRemove);
 	canvasData.edit.appendChild(removeButton);
 }
 

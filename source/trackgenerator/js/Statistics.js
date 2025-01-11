@@ -17,24 +17,24 @@ let statInfo = {
 };
 
 function statUpdate() {
+	statInfo.node.textContent = nodeList.length;
+	statInfo.switch.textContent = switchList.length;
+	statInfo.radio.textContent = radioList.length;
+	statInfo.track.textContent = trackList.length;
+	statInfo.build.textContent = buildingList.length;
+	statInfo.tree.textContent = treeList.length;
+	statInfo.light.textContent = lightList.length;
+	statInfo.landmark.textContent = landmarkList.length;
+	statInfo.pillar.textContent = stationPillarList.length;
+	statInfo.signal.textContent = signalList.length;
+	statInfo.swsignal.textContent = switchSignalList.length;
+	statInfo.wall.textContent = wallList.length;
+
 	statInfo.units = UNITS_PER_METER;
-	statInfo.node.innerHTML = nodeList.length;
-	statInfo.switch.innerHTML = switchList.length;
-	statInfo.radio.innerHTML = radioList.length;
-	statInfo.track.innerHTML = trackList.length;
-	statInfo.build.innerHTML = buildingList.length;
-	statInfo.tree.innerHTML = treeList.length;
-	statInfo.light.innerHTML = lightList.length;
-	statInfo.landmark.innerHTML = landmarkList.length;
-	statInfo.pillar.innerHTML = stationPillarList.length;
-	statInfo.signal.innerHTML = signalList.length;
-	statInfo.swsignal.innerHTML = switchSignalList.length;
-	statInfo.wall.innerHTML = wallList.length;
-	statInfo.permeter.innerHTML = UNITS_PER_METER;
+	statInfo.permeter.textContent = UNITS_PER_METER;
 }
 
 function statInit() {
-	statInfo.units = UNITS_PER_METER;
 	statInfo.node = document.getElementById("amountnode");
 	statInfo.switch = document.getElementById("amountswitch");
 	statInfo.radio = document.getElementById("amountradio");
@@ -47,6 +47,8 @@ function statInit() {
 	statInfo.signal = document.getElementById("amountsignal");
 	statInfo.swsignal = document.getElementById("amountswsignal");
 	statInfo.wall = document.getElementById("amountwall");
+
+	statInfo.units = UNITS_PER_METER;
 	statInfo.permeter = document.getElementById("permeter");
 
 	statUpdate();

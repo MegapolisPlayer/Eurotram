@@ -318,7 +318,7 @@ function canvasInit() {
 	canvasData.context.textAlign = "center";
 	canvasData.context.textBaseline = "middle";
 
-	document.getElementById("fmtversion").innerHTML = fileFormatVersion;
+	document.getElementById("fmtversion").textContent = fileFormatVersion;
 
 	makeBuildingTypeSelector();
 	makeLandmarkSelector();
