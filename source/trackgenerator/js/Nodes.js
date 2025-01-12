@@ -91,10 +91,10 @@ function nodeRemove() {
 
 	//shift track
 	trackList.forEach((v, i, a) => {
-		if(v.nodeIdFirst >= nodeId) {
+		if(v.nodeIdFirst > nodeId && !v.firstIsSwitch) {
 			a[i].nodeIdFirst--;
 		}
-		if(v.nodeIdSecond >= nodeId) {
+		if(v.nodeIdSecond > nodeId && !v.secondIsSwitch) {
 			a[i].nodeIdSecond--;
 		}
 	});

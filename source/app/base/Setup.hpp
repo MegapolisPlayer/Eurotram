@@ -32,12 +32,15 @@ r Raw Arrays
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <miniaudio/miniaudio.h>
+
 #include <iostream>
 #include <fstream>
 #include <array>
 #include <vector>
 #include <chrono>
 #include <csignal> //extra helpful to raise interrupts when debugging
+#include <clocale>
 
 #define FILE_READ_BLOCK_SIZE 8192
 

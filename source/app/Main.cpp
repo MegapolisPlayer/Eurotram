@@ -73,6 +73,8 @@ void MouseCallback(Window* aWindow, double aX, double aY) {
 int main() {
 	static_assert(sizeof(glm::vec3) == sizeof(GLfloat)*3, "Test failed: glm::vec3 has wrong size!");
 
+	setUTF8Encoding();
+
 	std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
 	float daylightIndex = 1.0f;
 

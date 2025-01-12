@@ -13,6 +13,8 @@ function scenarioClear() {
 	canvasClear();
 }
 
+let mapFileFormatVersion = 0;
+
 // utils
 
 function clamp(anum, min, max) {
@@ -65,11 +67,9 @@ function scenarioSerialize() {
 	//file signature
 	numberValuesArray.push(...("ETMP".split('').map((v) => { return v.charCodeAt(0); })));
 
-	console.log(numberValuesArray);
-
 	//header numbers
 
-	numberValuesArray.push(...numberToByteArray(fileFormatVersion, 2)); //V
+	numberValuesArray.push(...numberToByteArray(mapFileFormatVersion, 2)); //V
 	numberValuesArray.push(...numberToByteArray(Math.trunc(Date.now()/1000), 8)); //D - unix time in ms
 	
 	console.log(numberValuesArray);
@@ -407,8 +407,8 @@ function scenarioDeserialize(afiledata) {
 	}
 
 	let fmtver = readBytesAsNumber(numberArrayReference, 2);
-	if(fmtver != fileFormatVersion) {
-		alert("Wrong scenario format version - program supports version "+fileFormatVersion+" and file is of version "+fmtver);
+	if(fmtver != mapFileFormatVersion) {
+		alert("Wrong scenario format version - program supports version "+mapFileFormatVersion+" and file is of version "+fmtver);
 		return;
 	}
 

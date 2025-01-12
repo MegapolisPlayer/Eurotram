@@ -53,6 +53,9 @@ void setOutputColor(
 	const ConsoleColor::ConsoleStreamColor aForeground,
 	const ConsoleColor::ConsoleStreamColor aBackground = ConsoleColor::DEFAULT
 ) noexcept;
+
+void setUTF8Encoding() noexcept;
+
 enum struct LogLevel : uint8_t {
 	OK = 0,
 	ERROR,
@@ -60,6 +63,7 @@ enum struct LogLevel : uint8_t {
 	SUCCESS,
 	RESET
 };
+
 std::ostream& operator<<(std::ostream& aStream, const LogLevel aLevel) noexcept;
 std::string readFile(std::fstream& aStream, const std::string_view aFilepath) noexcept;
 

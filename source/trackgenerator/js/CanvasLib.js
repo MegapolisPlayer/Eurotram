@@ -19,17 +19,20 @@ let canvasData = {
 	hideTPElem: null,
 };
 
-function onclickHandler(event) {
+function getPoint(aevent) {
+	return canvasData.context.getTransform().invertSelf().transformPoint(new DOMPoint(
+		Math.trunc(aevent.pageX - aevent.target.offsetLeft),
+		Math.trunc(aevent.pageY - aevent.target.offsetTop)
+	));
+}
+ 
+function onclickHandler(aevent) {
 	//early exit
 	if(currentMode === mode.VIEW) { return; }
 
 	//here inverse since if scene moved to right we move to left (and same with Y axis)
 	//also this is easier than calculating transformations by hand (again)
-	let p = canvasData.context.getTransform().invertSelf().transformPoint(new DOMPoint(
-		Math.trunc(event.pageX - event.target.offsetLeft),
-		Math.trunc(event.pageY - event.target.offsetTop)
-	));
-
+	let p = getPoint(aevent);
     let x = p.x;
     let y = p.y;
 
@@ -318,8 +321,9 @@ function canvasInit() {
 	canvasData.context.textAlign = "center";
 	canvasData.context.textBaseline = "middle";
 
-	document.getElementById("fmtversion").textContent = fileFormatVersion;
-
+	document.getElementById("fmtversion").textContent = mapFileFormatVersion;
+	document.getElementById("lfmtversion").textContent = lineFileFormatVersion;
+	
 	makeBuildingTypeSelector();
 	makeLandmarkSelector();
 

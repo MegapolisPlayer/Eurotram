@@ -114,7 +114,7 @@ class StationTrack extends Track {
 	}
 }
 
-//saved in track list
+//IMPORTANT station tracks are saved in track list
 
 function stationTrackEditMenu(aid) {
 	canvasData.edit.replaceChildren();

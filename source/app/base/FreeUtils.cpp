@@ -4,12 +4,11 @@ void setOutputColor(
 	const ConsoleColor::ConsoleStreamColor aForeground,
 	const ConsoleColor::ConsoleStreamColor aBackground
 ) noexcept {
-#ifdef _WIN32
+#if defined(_WIN32)
 	static HANDLE sConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	if(aForeground == ConsoleColor::DEFAULT) { SetConsoleTextAttribute(sConsoleHandle, 7); }
 	else { SetConsoleTextAttribute(sConsoleHandle, (aBackground * 16) + aForeground); }
-#endif
-#ifdef __linux__
+#elif defined(__linux__)
 	std::string build;
 	build.append("\x1b[0;");
 	build.append(std::to_string(aForeground));
@@ -17,6 +16,19 @@ void setOutputColor(
 	build.append(std::to_string(aBackground + 10));
 	build.push_back('m');
 	std::cerr << build; //should also apply to cout and clog
+#else
+	#error "Only Windows and Linux are supported!"
+#endif
+}
+
+void setUTF8Encoding() noexcept {
+#if defined(_WIN32)
+	SetConsoleCP(CP_UTF8);
+	SetConsoleOutputCP(CP_UTF8);
+#elif defined(__linux__)
+	std::setlocale(LC_ALL, "en_US.UTF-8");
+#else
+	#error "Only Windows and Linux are supported!"
 #endif
 }
 
