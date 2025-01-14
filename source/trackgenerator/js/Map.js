@@ -78,7 +78,7 @@ function scenarioSerialize() {
 	numberValuesArray.push(...numberToByteArray(nodeList.length, 4));
 
 	//I - switch amount
-	numberValuesArray.push(...numberToByteArray(nodeList.length, 4));
+	numberValuesArray.push(...numberToByteArray(switchList.length, 4));
 
 	//T - track amount
 	numberValuesArray.push(...numberToByteArray(trackList.length, 4));

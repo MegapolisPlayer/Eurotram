@@ -1,34 +1,34 @@
-function addHiddenInput(aid, avalue) {
+function addHiddenInput(aid, avalue, aelem = canvasData.edit) {
 	let element = document.createElement("input");
 	element.type = "hidden";
 	element.id = aid;
 	element.name = aid;
 	element.setAttribute("value", avalue);
-	canvasData.edit.appendChild(element);
+	aelem.appendChild(element);
 }
 
-function addInput(aid, avalue, atype) {
+function addInput(aid, avalue, atype, aelem = canvasData.edit) {
 	let element = document.createElement("input");
 	element.type = atype;
 	element.id = aid;
 	element.name = aid;
 	element.setAttribute("value", avalue);
-	canvasData.edit.appendChild(element);
-	canvasData.edit.appendChild(document.createElement("br"));
+	aelem.appendChild(element);
+	aelem.appendChild(document.createElement("br"));
 }
 
-function addInputPlaceholder(aid, avalue, atype, aplaceholder) {
+function addInputPlaceholder(aid, avalue, atype, aplaceholder, aelem = canvasData.edit) {
 	let element = document.createElement("input");
 	element.type = atype;
 	element.id = aid;
 	element.name = aid;
 	element.placeholder = aplaceholder;
 	element.setAttribute("value", avalue);
-	canvasData.edit.appendChild(element);
-	canvasData.edit.appendChild(document.createElement("br"));
+	aelem.appendChild(element);
+	aelem.appendChild(document.createElement("br"));
 }
 
-function addInputCheckbox(aid, achecked) {
+function addInputCheckbox(aid, achecked, aelem = canvasData.edit) {
 	let element = document.createElement("input");
 	element.type = "checkbox";
 	element.id = aid;
@@ -36,28 +36,28 @@ function addInputCheckbox(aid, achecked) {
 	if(achecked) {
 		element.setAttribute("checked", "");
 	}
-	canvasData.edit.appendChild(element);
-	canvasData.edit.appendChild(document.createElement("br"));
+	aelem.appendChild(element);
+	aelem.appendChild(document.createElement("br"));
 }
 
-function addHiddenIdInput(aid) {
+function addHiddenIdInput(aid, aelem = canvasData.edit) {
 	let idinput = document.createElement("input");
 	idinput.type = "hidden";
 	idinput.id = "idinput";
 	idinput.setAttribute("value", aid);
-	canvasData.edit.appendChild(idinput);
+	aelem.appendChild(idinput);
 }
 
-function addBasicEditInputs(aobject) {
+function addBasicEditInputs(aobject, aelem = canvasData.edit) {
 	let editxinput = document.createElement("input");
 	editxinput.type = "number";
 	editxinput.id = "editxinput";
 	editxinput.name = editxinput.id;
 	editxinput.setAttribute("value", aobject.xpos);
 
-	canvasData.edit.appendChild(document.createTextNode("X: "));
-	canvasData.edit.appendChild(editxinput);
-	canvasData.edit.appendChild(document.createElement("br"));
+	aelem.appendChild(document.createTextNode("X: "));
+	aelem.appendChild(editxinput);
+	aelem.appendChild(document.createElement("br"));
 	
 	let edityinput = document.createElement("input");
 	edityinput.type = "number";
@@ -65,9 +65,9 @@ function addBasicEditInputs(aobject) {
 	edityinput.name = edityinput.id;
 	edityinput.setAttribute("value", aobject.ypos);
 	
-	canvasData.edit.appendChild(document.createTextNode("Y: "));
-	canvasData.edit.appendChild(edityinput);
-	canvasData.edit.appendChild(document.createElement("br"));
+	aelem.appendChild(document.createTextNode("Y: "));
+	aelem.appendChild(edityinput);
+	aelem.appendChild(document.createElement("br"));
 
 	let editheightinput = document.createElement("input");
 	editheightinput.type = "number";
@@ -75,9 +75,9 @@ function addBasicEditInputs(aobject) {
 	editheightinput.name = editheightinput.id;
 	editheightinput.setAttribute("value", aobject.height);
 	
-	canvasData.edit.appendChild(document.createTextNode("Height: "));
-	canvasData.edit.appendChild(editheightinput);
-	canvasData.edit.appendChild(document.createElement("br"));
+	aelem.appendChild(document.createTextNode("Height: "));
+	aelem.appendChild(editheightinput);
+	aelem.appendChild(document.createElement("br"));
 
 	let editcodeinput = document.createElement("input");
 	editcodeinput.type = "text";
@@ -87,9 +87,9 @@ function addBasicEditInputs(aobject) {
 	editcodeinput.maxLength = 4;
 	editcodeinput.setAttribute("value", aobject.stationCode);
 
-	canvasData.edit.appendChild(document.createTextNode("Station code: "));
-	canvasData.edit.appendChild(editcodeinput);
-	canvasData.edit.appendChild(document.createElement("br"));
+	aelem.appendChild(document.createTextNode("Station code: "));
+	aelem.appendChild(editcodeinput);
+	aelem.appendChild(document.createElement("br"));
 }
 
 function getDataFromBasicInputs(aobject) {
@@ -99,8 +99,8 @@ function getDataFromBasicInputs(aobject) {
 	aobject.stationCode = String(document.getElementById("editcodeinput").value);
 }
 
-function addTrackEditInputs(aobject, id) {
-	canvasData.edit.appendChild(document.createTextNode("Bezier: "));
+function addTrackEditInputs(aobject, id, aelem = canvasData.edit) {
+	aelem.appendChild(document.createTextNode("Bezier: "));
 
 	let editbezinput = document.createElement("input");
 	editbezinput.id = "editbezinput";
@@ -109,73 +109,73 @@ function addTrackEditInputs(aobject, id) {
 		editbezinput.setAttribute("checked", "");
 	}
 
-	canvasData.edit.appendChild(document.createElement("<hr>"));
+	aelem.appendChild(document.createElement("<hr>"));
 
 	let em = document.createElement("<em>");
 	em.appendChild(document.createTextNode("Control point values have no effect if Bezier curves are disabled."));
-	canvasData.edit.appendChild(em);
+	aelem.appendChild(em);
 
-	canvasData.edit.appendChild(document.createElement("<hr>"));
+	aelem.appendChild(document.createElement("<hr>"));
 
-	canvasData.edit.appendChild(document.createTextNode("CP1;X: "));
+	aelem.appendChild(document.createTextNode("CP1;X: "));
 	let cp1x = document.createElement("input");
 	cp1x.type = "number";
 	cp1x.id = "editcp1xinput";
 	cp1x.name = cp1x.id;
 	cp1x.setAttribute("value", aobject.controlPoint1.x);
-	canvasData.edit.appendChild(cp1x);
-	canvasData.edit.appendChild(document.createElement("<br>"));
+	aelem.appendChild(cp1x);
+	aelem.appendChild(document.createElement("<br>"));
 
-	canvasData.edit.appendChild(document.createTextNode("CP1;Y: "));
+	aelem.appendChild(document.createTextNode("CP1;Y: "));
 	let cp1y = document.createElement("input");
 	cp1y.type = "number";
 	cp1y.id = "editcp1yinput";
 	cp1y.name = cp1y.id;
 	cp1y.setAttribute("value", aobject.controlPoint1.y);
-	canvasData.edit.appendChild(cp1y);
-	canvasData.edit.appendChild(document.createElement("<br>"));
+	aelem.appendChild(cp1y);
+	aelem.appendChild(document.createElement("<br>"));
 
-	canvasData.edit.appendChild(document.createTextNode("CP2;X: "));
+	aelem.appendChild(document.createTextNode("CP2;X: "));
 	let cp2x = document.createElement("input");
 	cp2x.type = "number";
 	cp2x.id = "editcp2xinput";
 	cp2x.name = cp2x.id;
 	cp2x.setAttribute("value", aobject.controlPoint2.x);
-	canvasData.edit.appendChild(cp2x);
-	canvasData.edit.appendChild(document.createElement("<br>"));
+	aelem.appendChild(cp2x);
+	aelem.appendChild(document.createElement("<br>"));
 
-	canvasData.edit.appendChild(document.createTextNode("CP2;Y: "));
+	aelem.appendChild(document.createTextNode("CP2;Y: "));
 	let cp2y = document.createElement("input");
 	cp2y.type = "number";
 	cp2y.id = "editcp2yinput";
 	cp2y.name = cp2y.id;
 	cp2y.setAttribute("value", aobject.controlPoint2.y);
-	canvasData.edit.appendChild(cp2y);
-	canvasData.edit.appendChild(document.createElement("<br>"));
+	aelem.appendChild(cp2y);
+	aelem.appendChild(document.createElement("<br>"));
 
 	let btnCP2CP1 = document.createElement("button");
 	btnCP2CP1.onclick = "trackEditMoveCP2toCP1("+id+")";
 	btnCP2CP1.textContent = "Move CP2 to CP1";
-	canvasData.edit.appendChild(document.createElement("<br>"));
+	aelem.appendChild(document.createElement("<br>"));
 
 	let btnHeight = document.createElement("button");
 	btnHeight.onclick = "trackEditRecalcHeight("+id+")";
 	btnHeight.textContent = "Recalculate height points";
-	canvasData.edit.appendChild(document.createElement("<br>"));
+	aelem.appendChild(document.createElement("<br>"));
 
 	let btnRecalc = document.createElement("button");
 	btnHeight.onclick = "trackEditRecalcCP("+id+")";
 	btnRecalc.textContent = "Reset control points";
-	canvasData.edit.appendChild(document.createElement("<br>"));
+	aelem.appendChild(document.createElement("<br>"));
 
-	canvasData.edit.appendChild(document.createElement("<hr>"));
+	aelem.appendChild(document.createElement("<hr>"));
 
 	let h4 = document.createElement("h4");
 	h4.textContent = "Edit heightpoints manually";
-	canvasData.edit.appendChild(h4);
+	aelem.appendChild(h4);
 
 	for(let i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
-		canvasData.edit.textContent = "HgPt"+i+": ";
+		aelem.textContent = "HgPt"+i+": ";
 
 		let hpinput = document.createElement("input");
 		hpinput.type = "number";
@@ -183,7 +183,7 @@ function addTrackEditInputs(aobject, id) {
 		hpinput.name = hpinput.id;
 		hpinput.setAttribute("value", aobject.heightpoints[i]);
 
-		canvasData.edit.appendChild(document.createElement("<br>"));
+		aelem.appendChild(document.createElement("<br>"));
 	}
 }
 

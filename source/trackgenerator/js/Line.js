@@ -103,7 +103,15 @@ function lineAddOnClick(aevent) {
 	lineRedrawSelected();
 }
 
+//LINE ADDING STRUCTURE
+// add -> review -> serialize -> end
+//    <-------/
+
 function newLineCreate() {
+	//unhide canvas
+	showCanvas();
+	document.getElementById("hidemap").disabled = false;
+
 	currentMode = mode.VIEW;
 	canvasData.mode.textContent = "Adding new line...";
 
@@ -121,6 +129,13 @@ function newLineCreate() {
 	}
 	
 	//line no/letter
+	canvasData.edit.appendChild(document.createTextNode("Line number "));
+	addInput("lineno", 0, "text");
+
+	let lineInfo = document.createElement("em");
+	lineInfo.textContent = "Line input supports either a number (smaller than 256) or a 2-letter combination (e.g. XC). Line type settings may override this value.";
+	canvasData.edit.appendChild(lineInfo);
+	canvasData.edit.appendChild(document.createElement("br"));
 
 	//is line special (overrides)
 	//select box w/ options
@@ -169,13 +184,8 @@ function newLineCreate() {
 	canvasData.edit.appendChild(lineSpecial);
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	//scenario start
-	//scenario end calculated from start and timetable
-	canvasData.edit.appendChild(document.createTextNode("Line start time: "));
-	//ISO 8601 format - slice to remove milliseconds
-	addInput("startdate", new Date().toISOString().slice(0, 16), "datetime-local");
-
-	//line weather checkboxes
+	canvasData.edit.appendChild(document.createTextNode("Line order number "));
+	addInput("lineon", 0, "number");
 
 	let lineButton = document.createElement("button");
 	lineButton.textContent = "Exit";
@@ -191,23 +201,148 @@ function newLineCreate() {
 
 	let serializeButton = document.createElement("button");
 	serializeButton.textContent = "Done";
-	serializeButton.addEventListener("click", lineFinalize);
+	serializeButton.addEventListener("click", () => {
+		canvasData.element.removeEventListener("click", lineAddOnClick);
+		lineFinalize();
+	});
 	canvasData.edit.appendChild(serializeButton);
 
 	canvasData.element.addEventListener("click", lineAddOnClick);
 }
 
 let loops = [];
+let combinedTrackList = [];
 
 function lineFinalize() {
+	canvasData.edit.replaceChildren();
+	canvasData.canvasmenu.replaceChildren();
+	document.getElementById("hidemap").disabled = true;
+
+	console.log("Line manager");
 	currentMode = mode.VIEW;
-	canvasData.mode.textContent = "Finalizing new line...";
+	canvasData.mode.textContent = "Reviewing line...";
 
-	//add menu of station tracks and 
+	mapHidden = false;
+	toggleMap(); //hide map
+	//hide canvas
+	hideCanvas();
 
-	//button to add another loop
+	let header = document.createElement("h2");
+	header.textContent = "Finalize line";
+	canvasData.canvasmenu.appendChild(header);
+	canvasData.canvasmenu.appendChild(document.createElement("hr"));
 
-	lineSerialize();
+	//add list of stations and time offset
+
+	combinedTrackList.push(...lineTrackList);
+
+	let df = new DocumentFragment();
+	combinedTrackList.forEach((v, i, a) => {
+		df.appendChild(document.createTextNode("Track no. " + v));
+
+		if(trackList[v] instanceof StationTrack) {
+			df.appendChild(document.createTextNode(" STATION (" + trackList[v].stationCode + ") "));
+			addInput("station"+v, 0, "number", df);
+		}
+		else {
+			df.appendChild(document.createElement("br"));
+		}
+	});
+	canvasData.canvasmenu.append(df);
+
+	canvasData.canvasmenu.appendChild(document.createElement("hr"));
+
+	//scenario start
+	//scenario end calculated from start and timetable
+	canvasData.canvasmenu.appendChild(document.createTextNode("Line start time: "));
+	//ISO 8601 format - slice to remove milliseconds
+	addInput("startdate", new Date().toISOString().slice(0, 16), "datetime-local", canvasData.canvasmenu);
+
+	//line weather checkboxes
+
+	canvasData.canvasmenu.appendChild(document.createTextNode("Wind?"));
+	addInputCheckbox("iswind", false, canvasData.canvasmenu);
+	canvasData.canvasmenu.appendChild(document.createTextNode("Rain?"));
+	addInputCheckbox("israin", false, canvasData.canvasmenu);
+	canvasData.canvasmenu.appendChild(document.createTextNode("Lighting?"));
+	addInputCheckbox("islighting", false, canvasData.canvasmenu);
+	canvasData.canvasmenu.appendChild(document.createTextNode("Fog?"));
+	addInputCheckbox("isfog", false, canvasData.canvasmenu);
+	canvasData.canvasmenu.appendChild(document.createTextNode("Snow?"));
+	addInputCheckbox("issnow", false, canvasData.canvasmenu);
+
+	//seasons
+
+	let seasonSelect = document.createElement("select");
+	seasonSelect.id = "lineopt";
+
+	//spring
+	let option = document.createElement("option");
+	option.textContent ="Spring";
+	option.setAttribute("value", 0); 
+	seasonSelect.appendChild(option);
+
+	//summer
+	option = document.createElement("option");
+	option.textContent ="Summer";
+	option.setAttribute("value", 1); 
+	seasonSelect.appendChild(option);
+
+	//autumn
+	option = document.createElement("option");
+	option.textContent = "Autumn";
+	option.setAttribute("value", 2); 
+	seasonSelect.appendChild(option);
+
+	//winter
+	option = document.createElement("option");
+	option.textContent ="Winter";
+	option.setAttribute("value", 3); 
+	seasonSelect.appendChild(option);
+
+	canvasData.canvasmenu.appendChild(document.createTextNode("Season "));
+	canvasData.canvasmenu.appendChild(seasonSelect);
+	canvasData.canvasmenu.appendChild(document.createElement("br"));
+
+	canvasData.canvasmenu.appendChild(document.createElement("hr"));
+
+	//button to add another loop and serialize
+	let addLineButton = document.createElement("button");
+	addLineButton.textContent = "Add new loop";
+	addLineButton.addEventListener("click", () => {
+		let lastPoint = lineList.at(-1);
+
+		//clear
+		loops.push({
+			line: document.getElementById("lineno").value,
+			linetype: Number(document.getElementById("lineopt").value),
+			tracks: structuredClone(lineList),
+		});
+		lineList.length = 0;
+		lineTrackList.length = 0; 
+
+		//add last point as new starting point
+		lineList.push(lastPoint);
+
+		//reset and add new loop
+		canvasRedraw();
+		lineRedrawSelected();
+		lineVisualUnmake();
+		newLineCreate();
+	});
+	canvasData.canvasmenu.appendChild(addLineButton);
+
+	let serializeButton = document.createElement("button");
+	serializeButton.textContent = "Finish";
+	serializeButton.addEventListener("click", () => {
+		loops.push({
+			line: document.getElementById("lineno").value,
+			linetype: Number(document.getElementById("lineopt").value),
+			tracks: structuredClone(lineList),
+		});
+		lineSerialize();
+	});
+	canvasData.canvasmenu.appendChild(serializeButton);
 }
 
 function lineSerialize() {
@@ -242,15 +377,30 @@ function lineSerialize() {
 	return blob;
 }
 
-function lineEnd() {
+function lineVisualUnmake() {
+	//unhide canvas
+	showCanvas();
+	mapHidden = true;
+	toggleMap(); //unhide map
+	document.getElementById("hidemap").disabled = false;
+}
+
+function lineEnd() {	
+	lineVisualUnmake();
+
+	currentMode = mode.VIEW;
+	canvasData.mode.textContent = "View";
+
 	canvasData.element.removeEventListener("click", lineAddOnClick);
 	let nlist = document.getElementsByClassName("menubtn");
 	for(let i = 0; i < nlist.length; i++) {
 		nlist.item(i).disabled = false;
 	}
 	canvasData.edit.replaceChildren();
+	canvasData.canvasmenu.replaceChildren();
 	lineList.length = 0;
 	lineTrackList.length = 0;
+	combinedTrackList.length = 0;
 
 	canvasRedraw(); //remove drawn selection
 }

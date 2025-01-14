@@ -12,6 +12,17 @@ html, body {
 	margin: 0;
 }
 
+#menucontainer {
+	position: absolute;
+	float: left;
+	width: 1000px;
+	height: 1000px;
+	margin: 0;
+	padding: 0px;
+	z-index: 0;
+	overflow-y: scroll;
+}
+
 #lowerbg {
 	position: absolute;
 	float: left;

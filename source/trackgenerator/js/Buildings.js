@@ -118,7 +118,6 @@ function makeBuildingTypeSelector() {
 	for(let b in buildingType) {
 		let option = document.createElement("option");
 		option.setAttribute("value", buildingType[b]); //b is name of property, buildingType[b] is its value
-		option.textContent = b;
 		select.appendChild(option);
 	}
 

@@ -17,6 +17,8 @@ let canvasData = {
 	shiftYOut: null,
 	scaleOut: null,
 	hideTPElem: null,
+	hidden: false,
+	canvasmenu: null,
 };
 
 function getPoint(aevent) {
@@ -25,9 +27,22 @@ function getPoint(aevent) {
 		Math.trunc(aevent.pageY - aevent.target.offsetTop)
 	));
 }
- 
+
+function hideCanvas() {
+	canvasData.hidden = true;
+	document.getElementById("main").style.setProperty("display", "none");
+	document.getElementById("lowerbg").style.setProperty("display", "none");
+}
+
+function showCanvas() {
+	canvasData.hidden = false;
+	document.getElementById("main").style.setProperty("display", "block");
+	document.getElementById("lowerbg").style.setProperty("display", "block");
+}
+
 function onclickHandler(aevent) {
-	//early exit
+	//early exits
+	if(canvasData.hidden) return;
 	if(currentMode === mode.VIEW) { return; }
 
 	//here inverse since if scene moved to right we move to left (and same with Y axis)
@@ -203,12 +218,14 @@ let oldDragY = 0;
 let dragEnabled = false;
 
 function dragStartHandler(event) {
+	if(canvasData.hidden) return;
 	console.log("Dragging...");
 	dragStartX = Math.trunc(event.pageX - event.target.offsetLeft);
 	dragStartY = Math.trunc(event.pageY - event.target.offsetTop);
 	dragEnabled = true;
 }
 function dragHandler(event) {
+	if(canvasData.hidden) return;
 	if(!dragEnabled) return;
 
 	let dx = Math.trunc((event.pageX - event.target.offsetLeft))-dragStartX;
@@ -231,6 +248,7 @@ function dragHandler(event) {
 	canvasRedraw();
 }
 function dragEndHandler(event) {
+	if(canvasData.hidden) return;
 	dragStartX = 0;
 	dragStartY = 0;
 	console.log("Drag ended at "+canvasData.shiftX+" "+canvasData.shiftY);
@@ -324,6 +342,8 @@ function canvasInit() {
 	document.getElementById("fmtversion").textContent = mapFileFormatVersion;
 	document.getElementById("lfmtversion").textContent = lineFileFormatVersion;
 	
+	canvasData.canvasmenu = document.getElementById("menucontainer");
+
 	makeBuildingTypeSelector();
 	makeLandmarkSelector();
 
