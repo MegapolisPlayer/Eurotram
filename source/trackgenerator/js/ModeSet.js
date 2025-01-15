@@ -99,92 +99,102 @@ function getDataFromBasicInputs(aobject) {
 	aobject.stationCode = String(document.getElementById("editcodeinput").value);
 }
 
-function addTrackEditInputs(aobject, id, aelem = canvasData.edit) {
-	aelem.appendChild(document.createTextNode("Bezier: "));
+function addTrackEditInputs(aobject, aid, aelem = canvasData.edit) {
+	let df = new DocumentFragment();
+
+	df.appendChild(document.createTextNode("Bezier: "));
 
 	let editbezinput = document.createElement("input");
+	editbezinput.type = "checkbox";
 	editbezinput.id = "editbezinput";
-	editbezinput.id = editbezinput.name;
+	editbezinput.name = editbezinput.id;
 	if(aobject.bezier) {
 		editbezinput.setAttribute("checked", "");
 	}
+	df.appendChild(editbezinput);
+	df.appendChild(document.createElement("hr"));
 
-	aelem.appendChild(document.createElement("<hr>"));
+	let em = document.createElement("em");
+	em.textContent = "Control point values have no effect if Bezier curves are disabled.";
+	df.appendChild(em);
 
-	let em = document.createElement("<em>");
-	em.appendChild(document.createTextNode("Control point values have no effect if Bezier curves are disabled."));
-	aelem.appendChild(em);
+	df.appendChild(document.createElement("hr"));
 
-	aelem.appendChild(document.createElement("<hr>"));
-
-	aelem.appendChild(document.createTextNode("CP1;X: "));
+	df.appendChild(document.createTextNode("CP1;X: "));
 	let cp1x = document.createElement("input");
 	cp1x.type = "number";
 	cp1x.id = "editcp1xinput";
 	cp1x.name = cp1x.id;
 	cp1x.setAttribute("value", aobject.controlPoint1.x);
-	aelem.appendChild(cp1x);
-	aelem.appendChild(document.createElement("<br>"));
+	df.appendChild(cp1x);
+	df.appendChild(document.createElement("br"));
 
-	aelem.appendChild(document.createTextNode("CP1;Y: "));
+	df.appendChild(document.createTextNode("CP1;Y: "));
 	let cp1y = document.createElement("input");
 	cp1y.type = "number";
 	cp1y.id = "editcp1yinput";
 	cp1y.name = cp1y.id;
 	cp1y.setAttribute("value", aobject.controlPoint1.y);
-	aelem.appendChild(cp1y);
-	aelem.appendChild(document.createElement("<br>"));
+	df.appendChild(cp1y);
+	df.appendChild(document.createElement("br"));
 
-	aelem.appendChild(document.createTextNode("CP2;X: "));
+	df.appendChild(document.createTextNode("CP2;X: "));
 	let cp2x = document.createElement("input");
 	cp2x.type = "number";
 	cp2x.id = "editcp2xinput";
 	cp2x.name = cp2x.id;
 	cp2x.setAttribute("value", aobject.controlPoint2.x);
-	aelem.appendChild(cp2x);
-	aelem.appendChild(document.createElement("<br>"));
+	df.appendChild(cp2x);
+	df.appendChild(document.createElement("br"));
 
-	aelem.appendChild(document.createTextNode("CP2;Y: "));
+	df.appendChild(document.createTextNode("CP2;Y: "));
 	let cp2y = document.createElement("input");
 	cp2y.type = "number";
 	cp2y.id = "editcp2yinput";
 	cp2y.name = cp2y.id;
 	cp2y.setAttribute("value", aobject.controlPoint2.y);
-	aelem.appendChild(cp2y);
-	aelem.appendChild(document.createElement("<br>"));
+	df.appendChild(cp2y);
+	df.appendChild(document.createElement("br"));
 
 	let btnCP2CP1 = document.createElement("button");
-	btnCP2CP1.onclick = "trackEditMoveCP2toCP1("+id+")";
+	btnCP2CP1.setAttribute("onclick", "trackEditMoveCP2toCP1("+aid+")");
 	btnCP2CP1.textContent = "Move CP2 to CP1";
-	aelem.appendChild(document.createElement("<br>"));
+	df.appendChild(btnCP2CP1);
+	df.appendChild(document.createElement("br"));
 
 	let btnHeight = document.createElement("button");
-	btnHeight.onclick = "trackEditRecalcHeight("+id+")";
+	btnHeight.setAttribute("onclick", "trackEditRecalcHeight("+aid+")");
 	btnHeight.textContent = "Recalculate height points";
-	aelem.appendChild(document.createElement("<br>"));
+	df.appendChild(btnHeight);
+	df.appendChild(document.createElement("br"));
 
 	let btnRecalc = document.createElement("button");
-	btnHeight.onclick = "trackEditRecalcCP("+id+")";
+	btnHeight.setAttribute("onclick", "trackEditRecalcCP("+aid+")");
 	btnRecalc.textContent = "Reset control points";
-	aelem.appendChild(document.createElement("<br>"));
+	df.appendChild(btnRecalc);
+	df.appendChild(document.createElement("br"));
 
-	aelem.appendChild(document.createElement("<hr>"));
+	df.appendChild(document.createElement("hr"));
 
 	let h4 = document.createElement("h4");
 	h4.textContent = "Edit heightpoints manually";
-	aelem.appendChild(h4);
+	df.appendChild(h4);
 
 	for(let i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
-		aelem.textContent = "HgPt"+i+": ";
+		df.appendChild(document.createTextNode("HgPt"+i+": "));
 
 		let hpinput = document.createElement("input");
 		hpinput.type = "number";
 		hpinput.id = "edithght"+i;
 		hpinput.name = hpinput.id;
 		hpinput.setAttribute("value", aobject.heightpoints[i]);
-
-		aelem.appendChild(document.createElement("<br>"));
+		df.appendChild(hpinput);
+		df.appendChild(document.createElement("br"));
 	}
+
+	df.appendChild(document.createElement("hr"));
+
+	aelem.append(df);
 }
 
 function getDataFromTrackInputs(aobject) {
@@ -591,7 +601,7 @@ function onclickEditTrackHandler(ax, ay) {
 			) {
 				redrawTrackFirst();
 
-				if(trackList instanceof StationTrack) {
+				if(trackList[i] instanceof StationTrack) {
 					stationTrackEditMenu(i);
 				}
 				else {

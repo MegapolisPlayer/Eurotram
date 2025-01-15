@@ -190,7 +190,7 @@ function switchSignalEditMenu(aid) {
 	canvasData.edit.appendChild(document.createTextNode("Editing switch signal "+aid));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenInput("idinput", aid, "number");
+	addHiddenInput("idinput", aid);
 
 	addBasicEditInputs(switchSignalList[aid]);
 

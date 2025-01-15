@@ -129,8 +129,8 @@ function landmarkSelectMenu(ax, ay) {
 	canvasData.edit.appendChild(document.createTextNode("Select landmark at pos x = "+ax+", y = "+ay));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenInput("landmarkxinput", ax, "number");
-	addHiddenInput("landmarkyinput", ay, "number");
+	addHiddenInput("landmarkxinput", ax);
+	addHiddenInput("landmarkyinput", ay);
 
 	let dfcopy = landmarkTypeSelector.cloneNode(true);
 	canvasData.edit.append(dfcopy);

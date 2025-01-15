@@ -132,8 +132,8 @@ function buildingSelectMenu(ax, ay) {
 	canvasData.edit.appendChild(document.createTextNode("Select building type at pos x = "+ax+", y = "+ay));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenInput("buildxinput", ax, "number");
-	addHiddenInput("buildyinput", ay, "number");
+	addHiddenInput("buildxinput", ax);
+	addHiddenInput("buildyinput", ay);
 
 	canvasData.edit.appendChild(document.createTextNode("Station code:"));
 

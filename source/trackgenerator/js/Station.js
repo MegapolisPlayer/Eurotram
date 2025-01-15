@@ -107,6 +107,7 @@ class StationTrack extends Track {
 
 	constructor(anodeIdFirst = 0, anodeIdSecond = 0, aswitchFirst = false, aswitchSecond = false) {
 		super(anodeIdFirst, anodeIdSecond, aswitchFirst, aswitchSecond);
+		this.stationCode = "";
 	}
 
 	draw(style = "#ff0000") {
@@ -119,7 +120,7 @@ class StationTrack extends Track {
 function stationTrackEditMenu(aid) {
 	canvasData.edit.replaceChildren();
 	
-	canvasData.edit.appendChild(document.createTextNode("Editing track "+aid+" between"));
+	canvasData.edit.appendChild(document.createTextNode("Editing station track "+aid+" between"));
 
 	canvasData.edit.appendChild(document.createTextNode(
 		trackList[aid].firstIsSwitch ? " switch " : " node " + trackList[aid].nodeIdFirst
@@ -134,9 +135,9 @@ function stationTrackEditMenu(aid) {
 	addHiddenInput("idinput", aid);
 
 	canvasData.edit.appendChild(document.createTextNode("Station code: "));
-	addInputPlaceholder("editcodeinput", trackList[aid].stationCode, "XXXX");
+	addInputPlaceholder("editcodeinput", trackList[aid].stationCode, "text", "XXXX");
 
-	canvasData.edit.appendChild(addTrackEditInputs(trackList[aid], aid));
+	addTrackEditInputs(trackList[aid], aid);
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";
@@ -153,6 +154,7 @@ function stationTrackUpdate() {
 	console.log("Updating station track...");
 
 	let trackId = Number(document.getElementById("idinput").value);
+	trackList[trackId].stationCode = String(document.getElementById("editcodeinput").value);
 
 	getDataFromTrackInputs(trackList[trackId]);
 

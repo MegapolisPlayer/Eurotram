@@ -152,31 +152,31 @@ function newLineCreate() {
 
 	//Handling ride
 	option = document.createElement("option");
-	option.textContent ="Handling";
+	option.textContent = "Handling";
 	option.setAttribute("value", 1); 
 	lineSpecial.appendChild(option);
 
 	//service ride
 	option = document.createElement("option");
-	option.textContent ="Service";
+	option.textContent = "Service";
 	option.setAttribute("value", 2); 
 	lineSpecial.appendChild(option);
 
 	//special ride
 	option = document.createElement("option");
-	option.textContent ="Special";
+	option.textContent = "Special";
 	option.setAttribute("value", 3); 
 	lineSpecial.appendChild(option);
 
 	//practice ride
 	option = document.createElement("option");
-	option.textContent ="Practice";
+	option.textContent = "Practice";
 	option.setAttribute("value", 4); 
 	lineSpecial.appendChild(option);
 
 	//test ride
 	option = document.createElement("option");
-	option.textContent ="Test";
+	option.textContent = "Test";
 	option.setAttribute("value", 5); 
 	lineSpecial.appendChild(option);
 
@@ -212,8 +212,16 @@ function newLineCreate() {
 
 let loops = [];
 let combinedTrackList = [];
+let stationTimes = [];
 
 function lineFinalize() {
+	//get all inputs
+
+	let lineno = document.getElementById("lineno").value;
+	let lineon = document.getElementById("lineon").value;
+	let lineType = Number(document.getElementById("lineopt").value);
+
+	//clear
 	canvasData.edit.replaceChildren();
 	canvasData.canvasmenu.replaceChildren();
 	document.getElementById("hidemap").disabled = true;
@@ -232,9 +240,23 @@ function lineFinalize() {
 	canvasData.canvasmenu.appendChild(header);
 	canvasData.canvasmenu.appendChild(document.createElement("hr"));
 
+	//description
+
+	let em = document.createElement("em");
+	em.textContent = "Add time (in minutes) in which the tram should drive from the previous to this station."
+	canvasData.canvasmenu.appendChild(em);
+	canvasData.canvasmenu.appendChild(document.createElement("hr"));
+
+	//inputs
+
+	canvasData.canvasmenu.appendChild(document.createTextNode("Line scenario name: " ));
+	addInputPlaceholder("linename", "", "text", "Name of line scenario");
+	canvasData.canvasmenu.appendChild(document.createElement("br"));
+
 	//add list of stations and time offset
 
 	combinedTrackList.push(...lineTrackList);
+	stationTimes.push(...new Array(lineTrackList.filter(v => v instanceof StationTrack).length).fill(1));
 
 	let df = new DocumentFragment();
 	combinedTrackList.forEach((v, i, a) => {
@@ -242,7 +264,7 @@ function lineFinalize() {
 
 		if(trackList[v] instanceof StationTrack) {
 			df.appendChild(document.createTextNode(" STATION (" + trackList[v].stationCode + ") "));
-			addInput("station"+v, 0, "number", df);
+			addInput("station"+v, 1, "number", df);
 		}
 		else {
 			df.appendChild(document.createElement("br"));
@@ -274,7 +296,7 @@ function lineFinalize() {
 	//seasons
 
 	let seasonSelect = document.createElement("select");
-	seasonSelect.id = "lineopt";
+	seasonSelect.id = "seasonselect";
 
 	//spring
 	let option = document.createElement("option");
@@ -314,9 +336,11 @@ function lineFinalize() {
 
 		//clear
 		loops.push({
-			line: document.getElementById("lineno").value,
-			linetype: Number(document.getElementById("lineopt").value),
-			tracks: structuredClone(lineList),
+			line: lineno,
+			lineId: lineon,
+			lineType: lineType,
+			nodes: structuredClone(lineList),
+			tracks: structuredClone(lineTrackList),
 		});
 		lineList.length = 0;
 		lineTrackList.length = 0; 
@@ -332,17 +356,27 @@ function lineFinalize() {
 	});
 	canvasData.canvasmenu.appendChild(addLineButton);
 
+	//serialize button
 	let serializeButton = document.createElement("button");
 	serializeButton.textContent = "Finish";
 	serializeButton.addEventListener("click", () => {
 		loops.push({
-			line: document.getElementById("lineno").value,
-			linetype: Number(document.getElementById("lineopt").value),
-			tracks: structuredClone(lineList),
+			line: lineno,
+			lineId: lineon,
+			lineType: lineType,
+			nodes: structuredClone(lineList),
+			tracks: structuredClone(lineTrackList),
 		});
 		lineSerialize();
+		lineEnd(); //end line mode before returning
 	});
 	canvasData.canvasmenu.appendChild(serializeButton);
+
+	//exit button
+	let lineButton = document.createElement("button");
+	lineButton.textContent = "Exit";
+	lineButton.addEventListener("click", lineEnd);
+	canvasData.canvasmenu.appendChild(lineButton);
 }
 
 function lineSerialize() {
@@ -350,7 +384,7 @@ function lineSerialize() {
 
 	let numberValuesArray = [];
 
-	//we use same utils from Map.js
+	//we use same utils as in Map.js
 
 	//add file signature
 	numberValuesArray.push(...("ETSC".split('').map((v) => { return v.charCodeAt(0); })));
@@ -358,9 +392,144 @@ function lineSerialize() {
 	numberValuesArray.push(...numberToByteArray(lineFileFormatVersion, 2)); //V
 	numberValuesArray.push(...numberToByteArray(Math.trunc(Date.now()/1000), 8)); //D - unix time in ms
 
-	//S
+	//header numbers
 
+	//S - starting date
+	let startDate = document.getElementById("startdate").value;
+	numberValuesArray.push(...numberToByteArray(Math.trunc(startDate.parse()/1000), 8)); //S - start time in ms
 
+	//W - weather flags
+	let weatherFlags = 0;
+
+	if(document.getElementById("iswind").checked) {
+		weatherFlags |= WEATHER_WIND;
+	}
+	if(document.getElementById("israin").checked) {
+		weatherFlags |= WEATHER_RAIN;
+	}
+	if(document.getElementById("islighting").checked) {
+		weatherFlags |= WEATHER_LIGHTING;
+	}
+	if(document.getElementById("isfog").checked) {
+		weatherFlags |= WEATHER_FOG;
+	}
+	if(document.getElementById("issnow").checked) {
+		weatherFlags |= WEATHER_SNOW;
+	}
+
+	switch(document.getElementById("seasonselect").value) {
+		case(0):
+			weatherFlags |= WEATHER_SEASONS_SPRING;
+			break;
+		case(1):
+			weatherFlags |= WEATHER_SEASONS_SUMMER;
+			break;
+		case(2):
+			weatherFlags |= WEATHER_SEASONS_AUTUMN;
+			break;
+		case(3):
+			weatherFlags |= WEATHER_SEASONS_WINTER;
+			break;
+	}
+
+	numberValuesArray.push(...numberToByteArray(weatherFlags, 2));
+
+	//N - amount of loops
+	numberValuesArray.push(loops.length);
+
+	//J - name string
+	numberValuesArray.push(...document.getElementById("linename").value.split('').map((v) => { return v.charCodeAt(0); }));
+	numberValuesArray.push(0); //null terminator
+
+	//A - author string
+	numberValuesArray.push(...document.getElementById("authorname").value.split('').map((v) => { return v.charCodeAt(0); }));
+	numberValuesArray.push(0); //null terminator
+
+	//for each loop
+	loops.forEach((v, i, a) => {
+		//header
+
+		if(v.lineType == 0) {
+			//normal line
+			if(isNaN(v.line)) {
+				//numbered (13, 23...)
+				numberValuesArray.push(v.line); //L
+				numberValuesArray.push(0); //M
+			}
+			else {
+				//lettered (XC, X6...)
+				numberValuesArray.push(v.line[0]); //L
+				numberValuesArray.push(v.line[1]); //M
+			}
+		}
+		else {
+			//not normal
+			numberValuesArray.push(0); //L value ignored
+			numberValuesArray.push(v.lineType); //M
+		}
+
+		//I
+		numberValuesArray.push(...numberToByteArray(v.lineId, 2));
+
+		let stationAmount = v.tracks.filter((x) => {
+			return x instanceof StationTrack;
+		}).length;
+		let switchAmount = v.nodes.filter((x) => {
+			return x instanceof Switch;
+		}).length;
+
+		//N
+		numberValuesArray.push(...numberToByteArray(stationAmount + switchAmount, 2));
+
+		//objects
+
+		for(let i = 0; i < v.tracks.length; i++) {
+			//n + 1 nodes, n tracks
+
+			if(trackList[v.tracks[i]] instanceof StationTrack) {
+				numberValuesArray.push('S'.codePointAt());
+				numberValuesArray.push(...numberToByteArray(v.tracks[i], 4));
+				numberValuesArray.push(...stationCodeToArray(trackList[v.tracks[i]].stationCode));
+				numberValuesArray.push(...numberToByteArray(Number(document.getElementById("").value), 4));
+
+			}
+
+			if(nodeList[v.nodes[i + 1]] instanceof Switch) {
+				numberValuesArray.push('W'.codePointAt());
+				numberValuesArray.push(v.nodes[i + 1]);
+
+				//switch is last
+				if(!v.nodes[i + 2]) { 
+					numberValuesArray.push(0b11111111);
+				}
+				//next is front
+				else if(nodeList[v.nodes[i + 1]].frontId == v.nodes[i + 2]) {
+					numberValuesArray.push(0);
+				}
+				//next is left
+				else if(nodeList[v.nodes[i + 1]].leftId == v.nodes[i + 2]) {
+					numberValuesArray.push(1);
+				}
+				//next is right
+				else if(nodeList[v.nodes[i + 1]].rightId == v.nodes[i + 2]) {
+					numberValuesArray.push(2);
+				}
+				//next is back - different direction
+				else if(nodeList[v.nodes[i + 1]].backId == v.nodes[i + 2]) {
+					numberValuesArray.push(3);
+				}
+				//not set
+				else {
+					numberValuesArray.push(0b11111111);
+					console.warning("Switch ids not set!");
+				}
+			}
+		}
+
+		//end
+
+		
+	});
 
 	//convert to blob
 
@@ -371,8 +540,6 @@ function lineSerialize() {
 
 	//blobs are immutable
 	let blob = new Blob([binaryArray], {type: "application/octet-stream"}); //arbitrary binary data
-
-	lineEnd(); //end line mode before returning
 
 	return blob;
 }
@@ -401,6 +568,7 @@ function lineEnd() {
 	lineList.length = 0;
 	lineTrackList.length = 0;
 	combinedTrackList.length = 0;
+	stationTimes.length = 0;
 
 	canvasRedraw(); //remove drawn selection
 }
