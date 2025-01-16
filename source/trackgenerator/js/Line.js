@@ -250,28 +250,48 @@ function lineFinalize() {
 	//inputs
 
 	canvasData.canvasmenu.appendChild(document.createTextNode("Line scenario name: " ));
-	addInputPlaceholder("linename", "", "text", "Name of line scenario");
+	addInputPlaceholder("linename", "", "text", "Name of line scenario", canvasData.canvasmenu);
 	canvasData.canvasmenu.appendChild(document.createElement("br"));
 
 	//add list of stations and time offset
 
 	combinedTrackList.push(...lineTrackList);
-	stationTimes.push(...new Array(lineTrackList.filter(v => v instanceof StationTrack).length).fill(1));
+	lineTrackList.filter(v => trackList[v] instanceof StationTrack).forEach(
+		v => stationTimes.push({sc: trackList[v].stationCode, t: 1})
+	);
 
 	let df = new DocumentFragment();
-	combinedTrackList.forEach((v, i, a) => {
-		df.appendChild(document.createTextNode("Track no. " + v));
+	stationTimes.forEach((v, i, a) => {
+		df.appendChild(document.createTextNode(" Station (code " + v.sc + ") "));
+		
+		df.appendChild(document.createTextNode("Mins from prev: "));
+		let input = document.createElement("input");
+		input.type = "number";
+		input.size = 1;
+		input.min = 0;
+		input.setAttribute("value", v.t);
+		input.setAttribute("_id", i);
+		input.addEventListener("change", (e) => {
+			stationTimes[Number(e.target.getAttribute("_id"))].t = Number(e.target.value);
+		});
+		df.appendChild(input);
 
-		if(trackList[v] instanceof StationTrack) {
-			df.appendChild(document.createTextNode(" STATION (" + trackList[v].stationCode + ") "));
-			addInput("station"+v, 1, "number", df);
-		}
-		else {
-			df.appendChild(document.createElement("br"));
-		}
+		df.appendChild(document.createElement("br"));
 	});
 	canvasData.canvasmenu.append(df);
 
+	canvasData.canvasmenu.appendChild(document.createTextNode("Total duration: "));
+	let totdur = document.createElement("span");
+	totdur.id = "totdur";
+	canvasData.canvasmenu.appendChild(totdur);
+
+	let totdurrbtn = document.createElement("button");
+	totdurrbtn.textContent = "Recalculate";
+	totdurrbtn.addEventListener("click", (e) => {
+		document.getElementById("totdur").textContent = String(stationTimes.map(v => v.t).reduce((p, c) => p + c)) + " minutes";
+	});
+	totdurrbtn.click();
+	canvasData.canvasmenu.appendChild(totdurrbtn);
 	canvasData.canvasmenu.appendChild(document.createElement("hr"));
 
 	//scenario start
@@ -567,6 +587,7 @@ function lineEnd() {
 	canvasData.canvasmenu.replaceChildren();
 	lineList.length = 0;
 	lineTrackList.length = 0;
+	loops.length = 0;
 	combinedTrackList.length = 0;
 	stationTimes.length = 0;
 

@@ -226,8 +226,9 @@ let mode = {
 	LANDMARK_ADD: 19,
 	STATION_PILLAR_ADD: 20,
 	WALL_ADD: 21,
-	STATION_TRACK_ADD: 22,
-	TEXTURE_PARCEL_ADD: 23,
+	SIGN_ADD: 22,
+	STATION_TRACK_ADD: 23,
+	TEXTURE_PARCEL_ADD: 24,
 
 	EDIT: 30,
 	EDIT_TRACK: 31,
@@ -436,6 +437,14 @@ function wallAdd() {
 }
 function onclickWallAddHandler(ax, ay) {
 	wallAddMenu(ax, ay);
+}
+
+function signAdd() {
+	currentMode = mode.SIGN_ADD;
+	canvasData.mode.textContent = "Add sign";
+}
+function onclickSignalAddHandler(ax, ay) {
+
 }
 
 function landmarkAdd() {

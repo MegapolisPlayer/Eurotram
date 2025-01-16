@@ -105,6 +105,9 @@ function onclickHandler(aevent) {
 		case(mode.STATION_PILLAR_ADD):
 			onclickStationPillarAddHandler(x, y);
 			break;	
+		case(mode.SIGN_ADD):
+			onclickSignalAddHandler(x, y);
+			break;
 		case(mode.TEXTURE_PARCEL_ADD):
 			onclickTextureParcelAddHandler(x, y);
 			break;
@@ -344,8 +347,12 @@ function canvasInit() {
 	
 	canvasData.canvasmenu = document.getElementById("menucontainer");
 
+	//make selectors - optimization and code-saving measure
+	//to not generate large element packs at runtime but at "init time"
+
 	makeBuildingTypeSelector();
 	makeLandmarkSelector();
+	makeSignTypeSelector();
 
 	mapLayerInit();
 

@@ -1,0 +1,868 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 297 210"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="switchsignal.svg"
+   inkscape:export-filename="switchsignal.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showguides="false"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="261.09918"
+     inkscape:cy="406.76317"
+     inkscape:window-width="1920"
+     inkscape:window-height="1008"
+     inkscape:window-x="1920"
+     inkscape:window-y="44"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <rect
+       x="19.171202"
+       y="292.65473"
+       width="1074.9841"
+       height="92.664068"
+       id="rect28" />
+    <rect
+       x="153.44217"
+       y="324.20846"
+       width="415.24185"
+       height="182.29158"
+       id="rect27" />
+    <marker
+       markerWidth="0.52499998"
+       markerHeight="0.99999995"
+       refX="-0.5"
+       refY="0"
+       orient="270,00"
+       id="CapTriangle"
+       viewBox="0 0 0.525 1"
+       inkscape:stockid="Triangle cap"
+       style="overflow:visible"
+       preserveAspectRatio="xMidYMid"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         style="fill:context-stroke;stroke-width:0.5;stroke-linecap:butt"
+         d="M 0,-0.5 0.5,0 0,0.5 -0.025,0 Z"
+         sodipodi:nodetypes="sssssscsss"
+         id="path61" />
+    </marker>
+    <marker
+       markerWidth="1.04999995"
+       markerHeight="0.99999995"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       id="CapRibbon1"
+       viewBox="0 0 1.05 1"
+       inkscape:stockid="Ribbon cap"
+       style="overflow:visible"
+       preserveAspectRatio="xMidYMid"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         style="fill:context-stroke;stroke-linecap:butt"
+         d="M 0,-1 H 2 L 1,0 2,1 H 0 L -0.1,0 Z"
+         sodipodi:nodetypes="sssssscsss"
+         transform="scale(0.5)"
+         id="path62" />
+    </marker>
+    <rect
+       x="18.395891"
+       y="128.15098"
+       width="59.657144"
+       height="131.07085"
+       id="rect9" />
+    <rect
+       x="24.356401"
+       y="177.72058"
+       width="44.207115"
+       height="107.47529"
+       id="rect8" />
+    <rect
+       x="28.003871"
+       y="41.255686"
+       width="1063.7198"
+       height="38.823941"
+       id="rect3" />
+    <rect
+       x="19.868367"
+       y="23.842041"
+       width="785.79394"
+       height="51.070803"
+       id="rect2" />
+    <rect
+       x="19.868366"
+       y="23.842041"
+       width="785.79395"
+       height="51.070805"
+       id="rect2-7" />
+    <rect
+       x="18.395891"
+       y="128.15099"
+       width="59.657143"
+       height="131.07085"
+       id="rect9-8" />
+    <rect
+       x="18.395891"
+       y="128.15099"
+       width="59.657143"
+       height="131.07085"
+       id="rect9-6" />
+    <rect
+       x="18.395891"
+       y="128.15099"
+       width="59.657143"
+       height="131.07085"
+       id="rect9-8-8" />
+    <rect
+       x="18.395891"
+       y="128.15099"
+       width="59.657143"
+       height="131.07085"
+       id="rect9-8-8-1" />
+    <marker
+       markerWidth="1.05"
+       markerHeight="0.99999994"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       id="CapRibbon1-7-1"
+       viewBox="0 0 1.05 1"
+       inkscape:stockid="Ribbon cap"
+       style="overflow:visible"
+       preserveAspectRatio="xMidYMid"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         style="fill:context-stroke;stroke-linecap:butt"
+         d="M 0,-1 H 2 L 1,0 2,1 H 0 L -0.1,0 Z"
+         sodipodi:nodetypes="sssssscsss"
+         transform="scale(0.5)"
+         id="path62-1-0" />
+    </marker>
+    <marker
+       markerWidth="0.52499998"
+       markerHeight="0.99999994"
+       refX="-0.5"
+       refY="0"
+       orient="270"
+       id="CapTriangle-7-8"
+       viewBox="0 0 0.525 1"
+       inkscape:stockid="Triangle cap"
+       style="overflow:visible"
+       preserveAspectRatio="xMidYMid"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         style="fill:context-stroke;stroke-width:0.5;stroke-linecap:butt"
+         d="M 0,-0.5 0.5,0 0,0.5 -0.025,0 Z"
+         sodipodi:nodetypes="sssssscsss"
+         id="path61-2-5" />
+    </marker>
+    <rect
+       x="18.395891"
+       y="128.15099"
+       width="59.657143"
+       height="131.07085"
+       id="rect9-8-8-1-2" />
+    <rect
+       x="18.395891"
+       y="128.15099"
+       width="59.657143"
+       height="131.07085"
+       id="rect9-8-8-1-1" />
+    <rect
+       x="19.171202"
+       y="292.65472"
+       width="350.72321"
+       height="193.07323"
+       id="rect28-5" />
+    <rect
+       x="19.171202"
+       y="292.65472"
+       width="132.54291"
+       height="36.4001"
+       id="rect28-6" />
+    <rect
+       x="19.171202"
+       y="292.65472"
+       width="132.54291"
+       height="36.400101"
+       id="rect28-6-1" />
+    <rect
+       x="19.171202"
+       y="292.65472"
+       width="132.54291"
+       height="36.400101"
+       id="rect28-6-1-8" />
+    <rect
+       x="19.171202"
+       y="292.65472"
+       width="347.89478"
+       height="201.42164"
+       id="rect28-5-3" />
+    <rect
+       x="19.171202"
+       y="292.65472"
+       width="347.89478"
+       height="201.42165"
+       id="rect28-5-3-8" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#808080;stroke-width:1.541"
+       id="rect1"
+       width="297"
+       height="26.391739"
+       x="0"
+       y="0.16515885"
+       clip-path="none"
+       inkscape:label="titlebg" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.69257311,0,0,0.69257311,-4.7639748,-13.609167)"
+       id="text1"
+       style="font-weight:600;font-size:13.3333px;font-family:FreeSans;-inkscape-font-specification:'FreeSans Semi-Bold';text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect2);display:inline;fill:#ffffff;stroke-width:5.82425"
+       clip-path="none"
+       inkscape:label="title"><tspan
+         x="19.869141"
+         y="36.175099"
+         id="tspan4"><tspan
+           style="font-weight:bold;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans Bold'"
+           id="tspan3">Možné stavy výhybkových návěstidel v tramvajovém simulátoru</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,2.1166667,2.6458334)"
+       id="text2"
+       style="font-weight:600;font-size:26.6667px;font-family:FreeSans;-inkscape-font-specification:'FreeSans Semi-Bold';text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect3);display:inline;fill:#ffffff;stroke-width:5.82425"
+       clip-path="none"
+       inkscape:label="subtitle"><tspan
+         x="28.003906"
+         y="65.922557"
+         id="tspan6"><tspan
+           style="font-weight:normal;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans'"
+           id="tspan5">Výhybková návěstidla určují směr a stav postavení tramvajové výhybky.</tspan></tspan></text>
+    <rect
+       style="fill:#ff0000;stroke-width:1.65012"
+       id="rect4"
+       width="1.5770516"
+       height="20.117493"
+       x="4.8672462"
+       y="3.3022819"
+       clip-path="none"
+       inkscape:label="titleline" />
+    <rect
+       style="fill:#808080;stroke-width:1.05548"
+       id="rect5"
+       width="64.910843"
+       height="47.229115"
+       x="30.570009"
+       y="30.202446"
+       clip-path="none"
+       inkscape:label="g1" />
+    <rect
+       style="fill:#1a1a1a;stroke-width:0.997221"
+       id="rect6"
+       width="61.328098"
+       height="44.622314"
+       x="32.361382"
+       y="31.505846"
+       clip-path="none"
+       inkscape:label="bg1" />
+    <rect
+       style="fill:#000000;stroke-width:1.55992"
+       id="rect7"
+       width="25.909245"
+       height="47.229115"
+       x="5.0723805"
+       y="30.202446"
+       clip-path="none"
+       inkscape:label="b1" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.51819993,0,0,0.66546215,-8.1775181,-66.695199)"
+       id="text8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:96px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect9);display:inline;fill:#ffffff;stroke-width:5.82425"
+       x="0"
+       y="0"
+       clip-path="none"
+       inkscape:label="l1"><tspan
+         x="21.529297"
+         y="214.62282"
+         id="tspan7">L</tspan></text>
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:5.91702;stroke-dasharray:none;stroke-opacity:1"
+       d="M 87.604281,38.199481 45.845973,53.878235 87.527382,69.432441"
+       id="path11"
+       clip-path="none"
+       inkscape:label="p1" />
+    <rect
+       style="fill:#808080;stroke-width:1.05548"
+       id="rect5-4"
+       width="64.910843"
+       height="47.229115"
+       x="126.84461"
+       y="30.202446"
+       clip-path="none"
+       inkscape:label="g2" />
+    <rect
+       style="fill:#1a1a1a;stroke-width:0.997221"
+       id="rect6-3"
+       width="61.328098"
+       height="44.622314"
+       x="128.63599"
+       y="31.505844"
+       clip-path="none"
+       inkscape:label="bg2" />
+    <rect
+       style="fill:#000000;stroke-width:1.55992"
+       id="rect7-1"
+       width="25.909245"
+       height="47.229115"
+       x="101.34698"
+       y="30.202446"
+       clip-path="none"
+       inkscape:label="b2" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.51819993,0,0,0.66546215,88.097086,-66.695199)"
+       id="text8-4"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:96px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect9-8);display:inline;fill:#ffffff;stroke-width:5.82425"
+       x="0"
+       y="0"
+       clip-path="none"
+       inkscape:label="l2"><tspan
+         x="21.529297"
+         y="214.62282"
+         id="tspan8">L</tspan></text>
+    <rect
+       style="fill:#808080;stroke-width:1.05548"
+       id="rect5-9"
+       width="64.910843"
+       height="47.229115"
+       x="225.09772"
+       y="30.202442"
+       clip-path="none"
+       inkscape:label="g3" />
+    <rect
+       style="fill:#1a1a1a;stroke-width:0.997221"
+       id="rect6-2"
+       width="61.328098"
+       height="44.622314"
+       x="226.88908"
+       y="31.505842"
+       clip-path="none"
+       inkscape:label="bg3" />
+    <rect
+       style="fill:#000000;stroke-width:1.55992"
+       id="rect7-6"
+       width="25.909245"
+       height="47.229115"
+       x="199.60008"
+       y="30.202442"
+       clip-path="none"
+       inkscape:label="b3" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.51819993,0,0,0.66546215,186.35018,-66.695201)"
+       id="text8-6"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:96px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect9-6);display:inline;fill:#ffffff;stroke-width:5.82425"
+       x="0"
+       y="0"
+       clip-path="none"
+       inkscape:label="l3"><tspan
+         x="21.529297"
+         y="214.62282"
+         id="tspan9">L</tspan></text>
+    <path
+       style="fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:5.85625;stroke-dasharray:none;stroke-opacity:1"
+       d="M 234.41156,38.117333 275.10259,53.878514 234.4865,69.514492"
+       id="path11-95"
+       clip-path="none"
+       inkscape:label="p3" />
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:7.87148;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#CapRibbon1);marker-end:url(#CapTriangle);paint-order:normal"
+       d="m 159.30004,67.641049 c 0,-27.648091 0,-27.648091 0,-27.648091"
+       id="path12"
+       clip-path="none"
+       inkscape:label="p2" />
+    <rect
+       style="fill:#808080;stroke-width:1.05548"
+       id="rect5-4-2-6"
+       width="64.910843"
+       height="47.229115"
+       x="32.788177"
+       y="106.94058"
+       clip-path="none"
+       inkscape:label="g4" />
+    <rect
+       style="fill:#1a1a1a;stroke-width:0.997221"
+       id="rect6-3-2-4"
+       width="61.328098"
+       height="44.622314"
+       x="34.579552"
+       y="108.24397"
+       clip-path="none"
+       inkscape:label="bg4" />
+    <rect
+       style="fill:#000000;stroke-width:1.55992"
+       id="rect7-1-6-6"
+       width="25.909245"
+       height="47.229115"
+       x="7.290545"
+       y="106.94058"
+       clip-path="none"
+       inkscape:label="b4" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.51819993,0,0,0.66546215,-5.9593511,10.042923)"
+       id="text8-4-1-2"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:96px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect9-8-8-1);display:inline;fill:#ffffff;stroke-width:5.82425"
+       x="0"
+       y="0"
+       clip-path="none"
+       inkscape:label="l4"><tspan
+         x="21.529297"
+         y="214.62282"
+         id="tspan10">L</tspan></text>
+    <path
+       style="fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:7.871;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#CapRibbon1-7-1);marker-end:url(#CapTriangle-7-8);paint-order:normal"
+       d="m 65.243601,144.37918 c 0,-27.64809 0,-27.64809 0,-27.64809"
+       id="path12-6-5"
+       clip-path="none"
+       inkscape:label="p4" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4"
+       width="1.6837981"
+       height="8.6060791"
+       x="64.401703"
+       y="154.55963"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9"
+       width="1.6837981"
+       height="8.6060791"
+       x="147.34659"
+       y="-58.335098"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-9"
+       width="1.6837981"
+       height="8.6060791"
+       x="147.34659"
+       y="-80.068535"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-0"
+       width="1.6837981"
+       height="8.6060791"
+       x="140.79753"
+       y="-58.335102"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-9-5"
+       width="1.6837981"
+       height="8.6060791"
+       x="140.79753"
+       y="-80.068542"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-00"
+       width="1.6837981"
+       height="8.6060791"
+       x="134.37282"
+       y="-58.335098"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-9-4"
+       width="1.6837981"
+       height="8.6060791"
+       x="134.37282"
+       y="-80.068542"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-0-6"
+       width="1.6837981"
+       height="8.6060791"
+       x="127.42538"
+       y="-58.335098"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-9-5-2"
+       width="1.6837981"
+       height="8.6060791"
+       x="127.42538"
+       y="-80.068542"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-6"
+       width="1.6837981"
+       height="8.6060791"
+       x="120.67849"
+       y="-58.335098"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-9-9"
+       width="1.6837981"
+       height="8.6060791"
+       x="120.67849"
+       y="-80.068535"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-0-8"
+       width="1.6837981"
+       height="8.6060791"
+       x="113.66039"
+       y="-58.335098"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-9-9-5-7"
+       width="1.6837981"
+       height="8.6060791"
+       x="113.66039"
+       y="-80.068535"
+       transform="rotate(90)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-0"
+       width="1.6837981"
+       height="8.6060791"
+       x="150.33755"
+       y="67.691322"
+       transform="rotate(45)"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-0-9"
+       width="1.6837981"
+       height="8.6060791"
+       x="124.84542"
+       y="18.81612"
+       transform="rotate(45)"
+       inkscape:transform-center-x="11.22532"
+       inkscape:transform-center-y="-0.093544334"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-0-9-3"
+       width="1.6837981"
+       height="8.6060791"
+       x="32.782433"
+       y="-119.48518"
+       transform="rotate(135)"
+       inkscape:transform-center-y="0.28063212"
+       inkscape:transform-center-x="0.18708867"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect25-4-0-9-3-3"
+       width="1.6837981"
+       height="8.6060791"
+       x="58.349751"
+       y="-168.2852"
+       transform="rotate(135)"
+       inkscape:transform-center-y="0.28063212"
+       inkscape:transform-center-x="0.18708867"
+       inkscape:label="p4b1" />
+    <rect
+       style="fill:#808080;stroke-width:1.05548"
+       id="rect5-4-2-6-7"
+       width="64.910843"
+       height="47.229115"
+       x="228.59398"
+       y="106.94058"
+       clip-path="none"
+       inkscape:label="g6" />
+    <rect
+       style="fill:#1a1a1a;stroke-width:0.997221"
+       id="rect6-3-2-4-6"
+       width="61.328098"
+       height="44.622314"
+       x="230.38533"
+       y="108.24397"
+       clip-path="none"
+       inkscape:label="bg6" />
+    <rect
+       style="fill:#000000;stroke-width:1.55992"
+       id="rect7-1-6-6-1"
+       width="25.909245"
+       height="47.229115"
+       x="203.09633"
+       y="106.94058"
+       clip-path="none"
+       inkscape:label="b6" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.51819993,0,0,0.66546215,189.84642,10.04292)"
+       id="text8-4-1-2-3"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:96px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect9-8-8-1-2);display:inline;fill:#ffffff;stroke-width:5.82425"
+       x="0"
+       y="0"
+       clip-path="none"
+       inkscape:label="l6"><tspan
+         x="21.529297"
+         y="214.62282"
+         id="tspan11">L</tspan></text>
+    <rect
+       style="fill:#808080;stroke-width:1.05548"
+       id="rect5-4-2-6-0"
+       width="64.910843"
+       height="47.229115"
+       x="129.20621"
+       y="107.28455"
+       clip-path="none"
+       inkscape:label="g5" />
+    <rect
+       style="fill:#1a1a1a;stroke-width:0.997221"
+       id="rect6-3-2-4-5"
+       width="61.328098"
+       height="44.622314"
+       x="130.99759"
+       y="108.58794"
+       clip-path="none"
+       inkscape:label="bg5" />
+    <rect
+       style="fill:#000000;stroke-width:1.55992"
+       id="rect7-1-6-6-5"
+       width="25.909245"
+       height="47.229115"
+       x="103.33439"
+       y="107.28455"
+       clip-path="none"
+       inkscape:label="b5" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.51819993,0,0,0.66546215,90.084502,10.386885)"
+       id="text8-4-1-2-2"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:96px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect9-8-8-1-1);display:inline;fill:#ffffff;stroke-width:5.82425"
+       x="0"
+       y="0"
+       clip-path="none"
+       inkscape:label="l5"><tspan
+         x="21.529297"
+         y="214.62282"
+         id="tspan12">L</tspan></text>
+    <rect
+       style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect26"
+       width="44.901279"
+       height="6.9474487"
+       x="237.94991"
+       y="127.42538"
+       inkscape:label="p6" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,0.98170187,10.531193)"
+       id="text27"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect28);display:inline;opacity:1;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       inkscape:label="descLineOne"
+       x="0"
+       y="0"><tspan
+         x="45.276698"
+         y="316.67445"
+         id="tspan14"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan13">Neblikající šipka ukazující směr označuje že výhybka je do dané strany přehozena a je </tspan></tspan><tspan
+         x="455.12748"
+         y="350.00782"
+         id="tspan16"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan15">možné na ní vjet.</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,29.339644,0.20825846)"
+       id="text27-4"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect28-6);display:inline;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       inkscape:label="descLineOne"
+       x="0"
+       y="0"><tspan
+         x="52.090453"
+         y="316.67445"
+         id="tspan18"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan17">Vlevo</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,138.08174,0.15417048)"
+       id="text27-4-8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect28-6-1);display:inline;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       inkscape:label="descLineOne"
+       x="0"
+       y="0"><tspan
+         x="19.171875"
+         y="316.67445"
+         id="tspan19">Rovně</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,232.20908,0.15417048)"
+       id="text27-4-8-6"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect28-6-1-8);display:inline;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       inkscape:label="descLineOne"
+       x="0"
+       y="0"><tspan
+         x="19.171875"
+         y="316.67445"
+         id="tspan20">Vpravo</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,4.4101073,86.180209)"
+       id="text27-7"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect28-5);display:inline;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       inkscape:label="descLinetwoL"
+       x="0"
+       y="0"><tspan
+         x="38.908006"
+         y="316.67445"
+         id="tspan22"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan21">Blikající šipka ukazující do </tspan></tspan><tspan
+         x="30.743934"
+         y="350.00782"
+         id="tspan24"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan23">jakéhokoliv směru označuje </tspan></tspan><tspan
+         x="29.246536"
+         y="383.34119"
+         id="tspan26"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan25">že výhybka se přehazuje do </tspan></tspan><tspan
+         x="36.648889"
+         y="416.67457"
+         id="tspan28"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan27">daného směru a není ještě </tspan></tspan><tspan
+         x="138.20501"
+         y="450.00794"
+         id="tspan30"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan29">zajištěna. </tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,98.621174,79.275631)"
+       id="text27-7-3"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect28-5-3);display:inline;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       inkscape:label="descLinetwoM"
+       x="0"
+       y="0"><tspan
+         x="22.637154"
+         y="316.67445"
+         id="tspan34"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan31">Prázdné návěstidlo označuje </tspan></tspan><tspan
+         x="25.612419"
+         y="350.00782"
+         id="tspan36"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan35">že je výhybka nefunkční a je </tspan></tspan><tspan
+         x="38.470508"
+         y="383.34119"
+         id="tspan38"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan37">jí možné projíždět. Taková </tspan></tspan><tspan
+         x="50.091616"
+         y="416.67457"
+         id="tspan40"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan39">situace může nastat je-li </tspan></tspan><tspan
+         x="27.819453"
+         y="450.00794"
+         id="tspan42"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan41">nastaven na výhybce pouze </tspan></tspan><tspan
+         x="124.19327"
+         y="483.34132"
+         id="tspan44"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan43">jeden směr.</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,196.94114,78.605039)"
+       id="text27-7-3-0"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect28-5-3-8);display:inline;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       inkscape:label="descLinetwoR"
+       x="0"
+       y="0"><tspan
+         x="64.876791"
+         y="316.67445"
+         id="tspan46"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan45">Vodorovná úsečka na </tspan></tspan><tspan
+         x="44.134577"
+         y="350.00782"
+         id="tspan48"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan47">návěstidle označuje že je </tspan></tspan><tspan
+         x="44.857235"
+         y="383.34119"
+         id="tspan50"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan49">výhybka neplatná a bude </tspan></tspan><tspan
+         x="19.700953"
+         y="416.67457"
+         id="tspan52"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan51">scénář v simulátoru ukončen.
+</tspan></tspan><tspan
+         x="30.046018"
+         y="450.00794"
+         id="tspan54"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan53">Pochopitelně taková návěst </tspan></tspan><tspan
+         x="73.040864"
+         y="483.34132"
+         id="tspan56"><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan55">není v reálu použita.</tspan></tspan></text>
+  </g>
+</svg>

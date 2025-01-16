@@ -110,6 +110,9 @@ function scenarioSerialize() {
 	//W - wall amount
 	numberValuesArray.push(...numberToByteArray(wallList.length, 4));
 
+	//F - sign amount
+	numberValuesArray.push(...numberToByteArray(signList.length, 4));
+
 	//X - texparcels amount
 	numberValuesArray.push(...numberToByteArray(texparcelList.length, 4));
 
@@ -285,6 +288,10 @@ function scenarioSerialize() {
 		numberValuesArray.push(0); //null terminator
 	});
 
+	signList.forEach((v) => {
+		//TODO
+	});
+
 	//texparcels
 	texparcelList.forEach((v) => {
 		numberValuesArray.push(...numberToByteArray(v.x1, 4));
@@ -416,9 +423,9 @@ function scenarioDeserialize(afiledata) {
 
 	console.log("Scenario date: ", new Date(readBytesAsNumber(numberArrayReference, 8)*1000)); //argument in milliseconds
 
-	//read amounts - 13 values
+	//read amounts - 14 values
 	
-	let amounts = new Array(13).fill(0);
+	let amounts = new Array(14).fill(0);
 	
 	amounts.forEach((v, i, a) => {
 		a[i] = readBytesAsNumber(numberArrayReference, 4);
@@ -589,9 +596,17 @@ function scenarioDeserialize(afiledata) {
 		wallList[i].materialName = readNullTerminatedString(numberArrayReference);
 	}
 
+	//signs
+	signList.length = 0;
+	for(let i = 0; i < amounts[12]; i++) {
+		signList.push(new Sign());
+
+		//TODO
+	}
+
 	//texparcels
 	texparcelList.length = 0;
-	for(let i = 0; i < amounts[12]; i++) {
+	for(let i = 0; i < amounts[13]; i++) {
 		texparcelList.push(new Texparcel());
 		texparcelList[i].x1 = readBytesAsNumber(numberArrayReference, 4);
 		texparcelList[i].x2 = readBytesAsNumber(numberArrayReference, 4);

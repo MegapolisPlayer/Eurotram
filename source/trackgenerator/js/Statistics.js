@@ -13,6 +13,7 @@ let statInfo = {
 	signal: null,
 	swsignal: null,
 	wall: null,
+	sign: null,
 	permeter: null,
 };
 
@@ -29,6 +30,7 @@ function statUpdate() {
 	statInfo.signal.textContent = signalList.length;
 	statInfo.swsignal.textContent = switchSignalList.length;
 	statInfo.wall.textContent = wallList.length;
+	statInfo.sign.textContent = signList.length;
 
 	statInfo.units = UNITS_PER_METER;
 	statInfo.permeter.textContent = UNITS_PER_METER;
@@ -47,6 +49,7 @@ function statInit() {
 	statInfo.signal = document.getElementById("amountsignal");
 	statInfo.swsignal = document.getElementById("amountswsignal");
 	statInfo.wall = document.getElementById("amountwall");
+	statInfo.sign = document.getElementById("amountsign");
 
 	statInfo.units = UNITS_PER_METER;
 	statInfo.permeter = document.getElementById("permeter");
