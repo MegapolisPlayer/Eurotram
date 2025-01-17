@@ -123,15 +123,12 @@ function texparcelAddMenu(ax, ay) {
 	addInput("tphinput", 100, "number");
 
 	canvasData.edit.appendChild(document.createTextNode("Station code 1: "));
-	canvasData.edit.appendChild(document.createElement("br"));
 	addInputPlaceholder("tps1input", "", "text", "XXXX");
 
 	canvasData.edit.appendChild(document.createTextNode("Station code 2: "));
-	canvasData.edit.appendChild(document.createElement("br"));
 	addInputPlaceholder("tps2input", "", "text", "XXXX");
 
 	canvasData.edit.appendChild(document.createTextNode("Material: "));
-	canvasData.edit.appendChild(document.createElement("br"));
 	addInputPlaceholder("tpmatinput", "", "text", "Name of material");
 
 	let makeButton = document.createElement("button");

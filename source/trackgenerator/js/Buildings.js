@@ -109,7 +109,7 @@ function makeBuildingTypeSelector() {
 	buildingTypeSelector = new DocumentFragment();
 
 	let label = document.createElement("label");
-	label.for = "Select building type";
+	label.textContent = "Select building type";
 
 	let select = document.createElement("select");
 	select.name = "buildtypeinput";
@@ -117,7 +117,8 @@ function makeBuildingTypeSelector() {
 
 	for(let b in buildingType) {
 		let option = document.createElement("option");
-		option.setAttribute("value", buildingType[b]); //b is name of property, buildingType[b] is its value
+		option.textContent = b;
+		option.setAttribute("value", buildingType[b]);
 		select.appendChild(option);
 	}
 
@@ -139,9 +140,6 @@ function buildingSelectMenu(ax, ay) {
 
 	addInputPlaceholder("buildcodeinput", "", "text", "XXXX");
 
-	canvasData.edit.appendChild(buildcodeinput);
-	canvasData.edit.appendChild(document.createElement("br"));	
-
 	let dfcopy = buildingTypeSelector.cloneNode(true);
 	canvasData.edit.append(dfcopy);
 
@@ -155,7 +153,6 @@ function buildingMake() {
 	let x = Number(document.getElementById("buildxinput").value);
 	let y = Number(document.getElementById("buildyinput").value);
 	let type = Number(document.getElementById("buildtypeinput").value);
-	console.log(type, " and ", document.getElementById("buildtypeinput").value);
 	let stationCode = document.getElementById("buildcodeinput").value;
 
 	buildingList.push(new Building(x, y, type, stationCode));

@@ -58,10 +58,13 @@ function lineAddOnClick(aevent) {
 
 	let value = getColliding(nodeList, x, y);
 	let isSwitch = false;
+	console.log(value);
 	if(value === -1) {
 		value = getColliding(switchList, x, y);
+		console.log(value);
 		if(value === -1) {
 			//nothing added - still redraw
+			console.log("LM - nothing clicked");
 			lineRedrawSelected();
 			return;
 		}
@@ -120,7 +123,6 @@ function newLineCreate() {
 	let em = document.createElement("em");
 	em.textContent = "Click on all of the nodes where the tram will go."
 	canvasData.edit.appendChild(em);
-
 	canvasData.edit.appendChild(document.createElement("br"));
 	
 	let nlist = document.getElementsByClassName("menubtn");
@@ -256,27 +258,60 @@ function lineFinalize() {
 	//add list of stations and time offset
 
 	combinedTrackList.push(...lineTrackList);
+	//t - time from prev, m - time in station, c - is control point
 	lineTrackList.filter(v => trackList[v] instanceof StationTrack).forEach(
-		v => stationTimes.push({sc: trackList[v].stationCode, t: 1})
+		v => stationTimes.push({sc: trackList[v].stationCode, t: 1, m: 1, c: false})
 	);
 
 	let df = new DocumentFragment();
 	stationTimes.forEach((v, i, a) => {
+		//for each station
+
 		df.appendChild(document.createTextNode(" Station (code " + v.sc + ") "));
 		
 		df.appendChild(document.createTextNode("Mins from prev: "));
-		let input = document.createElement("input");
-		input.type = "number";
-		input.size = 1;
-		input.min = 0;
-		input.setAttribute("value", v.t);
-		input.setAttribute("_id", i);
-		input.addEventListener("change", (e) => {
+		let minsFromPrev = document.createElement("input");
+		minsFromPrev.class = "minsfp";
+		minsFromPrev.type = "number";
+		minsFromPrev.size = 1;
+		minsFromPrev.min = 0;
+		minsFromPrev.setAttribute("value", v.t);
+		minsFromPrev.setAttribute("_id", i);
+		minsFromPrev.addEventListener("change", (e) => {
 			stationTimes[Number(e.target.getAttribute("_id"))].t = Number(e.target.value);
 		});
-		df.appendChild(input);
-
+		df.appendChild(minsFromPrev);
 		df.appendChild(document.createElement("br"));
+
+		df.appendChild(document.createTextNode("Mins in station: "));
+		let minsInStation = document.createElement("input");
+		minsInStation.class = "minsis";
+		minsInStation.type = "number";
+		minsInStation.size = 1;
+		minsInStation.min = 0;
+		minsInStation.setAttribute("value", v.m);
+		minsInStation.setAttribute("_id", i);
+		minsInStation.addEventListener("change", (e) => {
+			stationTimes[Number(e.target.getAttribute("_id"))].m = Number(e.target.value);
+		});
+		df.appendChild(minsInStation);
+		df.appendChild(document.createElement("br"));
+
+		df.appendChild(document.createTextNode("Is control stop? "));
+		let controlPoint = document.createElement("input");
+		controlPoint.class = "iscontrol";
+		controlPoint.type = "checkbox";
+		if(v.c) {
+			controlPoint.setAttribute("checked", "");
+		}
+		controlPoint.setAttribute("_id", i);
+		controlPoint.addEventListener("change", (e) => {
+			stationTimes[Number(e.target.getAttribute("_id"))].c = e.target.checked;
+		});
+		df.appendChild(controlPoint);
+		df.appendChild(document.createElement("br"));
+
+		df.appendChild(document.createElement("hr"));
 	});
 	canvasData.canvasmenu.append(df);
 
@@ -288,7 +323,10 @@ function lineFinalize() {
 	let totdurrbtn = document.createElement("button");
 	totdurrbtn.textContent = "Recalculate";
 	totdurrbtn.addEventListener("click", (e) => {
-		document.getElementById("totdur").textContent = String(stationTimes.map(v => v.t).reduce((p, c) => p + c)) + " minutes";
+		document.getElementById("totdur").textContent = String(
+			stationTimes.map(v =>v.t).reduce((p, c) => p + c) +
+			stationTimes.map(v => v.m).reduce((p, c) => p + c) 
+		) + " minutes";
 	});
 	totdurrbtn.click();
 	canvasData.canvasmenu.appendChild(totdurrbtn);
@@ -387,7 +425,8 @@ function lineFinalize() {
 			nodes: structuredClone(lineList),
 			tracks: structuredClone(lineTrackList),
 		});
-		lineSerialize();
+		let blob = lineSerialize();
+		lineSave(blob);
 		lineEnd(); //end line mode before returning
 	});
 	canvasData.canvasmenu.appendChild(serializeButton);
@@ -416,7 +455,7 @@ function lineSerialize() {
 
 	//S - starting date
 	let startDate = document.getElementById("startdate").value;
-	numberValuesArray.push(...numberToByteArray(Math.trunc(startDate.parse()/1000), 8)); //S - start time in ms
+	numberValuesArray.push(...numberToByteArray(Math.trunc(startDate/1000), 8)); //S - start time in ms
 
 	//W - weather flags
 	let weatherFlags = 0;
@@ -502,16 +541,31 @@ function lineSerialize() {
 		numberValuesArray.push(...numberToByteArray(stationAmount + switchAmount, 2));
 
 		//objects
+		
+		let inputIndex = 0;
 
 		for(let i = 0; i < v.tracks.length; i++) {
 			//n + 1 nodes, n tracks
 
 			if(trackList[v.tracks[i]] instanceof StationTrack) {
 				numberValuesArray.push('S'.codePointAt());
-				numberValuesArray.push(...numberToByteArray(v.tracks[i], 4));
-				numberValuesArray.push(...stationCodeToArray(trackList[v.tracks[i]].stationCode));
-				numberValuesArray.push(...numberToByteArray(Number(document.getElementById("").value), 4));
 
+				//I
+				numberValuesArray.push(...numberToByteArray(v.tracks[i], 4));
+
+				//C
+				numberValuesArray.push(...stationCodeToArray(trackList[v.tracks[i]].stationCode));
+
+				//T
+				numberValuesArray.push(...numberToByteArray(Number(stationTimes[inputIndex].t), 4));
+			
+				//M
+				numberValuesArray.push(...numberToByteArray(Number(stationTimes[inputIndex].m), 4));
+				
+				//K
+				numberValuesArray.push(Number(stationTimes[inputIndex].c));
+
+				inputIndex++;
 			}
 
 			if(nodeList[v.nodes[i + 1]] instanceof Switch) {
@@ -520,7 +574,7 @@ function lineSerialize() {
 
 				//switch is last
 				if(!v.nodes[i + 2]) { 
-					numberValuesArray.push(0b11111111);
+					numberValuesArray.push(0b111111);
 				}
 				//next is front
 				else if(nodeList[v.nodes[i + 1]].frontId == v.nodes[i + 2]) {
@@ -535,7 +589,7 @@ function lineSerialize() {
 					numberValuesArray.push(2);
 				}
 				//next is back - different direction
-				else if(nodeList[v.nodes[i + 1]].backId == v.nodes[i + 2]) {
+				else if(nodeList[v.nodes[i + 1]].b11ackId == v.nodes[i + 2]) {
 					numberValuesArray.push(3);
 				}
 				//not set
@@ -545,10 +599,6 @@ function lineSerialize() {
 				}
 			}
 		}
-
-		//end
-
-		
 	});
 
 	//convert to blob

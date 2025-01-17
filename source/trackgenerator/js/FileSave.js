@@ -32,3 +32,18 @@ function fileSave() {
 
 	URL.revokeObjectURL(url);
 }
+
+//called from Line.js
+function lineSave(ablob) {
+	console.log("Saving line");
+
+	console.log(ablob);
+
+	let url = URL.createObjectURL(ablob);
+	let elem = document.createElement("a");
+	elem.href = url;
+	elem.download = "line.etscr";
+	elem.click();
+
+	URL.revokeObjectURL(url);
+}

@@ -209,6 +209,16 @@ function getDataFromTrackInputs(aobject) {
 	}
 }
 
+function getPropertyOfValue(aobject, avalue) {
+	for(let p in aobject) {
+		if(aobject[p] === avalue) {
+			return p;
+		}
+	}	
+	console.error("Property with value not found!");
+	return Number.MIN_VALUE;
+}
+
 let mode = {
 	VIEW: 0,
 
@@ -229,6 +239,7 @@ let mode = {
 	SIGN_ADD: 22,
 	STATION_TRACK_ADD: 23,
 	TEXTURE_PARCEL_ADD: 24,
+	PRESIGNAL_ADD: 25,
 
 	EDIT: 30,
 	EDIT_TRACK: 31,
@@ -279,6 +290,15 @@ function onclickSignalAddHandler(ax, ay) {
 	signalList.push(new Signal(ax, ay));
 	signalList.at(-1).draw();
 }
+function presignalAdd() {
+	currentMode = mode.PRESIGNAL_ADD;
+	canvasData.mode.textContent = "Add presignal";
+}
+function onclickPreignalAddHandler(ax, ay) {
+	signalList.push(new Presignal(ax, ay));
+	signalList.at(-1).draw();
+}
+
 function radioAdd() {
 	currentMode = mode.RADIO_ADD;
 	canvasData.mode.textContent = "Add radiobox";
@@ -443,8 +463,8 @@ function signAdd() {
 	currentMode = mode.SIGN_ADD;
 	canvasData.mode.textContent = "Add sign";
 }
-function onclickSignalAddHandler(ax, ay) {
-
+function onclickSignAddHandler(ax, ay) {
+	signSelectMenu(ax, ay);
 }
 
 function landmarkAdd() {
@@ -496,7 +516,12 @@ function onclickEditHandler(ax, ay) {
 
 	value = getColliding(signalList, ax, ay);
 	if(value !== -1) {
-		signalEditMenu(value);
+		if(signalList[value] instanceof Presignal) {
+			presignalEditMenu(value);
+		}
+		else {
+			signalEditMenu(value);
+		}
 		return;
 	}
 
@@ -521,6 +546,12 @@ function onclickEditHandler(ax, ay) {
 	value = getColliding(radioList, ax, ay);
 	if(value !== -1) {
 		radioEditMenu(value);
+		return;
+	}
+
+	value = getColliding(signList, ax, ay);
+	if(value !== -1) {
+		signEditMenu(value);
 		return;
 	}
 

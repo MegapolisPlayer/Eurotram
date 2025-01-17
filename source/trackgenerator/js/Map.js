@@ -10,6 +10,10 @@ function scenarioClear() {
 	texparcelList.length = 0;
 	wallList.length = 0;
 
+	currentMode = mode.VIEW;
+	canvasData.mode.textContent = "View";
+	canvasData.edit.replaceChildren();
+
 	canvasClear();
 }
 
@@ -54,8 +58,14 @@ function stationCodeToArray(astationcode) {
 const TRACK_TYPE = "TK";
 const STATION_TRACK_TYPE = "ST";
 
+const JUNCTION_SIGNAL_TYPE = "JS";
+const JUNCTION_PRESIGNAL_TYPE = "PJ";
+
 const TRACK_BYTES = TRACK_TYPE.split('').map((v) => { return v.charCodeAt(0); });
 const STATION_TRACK_BYTES = STATION_TRACK_TYPE.split('').map((v) => { return v.charCodeAt(0); });
+
+const JUNCTION_SIGNAL_BYTES = JUNCTION_SIGNAL_TYPE.split('').map((v) => { return v.charCodeAt(0); });
+const JUNCTION_PRESIGNAL_BYTES = JUNCTION_PRESIGNAL_TYPE.split('').map((v) => { return v.charCodeAt(0); });
 
 const TRACK_FLAG_FIRST_SWITCH = 0b00000001;
 const TRACK_FLAG_SECOND_SWITCH = 0b00000010;
@@ -212,12 +222,27 @@ function scenarioSerialize() {
 
 	//signals
 	signalList.forEach((v) => {
+		let isPresignal = v instanceof Presignal;
+
+		if(isPresignal) {
+			numberValuesArray.push(...JUNCTION_SIGNAL_BYTES);
+		}
+		else {
+			numberValuesArray.push(...JUNCTION_PRESIGNAL_BYTES);
+		}
+
 		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
 		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
 		numberValuesArray.push(...numberToByteArray(v.poleHeight, 2));
+
+		if(isPresignal) {
+			numberValuesArray.push(...numberToByteArray(v.signalId, 4));		
+		}
+
 		numberValuesArray.push(...stationCodeToArray(v.stationCode));
+
 	});
 
 	//radioboxes
@@ -289,7 +314,14 @@ function scenarioSerialize() {
 	});
 
 	signList.forEach((v) => {
-		//TODO
+		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
+		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.height, 4));
+		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
+
+		numberValuesArray.push(...stationCodeToArray(v.stationCode));
+
+		numberValuesArray.push(...numberToByteArray(v.type, 2));
 	});
 
 	//texparcels
@@ -523,9 +555,28 @@ function scenarioDeserialize(afiledata) {
 	//signals
 	signalList.length = 0;
 	for(let i = 0; i < amounts[4]; i++) {
-		signalList.push(new Signal());
+		let type = readBytesAsString(numberArrayReference, 2);
+
+		if(type == JUNCTION_SIGNAL_TYPE) {
+			signalList.push(new Signal());
+		}
+		else if (type == JUNCTION_PRESIGNAL_TYPE) {
+			signalList.push(new Presignal());
+		}
+		else {
+			console.log(numberArrayReference);
+			alert("Invalid corrupt file - signal type identificator invalid! ("+type+")");
+			window.location.href = window.location.href; //reload webpage
+			return;
+		}
+
 		readXYHR(numberArrayReference, signalList[i]);
 		signalList[i].poleHeight = readBytesAsNumber(numberArrayReference, 2);
+
+		if(type == JUNCTION_SIGNAL_TYPE) {
+			signalList[i].signalId = readBytesAsNumber(numberArrayReference, 4);
+		}
+
 		signalList[i].stationCode = readStationCode(numberArrayReference);
 	}
 
@@ -600,8 +651,12 @@ function scenarioDeserialize(afiledata) {
 	signList.length = 0;
 	for(let i = 0; i < amounts[12]; i++) {
 		signList.push(new Sign());
-
-		//TODO
+		signList[i].xpos = readBytesAsNumber(numberArrayReference, 4);
+		signList[i].ypos = readBytesAsNumber(numberArrayReference, 4);
+		signList[i].height = readBytesAsNumber(numberArrayReference, 4);
+		signList[i].rotation = readBytesAsNumber(numberArrayReference, 2);
+		signList[i].stationCode = readStationCode(numberArrayReference);
+		signList[i].type = readBytesAsNumber(numberArrayReference, 2);
 	}
 
 	//texparcels

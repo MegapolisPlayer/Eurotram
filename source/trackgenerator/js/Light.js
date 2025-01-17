@@ -100,7 +100,7 @@ function lightEditMenu(aid) {
 
 	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
 
-	addInput("editrotinput", buildingList[aid].rotation, "text");
+	addInput("editrotinput", lightList[aid].rotation, "text");
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";

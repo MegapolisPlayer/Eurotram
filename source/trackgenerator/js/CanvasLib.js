@@ -106,10 +106,13 @@ function onclickHandler(aevent) {
 			onclickStationPillarAddHandler(x, y);
 			break;	
 		case(mode.SIGN_ADD):
-			onclickSignalAddHandler(x, y);
+			onclickSignAddHandler(x, y);
 			break;
 		case(mode.TEXTURE_PARCEL_ADD):
 			onclickTextureParcelAddHandler(x, y);
+			break;
+		case(mode.PRESIGNAL_ADD):
+			onclickPreignalAddHandler(x, y);
 			break;
 		case(mode.EDIT):
 			onclickEditHandler(x, y);
@@ -280,7 +283,8 @@ function canvasRedraw(aNoTPOverride = false) {
 		stationPillarList,
 		signalList,
 		switchSignalList,
-		wallList
+		wallList,
+		signList,
 	].forEach((v) => {
 		v.forEach((w) => {
 			w.draw();
@@ -358,3 +362,11 @@ function canvasInit() {
 
 	canvasClear();
 }
+
+//TODO remove code duplication in update, edit menu and remove functions
+//TODO add utils for creating buttons
+//TODO make separate Utils.js and move everything there!
+//TODO fix GUI of app
+//TODO enforce coding conventions
+//TODO abstract translations in draw calls
+//TODO make all objects inherit from base XYHR/XYH

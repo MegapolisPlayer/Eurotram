@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="0.50331262"
-     inkscape:cx="505.64995"
-     inkscape:cy="340.7425"
+     inkscape:zoom="2.0132505"
+     inkscape:cx="716.503"
+     inkscape:cy="461.69119"
      inkscape:window-width="1920"
      inkscape:window-height="1008"
      inkscape:window-x="1920"
@@ -343,7 +343,7 @@
        inkscape:label="title"><tspan
          x="19.869141"
          y="36.175099"
-         id="tspan15">Seznam tramvajových návěstí, jejich funkcí a vzhledu</tspan></text>
+         id="tspan1">Seznam tramvajových návěstí, jejich funkcí a vzhledu</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,2.1166664,2.4806736)"
@@ -353,7 +353,7 @@
        inkscape:label="subtitle"><tspan
          x="28.003906"
          y="65.922557"
-         id="tspan18">Návěsti jsou značky které určují co má řidič tramvaje dělat resp. nedělat.</tspan></text>
+         id="tspan2">Návěsti jsou značky které určují co má řidič tramvaje dělat resp. nedělat.</tspan></text>
     <rect
        style="fill:#ff0000;stroke-width:1.65012"
        id="rect4"
@@ -413,14 +413,14 @@
        x="3.0296602"
        y="148.7469" />
     <rect
-       style="fill:#ffeeaa;fill-opacity:1;stroke:none;stroke-width:0.473086;stroke-linecap:square;stroke-opacity:1"
+       style="fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:0.473086;stroke-linecap:square;stroke-opacity:1"
        id="rect6-9-2-4"
        width="11.725396"
        height="17.236898"
        x="4.0517416"
        y="150.2494" />
     <rect
-       style="fill:#ffeeaa;fill-opacity:1;stroke:none;stroke-width:0.473086;stroke-linecap:square;stroke-opacity:1"
+       style="fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:0.473086;stroke-linecap:square;stroke-opacity:1"
        id="rect6-9-2-4-6"
        width="11.725396"
        height="17.236898"
@@ -447,9 +447,9 @@
        style="font-weight:bold;font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans Bold';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect7);display:inline;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="65.282216"
          y="177.50257"
-         id="tspan20"><tspan
+         id="tspan4"><tspan
            style="font-weight:normal;-inkscape-font-specification:'Liberation Sans'"
-           id="tspan19">Z</tspan></tspan></text>
+           id="tspan3">Z</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.23711429,0,0,0.4564791,-36.019338,-94.842882)"
@@ -457,9 +457,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="178.89056"
          y="468.47318"
-         id="tspan22"><tspan
+         id="tspan6"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold';fill:#ffffff"
-           id="tspan21">30</tspan></tspan></text>
+           id="tspan5">30</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.71747339,0,0,0.4564791,-29.358012,-98.505063)"
@@ -467,7 +467,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="189.45182"
          y="468.47318"
-         id="tspan23">r</tspan></text>
+         id="tspan7">r</tspan></text>
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.383932;stroke-linecap:square;stroke-opacity:1"
        id="rect5-8-2-4-7"
@@ -501,7 +501,7 @@
        x="117.90699"
        y="129.34529" />
     <rect
-       style="fill:#ffeeaa;fill-opacity:1;stroke:none;stroke-width:0.363726;stroke-linecap:square;stroke-opacity:1"
+       style="fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:0.363726;stroke-linecap:square;stroke-opacity:1"
        id="rect6-9-2-4-6-1"
        width="11.725396"
        height="10.188872"
@@ -514,9 +514,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="178.89056"
          y="468.47318"
-         id="tspan25"><tspan
+         id="tspan9"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan24">40</tspan></tspan></text>
+           id="tspan8">40</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.14725494,0,0,0.17601601,96.170065,51.407673)"
@@ -524,9 +524,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-5);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="155.57107"
          y="468.47318"
-         id="tspan27"><tspan
+         id="tspan11"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan26">ZÓNA</tspan></tspan></text>
+           id="tspan10">ZÓNA</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.13112179,0,0,0.17601601,97.889395,55.062223)"
@@ -534,9 +534,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-5-5);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="158.16671"
          y="468.47318"
-         id="tspan29"><tspan
+         id="tspan13"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan28">22 - 6 h</tspan></tspan></text>
+           id="tspan12">22 - 6 h</tspan></tspan></text>
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.383932;stroke-linecap:square;stroke-opacity:1"
        id="rect5-8-2-1-4-3"
@@ -545,7 +545,7 @@
        x="102.84422"
        y="129.34529" />
     <rect
-       style="fill:#ffeeaa;fill-opacity:1;stroke:none;stroke-width:0.363726;stroke-linecap:square;stroke-opacity:1"
+       style="fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:0.363726;stroke-linecap:square;stroke-opacity:1"
        id="rect6-9-2-4-6-1-3"
        width="11.725396"
        height="10.188872"
@@ -558,9 +558,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-4);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="178.89056"
          y="468.47318"
-         id="tspan31"><tspan
+         id="tspan15"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan30">30</tspan></tspan></text>
+           id="tspan14">30</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.14725494,0,0,0.17601601,81.107305,51.407663)"
@@ -568,9 +568,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-5-6);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="155.57107"
          y="468.47318"
-         id="tspan33"><tspan
+         id="tspan17"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan32">ZÓNA</tspan></tspan></text>
+           id="tspan16">ZÓNA</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.13112179,0,0,0.17601601,82.826625,55.062213)"
@@ -578,9 +578,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-5-5-3);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="158.16671"
          y="468.47318"
-         id="tspan35"><tspan
+         id="tspan19"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan34">22 - 6 h</tspan></tspan></text>
+           id="tspan18">22 - 6 h</tspan></tspan></text>
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.383932;stroke-linecap:square;stroke-opacity:1"
        id="rect5-8-2-1-4-2"
@@ -595,9 +595,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-7);display:inline;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="178.89056"
          y="468.47318"
-         id="tspan37"><tspan
+         id="tspan21"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan36">40</tspan></tspan></text>
+           id="tspan20">40</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.14725494,0,0,0.17601601,96.347378,77.058767)"
@@ -605,9 +605,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-5-4);display:inline;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="155.57107"
          y="468.47318"
-         id="tspan39"><tspan
+         id="tspan23"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan38">ZÓNA</tspan></tspan></text>
+           id="tspan22">ZÓNA</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.13112179,0,0,0.17601601,98.066698,80.713317)"
@@ -615,9 +615,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-5-5-1);display:inline;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="158.16671"
          y="468.47318"
-         id="tspan41"><tspan
+         id="tspan25"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan40">22 - 6 h</tspan></tspan></text>
+           id="tspan24">22 - 6 h</tspan></tspan></text>
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.383932;stroke-linecap:square;stroke-opacity:1"
        id="rect5-8-2-1-4-3-4"
@@ -632,9 +632,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-4-1);display:inline;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="178.89056"
          y="468.47318"
-         id="tspan43"><tspan
+         id="tspan27"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan42">30</tspan></tspan></text>
+           id="tspan26">30</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.14725494,0,0,0.17601601,81.284618,77.058757)"
@@ -642,9 +642,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-5-6-3);display:inline;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="155.57107"
          y="468.47318"
-         id="tspan45"><tspan
+         id="tspan29"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan44">ZÓNA</tspan></tspan></text>
+           id="tspan28">ZÓNA</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.13112179,0,0,0.17601601,83.003928,80.713307)"
@@ -652,9 +652,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-5-5-3-0);display:inline;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="158.16671"
          y="468.47318"
-         id="tspan47"><tspan
+         id="tspan31"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan46">22 - 6 h</tspan></tspan></text>
+           id="tspan30">22 - 6 h</tspan></tspan></text>
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.383932;stroke-linecap:square;stroke-opacity:1"
        id="rect5-8-2-1-4-3-6"
@@ -663,7 +663,7 @@
        x="4.4844823"
        y="180.8351" />
     <rect
-       style="fill:#ffeeaa;fill-opacity:1;stroke:none;stroke-width:0.473087;stroke-linecap:square;stroke-opacity:1"
+       style="fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:0.473087;stroke-linecap:square;stroke-opacity:1"
        id="rect6-9-2-4-6-1-3-5"
        width="11.725396"
        height="17.236917"
@@ -676,9 +676,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-4-0);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="178.89056"
          y="468.47318"
-         id="tspan49"><tspan
+         id="tspan33"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan48">30</tspan></tspan></text>
+           id="tspan32">30</tspan></tspan></text>
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.383932;stroke-linecap:square;stroke-opacity:1"
        id="rect5-8-2-1-4-3-6-5"
@@ -687,7 +687,7 @@
        x="103.30143"
        y="81.346527" />
     <rect
-       style="fill:#ffeeaa;fill-opacity:1;stroke:none;stroke-width:0.473087;stroke-linecap:square;stroke-opacity:1"
+       style="fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:0.473087;stroke-linecap:square;stroke-opacity:1"
        id="rect6-9-2-4-6-1-3-5-08"
        width="11.725396"
        height="17.236917"
@@ -700,7 +700,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-4-0-50);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="187.18869"
          y="468.47318"
-         id="tspan50">v</tspan></text>
+         id="tspan34">v</tspan></text>
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.427776;stroke-linecap:square;stroke-opacity:1"
        id="rect5-8-2-1-4-3-6-9"
@@ -709,7 +709,7 @@
        x="103.38246"
        y="53.97052" />
     <rect
-       style="fill:#ffeeaa;fill-opacity:1;stroke:none;stroke-width:0.473087;stroke-linecap:square;stroke-opacity:1"
+       style="fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:0.473087;stroke-linecap:square;stroke-opacity:1"
        id="rect6-9-2-4-6-1-3-5-0"
        width="11.725396"
        height="17.236917"
@@ -722,9 +722,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.1046px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-7-3-4-0-5);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-opacity:1"><tspan
          x="178.89056"
          y="468.47318"
-         id="tspan52"><tspan
+         id="tspan36"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan51">30</tspan></tspan></text>
+           id="tspan35">30</tspan></tspan></text>
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.383932;stroke-linecap:square;stroke-opacity:1"
        id="rect5-8-2-1-4-3-6-4"
@@ -733,7 +733,7 @@
        x="103.36058"
        y="31.168495" />
     <rect
-       style="fill:#ffeeaa;fill-opacity:1;stroke:none;stroke-width:0.473087;stroke-linecap:square;stroke-opacity:1"
+       style="fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:0.473087;stroke-linecap:square;stroke-opacity:1"
        id="rect6-9-2-4-6-1-3-5-1"
        width="11.725396"
        height="17.236917"
@@ -776,7 +776,7 @@
        inkscape:transform-center-y="-1.6131922e-05"
        transform="rotate(45)" />
     <rect
-       style="fill:#00ff00;fill-opacity:1;stroke:#000000;stroke-width:0.371871;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#008000;fill-opacity:1;stroke:#000000;stroke-width:0.371871;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
        id="rect11-2-3"
        width="7.6728683"
        height="7.6075277"
@@ -830,7 +830,7 @@
        inkscape:transform-center-y="-1.2374025e-05"
        transform="rotate(45)" />
     <rect
-       style="fill:#00ff00;fill-opacity:1;stroke:#000000;stroke-width:0.371871;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#008000;fill-opacity:1;stroke:#000000;stroke-width:0.371871;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
        id="rect11-2-3-8"
        width="7.6728683"
        height="7.6075277"
@@ -890,7 +890,7 @@
        transform="rotate(-135)"
        inkscape:transform-center-y="3.5781464e-06" />
     <rect
-       style="fill:#00ff00;fill-opacity:1;stroke:#000000;stroke-width:0.371871;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#008000;fill-opacity:1;stroke:#000000;stroke-width:0.371871;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
        id="rect11-2-3-8-3"
        width="7.6728683"
        height="7.6075277"
@@ -954,7 +954,7 @@
        inkscape:transform-center-y="-3.0348038e-06"
        transform="rotate(45)" />
     <rect
-       style="fill:#00ff00;fill-opacity:1;stroke:#000000;stroke-width:0.371871;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#008000;fill-opacity:1;stroke:#000000;stroke-width:0.371871;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
        id="rect11-2-3-3"
        width="7.6728683"
        height="7.6075277"
@@ -984,21 +984,21 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan54"><tspan
+         id="tspan38"><tspan
            dx="0 0 0 26.061848 0 26.061844 0 0 0 0 0 0 0 0 26.061844"
            style="text-align:justify"
-           id="tspan53">Č. 1 označuje zajišťovací </tspan></tspan><tspan
+           id="tspan37">Č. 1 označuje zajišťovací </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan56"><tspan
+         id="tspan40"><tspan
            dx="0 0 0 0 0 0 0 0 0 0.67333984 0 0 0 0 0 0 0 0.67333984 0 0 0.67333984 0 0 0 0 0 0.67333984"
            style="text-align:justify"
-           id="tspan55">výhybky. Takovou je možné najít </tspan></tspan><tspan
+           id="tspan39">výhybky. Takovou je možné najít </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan58"><tspan
+         id="tspan42"><tspan
            style="text-align:justify"
-           id="tspan57">např. na obratišti Zvonařka.</tspan></tspan></text>
+           id="tspan41">např. na obratišti Zvonařka.</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,0.577495,1.7931387)"
@@ -1008,9 +1008,9 @@
        y="0"><tspan
          x="90.240234"
          y="146.89656"
-         id="tspan60"><tspan
+         id="tspan44"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan59">Základní návěsti</tspan></tspan></text>
+           id="tspan43">Základní návěsti</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,1.5233784,144.72604)"
@@ -1020,9 +1020,9 @@
        y="0"><tspan
          x="90.240234"
          y="146.89656"
-         id="tspan62"><tspan
+         id="tspan46"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan61">Rychlostní návěsti</tspan></tspan></text>
+           id="tspan45">Rychlostní návěsti</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,191.22527,4.2821084)"
@@ -1032,9 +1032,9 @@
        y="0"><tspan
          x="90.240234"
          y="146.89656"
-         id="tspan64"><tspan
+         id="tspan48"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan63">Návěsti pro sběrač</tspan></tspan></text>
+           id="tspan47">Návěsti pro sběrač</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,-1.7852757,34.046494)"
@@ -1044,21 +1044,21 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan66"><tspan
+         id="tspan50"><tspan
            dx="0 0 0 3.140625 0 3.140625 0 0 0 0 0 0 0 0 3.140625 0 0 0 0 0 0 3.140625 0 0 0 0 0 3.140625"
            style="text-align:justify"
-           id="tspan65">Č. 2 označuje návěst stůj. Vlak </tspan></tspan><tspan
+           id="tspan49">Č. 2 označuje návěst stůj. Vlak </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan68"><tspan
+         id="tspan52"><tspan
            dx="0 0 0 0 0 0 0.92578125 0 0 0 0 0 0 0.92578125 0 0 0 0 0 0 0 0.92578125 0 0 0 0 0 0 0 0.92578125"
            style="text-align:justify"
-           id="tspan67">nesmí návěst projet. Použivá se </tspan></tspan><tspan
+           id="tspan51">nesmí návěst projet. Použivá se </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan70"><tspan
+         id="tspan54"><tspan
            style="text-align:justify"
-           id="tspan69">při výlukách.</tspan></tspan></text>
+           id="tspan53">při výlukách.</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,-1.6683617,58.84495)"
@@ -1068,15 +1068,15 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan72"><tspan
+         id="tspan56"><tspan
            dx="0 0 0 24.520832 0 24.520828 0 0 0 0 0 0 0 0 24.520828"
            style="text-align:justify"
-           id="tspan71">Č. 3 označuje přítomnost </tspan></tspan><tspan
+           id="tspan55">Č. 3 označuje přítomnost </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan74"><tspan
+         id="tspan58"><tspan
            style="text-align:justify"
-           id="tspan73">přejezdu s předností tramvaje.</tspan></tspan></text>
+           id="tspan57">přejezdu s předností tramvaje.</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,-1.7474944,81.982325)"
@@ -1086,21 +1086,21 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan76"><tspan
+         id="tspan60"><tspan
            dx="0 0 0 29.373047 0 29.373047 0 0 0 0 0 0 0 0 29.373047"
            style="text-align:justify"
-           id="tspan75">Č. 4 označuje maximální </tspan></tspan><tspan
+           id="tspan59">Č. 4 označuje maximální </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan78"><tspan
+         id="tspan62"><tspan
            dx="0 0 0 0 0 0 0 0 0 4.8128891 0 0 0 0 0 4.8128815 0 0 0 0 0 4.8128967 0 0 4.8128967 0 0 0 0 4.8128967"
            style="text-align:justify"
-           id="tspan77">rychlost úseku pokud se liší od </tspan></tspan><tspan
+           id="tspan61">rychlost úseku pokud se liší od </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan80"><tspan
+         id="tspan64"><tspan
            style="text-align:justify"
-           id="tspan79">očekáváné.</tspan></tspan></text>
+           id="tspan63">očekáváné.</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,-1.6416764,103.7821)"
@@ -1110,12 +1110,12 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan82"><tspan
+         id="tspan66"><tspan
            dx="0 0 0 15.5625 0 15.5625 0 0 0 0 0 0 0 0 15.5625 0 0 0 0 0 15.5625"
-           id="tspan81">Č. 5 označuje konec úseku </tspan></tspan><tspan
+           id="tspan65">Č. 5 označuje konec úseku </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan83">označeného značkou č. 4.</tspan></text>
+         id="tspan67">označeného značkou č. 4.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,-1.6181641,122.74036)"
@@ -1125,17 +1125,17 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan85"><tspan
+         id="tspan69"><tspan
            dx="0 0 0 3.4195328 3.419529 0 3.419529 0 0 0 0 0 0 0 0 3.4195404 0 0 0 0 0 0 3.4195251"
-           id="tspan84">Č.  6 označuje návěst &quot;pomalu&quot; </tspan></tspan><tspan
+           id="tspan68">Č.  6 označuje návěst &quot;pomalu&quot; </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan87"><tspan
+         id="tspan71"><tspan
            dx="0 0 0 0 0 0 0 6.5332031 0 0 0 0 0 0 0 6.5332031 0 0 0 0 0 0 0 0 0 6.5332031 0 0 6.5332031"
-           id="tspan86">neboli omezení rychlosti na 10 </tspan></tspan><tspan
+           id="tspan70">neboli omezení rychlosti na 10 </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan88">kilometrů za hodinu.</tspan></text>
+         id="tspan72">kilometrů za hodinu.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,98.664955,5.5811734)"
@@ -1145,17 +1145,17 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan90"><tspan
+         id="tspan74"><tspan
            dx="0 0 0 0.96614647 0 0.96614838 0 0 0 0 0 0 0 0 0.96614075"
-           id="tspan89">Č. 8 označuje konec </tspan></tspan><tspan
+           id="tspan73">Č. 8 označuje konec </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan92"><tspan
+         id="tspan76"><tspan
            dx="0 0 0 0 0 0 18.871094"
-           id="tspan91">úseku označeného </tspan></tspan><tspan
+           id="tspan75">úseku označeného </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan93">značkou č. 7.</tspan></text>
+         id="tspan77">značkou č. 7.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,99.163247,30.31194)"
@@ -1165,17 +1165,17 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan95"><tspan
+         id="tspan79"><tspan
            dx="0 0 0 9.9589844 0 9.9589844 0 0 0 0 0 0 0 0 9.9589844 0 0 0 0 0 9.9589844"
-           id="tspan94">Č. 9 označuje místo které </tspan></tspan><tspan
+           id="tspan78">Č. 9 označuje místo které </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan97"><tspan
+         id="tspan81"><tspan
            dx="0 0 0 0 0 0 0 0 2.6184921 0 0 0 0 2.6184998 0 0 0 0 0 0 2.6184845"
-           id="tspan96">tramvaj musí projet nejvýšše </tspan></tspan><tspan
+           id="tspan80">tramvaj musí projet nejvýšše </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan98">uvedenou rychlostí.</tspan></text>
+         id="tspan82">uvedenou rychlostí.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,99.696725,54.957111)"
@@ -1185,17 +1185,17 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan100"><tspan
+         id="tspan84"><tspan
            dx="0 0 0 32.905273 0 0 32.905273"
-           id="tspan99">Č. 10 stanovuje </tspan></tspan><tspan
+           id="tspan83">Č. 10 stanovuje </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan102"><tspan
+         id="tspan86"><tspan
            dx="0 0 0 0 0 0 0 0 0 0 0 0.62044525 0 0 0 0 0 0.62045288 0 0 0.62043762"
-           id="tspan101">rychlostní limit 10 km/</tspan></tspan><tspan
+           id="tspan85">rychlostní limit 10 km/</tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan103">h z důvodu výhybky.</tspan></text>
+         id="tspan87">h z důvodu výhybky.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,99.956445,78.126231)"
@@ -1205,17 +1205,17 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan105"><tspan
+         id="tspan89"><tspan
            dx="0 0 0 0.84453201 0 0 0.84453201 0 0 0 0 0 0 0 0 0.84454346 0 0 0 0 0 0 0.8445282 0 0.84454346"
-           id="tspan104">Č. 11 označuje oblouk o malém </tspan></tspan><tspan
+           id="tspan88">Č. 11 označuje oblouk o malém </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan107"><tspan
+         id="tspan91"><tspan
            dx="0 0 0 0 0 0 0 0 0 2.7664032 0 2.7664108 0 2.7664185 0 0 0 2.7664032 0 2.7664032"
-           id="tspan106">poloměru r &lt; 25m a maximální </tspan></tspan><tspan
+           id="tspan90">poloměru r &lt; 25m a maximální </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan108">rychlost 15 km/h na něm.</tspan></text>
+         id="tspan92">rychlost 15 km/h na něm.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,114.88866,129.466)"
@@ -1225,17 +1225,17 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan110"><tspan
+         id="tspan94"><tspan
            dx="0 0 0 0 0 0 0 0.92655945 0 0 0.92656708 0 0 0.92657471 0 0.92655945 0 0 0.92655945"
-           id="tspan109">Značky č. 14 a 15 oznařují </tspan></tspan><tspan
+           id="tspan93">Značky č. 14 a 15 oznařují </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan112"><tspan
+         id="tspan96"><tspan
            dx="0 0 0 0 0 0 22.308594 0 0 0 0 0 22.308594"
-           id="tspan111">konec úseku určeného </tspan></tspan><tspan
+           id="tspan95">konec úseku určeného </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan113">značkami 12 a 13.</tspan></text>
+         id="tspan97">značkami 12 a 13.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,114.03963,102.47754)"
@@ -1245,17 +1245,17 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan115"><tspan
+         id="tspan99"><tspan
            dx="0 0 0 0 0 0 0 4.1335907 0 0 4.1335983 0 0 4.133606 0 4.1335907 0 0 4.1335907"
-           id="tspan114">Značky č. 12 a 13 určují </tspan></tspan><tspan
+           id="tspan98">Značky č. 12 a 13 určují </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan117"><tspan
+         id="tspan101"><tspan
            dx="0 0 0 0 0 0 0 0 0 0 29.037109 0 0 0 0 0 0 0 0 29.037109"
-           id="tspan116">maximální rychlost v </tspan></tspan><tspan
+           id="tspan100">maximální rychlost v </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan118">určitý čas.</tspan></text>
+         id="tspan102">určitý čas.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,199.69226,15.079893)"
@@ -1265,16 +1265,16 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan119">Č. 16 - Úsekový dělič.
+         id="tspan103">Č. 16 - Úsekový dělič.
 </tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan121"><tspan
+         id="tspan105"><tspan
            dx="0 0 0 0 0 0 0 0 5.8658829 0 0 0 0 5.8658752 0 0 0 0 0 0 5.8658905"
-           id="tspan120">Tramvaj musí projet toto </tspan></tspan><tspan
+           id="tspan104">Tramvaj musí projet toto </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan122">místo bez odběru proudu.</tspan></text>
+         id="tspan106">místo bez odběru proudu.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,199.69226,38.388945)"
@@ -1284,17 +1284,17 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan124"><tspan
+         id="tspan108"><tspan
            dx="0 0 0 6.0085945 0 0 6.0085945 0 6.0085907 0 0 0 0 0 0 0 6.0085907 0 0 0 0 0 6.0085907"
-           id="tspan123">Č. 17 - Úsekový dělič s </tspan></tspan><tspan
+           id="tspan107">Č. 17 - Úsekový dělič s </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan126"><tspan
+         id="tspan110"><tspan
            dx="0 0 0 0 0 0 0 0 0 7.0338516 0 0 7.033844 0 0 0 0 0 7.0338593"
-           id="tspan125">magnety. Je možné toto </tspan></tspan><tspan
+           id="tspan109">magnety. Je možné toto </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan127">místo projet s odběrem.</tspan></text>
+         id="tspan111">místo projet s odběrem.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,198.70649,61.697997)"
@@ -1304,17 +1304,17 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan129"><tspan
+         id="tspan113"><tspan
    dx="0 0 0 10.835938 0 0 10.835938 0 10.835938 0 0 0 0 0 0 10.835938"
-   id="tspan128">Č. 18 - Stáhni sběrač</tspan>. </tspan><tspan
+   id="tspan112">Č. 18 - Stáhni sběrač</tspan>. </tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan131"><tspan
+         id="tspan115"><tspan
            dx="0 0 0 0 0 0 0 0 0 25.673828 0 0 0 0 0 0 0 0 25.673828"
-           id="tspan130">Označuje překážku v </tspan></tspan><tspan
+           id="tspan114">Označuje překážku v </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan132">trolejovém vedení.</tspan></text>
+         id="tspan116">trolejovém vedení.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,199.41765,86.627713)"
@@ -1324,24 +1324,24 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan135"><tspan
+         id="tspan119"><tspan
            dx="0 0 0 1.1386719 0 0 1.1386719 0 1.1386719 0 0 0 0 0 0 1.1386719"
-           id="tspan133">Č. 19 - Zvedni sběrač</tspan><tspan
+           id="tspan117">Č. 19 - Zvedni sběrač</tspan><tspan
            dx="0 0 1.1386719"
-           id="tspan134">. Po </tspan></tspan><tspan
+           id="tspan118">. Po </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan137"><tspan
+         id="tspan121"><tspan
            dx="0 0 0 0 0 25.893883 0 0 0 0 0 0 0 25.89389 0 0 25.893875"
-           id="tspan136">této návěsti je plně </tspan></tspan><tspan
+           id="tspan120">této návěsti je plně </tspan></tspan><tspan
          x="90.240234"
          y="200.00678"
-         id="tspan139"><tspan
+         id="tspan123"><tspan
            dx="0 0 0 0 0 0 0 0 0 69.654297"
-           id="tspan138">bezpečné zvednout </tspan></tspan><tspan
+           id="tspan122">bezpečné zvednout </tspan></tspan><tspan
          x="90.240234"
          y="230.00678"
-         id="tspan140">sběrač. </tspan></text>
+         id="tspan124">sběrač. </tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.22293176,0,0,0.22293176,0.10657924,157.73728)"
@@ -1351,13 +1351,13 @@
        y="0"><tspan
          x="90.240234"
          y="140.00678"
-         id="tspan143"><tspan
+         id="tspan127"><tspan
            dx="0 0 0 5.9929695 0 5.9929695 0 0 0 0 0 0 0 0 5.992981 0 0 0 0 5.9929657"
-           id="tspan141">Č. 7 označuje úsek s </tspan><tspan
+           id="tspan125">Č. 7 označuje úsek s </tspan><tspan
            dx="5.9929657"
-           id="tspan142">maximální </tspan></tspan><tspan
+           id="tspan126">maximální </tspan></tspan><tspan
          x="90.240234"
          y="170.00678"
-         id="tspan144">rychlostí.</tspan></text>
+         id="tspan128">rychlostí.</tspan></text>
   </g>
 </svg>

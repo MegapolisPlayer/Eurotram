@@ -34,10 +34,7 @@ class StationPillar {
 
 		canvasData.context.translate(NODE_SIZE/2,NODE_SIZE/4);
 		canvasData.context.rotate(-toRadians(this.rotation));
-		canvasData.context.translate(
-			-this.xpos,
-			-this.ypos,
-		);
+		canvasData.context.translate(-this.xpos, -this.ypos);
 	}
 
 	collision(ax, ay) {
@@ -58,7 +55,7 @@ class StationPillar {
 let stationPillarList = [];
 
 function stationPillarEditMenu(aid) {
-	canvasData.edit.replaceChldren();
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.appendChild(document.createTextNode("Editing station pillar "+aid));
 	canvasData.edit.appendChild(document.createElement("br"));

@@ -12,7 +12,6 @@ class Signal {
 		this.ypos = aypos;
 	}
 
-	//teal square
 	draw(style = "#0000aa") {
 		if(!this.willRender()) { return; }
 		console.log("signal draw");
@@ -60,10 +59,9 @@ class Signal {
 let signalList = [];
 
 function signalEditMenu(aid) {
-	canvasData.edit.replaceChldren();
+	canvasData.edit.replaceChildren();
 
 	canvasData.edit.appendChild(document.createTextNode("Editing signal "+aid));
-
 	canvasData.edit.appendChild(document.createElement("br"));
 
 	addHiddenIdInput(aid);
@@ -76,12 +74,12 @@ function signalEditMenu(aid) {
 
 	let updateButton = document.createElement("button");
 	updateButton.addEventListener("click", signalUpdate);
-	updateButton.textContent = "Update signal track";
+	updateButton.textContent = "Update";
 	canvasData.edit.appendChild(updateButton);
 
 	let removeButton = document.createElement("button");
 	removeButton.addEventListener("click", signalRemove);
-	removeButton.textContent = "Remove signal";
+	removeButton.textContent = "Remove";
 	canvasData.edit.appendChild(removeButton);
 }
 
@@ -100,10 +98,67 @@ function signalRemove() {
 
 	let signalId =  Number(document.getElementById("idinput").value);
 	signalList.splice(signalId, 1);
-	canvasData.edit.replaceChldren();
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }
+
+//----------
+
+class Presignal extends Signal {
+	signalId = 0; //which signal do we reference
+
+	constructor(axpos = 0, aypos = 0) {
+		super(axpos, aypos);
+	}
+
+	draw(style = "#00ffff") {
+		super.draw(style); //style override
+	}
+};
+
+//IMPORTANT presignals are saved in signal list
+
+function presignalEditMenu(aid) {
+	canvasData.edit.replaceChildren();
+
+	canvasData.edit.appendChild(document.createTextNode("Editing presignal "+aid));
+	canvasData.edit.appendChild(document.createElement("br"));
+
+	addHiddenIdInput(aid);
+
+	addBasicEditInputs(signalList[aid]);
+
+	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
+	addInput("editrotinput", signalList[aid].rotation, "number");
+
+	canvasData.edit.appendChild(document.createTextNode("Signal id: "));
+	addInput("editsiginput", signalList[aid].signalId, "number");
+
+	let updateButton = document.createElement("button");
+	updateButton.addEventListener("click", presignalUpdate);
+	updateButton.textContent = "Update";
+	canvasData.edit.appendChild(updateButton);
+
+	let removeButton = document.createElement("button");
+	removeButton.addEventListener("click", signalRemove);
+	removeButton.textContent = "Remove";
+	canvasData.edit.appendChild(removeButton);
+}
+
+function presignalUpdate() {
+	console.log("Updating presignal...");
+
+	let signalId =  Number(document.getElementById("idinput").value);
+
+	getDataFromBasicInputs(signalList[signalId]);
+	signalList[signalId].rotation = Number(document.getElementById("editrotinput").value);
+	signalList[signalId].signalId = Number(document.getElementById("editsiginput").value);
+
+	canvasRedraw();
+}
+
+//remove handled by signal
 
 //----------
 
@@ -221,7 +276,7 @@ function switchSignalRemove() {
 
 	let swsignalId =  Number(document.getElementById("idinput").value);
 	switchSignalList.splice(swsignalId, 1);
-	canvasData.edit.replaceChldren();
+	canvasData.edit.replaceChildren();
 
 	canvasRedraw();
 }
