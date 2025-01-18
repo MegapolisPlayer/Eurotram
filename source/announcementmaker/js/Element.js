@@ -10,8 +10,8 @@ const baseNames = [
 	"The metro station...",
 	"...is closed",
 	"Train is going to the depot...",
-	"...is changed to line...",
 	"From the station...",
+	"...is changed to line...",
 	"Direction",
 	"Cablecar closure",
 ];
@@ -40,50 +40,50 @@ let uniqueId = 0;
 
 function newElement() {
 	let container = document.createElement("div");
-	container.setAttribute("class", "element");
+	container.classList.add("element");
 	container.setAttribute("id", "e"+uniqueId);
 
 	let stationCodeField = document.createElement("input");
-	stationCodeField.class = "scode";
+	stationCodeField.classList.add("scode");
 	stationCodeField.type = "text";
 	stationCodeField.placeholder = "XXXX";
 	stationCodeField.size = 4;
 
 	let stationNameField = document.createElement("input");
-	stationCodeField.class = "sname";
+	stationNameField.classList.add("sname");
 	stationNameField.type = "text";
 	stationNameField.placeholder = "Station name";
 	stationNameField.size = 15;
 
 	let stationsLinesField = document.createElement("input");
-	stationCodeField.class = "slines";
+	stationsLinesField.classList.add("slines");
 	stationsLinesField.type = "text";
 	stationsLinesField.placeholder = "Lines";
 	stationsLinesField.size = 20;
 
 	let stationAudioField = document.createElement("input");
-	stationAudioField.class = "sfile";
+	stationAudioField.classList.add("sfile");
 	stationAudioField.type = "text";
 	stationAudioField.placeholder = "Audio file";
 	stationAudioField.size = 10;
 
 	let stationHasMetro = document.createElement("input");
-	stationHasMetro.class = "smetro";
+	stationHasMetro.classList.add("smetro");
 	stationHasMetro.type = "checkbox";
 
 	let labelHasMetro = document.createElement("label");
 	labelHasMetro.appendChild(document.createTextNode("Has metro?"));
 
 	let stationHasRail = document.createElement("input");
-	stationHasRail.class = "srail";
+	stationHasRail.classList.add("srail");
 	stationHasRail.type = "checkbox";
 
 	let labelHasRail = document.createElement("label");
 	labelHasRail.appendChild(document.createTextNode("Has rail?"));
 
-	let cablecarFail = document.createElement("input");
-	cablecarFail.class = "scable";
-	cablecarFail.type = "checkbox";
+	let stationCablecarFail = document.createElement("input");
+	stationCablecarFail.classList.add("scable");
+	stationCablecarFail.type = "checkbox";
 
 	let labelCablecarFail = document.createElement("label");
 	labelCablecarFail.appendChild(document.createTextNode("Announce cablecar closure?"));
@@ -106,7 +106,7 @@ function newElement() {
 	container.appendChild(labelHasMetro);
 	container.appendChild(stationHasRail);
 	container.appendChild(labelHasRail);
-	container.appendChild(cablecarFail);
+	container.appendChild(stationCablecarFail);
 	container.appendChild(labelCablecarFail);
 	container.appendChild(document.createElement("br"));
 	
@@ -116,11 +116,22 @@ function newElement() {
 	document.getElementById("list").appendChild(container);
 
 	uniqueId++;
+
+	//return for editing
+	return [
+		stationCodeField,
+		stationNameField,
+		stationAudioField, 
+		stationsLinesField,
+		stationHasMetro,
+		stationHasRail,
+		stationCablecarFail
+	];
 }
 
-function removeElement(aid) {
-	console.debug("Removing "+aid);
-	document.getElementById("e"+aid).remove();
+function removeElement(aId) {
+	console.debug("Removing "+aId);
+	document.getElementById("e"+aId).remove();
 }
 
 function resetElements() {

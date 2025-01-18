@@ -12,8 +12,8 @@
 		<hr>
 		<p>
 			<strong>File operations</strong>
-			<button>Load annunciator</button>
-			<button>Save annunciator</button>
+			<button onclick="fileLoad()">Load annunciator</button>
+			<button onclick="fileSave()">Save annunciator</button>
 			<br>
 			<strong>Stations</strong>
 			<button onclick="resetElements()">Remove all</button>
@@ -23,6 +23,7 @@
 			<input type='text' id='annunciatorname' name='annunciatorname' placeholder='Name of annunciator'>
 			<input type='text' id='authorname' name='authorname' placeholder='Author of annunciator'>
 			<br>
+			<em>File format version: <span id="fmtver"></span></em>
 		</p>
 
 		<hr>
@@ -30,6 +31,8 @@
 		<div id="container">
 			<div id="static">
 				<strong>The .wav extension is added by default.</strong>
+				<br>
+				<em>Line list is comma-separated! Only numbers are allowed as line names. File paths are relative to simulation application.</em>
 				<br>
 			</div>
 			<div id="list">
@@ -39,5 +42,8 @@
 
 		<script src="js/Element.js"></script>
 		<script src="js/File.js"></script>
+		<script>
+			document.getElementById("fmtver").textContent = ANNUCIATOR_FILE_FORMAT_VERSION;
+		</script>
 	</body>
 </html>
