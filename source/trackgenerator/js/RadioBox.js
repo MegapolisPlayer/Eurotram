@@ -1,91 +1,53 @@
-class RadioBox {
-	xpos = 0;
-	ypos = 0;
-	height = 0;
+class RadioBox extends StandardPoint{
 	stationCode = "";
 
 	//we dont store value of switch - switch stores our value
 	//in simulator - when tram in 1-2 meter radius - sends signal
 	//1 radiobox may control multiple switches
 
-	constructor(axpos = 0, aypos = 0) {
-		this.xpos = axpos;
-		this.ypos = aypos;
+	constructor(axPos = 0, ayPos = 0) {
+		super(axPos, ayPos);
 	}
 
-	draw(style = "#800000") {
-		if(!this.willRender()) { return; }
-		console.log("radiobox draw");
-		canvasData.context.fillStyle = style;
-		canvasData.context.fillRect(
-			this.xpos - NODE_SIZE/2,
-			this.ypos - NODE_SIZE/2,
-		NODE_SIZE, NODE_SIZE);
-	}
-
-	collision(ax, ay) {
-		return (ax >= this.xpos-NODE_SIZE) &&
-			(ax <= this.xpos+NODE_SIZE) &&
-			(ay >= this.ypos-NODE_SIZE) &&
-			(ay <= this.ypos+NODE_SIZE);
-	}
-
-	willRender() {
-		return canvasIsInFrustum(
-			this.xpos - NODE_SIZE/2,
-			this.ypos - NODE_SIZE/2, 
-			NODE_SIZE, NODE_SIZE)
+	draw(aStyle = "#800000") {
+		abstractDrawPoint(aStyle, this);
 	}
 }
 
 let radioList = [];
 
-function radioEditMenu(aid) {
+function radioEditMenu(aID) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Editing radiobox "+aid));
+	canvasData.edit.appendChild(document.createTextNode("Editing radiobox "+aID));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenIdInput(aid);
+	addHiddenIdInput(aID);
 
-	addBasicEditInputs(radioList[aid]);
+	addBasicEditInputs(radioList[aID]);
 
 	let updateButton = document.createElement("button");
 	updateButton.appendChild(document.createTextNode("Update"));
-	updateButton.addEventListener("click", radioUpdate);
+	updateButton.addEventListener("click", () => {
+		let radioId = getIDFromInput();
+		getDataFromBasicInputs(radioList[radioId]);
+		canvasRedraw();
+	});
 	canvasData.edit.appendChild(updateButton);
 	
 	let removeButton = document.createElement("button");
 	removeButton.appendChild(document.createTextNode("Remove"));
-	removeButton.addEventListener("click", radioRemove);
-	canvasData.edit.appendChild(removeButton);
-}
-
-function radioUpdate() {
-	console.log("Updating radio...");
-
-	let radioId = Number(document.getElementById("idinput").value);
-
-	getDataFromBasicInputs(radioList[radioId]);
-
-	canvasRedraw();
-}
-
-function radioRemove() {
-	console.log("Removing radio...");
-
-	let radioId =  Number(document.getElementById("idinput").value);
-
-	//remove references of switches
-	nodeList.forEach((v) => {
-		if(v instanceof Switch) {
-			if(v.radioBoxId == radioId) {
-				v.radioBoxId = -1;
-			}
-		}
+	removeButton.addEventListener("click", () => {
+		removeFromListById(radioList, () => {
+			//remove references of switches
+			nodeList.forEach((v) => {
+				if(v instanceof Switch) {
+					if(v.radioBoxId == radioId) {
+						v.radioBoxId = -1;
+					}
+				}
+			});
+		});
 	});
-
-	nodeList.splice(radioId, 1);
-	canvasData.edit.replaceChildren();
-	canvasRedraw();
+	canvasData.edit.appendChild(removeButton);
 }

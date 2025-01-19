@@ -22,18 +22,18 @@ class Texparcel {
 
 	materialName = "";
 	
-	constructor(axpos = 0, aypos = 0, axsize = 0, aysize = 0, astationCode1 = "", astationCode2 = "", amaterialName = "") {
-		this.x1 = axpos-axsize/2;
-		this.y1 = aypos-aysize/2;
+	constructor(axPos = 0, ayPos = 0, axsize = 0, aysize = 0, astationCode1 = "", astationCode2 = "", amaterialName = "") {
+		this.x1 = axPos-axsize/2;
+		this.y1 = ayPos-aysize/2;
 
-		this.x2 = axpos+axsize/2;
-		this.y2 = aypos-aysize/2;
+		this.x2 = axPos+axsize/2;
+		this.y2 = ayPos-aysize/2;
 
-		this.x3 = axpos+axsize/2;
-		this.y3 = aypos+aysize/2;
+		this.x3 = axPos+axsize/2;
+		this.y3 = ayPos+aysize/2;
 
-		this.x4 = axpos-axsize/2;
-		this.y4 = aypos+aysize/2;
+		this.x4 = axPos-axsize/2;
+		this.y4 = ayPos+aysize/2;
 
 		this.stationCode1 = astationCode1;
 		this.stationCode2 = astationCode2;
@@ -42,7 +42,6 @@ class Texparcel {
 
 	draw() {
 		if(!this.willRender()) { return; }
-		console.log("texparcel draw");
 
 		canvasData.context.globalAlpha = 0.25;
 		
@@ -79,16 +78,16 @@ class Texparcel {
 		canvasData.context.globalAlpha = 1;
 	}
 
-	collision(ax, ay) {
+	collision(aX, aY) {
 		//check collision with small point in middle		
 
 		let avgX = (this.x1 + this.x2 + this.x3 + this.x4) / 4;
 		let avgY = (this.y1 + this.y2 + this.y3 + this.y4) / 4;
 
-		return (ax >= avgX-NODE_SIZE) &&
-			(ax <= avgX+NODE_SIZE) &&
-			(ay >= avgY-NODE_SIZE) &&
-			(ay <= avgY+NODE_SIZE);
+		return (aX >= avgX-NODE_SIZE) &&
+			(aX <= avgX+NODE_SIZE) &&
+			(aY >= avgY-NODE_SIZE) &&
+			(aY <= avgY+NODE_SIZE);
 	}
 
 	willRender() {
@@ -110,12 +109,12 @@ function renderTextureParcels() {
 	});
 }
 
-function texparcelAddMenu(ax, ay) {
-	canvasData.edit.appendChild(document.createTextNode("Setup texture parcel x = "+ax+", y = "+ay));
+function texparcelAddMenu(aX, aY) {
+	canvasData.edit.appendChild(document.createTextNode("Setup texture parcel x = "+aX+", y = "+aY));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addInput("tpxinput", ax, "hidden");
-	addInput("tpyinput", ay, "hidden");
+	addInput("tpxinput", aX, "hidden");
+	addInput("tpyinput", aY, "hidden");
 
 	canvasData.edit.appendChild(document.createTextNode("X Size: "));
 	addInput("tpwinput", 200, "number");
@@ -152,85 +151,75 @@ function texparcelMake() {
 	canvasData.edit.replaceChildren(); //clear AFTER getting values
 }
 
-function texparcelEditMenu(aid) {
+function texparcelEditMenu(aID) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Editing texture parcel "+aid));
+	canvasData.edit.appendChild(document.createTextNode("Editing texture parcel "+aID));
 	canvasData.edit.appendChild(document.createElement("br"));
-	addHiddenIdInput(aid);
+	addHiddenIdInput(aID);
 
 	canvasData.edit.appendChild(document.createTextNode("X1: "));
-	addInput("editx1input", texparcelList[aid].x1, "number");
+	addInput("editx1input", texparcelList[aID].x1, "number");
 	canvasData.edit.appendChild(document.createTextNode("Y1: "));
-	addInput("edity1input", texparcelList[aid].y1, "number");
+	addInput("edity1input", texparcelList[aID].y1, "number");
 	canvasData.edit.appendChild(document.createTextNode("H1: "));
-	addInput("edith1input", texparcelList[aid].h1, "number");
+	addInput("edith1input", texparcelList[aID].h1, "number");
 	canvasData.edit.appendChild(document.createTextNode("X2: "));
-	addInput("editx2input", texparcelList[aid].x2, "number");
+	addInput("editx2input", texparcelList[aID].x2, "number");
 	canvasData.edit.appendChild(document.createTextNode("Y2: "));
-	addInput("edity2input", texparcelList[aid].y2, "number");
+	addInput("edity2input", texparcelList[aID].y2, "number");
 	canvasData.edit.appendChild(document.createTextNode("H2: "));
-	addInput("edith2input", texparcelList[aid].h2, "number");
+	addInput("edith2input", texparcelList[aID].h2, "number");
 	canvasData.edit.appendChild(document.createTextNode("X3: "));
-	addInput("editx3input", texparcelList[aid].x3, "number");
+	addInput("editx3input", texparcelList[aID].x3, "number");
 	canvasData.edit.appendChild(document.createTextNode("Y3: "));
-	addInput("edity3input", texparcelList[aid].y3, "number");
+	addInput("edity3input", texparcelList[aID].y3, "number");
 	canvasData.edit.appendChild(document.createTextNode("H3: "));
-	addInput("edith3input", texparcelList[aid].h3, "number");
+	addInput("edith3input", texparcelList[aID].h3, "number");
 	canvasData.edit.appendChild(document.createTextNode("X4: "));
-	addInput("editx4input", texparcelList[aid].x4, "number");
+	addInput("editx4input", texparcelList[aID].x4, "number");
 	canvasData.edit.appendChild(document.createTextNode("Y4: "));
-	addInput("edity4input", texparcelList[aid].y4, "number");
+	addInput("edity4input", texparcelList[aID].y4, "number");
 	canvasData.edit.appendChild(document.createTextNode("H4: "));
-	addInput("edith4input", texparcelList[aid].h4, "number");
+	addInput("edith4input", texparcelList[aID].h4, "number");
 
 	canvasData.edit.appendChild(document.createTextNode("Station code 1: "));
-	addInputPlaceholder("editsc1input", texparcelList[aid].stationCode1, "text", "XXXX");
+	addInputPlaceholder("editsc1input", texparcelList[aID].stationCode1, "text", "XXXX");
 	canvasData.edit.appendChild(document.createTextNode("Station code 2: "));
-	addInputPlaceholder("editsc2input", texparcelList[aid].stationCode2, "text", "XXXX");
+	addInputPlaceholder("editsc2input", texparcelList[aID].stationCode2, "text", "XXXX");
 	canvasData.edit.appendChild(document.createTextNode("Material name: "));
-	addInputPlaceholder("editmatinput", texparcelList[aid].materialNames, "text", "Name of material");
+	addInputPlaceholder("editmatinput", texparcelList[aID].materialNames, "text", "Name of material");
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";
-	updateButton.addEventListener("click", texparcelUpdate);
+	updateButton.addEventListener("click", () => {
+		let tpId =  getIDFromInput();
+
+		texparcelList[tpId].x1 = Number(document.getElementById("editx1input").value);
+		texparcelList[tpId].x2 = Number(document.getElementById("editx2input").value);
+		texparcelList[tpId].x3 = Number(document.getElementById("editx3input").value);
+		texparcelList[tpId].x4 = Number(document.getElementById("editx4input").value);
+		texparcelList[tpId].y1 = Number(document.getElementById("edity1input").value);
+		texparcelList[tpId].y2 = Number(document.getElementById("edity2input").value);
+		texparcelList[tpId].y3 = Number(document.getElementById("edity3input").value);
+		texparcelList[tpId].y4 = Number(document.getElementById("edity4input").value);
+		texparcelList[tpId].h1 = Number(document.getElementById("edith1input").value);
+		texparcelList[tpId].h2 = Number(document.getElementById("edith2input").value);
+		texparcelList[tpId].h3 = Number(document.getElementById("edith3input").value);
+		texparcelList[tpId].h4 = Number(document.getElementById("edith4input").value);
+
+		texparcelList[tpId].stationCode1 = document.getElementById("editsc1input").value;
+		texparcelList[tpId].stationCode2 = document.getElementById("editsc2input").value;
+		texparcelList[tpId].materialName = document.getElementById("editmatinput").value;
+
+		canvasRedraw();
+	});
 	canvasData.edit.appendChild(updateButton);
 
 	let removeButton = document.createElement("button");
 	removeButton.textContent = "Remove";
-	removeButton.addEventListener("click", texparcelRemove);
+	removeButton.addEventListener("click", () => {
+		removeFromListById(texparcelList);
+	});
 	canvasData.edit.appendChild(removeButton);
-}
-function texparcelUpdate() {
-	console.log("Updating texparcel...");
-
-	let tpId =  Number(document.getElementById("idinput").value);
-
-	texparcelList[tpId].x1 = Number(document.getElementById("editx1input").value);
-	texparcelList[tpId].x2 = Number(document.getElementById("editx2input").value);
-	texparcelList[tpId].x3 = Number(document.getElementById("editx3input").value);
-	texparcelList[tpId].x4 = Number(document.getElementById("editx4input").value);
-	texparcelList[tpId].y1 = Number(document.getElementById("edity1input").value);
-	texparcelList[tpId].y2 = Number(document.getElementById("edity2input").value);
-	texparcelList[tpId].y3 = Number(document.getElementById("edity3input").value);
-	texparcelList[tpId].y4 = Number(document.getElementById("edity4input").value);
-	texparcelList[tpId].h1 = Number(document.getElementById("edith1input").value);
-	texparcelList[tpId].h2 = Number(document.getElementById("edith2input").value);
-	texparcelList[tpId].h3 = Number(document.getElementById("edith3input").value);
-	texparcelList[tpId].h4 = Number(document.getElementById("edith4input").value);
-
-	texparcelList[tpId].stationCode1 = document.getElementById("editsc1input").value;
-	texparcelList[tpId].stationCode2 = document.getElementById("editsc2input").value;
-	texparcelList[tpId].materialName = document.getElementById("editmatinput").value;
-
-	canvasRedraw();
-}
-function texparcelRemove() {
-	console.log("Removing texparcel...");
-
-	let tpId =  Number(document.getElementById("idinput").value);
-	texparcelList.splice(tpId, 1);
-	canvasData.edit.replaceChildren();
-
-	canvasRedraw();
 }

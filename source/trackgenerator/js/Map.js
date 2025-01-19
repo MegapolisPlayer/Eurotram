@@ -9,6 +9,10 @@ function scenarioClear() {
 	landmarkList.length = 0;
 	texparcelList.length = 0;
 	wallList.length = 0;
+	signList.length = 0;
+	stationPillarList.length = 0;
+	signalList.length = 0;
+	switchSignalList.length = 0;
 
 	currentMode = mode.VIEW;
 	canvasData.mode.textContent = "View";
@@ -141,8 +145,8 @@ function scenarioSerialize() {
 
 	//nodes
 	nodeList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 
 		numberValuesArray.push(...stationCodeToArray(v.stationCode));
@@ -151,8 +155,8 @@ function scenarioSerialize() {
 
 	//switch
 	switchList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...stationCodeToArray(v.stationCode));
 		
@@ -208,8 +212,8 @@ function scenarioSerialize() {
 
 	//switch signals
 	switchSignalList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
 		numberValuesArray.push(...stationCodeToArray(v.stationCode));
@@ -231,8 +235,8 @@ function scenarioSerialize() {
 			numberValuesArray.push(...JUNCTION_PRESIGNAL_BYTES);
 		}
 
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
 		numberValuesArray.push(...numberToByteArray(v.poleHeight, 2));
@@ -247,16 +251,16 @@ function scenarioSerialize() {
 
 	//radioboxes
 	radioList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...stationCodeToArray(v.stationCode));
 	});
 
 	//station pillars
 	stationPillarList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
 		numberValuesArray.push(...stationCodeToArray(v.stationCode));
@@ -264,8 +268,8 @@ function scenarioSerialize() {
 
 	//lightposts
 	lightList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
 		numberValuesArray.push(...stationCodeToArray(v.stationCode));
@@ -273,16 +277,16 @@ function scenarioSerialize() {
 
 	//trees
 	treeList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...stationCodeToArray(v.stationCode));
 	});
 
 	//buildings
 	buildingList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
 		numberValuesArray.push(v.type);
@@ -291,8 +295,8 @@ function scenarioSerialize() {
 
 	//landmarks
 	landmarkList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
 	});
@@ -314,8 +318,8 @@ function scenarioSerialize() {
 	});
 
 	signList.forEach((v) => {
-		numberValuesArray.push(...numberToByteArray(v.xpos, 4));
-		numberValuesArray.push(...numberToByteArray(v.ypos, 4));
+		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
+		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
 
@@ -359,80 +363,6 @@ function scenarioSerialize() {
 	let blob = new Blob([binaryArray], {type: "application/octet-stream"}); //arbitrary binary data
 
 	return blob;
-}
-
-//utils
-
-function readBytesAsNumber(aarrayref, abytes) {
-	let number = aarrayref.value.slice(0, abytes);
-
-	//add two's complement rule
-	//blank first bit, subtract 2^(abytes*8) at end
-	let hastwos = (number[number.length - 1] & 0b10000000) != 0;
-	if(hastwos) {
-		number[number.length - 1] &= 0b01111111;
-	}
-
-	number = number.map((v) => {
-		return Number(v).toString(16).padStart(2, '0');
-	});
-
-	number.reverse(); //convert from little endian encoding
-	number = parseInt(number.join(''), 16);
-
-	if(hastwos) {
-		number -= Math.pow(2, (abytes*8)-1);
-	}
-
-	aarrayref.value = aarrayref.value.slice(abytes);
-
-	return number;
-}
-
-function disregardBytes(aarrayref, abytes) {
-	aarrayref.value = aarrayref.value.slice(abytes);
-}
-
-function readBytesAsString(aarrayref, abytes) {
-	let string = aarrayref.value.slice(0, abytes);
-	string = string.filter((v) => {
-		return v != 0;
-	})
-	aarrayref.value = aarrayref.value.slice(abytes);
-	return String.fromCodePoint(...string);
-}
-
-//reads until null terminator found
-function readNullTerminatedString(aarrayref) {
-	let ntid = aarrayref.value.indexOf(0);
-	if(ntid <= 0) { 
-		aarrayref.value = aarrayref.value.slice(ntid+1);
-		return "";
-	} //empty string or no string
-
-	let string = aarrayref.value.slice(0, ntid);
-
-	string = String.fromCodePoint(...string);
-
-	aarrayref.value = aarrayref.value.slice(ntid+1); //to include NT
-	return string;
-}
-
-//X, Y position + height, writes values to object
-function readXYH(aarrayref, object) {
-	object.xpos = readBytesAsNumber(aarrayref, 4); //32bit
-	object.ypos = readBytesAsNumber(aarrayref, 4); //32bit
-	object.height = readBytesAsNumber(aarrayref, 4); //32bit
-}
-
-//read X,Y,H + rotation, writes values to object
-function readXYHR(aarrayref, object) {
-	readXYH(aarrayref, object);
-	object.rotation = readBytesAsNumber(aarrayref, 2); //16bit rotation
-}
-
-function readStationCode(aarrayref) {
-	return readBytesAsString(aarrayref, 4);
 }
 
 function scenarioDeserialize(afiledata) {
@@ -651,8 +581,8 @@ function scenarioDeserialize(afiledata) {
 	signList.length = 0;
 	for(let i = 0; i < amounts[12]; i++) {
 		signList.push(new Sign());
-		signList[i].xpos = readBytesAsNumber(numberArrayReference, 4);
-		signList[i].ypos = readBytesAsNumber(numberArrayReference, 4);
+		signList[i].xPos = readBytesAsNumber(numberArrayReference, 4);
+		signList[i].yPos = readBytesAsNumber(numberArrayReference, 4);
 		signList[i].height = readBytesAsNumber(numberArrayReference, 4);
 		signList[i].rotation = readBytesAsNumber(numberArrayReference, 2);
 		signList[i].stationCode = readStationCode(numberArrayReference);

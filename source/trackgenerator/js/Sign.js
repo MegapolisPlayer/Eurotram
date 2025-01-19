@@ -1,58 +1,28 @@
-class Sign {
-	xpos = 0;
-	ypos = 0;
-	height = 0;
-	rotation = 0;
+class Sign extends RotatedStandardPoint{
 	stationCode = 0;
 	type = 0;
 
-	constructor(axpos = 0, aypos = 0, arotation = 0, atype = 0, astationCode = "") {
-		this.xpos = axpos;
-		this.ypos = aypos;
-		this.rotation = arotation;
-		this.type = atype;
+	constructor(axPos = 0, ayPos = 0, aRotation = 0, aType = 0, astationCode = "") {
+		super(axPos, ayPos, aRotation);
+		this.type = aType;
 		this.stationCode = astationCode;
+		this.pointSizeX = NODE_SIZE;
+		this.pointSizeY = NODE_SIZE/2;
 	}
 
 	//same as station pillar - TODO abstract these functions at some point
 
-	draw(style = "#008000") {
-		if(!this.willRender()) { return; }
-		console.log("sign draw");
-
-		canvasData.context.translate(this.xpos, this.ypos);
-		canvasData.context.rotate(toRadians(this.rotation));
-		canvasData.context.translate(-NODE_SIZE/2,-NODE_SIZE/4);
-
-		canvasData.context.fillStyle = style;
-		canvasData.context.strokeStyle = SELECT_COLOR;
-
-		canvasData.context.fillRect(0, 0, NODE_SIZE, NODE_SIZE/2);
-
-		canvasData.context.lineWidth = LINE_WIDTH/2;
-		canvasData.context.beginPath();
-		canvasData.context.moveTo(0, NODE_SIZE/2-LINE_WIDTH/4);
-		canvasData.context.lineTo(NODE_SIZE, NODE_SIZE/2-LINE_WIDTH/4);
-		canvasData.context.stroke();
-		canvasData.context.lineWidth = LINE_WIDTH;
-
-		canvasData.context.translate(NODE_SIZE/2,NODE_SIZE/4);
-		canvasData.context.rotate(-toRadians(this.rotation));
-		canvasData.context.translate(-this.xpos, -this.ypos);
-	}
-
-	collision(ax, ay) {
-		return (ax >= this.xpos-NODE_SIZE) &&
-			(ax <= this.xpos+NODE_SIZE) &&
-			(ay >= this.ypos-NODE_SIZE) &&
-			(ay <= this.ypos+NODE_SIZE);
-	}
-
-	willRender() {
-		return canvasIsInFrustum(
-			this.xpos - NODE_SIZE/2,
-			this.ypos - NODE_SIZE/2, 
-			NODE_SIZE, NODE_SIZE)
+	draw(aStyle = "#008000") {
+		abstractDrawPoint(aStyle, this, () => {
+			canvasData.context.strokeStyle = SELECT_COLOR;
+		
+			canvasData.context.lineWidth = LINE_WIDTH/2;
+			canvasData.context.beginPath();
+			canvasData.context.moveTo(0, NODE_SIZE/2-LINE_WIDTH/4);
+			canvasData.context.lineTo(NODE_SIZE, NODE_SIZE/2-LINE_WIDTH/4);
+			canvasData.context.stroke();
+			canvasData.context.lineWidth = LINE_WIDTH;
+		});
 	}
 };
 
@@ -104,14 +74,14 @@ function makeSignTypeSelector() {
 	signTypeSelector.appendChild(document.createElement("br"));
 }
 
-function signSelectMenu(ax, ay) {
+function signSelectMenu(aX, aY) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Select sign type at pos x = "+ax+", y = "+ay));
+	canvasData.edit.appendChild(document.createTextNode("Select sign type at pos x = "+aX+", y = "+aY));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenInput("signxinput", ax);
-	addHiddenInput("signyinput", ay);
+	addHiddenInput("signxinput", aX);
+	addHiddenInput("signyinput", aY);
 
 	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
 	addInput("signrotinput", 0, "text");
@@ -125,40 +95,36 @@ function signSelectMenu(ax, ay) {
 
 	let makeButton = document.createElement("button");
 	makeButton.textContent = "Make sign";
-	makeButton.addEventListener("click", signMake);
+	makeButton.addEventListener("click", () => {
+		let x = Number(document.getElementById("signxinput").value);
+		let y = Number(document.getElementById("signyinput").value);
+		let r = Number(document.getElementById("signrotinput").value);
+		let type = Number(document.getElementById("signtypeinput").value);
+		let stationCode = document.getElementById("signcodeinput").value;
+		signList.push(new Sign(x, y, r, type, stationCode));
+		signList.at(-1).draw();
+		canvasData.edit.replaceChildren();
+	});
 	canvasData.edit.appendChild(makeButton);
 }
 
-function signMake() {
-	let x = Number(document.getElementById("signxinput").value);
-	let y = Number(document.getElementById("signyinput").value);
-	let r = Number(document.getElementById("signrotinput").value);
-	let type = Number(document.getElementById("signtypeinput").value);
-	let stationCode = document.getElementById("signcodeinput").value;
-
-	signList.push(new Sign(x, y, r, type, stationCode));
-	signList.at(-1).draw();
-
-	canvasData.edit.replaceChildren();
-}
-
-function signEditMenu(aid) {
+function signEditMenu(aID) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Editing signs "+aid));
+	canvasData.edit.appendChild(document.createTextNode("Editing sign "+aID));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenIdInput(aid);
+	addHiddenIdInput(aID);
 
-	addBasicEditInputs(signList[aid]);
+	addBasicEditInputs(signList[aID]);
 
 	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
-	addInput("editrotinput", signList[aid].rotation, "text");
+	addInput("editrotinput", signList[aID].rotation, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Current: "));
 	let updateBlock1 = document.createElement("span");
 	updateBlock1.id = "currentselected";
-	updateBlock1.textContent = getPropertyOfValue(signTypes, signList[aid].type);
+	updateBlock1.textContent = getPropertyOfValue(signTypes, signList[aID].type);
 	canvasData.edit.appendChild(updateBlock1);
 	canvasData.edit.appendChild(document.createElement("br"));
 
@@ -167,34 +133,20 @@ function signEditMenu(aid) {
 
 	let updateButton = document.createElement("button");
 	updateButton.appendChild(document.createTextNode("Update"));
-	updateButton.addEventListener("click", signUpdate);
+	updateButton.addEventListener("click", () => {
+		let signId = getIDFromInput();
+		getDataFromBasicInputs(signList[signId]);
+		signList[signId].rotation = Number(document.getElementById("editrotinput").value);
+		signList[signId].type = Number(document.getElementById("signtypeinput").value);
+		document.getElementById("currentselected").textContent = getPropertyOfValue(signTypes, signList[signId].type);
+		canvasRedraw();
+	});
 	canvasData.edit.appendChild(updateButton);
 
 	let removeButton = document.createElement("button");
 	removeButton.appendChild(document.createTextNode("Remove"));
-	removeButton.addEventListener("click", signRemove);
+	removeButton.addEventListener("click", () => {
+		removeFromListById(signList);
+	});
 	canvasData.edit.appendChild(removeButton);
-}
-
-function signUpdate() {
-	console.log("Updating sign...");
-
-	let signId = Number(document.getElementById("idinput").value);
-	getDataFromBasicInputs(signList[signId]);
-	signList[signId].rotation = Number(document.getElementById("editrotinput").value);
-	signList[signId].type = Number(document.getElementById("signtypeinput").value);
-
-	document.getElementById("currentselected").textContent = getPropertyOfValue(signTypes, signList[signId].type);
-
-	canvasRedraw();
-}
-
-function signRemove() {
-	console.log("Removing sign...");
-
-	let signId =  Number(document.getElementById("idinput").value);
-	signList.splice(signId, 1);
-	canvasData.edit.replaceChildren();
-
-	canvasRedraw();
 }

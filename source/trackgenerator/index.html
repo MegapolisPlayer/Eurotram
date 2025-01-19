@@ -17,17 +17,22 @@
 		<h1>Eurotram map and scenario editor</h1>
 		<em>(c) Martin/MegapolisPlayer 2024-2025</em>
 		<hr>
-		<strong>File</strong>
-		<button class="menubtn" onclick="fileLoad()">Load</button>
-		<button class="menubtn" onclick="fileSave()">Save</button>
-		<em>File operations</em>
+		<em>Current mode: </em><span id="curmode">View</span>
 		<br>
-		<strong>Scenario</strong>
-		<button class="menubtn" onclick="scenarioClear()">Clear everything</button>
+		<input type='text' id='scenarioname' name='scenarioname' placeholder='Name of scenario'>
+		<input type='text' id='authorname' name='authorname' placeholder='Author of scenario'>
+		<br>
+		<button class="menubtn" onclick="viewMode()">View mode</button>
+		<button class="menubtn" onclick="fileLoad()">Load file</button>
+		<button class="menubtn" onclick="fileSave()">Save file</button>
 		<button class="menubtn" onclick="newLineCreate()">Make new line</button>
-		<em>Scenario operations</em>
+		<button onclick="canvasZoomIn()">Zoom in</button>
+		<button onclick="canvasZoomOut()">Zoom out</button>
+		<button onclick="canvasZoomReset()">Reset zoom</button>
+		<button onclick="canvasPosReset()">Reset map position</button>
+		<button class="menubtn" onclick="trackRecalcAllHeightpoints()">Recalculate all track heights</button>
+		<button class="menubtn" onclick="scenarioClear()">Clear everything</button>
 		<br>
-		<strong>Add</strong>
 		<button class="menubtn" onclick="nodeAdd()">Node</button>
 		<button class="menubtn" onclick="switchAdd()">Switch</button>
 		<button class="menubtn" onclick="switchSignalAdd()">Switch signal</button>
@@ -43,28 +48,12 @@
 		<button class="menubtn" onclick="wallAdd()">Wall</button>
 		<button class="menubtn" onclick="signAdd()">Sign</button>
 		<button class="menubtn" onclick="landmarkAdd()">Landmark</button>
-		<em>Add new objects</em>
+		<button class="menubtn" onclick="textureParcelAdd()">Texparcel</button>
 		<br>
-		<strong>Edit or remove</strong>
 		<button class="menubtn" onclick="edit()">Edit/Remove</button>
 		<button class="menubtn" onclick="editTrack()">Edit/Remove track</button>
-		<em>Adjust existing objects</em>
+		<button class="menubtn" onclick="textureParcelEdit()">Edit/Remove texparcel</button>
 		<br>
-		<strong>Move map</strong>
-		<button class="menubtn" onclick="viewMode()">View mode</button>
-		<button onclick="canvasPosReset()">Reset map position</button>
-		<em>Move viewport</em>
-		<br>
-		<strong>Global operations</strong>
-		<button class="menubtn" onclick="trackRecalcAllHeightpoints()">Recalculate all track heights</button>
-		<em>Quick operations</em>
-		<br>
-		<strong>Texture parcels</strong>
-		<button class="menubtn" onclick="textureParcelAdd()">Add</button>
-		<button class="menubtn" onclick="textureParcelEdit()">Edit/Remove</button>
-		<em>Texture parcels are parts of the surface with a specific material.</em>
-		<br>
-		<em>Current mode: </em><span id="curmode">View</span>
 		<hr>
 		<div id="container">
 			<!-- under canvas -->
@@ -75,24 +64,11 @@
 				Canvas is not supported. Please use a different, newer browser.
 			</canvas>
 			<div id="editmenu">
-				Scenario name:
-				<input type='text' id='scenarioname' name='scenarioname' placeholder='Name of scenario'>
-				<br>
-				Author name: 
-				<input type='text' id='authorname' name='authorname' placeholder='Author of scenario'>
-				<br>
-
 				<span id="permeter"></span> units = 1 meter<br>
 
 				X offset = <span id="shiftx">0 (0m)</span><br>
 				Y offset = <span id="shifty">0 (0m)</span><br>
 				Scale = <span id="scale">1</span>x<br>
-
-				<button onclick="canvasZoomIn()">Zoom in</button>
-				<button onclick="canvasZoomOut()">Zoom out</button>
-				<button onclick="canvasZoomReset()">Reset zoom</button>
-
-				<br>
 
 				<input type="checkbox" id="hideter" name="hideter">
 				<label for="hideter">Hide texture parcels</label>
@@ -100,7 +76,6 @@
 				<input type="checkbox" id="hidemap" name="hidemap" onchange="toggleMap()">
 				<label for="hidemap">Hide map</label>
 				<br>
-
 				<hr>
 
 				<h2>Edit menu</h2>
@@ -175,6 +150,7 @@
 		integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
 		crossorigin=""></script>
 
+		<script src="js/Utils.js"></script>
 		<script src="js/ModeSet.js"></script>
 
 		<script src="js/Nodes.js"></script>

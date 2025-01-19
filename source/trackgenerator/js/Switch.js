@@ -1,7 +1,4 @@
-class Switch {
-	xpos = 0; //same as node, interchangable
-	ypos = 0;
-	height = 0;
+class Switch extends StandardPoint {
 	stationCode = "";
 	//switch cannot border 2 stations
 
@@ -14,70 +11,49 @@ class Switch {
 	signalId = -1;
 	signalLetter = '-';
 
-	constructor(axpos = 0, aypos = 0, astationCode = "") {
-		this.xpos = axpos;
-		this.ypos = aypos;
+	constructor(axPos = 0, ayPos = 0, astationCode = "") {
+		super(axPos, ayPos);
 		this.stationCode = astationCode;	
 	}
 
-	draw(style = "#aa6600") {
-		if(!this.willRender()) { return; }
-		console.log("switch draw");
-		canvasData.context.fillStyle = style;
-		canvasData.context.fillRect(
-			this.xpos - NODE_SIZE/2,
-			this.ypos - NODE_SIZE/2,
-		NODE_SIZE, NODE_SIZE);
-	}
-
-	collision(ax, ay) {
-		return (ax >= this.xpos-NODE_SIZE) &&
-			(ax <= this.xpos+NODE_SIZE) &&
-			(ay >= this.ypos-NODE_SIZE) &&
-			(ay <= this.ypos+NODE_SIZE);
-	}
-
-	willRender() {
-		return canvasIsInFrustum(
-			this.xpos - NODE_SIZE/2,
-			this.ypos - NODE_SIZE/2, 
-			NODE_SIZE, NODE_SIZE)
+	draw(aStyle = "#aa6600") {
+		abstractDrawPoint(aStyle, this);
 	}
 };
 
 let switchList = [];
 
-function switchEditMenu(aid) {
+function switchEditMenu(aID) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Editing switch no. "+aid));
+	canvasData.edit.appendChild(document.createTextNode("Editing switch no. "+aID));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenIdInput(aid);
+	addHiddenIdInput(aID);
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addBasicEditInputs(switchList[aid]);
+	addBasicEditInputs(switchList[aID]);
 	
 	canvasData.edit.appendChild(document.createTextNode("Before node id: "));
-	addInput(aid, switchList[aid].beforeId, "text");
+	addInput(aID, switchList[aID].beforeId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Front node id: "));
-	addInput(aid, switchList[aid].frontId, "text");
+	addInput(aID, switchList[aID].frontId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Left node id: "));
-	addInput(aid, switchList[aid].leftId, "text");
+	addInput(aID, switchList[aID].leftId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Right node id: "));
-	addInput(aid, switchList[aid].rightId, "text");
+	addInput(aID, switchList[aID].rightId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Radio box id: "));
-	addInput(aid, switchList[aid].radioBoxId, "text");
+	addInput(aID, switchList[aID].radioBoxId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Switch signal id: "));
-	addInput(aid, switchList[aid].signalId, "text");
+	addInput(aID, switchList[aID].signalId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Switch signal letter: "));
-	addInput(aid, switchList[aid].signalLetter, "text");
+	addInput(aID, switchList[aID].signalLetter, "text");
 
 	canvasData.edit.appendChild(document.createElement("hr"));
 
@@ -93,56 +69,39 @@ function switchEditMenu(aid) {
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";
-	updateButton.addEventListener("click", switchUpdate);
+	updateButton.addEventListener("click", () => {
+		//TODO check if switch doesnt self-reference
+		let switchId = getIDFromInput();
+		getDataFromBasicInputs(switchList[switchId]);
+		switchList[switchId].beforeId = Number(document.getElementById("editbefinput").value);
+		switchList[switchId].frontId = Number(document.getElementById("editfroinput").value);
+		switchList[switchId].leftId = Number(document.getElementById("editlefinput").value);
+		switchList[switchId].rightId = Number(document.getElementById("editriginput").value);
+		switchList[switchId].radioBoxId = Number(document.getElementById("editradinput").value);
+		switchList[switchId].signalId = Number(document.getElementById("editsiginput").value);
+		switchList[switchId].signalLetter = document.getElementById("editsiglinput").value;
+		canvasRedraw();
+	});
 	canvasData.edit.appendChild(updateButton);
 
 	let removeButton = document.createElement("button");
 	removeButton.textContent = "Remove switch";
-	removeButton.addEventListener("click", switchRemove);
+	removeButton.addEventListener("click", () => {
+		removeFromListById(switchList, (aID, aList) => {
+			trackList = trackList.filter((v, i) => {
+				return !((v.nodeIdFirst === aID && v.firstIsSwitch) || (v.nodeIdSecond === aID && v.secondIsSwitch));
+			});
+		
+			//shift track
+			trackList.forEach((v, i, a) => {
+				if(v.nodeIdFirst > aID && v.firstIsSwitch) {
+					a[i].nodeIdFirst--;
+				}
+				if(v.nodeIdSecond > aID && v.secondIsSwitch) {
+					a[i].nodeIdSecond--;
+				}
+			});
+		});
+	});
 	canvasData.edit.appendChild(removeButton);
-}
-
-function switchUpdate() {
-	console.log("Updating switch...");
-
-	let switchId =  Number(document.getElementById("idinput").value);
-
-	getDataFromBasicInputs(switchList[switchId]);
-
-	//TODO check if switch doesnt self-reference
-
-	switchList[switchId].beforeId = Number(document.getElementById("editbefinput").value);
-	switchList[switchId].frontId = Number(document.getElementById("editfroinput").value);
-	switchList[switchId].leftId = Number(document.getElementById("editlefinput").value);
-	switchList[switchId].rightId = Number(document.getElementById("editriginput").value);
-	switchList[switchId].radioBoxId = Number(document.getElementById("editradinput").value);
-	switchList[switchId].signalId = Number(document.getElementById("editsiginput").value);
-	switchList[switchId].signalLetter = document.getElementById("editsiglinput").value;
-
-	canvasRedraw();
-}
-
-function switchRemove() {
-	console.log("Removing switch and connected track");
-
-	let switchId = Number(document.getElementById("idinput").value);
-
-	trackList = trackList.filter((v, i) => {
-		return !((v.nodeIdFirst === switchId && v.firstIsSwitch) || (v.nodeIdSecond === switchId && v.secondIsSwitch));
-	});
-
-	//shift track
-	trackList.forEach((v, i, a) => {
-		if(v.nodeIdFirst > switchId && v.firstIsSwitch) {
-			a[i].nodeIdFirst--;
-		}
-		if(v.nodeIdSecond > switchId && v.secondIsSwitch) {
-			a[i].nodeIdSecond--;
-		}
-	});
-
-	switchList.splice(switchId, 1);
-	canvasData.edit.replaceChildren();
-
-	canvasRedraw();
 }

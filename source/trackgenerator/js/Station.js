@@ -1,100 +1,58 @@
-class StationPillar {
-	xpos = 0;
-	ypos = 0;
-	height = 0;
-	rotation = 0;
+class StationPillar extends RotatedStandardPoint {
 	stationCode = "";
 
 	//TODO support more types of pillars in the future release
 
-	constructor(axpos = 0, aypos = 0) {
-		this.xpos = axpos;
-		this.ypos = aypos;
+	constructor(axPos = 0, ayPos = 0) {
+		super(axPos, ayPos);
+		this.pointSizeX = NODE_SIZE;
+		this.pointSizeY = NODE_SIZE/2;
 	}
 
-	draw(style = "#aaaa00") {
-		if(!this.willRender()) { return; }
-		console.log("station pillar draw");
-
-		canvasData.context.translate(this.xpos, this.ypos);
-		canvasData.context.rotate(toRadians(this.rotation));
-		canvasData.context.translate(-NODE_SIZE/2,-NODE_SIZE/4);
+	draw(aStyle = "#aaaa00") {
+		abstractDrawPoint(aStyle, this, () => {
+			canvasData.context.strokeStyle = SELECT_COLOR;
 		
-		canvasData.context.fillStyle = style;
-		canvasData.context.strokeStyle = SELECT_COLOR;
-
-		canvasData.context.fillRect(0, 0, NODE_SIZE, NODE_SIZE/2);
-
-		canvasData.context.lineWidth = LINE_WIDTH/2;
-		canvasData.context.beginPath();
-		canvasData.context.moveTo(0, NODE_SIZE/2-LINE_WIDTH/4);
-		canvasData.context.lineTo(NODE_SIZE, NODE_SIZE/2-LINE_WIDTH/4);
-		canvasData.context.stroke();
-		canvasData.context.lineWidth = LINE_WIDTH;
-
-		canvasData.context.translate(NODE_SIZE/2,NODE_SIZE/4);
-		canvasData.context.rotate(-toRadians(this.rotation));
-		canvasData.context.translate(-this.xpos, -this.ypos);
-	}
-
-	collision(ax, ay) {
-		return (ax >= this.xpos-NODE_SIZE) &&
-			(ax <= this.xpos+NODE_SIZE) &&
-			(ay >= this.ypos-NODE_SIZE) &&
-			(ay <= this.ypos+NODE_SIZE);
-	}
-
-	willRender() {
-		return canvasIsInFrustum(
-			this.xpos - NODE_SIZE/2,
-			this.ypos - NODE_SIZE/2, 
-			NODE_SIZE, NODE_SIZE)
+			canvasData.context.lineWidth = LINE_WIDTH/2;
+			canvasData.context.beginPath();
+			canvasData.context.moveTo(0, NODE_SIZE/2-LINE_WIDTH/4);
+			canvasData.context.lineTo(NODE_SIZE, NODE_SIZE/2-LINE_WIDTH/4);
+			canvasData.context.stroke();
+			canvasData.context.lineWidth = LINE_WIDTH;
+		});
 	}
 }
 
 let stationPillarList = [];
 
-function stationPillarEditMenu(aid) {
+function stationPillarEditMenu(aID) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Editing station pillar "+aid));
+	canvasData.edit.appendChild(document.createTextNode("Editing station pillar "+aID));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenIdInput(aid);
+	addHiddenIdInput(aID);
 
-	addBasicEditInputs(stationPillarList[aid]);
+	addBasicEditInputs(stationPillarList[aID]);
 	canvasData.edit.appendChild(document.createTextNode("Rotation:"));
-	addInput("editrotinput", stationPillarList[aid].rotation, "number");
+	addInput("editrotinput", stationPillarList[aID].rotation, "number");
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";
-	updateButton.addEventListener("click", stationPillarUpdate);
+	updateButton.addEventListener("click", () => {
+		let spId =  getIDFromInput();
+		getDataFromBasicInputs(stationPillarList[spId]);
+		stationPillarList[spId].rotation = Number(document.getElementById("editrotinput").value);
+		canvasRedraw();
+	});
 	canvasData.edit.appendChild(updateButton);
 
 	let removeButton = document.createElement("button");
 	removeButton.textContent = "Remove";
-	removeButton.addEventListener("click", stationPillarRemove);
+	removeButton.addEventListener("click", () => {
+		removeFromListById(stationPillarList);
+	});
 	canvasData.edit.appendChild(removeButton);
-}
-
-function stationPillarUpdate() {
-	console.log("Updating station pillar...");
-
-	let spId =  Number(document.getElementById("idinput").value);
-
-	getDataFromBasicInputs(stationPillarList[spId]);
-	stationPillarList[spId].rotation = Number(document.getElementById("editrotinput").value);
-
-	canvasRedraw();
-}
-function stationPillarRemove() {
-	console.log("Removing station pillar...");
-
-	let spId =  Number(document.getElementById("idinput").value);
-	stationPillarList.splice(spId, 1);
-	canvasData.edit.replaceChildren();
-
-	canvasRedraw();
 }
 
 //uses some elements of track
@@ -107,59 +65,54 @@ class StationTrack extends Track {
 		this.stationCode = "";
 	}
 
-	draw(style = "#ff0000") {
-		super.draw(style); //style override
+	draw(aStyle = "#ff0000") {
+		super.draw(aStyle); //aStyle override
 	}
 }
 
 //IMPORTANT station tracks are saved in track list
 
-function stationTrackEditMenu(aid) {
+function stationTrackEditMenu(aID) {
 	canvasData.edit.replaceChildren();
 	
-	canvasData.edit.appendChild(document.createTextNode("Editing station track "+aid+" between"));
+	canvasData.edit.appendChild(document.createTextNode("Editing station track "+aID+" between"));
 
 	canvasData.edit.appendChild(document.createTextNode(
-		trackList[aid].firstIsSwitch ? " switch " : " node " + trackList[aid].nodeIdFirst
+		trackList[aID].firstIsSwitch ? " switch " : " node " + trackList[aID].nodeIdFirst
 	));
 
 	canvasData.edit.appendChild(document.createTextNode(
-		trackList[aid].secondIsSwitch ? " switch " : " node " + trackList[aid].nodeIdSecond
+		trackList[aID].secondIsSwitch ? " switch " : " node " + trackList[aID].nodeIdSecond
 	));
 
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenInput("idinput", aid);
+	addHiddenInput("idinput", aID);
 
 	canvasData.edit.appendChild(document.createTextNode("Station code: "));
-	addInputPlaceholder("editcodeinput", trackList[aid].stationCode, "text", "XXXX");
+	addInputPlaceholder("editcodeinput", trackList[aID].stationCode, "text", "XXXX");
 
-	addTrackEditInputs(trackList[aid], aid);
+	addTrackEditInputs(trackList[aID], aID);
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";
-	updateButton.addEventListener("click", stationTrackUpdate);
+	updateButton.addEventListener("click", () => {
+		let trackId = getIDFromInput();
+		trackList[trackId].stationCode = String(document.getElementById("editcodeinput").value);
+		getDataFromTrackInputs(trackList[trackId]);
+		canvasRedraw();
+		if(trackList[trackId].bezier) {
+			trackList[trackId].drawControlPts(); //draw only for edited track
+		}
+	});
 	canvasData.edit.appendChild(updateButton);
 
 	let removeButton = document.createElement("button");
 	removeButton.textContent = "Remove";
-	removeButton.addEventListener("click", trackRemove);
+	removeButton.addEventListener("click", () => {
+		removeFromListById(trackList);
+	});
 	canvasData.edit.appendChild(removeButton);
-}
-
-function stationTrackUpdate() {
-	console.log("Updating station track...");
-
-	let trackId = Number(document.getElementById("idinput").value);
-	trackList[trackId].stationCode = String(document.getElementById("editcodeinput").value);
-
-	getDataFromTrackInputs(trackList[trackId]);
-
-	canvasRedraw();
-
-	if(trackList[trackId].bezier) {
-		trackList[trackId].drawControlPts(); //draw only for edited track
-	}
 }
 
 //removing is done by track function
@@ -195,13 +148,13 @@ let stationPlatformType = {
 };
 
 class StationPlatform {
-	xpos = 0;
-	ypos = 0;
+	xPos = 0;
+	yPos = 0;
 }
 
 let stationPlatformList = [];
 
-function stationPlatformEditMenu(aid) {
+function stationPlatformEditMenu(aID) {
 	
 }
 */

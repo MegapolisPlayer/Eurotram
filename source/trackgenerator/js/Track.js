@@ -29,15 +29,14 @@ class Track {
 		this.recalculateHeightpoints();	
 	}
 
-	draw(style = "#aaaaaa") {
+	draw(aStyle = "#aaaaaa") {
 		let point1 = this.firstIsSwitch ? switchList[this.nodeIdFirst] : nodeList[this.nodeIdFirst];
 		let point2 = this.secondIsSwitch ? switchList[this.nodeIdSecond] : nodeList[this.nodeIdSecond];
 
 		if(point1.willRender() || point2.willRender()) {
-			console.log("track draw");
-			canvasData.context.strokeStyle = style;
+			canvasData.context.strokeStyle = aStyle;
 			canvasData.context.beginPath();
-			canvasData.context.moveTo(point1.xpos, point1.ypos);
+			canvasData.context.moveTo(point1.xPos, point1.yPos);
 
 			if(this.bezier) {
 				canvasData.context.bezierCurveTo(
@@ -48,15 +47,15 @@ class Track {
 					this.controlPoint2.x,
 					this.controlPoint2.y,
 					//end point
-					point2.xpos,
-					point2.ypos
+					point2.xPos,
+					point2.yPos
 				);
 				canvasData.context.stroke();
 			}
 			else {
 				canvasData.context.lineTo(
-					point2.xpos,
-					point2.ypos
+					point2.xPos,
+					point2.yPos
 				);
 				canvasData.context.stroke();
 			}
@@ -64,10 +63,9 @@ class Track {
 		else return;
 	}
 
-	drawControlPts(style = "#bbbbbb") {
+	drawControlPts(aStyle = "#bbbbbb") {
 		if(nodeList[this.nodeIdFirst].willRender() || nodeList[this.nodeIdSecond].willRender()) {
-			console.log("track ctl draw");
-			canvasData.context.fillStyle = style;
+			canvasData.context.fillStyle = aStyle;
 
 			canvasData.context.fillRect(
 				this.controlPoint1.x - NODE_SIZE/2,
@@ -86,14 +84,14 @@ class Track {
 		let point1 = this.firstIsSwitch ? switchList[this.nodeIdFirst] : nodeList[this.nodeIdFirst];
 		let point2 = this.secondIsSwitch ? switchList[this.nodeIdSecond] : nodeList[this.nodeIdSecond];
 
-		console.log(point1, point2);
+		//console.log(point1, point2);
 
 		let stepHeightDelta = (point2.height-point1.height)/TRACK_HEIGHTPOINTS_AMOUNT;
 		for(let i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
 			//divide by delta for each p
 			this.heightpoints.push(point1.height + stepHeightDelta*i);
 		}
-		console.log("HghtPts "+this.heightpoints);
+		//console.log("HghtPts "+this.heightpoints);
 	}
 
 	recalculateCP() {
@@ -103,8 +101,8 @@ class Track {
 		let point1 = this.firstIsSwitch ? switchList[this.nodeIdFirst] : nodeList[this.nodeIdFirst];
 		let point2 = this.secondIsSwitch ? switchList[this.nodeIdSecond] : nodeList[this.nodeIdSecond];
 
-		this.controlPoint1.x = (point1.xpos+point2.xpos)/2;
-		this.controlPoint1.y = (point1.ypos+point2.ypos)/2;
+		this.controlPoint1.x = (point1.xPos+point2.xPos)/2;
+		this.controlPoint1.y = (point1.yPos+point2.yPos)/2;
 
 		this.controlPoint2.x = this.controlPoint1.x;
 		this.controlPoint2.y = this.controlPoint1.y;
@@ -119,82 +117,67 @@ function trackRecalcAllHeightpoints() {
 	});
 }
 
-function trackEditMenu(aid) {
+function trackEditMenu(aID) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Editing track "+aid+" between"));
+	canvasData.edit.appendChild(document.createTextNode("Editing track "+aID+" between"));
 
 	canvasData.edit.appendChild(document.createTextNode(
-		trackList[aid].firstIsSwitch ? " switch " : " node " + trackList[aid].nodeIdFirst
+		trackList[aID].firstIsSwitch ? " switch " : " node " + trackList[aID].nodeIdFirst
 	));
 	canvasData.edit.appendChild(document.createTextNode(
-		trackList[aid].secondIsSwitch ? " switch " : " node " + trackList[aid].nodeIdSecond
+		trackList[aID].secondIsSwitch ? " switch " : " node " + trackList[aID].nodeIdSecond
 	));
 
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenIdInput(aid);
+	addHiddenIdInput(aID);
 
-	addTrackEditInputs(trackList[aid], aid);
+	addTrackEditInputs(trackList[aID], aID);
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";
-	updateButton.addEventListener("click", trackUpdate);
+	updateButton.addEventListener("click", () => {
+		let trackId = getIDFromInput();
+		getDataFromTrackInputs(trackList[trackId]);
+		canvasRedraw();
+		if(trackList[trackId].bezier) {
+			trackList[trackId].drawControlPts(); //draw only for edited track
+		}
+	});
 	canvasData.edit.appendChild(updateButton);
 
 	let removeButton = document.createElement("button");
 	removeButton.textContent = "Remove";
-	removeButton.addEventListener("click", trackRemove);
+	removeButton.addEventListener("click", () => {
+		removeFromListById(trackList);
+	});
 	canvasData.edit.appendChild(removeButton);
 }
 
-function trackEditMoveCP2toCP1(aid) {
+function trackEditMoveCP2toCP1(aID) {
 	//move control pt 2 to ct 1 - when we only want to have single control point
 
-	trackList[aid].controlPoint1.x = Number(document.getElementById("editcp1xinput").value);
-	trackList[aid].controlPoint1.y = Number(document.getElementById("editcp1yinput").value);
+	trackList[aID].controlPoint1.x = Number(document.getElementById("editcp1xinput").value);
+	trackList[aID].controlPoint1.y = Number(document.getElementById("editcp1yinput").value);
 
-	trackList[aid].controlPoint2.x = trackList[aid].controlPoint1.x;
-	trackList[aid].controlPoint2.y = trackList[aid].controlPoint1.y;
-
-	canvasRedraw();
-
-	trackList[aid].drawControlPts();
-
-	document.getElementById("editcp2xinput").value = trackList[aid].controlPoint2.x;
-	document.getElementById("editcp2yinput").value = trackList[aid].controlPoint2.y;
-}
-
-function trackEditRecalcHeight(aid) {
-	trackList[aid].recalculateHeightpoints();
-}
-
-function trackEditRecalcCP(aid) {
-	trackList[aid].recalculateCP();
-	canvasRedraw();
-	trackList[aid].drawControlPts();
-}
-
-function trackUpdate() {
-	console.log("Updating track...");
-
-	let trackId = Number(document.getElementById("idinput").value);
-
-	getDataFromTrackInputs(trackList[trackId]);
+	trackList[aID].controlPoint2.x = trackList[aID].controlPoint1.x;
+	trackList[aID].controlPoint2.y = trackList[aID].controlPoint1.y;
 
 	canvasRedraw();
 
-	if(trackList[trackId].bezier) {
-		trackList[trackId].drawControlPts(); //draw only for edited track
-	}
+	trackList[aID].drawControlPts();
+
+	document.getElementById("editcp2xinput").value = trackList[aID].controlPoint2.x;
+	document.getElementById("editcp2yinput").value = trackList[aID].controlPoint2.y;
 }
 
-function trackRemove() {
-	console.log("Removing track...");
+function trackEditRecalcHeight(aID) {
+	trackList[aID].recalculateHeightpoints();
+}
 
-	let trackId = Number(document.getElementById("idinput").value);
-	trackList.splice(trackId, 1);
-	canvasData.edit.replaceChildren();
-
+function trackEditRecalcCP(aID) {
+	trackList[aID].recalculateCP();
 	canvasRedraw();
+	trackList[aID].drawControlPts();
 }

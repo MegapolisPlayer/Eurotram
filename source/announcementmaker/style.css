@@ -2,7 +2,17 @@ html, body {
 	font-family: sans-serif;
 	margin: 0;
 	width: 100%;
-	background-color: #cccccc;
+	background-color: #444444;
+	color: #ffffff;
+}
+
+button {
+	border: none;
+}
+
+button:hover {
+	background-color: #00aaaa;
+	color: #ffffff;
 }
 
 #container {
@@ -15,16 +25,16 @@ html, body {
 }
 
 #static {
-	border-left: 1px solid #000000;
-	border-right: 1px solid #000000;
+	border-left: 1px solid #ffffff;
+	border-right: 1px solid #ffffff;
 	min-height: 20vh;
 	width: 50vw;
 	text-align: center;
 }
 
 #list {
-	border-left: 1px solid #000000;
-	border-right: 1px solid #000000;
+	border-left: 1px solid #ffffff;
+	border-right: 1px solid #ffffff;
 	width: 50vw;
 	text-align: center;
 }

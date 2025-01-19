@@ -1,71 +1,50 @@
-const LIGHT_LENGTH = 40;
+const LIGHT_LENGTH = 60;
 
-function toRadians(degrees) {
-	return degrees * Math.PI / 180.0;
-}
-
-class Light {
-	xpos = 0;
-	ypos = 0;
-	height = 0;
-	rotation = 0;	
+class Light extends RotatedStandardPoint {	
 	stationCode = "";
 
-	constructor(axpos = 0, aypos = 0) {
-		this.xpos = axpos;
-		this.ypos = aypos;
+	constructor(axPos = 0, ayPos = 0) {
+		super(axPos, ayPos);
 	}
 
-	draw(style = "#808080") {
-		if(!this.willRender()) { return; }
-		console.log("draw light");
+	draw(aStyle = "#808080") {
+		abstractDrawPoint(aStyle, this, () => {
+			canvasData.context.strokeStyle = aStyle;
 
-		canvasData.context.fillStyle = style;
-		canvasData.context.strokeStyle = style;
-
-		canvasData.context.beginPath();
-
-		canvasData.context.moveTo(
-			this.xpos,
-			this.ypos
-		);
-
-		let endX = this.xpos + (LIGHT_LENGTH * Math.sin(toRadians(this.rotation)));
-		let endY = this.ypos + (LIGHT_LENGTH * Math.cos(toRadians(this.rotation)));
-
-		canvasData.context.lineTo(endX, endY);
-
-		canvasData.context.stroke();
-
-		canvasData.context.fillRect(
-			endX - NODE_SIZE/2,
-			endY - NODE_SIZE/2,
-		NODE_SIZE, NODE_SIZE);
+			canvasData.context.beginPath();
+			canvasData.context.moveTo(NODE_SIZE/2, 0);
+			canvasData.context.lineTo(NODE_SIZE/2, LIGHT_LENGTH);
+			canvasData.context.stroke();
+	
+			canvasData.context.fillRect(
+				0, LIGHT_LENGTH-NODE_SIZE/2,
+				NODE_SIZE, NODE_SIZE);
+		}, true);
 	}
 
-	collision(ax, ay) {
-		let endX = this.xpos + (LIGHT_LENGTH * Math.sin(toRadians(this.rotation)));
-		let endY = this.ypos + (LIGHT_LENGTH * Math.cos(toRadians(this.rotation)));
+	collision(aX, aY) {
+		let endX = this.xPos + (LIGHT_LENGTH * Math.sin(toRadians(this.rotation)));
+		let endY = this.yPos + (LIGHT_LENGTH * Math.cos(toRadians(this.rotation)));
 
 		//hitbox larger than box itself so it is easier to click on it
 		//consider both "nodes" (start, end)
 		return (
-		((ax >= endX-NODE_SIZE) &&
-		(ax <= endX+NODE_SIZE) &&
-		(ay >= endY-NODE_SIZE) &&
-		(ay <= endY+NODE_SIZE)) ||
-		((ax >= this.xpos-NODE_SIZE) &&
-		(ax <= this.xpos+NODE_SIZE) &&
-		(ay >= this.ypos-NODE_SIZE) &&
-		(ay <= this.ypos+NODE_SIZE))
+		((aX >= endX-NODE_SIZE) &&
+		(aX <= endX+NODE_SIZE) &&
+		(aY >= endY-NODE_SIZE) &&
+		(aY <= endY+NODE_SIZE)) ||
+		((aX >= this.xPos-NODE_SIZE) &&
+		(aX <= this.xPos+NODE_SIZE) &&
+		(aY >= this.yPos-NODE_SIZE) &&
+		(aY <= this.yPos+NODE_SIZE))
 		);
 	}
 
 	willRender() {
 		//check rectangle around lamp
 
-		let minX = this.xpos;
-		let minY = this.ypos;
+		let minX = this.xPos;
+		let minY = this.yPos;
 
 		let sizeX = (LIGHT_LENGTH * Math.sin(toRadians(this.rotation)));
 		let sizeY = (LIGHT_LENGTH * Math.cos(toRadians(this.rotation)));
@@ -88,48 +67,34 @@ class Light {
 
 lightList = [];
 
-function lightEditMenu(aid) {
+function lightEditMenu(aID) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Editing light "+aid));
+	canvasData.edit.appendChild(document.createTextNode("Editing light "+aID));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenIdInput(aid);
+	addHiddenIdInput(aID);
 
-	addBasicEditInputs(lightList[aid]);
+	addBasicEditInputs(lightList[aID]);
 
 	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
 
-	addInput("editrotinput", lightList[aid].rotation, "text");
+	addInput("editrotinput", lightList[aID].rotation, "text");
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";
-	updateButton.addEventListener("click", lightUpdate);
+	updateButton.addEventListener("click", () => {
+		let lightId = getIDFromInput();
+		getDataFromBasicInputs(lightList[lightId]);
+		lightList[lightId].rotation = Number(document.getElementById("editrotinput").value);
+		canvasRedraw();
+	});
 	canvasData.edit.appendChild(updateButton);
 
 	let removeButton = document.createElement("button");
 	removeButton.textContent = "Remove";
-	removeButton.addEventListener("click", lightRemove);
+	removeButton.addEventListener("click", () => {
+		removeFromListById(lightList);
+	});
 	canvasData.edit.appendChild(removeButton);
-}
-
-function lightUpdate() {
-	console.log("Updating light...");
-
-	let lightId = Number(document.getElementById("idinput").value);
-
-	getDataFromBasicInputs(lightList[lightId]);
-	lightList[lightId].rotation = Number(document.getElementById("editrotinput").value);
-
-	canvasRedraw();
-}
-
-function lightRemove() {
-	console.log("Remove light...");
-
-	let lightId = Number(document.getElementById("idinput").value);
-	lightList.splice(lightId, 1);
-	canvasData.edit.replaceChildren();
-
-	canvasRedraw();
 }

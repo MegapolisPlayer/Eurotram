@@ -21,13 +21,6 @@ let canvasData = {
 	canvasmenu: null,
 };
 
-function getPoint(aevent) {
-	return canvasData.context.getTransform().invertSelf().transformPoint(new DOMPoint(
-		Math.trunc(aevent.pageX - aevent.target.offsetLeft),
-		Math.trunc(aevent.pageY - aevent.target.offsetTop)
-	));
-}
-
 function hideCanvas() {
 	canvasData.hidden = true;
 	document.getElementById("main").style.setProperty("display", "none");
@@ -40,14 +33,14 @@ function showCanvas() {
 	document.getElementById("lowerbg").style.setProperty("display", "block");
 }
 
-function onclickHandler(aevent) {
+function onclickHandler(aEvent) {
 	//early exits
 	if(canvasData.hidden) return;
 	if(currentMode === mode.VIEW) { return; }
 
 	//here inverse since if scene moved to right we move to left (and same with Y axis)
 	//also this is easier than calculating transformations by hand (again)
-	let p = getPoint(aevent);
+	let p = getPoint(aEvent);
     let x = p.x;
     let y = p.y;
 
@@ -59,7 +52,6 @@ function onclickHandler(aevent) {
 	NODE_SIZE, NODE_SIZE);
 	*/
 
-	console.log("Click "+x+" "+y);
 	switch(currentMode) {
 		case(mode.VIEW):
 			break; //handled in early exit, here for completeness sake
@@ -225,7 +217,6 @@ let dragEnabled = false;
 
 function dragStartHandler(event) {
 	if(canvasData.hidden) return;
-	console.log("Dragging...");
 	dragStartX = Math.trunc(event.pageX - event.target.offsetLeft);
 	dragStartY = Math.trunc(event.pageY - event.target.offsetTop);
 	dragEnabled = true;
@@ -247,8 +238,6 @@ function dragHandler(event) {
 	canvasData.shiftX += dx;
 	canvasData.shiftY += dy;
 
-	console.log("Drag "+canvasData.shiftX+" "+canvasData.shiftY);
-
 	dragStartX = Math.trunc(event.pageX - event.target.offsetLeft);
 	dragStartY = Math.trunc(event.pageY - event.target.offsetTop);
 	canvasRedraw();
@@ -257,7 +246,6 @@ function dragEndHandler(event) {
 	if(canvasData.hidden) return;
 	dragStartX = 0;
 	dragStartY = 0;
-	console.log("Drag ended at "+canvasData.shiftX+" "+canvasData.shiftY);
 	dragEnabled = false;
 }
 
@@ -297,26 +285,17 @@ function canvasRedraw(aNoTPOverride = false) {
 	canvasData.scaleOut.replaceChildren(document.createTextNode(canvasData.scale));
 }
 
-function getColliding(alist, ax, ay) {
-	for(let i = 0; i < alist.length; i++) {
-		if(alist[i].collision(ax, ay)) {
-			return i;
-		}
-	}
-	return -1;
-}
-
 //params: x,y pos + x,y size
 //returns false if outside frustum (therefore shouldnt be rendered)
 //scale offset * scale - why does this work?
-function canvasIsInFrustum(ax, ay, asx, asy) {
+function canvasIsInFrustum(aX, aY, asx, asy) {
 	return true;
 	/*
 	return !(
-		(ax + canvasData.shiftX + asx < 0) ||
-		(ay + canvasData.shiftY + asy < 0) ||
-		(canvasData.shiftX + ax > (canvasData.element.width * (1.0/canvasData.scale))) ||
-		(canvasData.shiftY + ay > (canvasData.element.height * (1.0/canvasData.scale)))
+		(aX + canvasData.shiftX + asx < 0) ||
+		(aY + canvasData.shiftY + asy < 0) ||
+		(canvasData.shiftX + aX > (canvasData.element.width * (1.0/canvasData.scale))) ||
+		(canvasData.shiftY + aY > (canvasData.element.height * (1.0/canvasData.scale)))
 	);
 	*/
 }
@@ -365,7 +344,6 @@ function canvasInit() {
 
 //TODO remove code duplication in update, edit menu and remove functions
 //TODO add utils for creating buttons
-//TODO make separate Utils.js and move everything there!
 //TODO fix GUI of app
 //TODO enforce coding conventions
 //TODO abstract translations in draw calls

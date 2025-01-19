@@ -6,10 +6,10 @@ function fileLoad() {
 	input.type = "file";
 	input.accept = ".etmap";
 
-	input.addEventListener("change", (e) => {
+	input.addEventListener("change", (aEvent) => {
 		let fileread = new FileReader();
-		fileread.addEventListener("loadend", (e) => {
-			scenarioDeserialize(e.target.result);
+		fileread.addEventListener("loadend", (aEvent) => {
+			scenarioDeserialize(aEvent.target.result);
 		});
 		fileread.readAsArrayBuffer(input.files[0]);
 	});

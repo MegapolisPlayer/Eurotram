@@ -1,82 +1,52 @@
 const TREE_RADIUS = 40;
 
-class Tree {
-	xpos = 0;
-	ypos = 0;
-	height = 0;
+class Tree extends StandardPoint {
 	stationCode = "";
 
-	constructor(axpos = 0, aypos = 0) {
-		this.xpos = axpos;
-		this.ypos = aypos;
+	constructor(axPos = 0, ayPos = 0) {
+		super(axPos, ayPos);
+		this.pointSizeX = TREE_RADIUS*2;
+		this.pointSizeY = TREE_RADIUS*2;
 	}
 
-	draw(style = "#00ff00") {
-		if(!this.willRender()) { return; }
-		console.log("tree draw");
-		canvasData.context.fillStyle = style;
-		canvasData.context.beginPath();
-		canvasData.context.arc(
-			this.xpos,
-			this.ypos,
-			TREE_RADIUS, 0, 2*Math.PI
-		);
-		canvasData.context.fill();
-	}
-
-	collision(ax, ay) {
-		return (ax >= this.xpos-TREE_RADIUS) &&
-			(ax <= this.xpos+TREE_RADIUS) &&
-			(ay >= this.ypos-TREE_RADIUS) &&
-			(ay <= this.ypos+TREE_RADIUS);
-	}
-
-	willRender() {
-		return canvasIsInFrustum(
-			this.xpos - TREE_RADIUS,
-			this.ypos - TREE_RADIUS, 
-			TREE_RADIUS*2, TREE_RADIUS*2)
+	draw(aStyle = "#00ff00") {
+		abstractDrawPoint(aStyle, this, () => {
+			canvasData.context.beginPath();
+			canvasData.context.arc(
+				TREE_RADIUS,
+				TREE_RADIUS,
+				TREE_RADIUS, 0, 2*Math.PI
+			);
+			canvasData.context.fill();
+		}, true);
 	}
 };
 
 let treeList = [];
 
-function treeEditMenu(aid) {
+function treeEditMenu(aID) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Editing tree no. "+aid));
+	canvasData.edit.appendChild(document.createTextNode("Editing tree no. "+aID));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenIdInput(aid);
+	addHiddenIdInput(aID);
 
-	addBasicEditInputs(treeList[aid]);
+	addBasicEditInputs(treeList[aID]);
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";
-	updateButton.addEventListener("click", treeUpdate);
+	updateButton.addEventListener("click", () => {
+		let treeId = getIDFromInput();
+		getDataFromBasicInputs(treeList[treeId]);
+		canvasRedraw();
+	});
 	canvasData.edit.appendChild(updateButton);
 
 	let removeButton = document.createElement("button");
 	removeButton.textContent = "Remove";
-	removeButton.addEventListener("click", treeRemove);
+	removeButton.addEventListener("click", () => {
+		removeFromListById(treeList);
+	});
 	canvasData.edit.appendChild(removeButton);
-}
-
-function treeUpdate() {
-	console.log("Updating tree...");
-
-	let treeId = Number(document.getElementById("idinput").value);
-	getDataFromBasicInputs(treeList[treeId]);
-
-	canvasRedraw();
-}
-
-function treeRemove() {
-	console.log("Updating tree...");
-
-	let treeId = Number(document.getElementById("idinput").value);
-	treeList.splice(treeId, 1);
-	canvasData.edit.replaceChildren();
-
-	canvasRedraw();
 }

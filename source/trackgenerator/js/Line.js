@@ -49,30 +49,21 @@ function lineUndo() {
 	}
 }
 
-function lineAddOnClick(aevent) {
-	let p = getPoint(aevent);
+function lineAddOnClick(aEvent) {
+	let p = getPoint(aEvent);
 	let x = p.x;
 	let y = p.y;
 
-	console.log("Line edit click!");
-
 	let value = getColliding(nodeList, x, y);
 	let isSwitch = false;
-	console.log(value);
 	if(value === -1) {
 		value = getColliding(switchList, x, y);
-		console.log(value);
 		if(value === -1) {
 			//nothing added - still redraw
-			console.log("LM - nothing clicked");
 			lineRedrawSelected();
 			return;
 		}
-		console.log("LM - clicked switch");
 		isSwitch = true;
-	}
-	else {
-		console.log("LM - clicked node");
 	}
 
 	//find and add new track
@@ -277,8 +268,8 @@ function lineFinalize() {
 		minsFromPrev.min = 0;
 		minsFromPrev.setAttribute("value", v.t);
 		minsFromPrev.setAttribute("_id", i);
-		minsFromPrev.addEventListener("change", (e) => {
-			stationTimes[Number(e.target.getAttribute("_id"))].t = Number(e.target.value);
+		minsFromPrev.addEventListener("change", (aEvent) => {
+			stationTimes[Number(aEvent.target.getAttribute("_id"))].t = Number(aEvent.target.value);
 		});
 		df.appendChild(minsFromPrev);
 		df.appendChild(document.createElement("br"));
@@ -291,8 +282,8 @@ function lineFinalize() {
 		minsInStation.min = 0;
 		minsInStation.setAttribute("value", v.m);
 		minsInStation.setAttribute("_id", i);
-		minsInStation.addEventListener("change", (e) => {
-			stationTimes[Number(e.target.getAttribute("_id"))].m = Number(e.target.value);
+		minsInStation.addEventListener("change", (aEvent) => {
+			stationTimes[Number(aEvent.target.getAttribute("_id"))].m = Number(aEvent.target.value);
 		});
 		df.appendChild(minsInStation);
 		df.appendChild(document.createElement("br"));
@@ -305,8 +296,8 @@ function lineFinalize() {
 			controlPoint.setAttribute("checked", "");
 		}
 		controlPoint.setAttribute("_id", i);
-		controlPoint.addEventListener("change", (e) => {
-			stationTimes[Number(e.target.getAttribute("_id"))].c = e.target.checked;
+		controlPoint.addEventListener("change", (aEvent) => {
+			stationTimes[Number(aEvent.target.getAttribute("_id"))].c = aEvent.target.checked;
 		});
 		df.appendChild(controlPoint);
 		df.appendChild(document.createElement("br"));
@@ -322,7 +313,7 @@ function lineFinalize() {
 
 	let totdurrbtn = document.createElement("button");
 	totdurrbtn.textContent = "Recalculate";
-	totdurrbtn.addEventListener("click", (e) => {
+	totdurrbtn.addEventListener("click", (aEvent) => {
 		document.getElementById("totdur").textContent = String(
 			stationTimes.map(v =>v.t).reduce((p, c) => p + c) +
 			stationTimes.map(v => v.m).reduce((p, c) => p + c) 

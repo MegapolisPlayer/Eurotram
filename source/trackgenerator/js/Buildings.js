@@ -5,20 +5,13 @@ let buildingType = {
 	PREFAB: 3
 };
 
-class Building {
-	xpos = 0;
-	ypos = 0;
-	height = 0;
-	rotation = 0;
-	xsize = 0;
-	ysize = 0;
+class Building extends RotatedStandardBigPoint {
 	type = 0;
 	stationCode = "";
 
-	constructor(axpos = 0, aypos = 0, atype = 0, astationCode = "") {
-		this.xpos = axpos;
-		this.ypos = aypos;
-		this.type = atype;
+	constructor(axPos = 0, ayPos = 0, aType = 0, astationCode = "") {
+		super(axPos, ayPos);
+		this.type = aType;
 		this.stationCode = astationCode;
 		this.updateFromType(); //xsize, ysize
 	}
@@ -54,48 +47,37 @@ class Building {
 		this.ysize *= UNITS_PER_METER;
 	}
 
-	draw(style = "#ff0000") {
-		if(!this.willRender()) { return; }
-		console.log("building draw");
+	draw(aStyle = "#800000") {
+		abstractDrawBigPoint(aStyle, this, () => {
+			canvasData.context.fillRect(0, 0, this.xsize, this.ysize);
 
-		canvasData.context.translate(this.xpos, this.ypos);
-		canvasData.context.rotate(toRadians(this.rotation));
-		canvasData.context.translate(-this.xsize/2,-this.ysize/2);
-
-		canvasData.context.fillStyle = style;
-		canvasData.context.fillRect(0, 0, this.xsize, this.ysize);
-
-		canvasData.context.strokeStyle = SELECT_COLOR;
-		canvasData.context.beginPath();
-		canvasData.context.moveTo(0, this.ysize-LINE_WIDTH/2);
-		canvasData.context.lineTo(this.xsize, this.ysize-LINE_WIDTH/2);
-		canvasData.context.stroke();
-
-		if(this.type === buildingType.CORNER) {
-			//mark second front edge
+			canvasData.context.strokeStyle = SELECT_COLOR;
 			canvasData.context.beginPath();
-			canvasData.context.moveTo(this.xsize-LINE_WIDTH/2, 0);
-			canvasData.context.lineTo(this.xsize-LINE_WIDTH/2, this.ysize);
+			canvasData.context.moveTo(0, this.ysize-LINE_WIDTH/2);
+			canvasData.context.lineTo(this.xsize, this.ysize-LINE_WIDTH/2);
 			canvasData.context.stroke();
-		}
-
-		//reset back
-		canvasData.context.translate(this.xsize/2,this.ysize/2);
-		canvasData.context.rotate(-toRadians(this.rotation));
-		canvasData.context.translate(-this.xpos, -this.ypos);
+	
+			if(this.type === buildingType.CORNER) {
+				//mark second front edge
+				canvasData.context.beginPath();
+				canvasData.context.moveTo(this.xsize-LINE_WIDTH/2, 0);
+				canvasData.context.lineTo(this.xsize-LINE_WIDTH/2, this.ysize);
+				canvasData.context.stroke();
+			}
+		});
 	}
 
-	collision(ax, ay) {
-		return (ax >= this.xpos-this.xsize/2) &&
-			(ax <= this.xpos+this.xsize/2) &&
-			(ay >= this.ypos-this.ysize/2) &&
-			(ay <= this.ypos+this.ysize/2);
+	collision(aX, aY) {
+		return (aX >= this.xPos-this.xsize/2) &&
+			(aX <= this.xPos+this.xsize/2) &&
+			(aY >= this.yPos-this.ysize/2) &&
+			(aY <= this.yPos+this.ysize/2);
 	}
 
 	willRender() {
 		return canvasIsInFrustum(
-			this.xpos-this.xsize/2,
-			this.ypos-this.ysize/2,
+			this.xPos-this.xsize/2,
+			this.yPos-this.ysize/2,
 			this.xsize, this.ysize
 		);	
 	}
@@ -127,14 +109,14 @@ function makeBuildingTypeSelector() {
 	buildingTypeSelector.appendChild(document.createElement("br"));
 }
 
-function buildingSelectMenu(ax, ay) {
+function buildingSelectMenu(aX, aY) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Select building type at pos x = "+ax+", y = "+ay));
+	canvasData.edit.appendChild(document.createTextNode("Select building type at pos x = "+aX+", y = "+aY));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenInput("buildxinput", ax);
-	addHiddenInput("buildyinput", ay);
+	addHiddenInput("buildxinput", aX);
+	addHiddenInput("buildyinput", aY);
 
 	canvasData.edit.appendChild(document.createTextNode("Station code:"));
 
@@ -161,51 +143,38 @@ function buildingMake() {
 	canvasData.edit.replaceChildren();//clear AFTER getting values
 }
 
-function buildingEditMenu(aid) {
+function buildingEditMenu(aID) {
 	canvasData.edit.replaceChildren();
 
-	canvasData.edit.appendChild(document.createTextNode("Editing building "+aid));
+	canvasData.edit.appendChild(document.createTextNode("Editing building "+aID));
 	canvasData.edit.appendChild(document.createElement("br"));
 
-	addHiddenIdInput(aid);
+	addHiddenIdInput(aID);
 
-	addBasicEditInputs(buildingList[aid]);
+	addBasicEditInputs(buildingList[aID]);
 
 	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
-	addInput("editrotinput", buildingList[aid].rotation, "text");
+	addInput("editrotinput", buildingList[aID].rotation, "text");
 
 	let dfcopy = buildingTypeSelector.cloneNode(true);
 	canvasData.edit.append(dfcopy);
 
 	let updateButton = document.createElement("button");
 	updateButton.appendChild(document.createTextNode("Update"));
-	updateButton.addEventListener("click", buildingUpdate);
+	updateButton.addEventListener("click", () => {
+		let buildId = getIDFromInput();
+		getDataFromBasicInputs(buildingList[buildId]);
+		buildingList[buildId].rotation = Number(document.getElementById("editrotinput").value);
+		buildingList[buildId].type = Number(document.getElementById("buildtypeinput").value);
+		buildingList[buildId].updateFromType();
+		canvasRedraw();
+	});
 	canvasData.edit.appendChild(updateButton);
 	
 	let removeButton = document.createElement("button");
 	removeButton.appendChild(document.createTextNode("Remove"));
-	removeButton.addEventListener("click", buildingRemove);
+	removeButton.addEventListener("click", () => {
+		removeFromListById(buildingList);
+	});
 	canvasData.edit.appendChild(removeButton);
-}
-
-function buildingUpdate() {
-	console.log("Updating building...");
-
-	let buildId = Number(document.getElementById("idinput").value);
-	getDataFromBasicInputs(buildingList[buildId]);
-	buildingList[buildId].rotation = Number(document.getElementById("editrotinput").value);
-	buildingList[buildId].type = Number(document.getElementById("buildtypeinput").value);
-	buildingList[buildId].updateFromType();
-
-	canvasRedraw();
-}
-
-function buildingRemove() {
-	console.log("Removing building...");
-
-	let buildId =  Number(document.getElementById("idinput").value);
-	buildingList.splice(buildId, 1);
-	canvasData.edit.replaceChildren();
-
-	canvasRedraw();
 }
