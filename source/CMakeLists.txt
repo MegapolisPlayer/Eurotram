@@ -14,8 +14,9 @@ project(eurotram VERSION 0.1.0)
 add_compile_definitions(GLEW_NO_GLU)
 add_executable(eurotram
 "app/audio/Announcements.cpp"
-"app/audio/Dispatcher.cpp"
 "app/audio/SFX.cpp"
+"app/audio/AudioManager.cpp"
+"app/audio/SoundTransform.cpp"
 
 "app/base/Instancer.cpp"
 "app/base/Buffer.cpp"

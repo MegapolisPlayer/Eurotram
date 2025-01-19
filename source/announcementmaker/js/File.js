@@ -19,11 +19,6 @@ function numberToByteArray(anum, abytes) {
 	return byteArray;
 }
 
-//8-bit ints
-function numberToByte(anum) {
-	return clamp(Math.trunc(anum), -128, 127);
-}
-
 function stationCodeToArray(astationcode) {
 	let arr = astationcode.split('').map((v) => { return v.charCodeAt(0); });
 	for(let i = arr.length; i < 4; i++) {
@@ -36,7 +31,8 @@ const ANNUCIATOR_FILE_FORMAT_VERSION  = 0;
 
 const STATION_ENTRY_METRO_TRANSFER    = 0b00000001;
 const STATION_ENTRY_TRAIN_TRANSFER    = 0b00000010;
-const STATION_ENTRY_CABLE_CAR_CLOSURE = 0b00000100;
+const STATION_ENTRY_FUNICULAR_CLOSURE = 0b00000100;
+const STATION_ENTRY_ON_REQUEST        = 0b00001000;
 
 function serialize() {
 	let numberValuesArray = [];
@@ -54,7 +50,28 @@ function serialize() {
 	numberValuesArray.push(...document.getElementById("authorname").value.split('').map((v) => { return v.charCodeAt(0); }));
 	numberValuesArray.push(0); //null terminator
 
-	//N - station amount
+	//P - line prefix
+	numberValuesArray.push(...document.getElementById("lineprefix").value.split('').map((u) => { return u.charCodeAt(0); }));
+	numberValuesArray.push(0); //null terminator
+
+	//K
+	let lines = document.getElementById("lines").value.split(',').filter(v => v.length > 0);
+	numberValuesArray.push(lines.length);
+
+	//L...L
+	lines.forEach(v => numberValuesArray.push(v));
+
+	//M
+	let specialLines = document.getElementById("speciallines").value.split(',').filter(v => v.length > 0);
+	numberValuesArray.push(specialLines.length);
+
+	//N...N
+	specialLines.forEach(v => {
+		numberValuesArray.push(...v.split('').map((v) => { return v.charCodeAt(0); }));
+		numberValuesArray.push(0); //null terminator
+	});
+
+	//Z - station amount
 	let stations = document.querySelectorAll(".element");
 	numberValuesArray.push(...numberToByteArray(stations.length, 4));
 
@@ -67,10 +84,12 @@ function serialize() {
 	let stationCodes = document.querySelectorAll(".scode");
 	let stationNames = document.querySelectorAll(".sname");
 	let stationLines = document.querySelectorAll(".slines");
+	let stationSpecialLines = document.querySelectorAll(".ssplines");
 	let stationFilenames = document.querySelectorAll(".sfile");
+	let stationOnRequest = document.querySelectorAll(".srequest");
 	let stationMetroTransfer = document.querySelectorAll(".smetro");
 	let stationRailTransfer = document.querySelectorAll(".srail");
-	let stationCableCar = document.querySelectorAll(".scable");
+	let stationFunicular = document.querySelectorAll(".sfunicular");
 
 	stations.forEach((v, i, a) => {
 		//for each station
@@ -88,27 +107,41 @@ function serialize() {
 		let lines = stationLines[i].value.split(',').map(u => Number(u)).filter(u => u != NaN && u != 0);
 
 		//K - amount of lines - split by comma
-		numberValuesArray.push(numberToByte(lines.length));
+		numberValuesArray.push(lines.length);
 
 		//L - lines
 		lines.forEach(u => {
-			numberValuesArray.push(numberToByte(u));
+			numberValuesArray.push(u);
 		});
+
+		let specialLines = stationSpecialLines[i].value.split(',').filter(v => v.length > 0);
+
+		//M - amount of special lines
+		numberValuesArray.push(specialLines.length);
+
+		//N - special lines
+		specialLines.forEach(u => {
+			numberValuesArray.push(...(u.split('').map((t) => { return t.charCodeAt(0); })));
+			numberValuesArray.push(0); //null terminator
+		})
 
 		//F - flags
 		let flagValue = 0;
 
+		if(stationOnRequest[i].checked) {
+			flagValue |= STATION_ENTRY_ON_REQUEST;
+		}
 		if(stationMetroTransfer[i].checked) {
 			flagValue |= STATION_ENTRY_METRO_TRANSFER;
 		}
 		if(stationRailTransfer[i].checked) {
 			flagValue |= STATION_ENTRY_TRAIN_TRANSFER;
 		}
-		if(stationCableCar[i].checked) {
-			flagValue |= STATION_ENTRY_CABLE_CAR_CLOSURE;
+		if(stationFunicular[i].checked) {
+			flagValue |= STATION_ENTRY_FUNICULAR_CLOSURE;
 		}
 		
-		numberValuesArray.push(numberToByte(flagValue));
+		numberValuesArray.push(flagValue);
 	});
 
 	//convert to blob
@@ -207,6 +240,24 @@ function deserialize(afiledata) {
 	document.getElementById("annunciatorname").value = readNullTerminatedString(numberArrayReference);
 	//author
 	document.getElementById("authorname").value = readNullTerminatedString(numberArrayReference);
+	//line prefix
+	document.getElementById("lineprefix").value = readNullTerminatedString(numberArrayReference);
+
+	//lines
+	let amountLines = readBytesAsNumber(numberArrayReference, 1);
+	let string = "";
+	for(let i = 0; i < amountLines; i++) {
+		string += String(readBytesAsNumber(numberArrayReference, 1))+",";
+	}
+	document.getElementById("lines").value = string;
+
+	//special lines
+	let amountSpecialLines = readBytesAsNumber(numberArrayReference, 1);
+	string = "";
+	for(let i = 0; i < amountSpecialLines; i++) {
+		string += readNullTerminatedString(numberArrayReference)+",";
+	}
+	document.getElementById("speciallines").value = string;
 
 	//amount of stations
 	let amountStops = readBytesAsNumber(numberArrayReference, 4);
@@ -230,10 +281,16 @@ function deserialize(afiledata) {
 			elems[3].value += (String(readBytesAsNumber(numberArrayReference, 1)) + ","); 
 		}
 
+		let specialLineAmount =  readBytesAsNumber(numberArrayReference, 1);
+		for(let j = 0; j < specialLineAmount; j++) {
+			elems[4].value += (readNullTerminatedString(numberArrayReference) + ","); 
+		}
+
 		let flags = readBytesAsNumber(numberArrayReference, 1);
-		elems[4].checked = (flags & STATION_ENTRY_METRO_TRANSFER) > 0;
-		elems[5].checked = (flags & STATION_ENTRY_TRAIN_TRANSFER) > 0;
-		elems[6].checked = (flags & STATION_ENTRY_CABLE_CAR_CLOSURE) > 0;
+		elems[5].checked = (flags & STATION_ENTRY_ON_REQUEST) > 0;
+		elems[6].checked = (flags & STATION_ENTRY_METRO_TRANSFER) > 0;
+		elems[7].checked = (flags & STATION_ENTRY_TRAIN_TRANSFER) > 0;
+		elems[8].checked = (flags & STATION_ENTRY_FUNICULAR_CLOSURE) > 0;
 	}
 }
 

@@ -28,13 +28,13 @@ button:hover {
 	border-left: 1px solid #ffffff;
 	border-right: 1px solid #ffffff;
 	min-height: 20vh;
-	width: 50vw;
+	width: 80vw;
 	text-align: center;
 }
 
 #list {
 	border-left: 1px solid #ffffff;
 	border-right: 1px solid #ffffff;
-	width: 50vw;
+	width: 80vw;
 	text-align: center;
 }

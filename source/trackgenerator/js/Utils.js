@@ -93,8 +93,6 @@ class RotatedStandardPoint extends StandardPoint {
 	}
 };
 
-//TODO change abstract to base!
-
 function abstractDrawPoint(aStyle, aObject, aFunction = null, aNoBaseRect = false) {
 	if(!aObject.willRender()) { return; }
 
@@ -374,7 +372,34 @@ function getDataFromTrackInputs(aObject) {
 
 
 
-//File reading utils
+//File utils
+
+function clamp(anum, min, max) {
+	return (anum < min) ? min : ((anum > max) ? max : anum);
+}
+
+function numberToByteArray(anum, abytes) {
+	let byteArray = new Array(abytes).fill(0);
+
+	//faking unsigned bit-shift leads to correct translation - convert to two's complement
+	//truncating to sanitize input
+	let binary = (Math.trunc(anum) >>> 0).toString(16).padStart(abytes*2, '0');
+
+	//flip to little endian - ignore if 1 byte
+	byteArray.forEach((v, i, a) => {
+		a[i] = Number("0x"+binary[binary.length-1-1-2*i]+binary[binary.length-1-2*i]);
+	});
+
+	return byteArray;
+}
+
+function stationCodeToArray(astationcode) {
+	let arr = astationcode.split('').map((v) => { return v.charCodeAt(0); });
+	for(let i = arr.length; i < 4; i++) {
+		arr.push(0);
+	}
+	return arr;
+}
 
 function readBytesAsNumber(aarrayref, abytes) {
 	let number = aarrayref.value.slice(0, abytes);

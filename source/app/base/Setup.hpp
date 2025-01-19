@@ -41,6 +41,9 @@ r Raw Arrays
 #include <chrono>
 #include <csignal> //extra helpful to raise interrupts when debugging
 #include <clocale>
+#include <thread>
+
+using namespace std::chrono_literals;
 
 #define FILE_READ_BLOCK_SIZE 8192
 

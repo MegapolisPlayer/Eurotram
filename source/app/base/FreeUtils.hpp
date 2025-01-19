@@ -115,6 +115,8 @@ private:
 
 // OTHER
 
+void readBytesToString(std::ifstream& aStream, std::string& aBuffer, const uint64_t aBytes) noexcept;
+
 template<typename tType>
 concept MultipliableByFloat = requires(tType a, float b) {
 	a * b;

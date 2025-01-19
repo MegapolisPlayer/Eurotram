@@ -127,3 +127,14 @@ float TimerAverage::getAverageUSfloat() const noexcept {
 }
 
 TimerAverage::~TimerAverage() noexcept {}
+
+void readBytesToString(std::ifstream& aStream, std::string& aBuffer, const uint64_t aBytes) noexcept {
+	try {
+		aBuffer.resize(aBytes);
+		aStream.read(aBuffer.data(), aBytes);
+	}
+	catch(std::ios_base::failure f) {
+		std::cerr << LogLevel::ERROR << "Error reading file!\n" << LogLevel::RESET;
+		aBuffer.resize(0); //make buffer empty
+	}
+}

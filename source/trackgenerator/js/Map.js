@@ -23,40 +23,6 @@ function scenarioClear() {
 
 let mapFileFormatVersion = 0;
 
-// utils
-
-function clamp(anum, min, max) {
-	return (anum < min) ? min : ((anum > max) ? max : anum);
-}
-
-function numberToByteArray(anum, abytes) {
-	let byteArray = new Array(abytes).fill(0);
-
-	//faking unsigned bit-shift leads to correct translation - convert to two's complement
-	//truncating to sanitize input
-	let binary = (Math.trunc(anum) >>> 0).toString(16).padStart(abytes*2, '0');
-
-	//flip to little endian - ignore if 1 byte
-	byteArray.forEach((v, i, a) => {
-		a[i] = Number("0x"+binary[binary.length-1-1-2*i]+binary[binary.length-1-2*i]);
-	});
-
-	return byteArray;
-}
-
-//8-bit ints
-function numberToByte(anum) {
-	return clamp(Math.trunc(anum), -128, 127);
-}
-
-function stationCodeToArray(astationcode) {
-	let arr = astationcode.split('').map((v) => { return v.charCodeAt(0); });
-	for(let i = arr.length; i < 4; i++) {
-		arr.push(0);
-	}
-	return arr;
-}
-
 // funcs
 
 const TRACK_TYPE = "TK";

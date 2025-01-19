@@ -1,4 +1,5 @@
 #include "model/Model.hpp"
+#include "audio/Audio.hpp"
 
 static bool FirstMove = true;
 static double LastX = 400, LastY = 400;
@@ -72,8 +73,26 @@ void MouseCallback(Window* aWindow, double aX, double aY) {
 
 int main() {
 	static_assert(sizeof(glm::vec3) == sizeof(GLfloat)*3, "Test failed: glm::vec3 has wrong size!");
-
 	setUTF8Encoding();
+
+	initAudioEngine();
+
+	{
+		Annunciator a("Linka13.etanc");
+		a.setVolume(0.3);
+		a.playAnnouncementCurrent("MUZM", true);
+		a.playAnnouncementLineChange("MUZM", 23, "ZVON", true);
+		a.playAnnouncementNext("IPPV", true);
+		a.playAnnouncementCurrent("IPPV", true);
+		a.playAnnouncementNext("BRUS", true);
+		a.playAnnouncementCurrent("BRUS", true);
+		a.playAnnouncementNext("ZVON", true);
+		a.playAnnouncementCurrent("ZVON", true);
+		a.playAnnouncementTerminus(true);
+	}
+
+	terminateAudioEngine();
+	return 0;
 
 	std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
 	float daylightIndex = 1.0f;
@@ -260,6 +279,14 @@ int main() {
 
 		ImGui::End();
 
+		ImGui::Begin("Announcements");
+
+		if(ImGui::Button("Next announcement")) {
+			//TODO next announcement
+		};
+
+		ImGui::End();
+
 		guiTimer.end();
 
         mainWindow.endFrame();
@@ -267,6 +294,8 @@ int main() {
     }
 
     std::cout << "Frametime average\n" << avgFrame.getAverageUSfloat() << "us\n";
+
+	terminateAudioEngine();
 
     return 0;
 }
