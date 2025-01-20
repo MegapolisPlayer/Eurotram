@@ -12,6 +12,7 @@ enum class AnnunciatorBaseSound : uint8_t {
 	EXIT_TO_ROAD,
 	TERMINUS,
 	TERMINUS_OTHER_LANGUAGE,
+	LINE,
 	TRANSFER_TO_METRO,
 	TRANSFER_TO_RAIL,
 	LINE_ROUTE_CHANGE,
@@ -32,6 +33,7 @@ enum AnnunciatorStationFlags : uint8_t {
 	STATION_FLAG_TRAIN_TRANSFER    = 0b00000010,
 	STATION_FLAG_FUNICULAR_CLOSURE = 0b00000100,
 	STATION_FLAG_ON_REQUEST        = 0b00001000,
+	STATION_FLAG_METRO_CLOSURE     = 0b00010000,
 };
 
 //IMPORTANT - miniaudio structs ARE NOT COPIABLE OR MOVABLE BY DEFAULT
@@ -70,8 +72,7 @@ public:
 
 	void playAnnouncementLineChange(const std::string_view aStationCode, const uint8_t aNewLine, const std::string_view aNewEndStationCode, const bool aWaitUntilDone = false) noexcept;
 	void playAnnouncementTerminus(const bool aWaitUntilDone = false); //only plays the terminus announcement - not the station one
-
-	//TODO add checkbox if metro station closed!
+	void playAnnouncementStart(const uint8_t aNewLine, const std::string_view aEndStationCode, const bool aWaitUntilDone = false);
 
 	void setVolume(const float aVolume) noexcept;
 
@@ -100,7 +101,7 @@ private:
 	AnnunciatorLineSound* getDataFromLine(const uint8_t aLine) noexcept;
 
 	void playSound(ma_sound* aSound) noexcept;
-	void playSoundCollection(std::vector<ma_sound*>& arSounds, const bool aWaitUntilDone = false) noexcept;
+	void playSoundCollection(std::vector<ma_sound*>& arSounds, const bool aWaitUntilDone = false, ma_sound* aRepeatingSound = nullptr) noexcept;
 };
 
 #endif

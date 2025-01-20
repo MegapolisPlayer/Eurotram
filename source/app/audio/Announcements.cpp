@@ -221,11 +221,20 @@ void Annunciator::playAnnouncementNext(const std::string_view aNextStationCode, 
 	if((soundData->flags & STATION_FLAG_ON_REQUEST) != 0) {
 		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::NEXT_STOP_ON_REQUEST));
 	}
+
+	//same sound cannot have 2 starting points - we set after it played
+	if((soundData->flags & STATION_FLAG_METRO_CLOSURE) != 0) {
+		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::WARNING_FOR_PASSENGERS));
+		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::THE_METRO_STATION_IS));
+		sounds.push_back(soundData->sound); //TODO later add separate name for metro
+		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::CURRENTLY_CLOSED));
+	}
+
 	if((soundData->flags & STATION_FLAG_FUNICULAR_CLOSURE) != 0) {
 		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::FUNICULAR_CLOSED));
 	}
 
-	playSoundCollection(sounds, aWaitUntilDone);
+	playSoundCollection(sounds, aWaitUntilDone, ((soundData->flags & STATION_FLAG_METRO_CLOSURE) != 0) ? soundData->sound : nullptr);
 }
 void Annunciator::playAnnouncement(const std::string_view aStationCode,const std::string_view aNextStationCode, const bool aWaitUntilDone) noexcept {
 	this->playAnnouncementCurrent(aStationCode);
@@ -268,6 +277,24 @@ void Annunciator::playAnnouncementTerminus(const bool aWaitUntilDone) {
 	std::vector<ma_sound*> sounds;
 	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::TERMINUS));
 	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::TERMINUS_OTHER_LANGUAGE));
+	playSoundCollection(sounds, aWaitUntilDone);
+}
+void Annunciator::playAnnouncementStart(const uint8_t aNewLine, const std::string_view aEndStationCode, const bool aWaitUntilDone) {
+	std::vector<ma_sound*> sounds;
+	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::LINE));
+	AnnunciatorLineSound* lineSoundData = getDataFromLine(aNewLine);
+	if(lineSoundData == nullptr) {
+		std::cerr << LogLevel::ERROR << "No sound found for line " << aNewLine << "\n" << LogLevel::RESET;
+		return;
+	}
+	sounds.push_back(lineSoundData->sound);
+	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::DIRECTION));
+	AnnunciatorStationSound* soundData = getDataFromStationCode(aEndStationCode);
+	if(soundData == nullptr) {
+		std::cerr << LogLevel::ERROR << "No sound found for station code " << aEndStationCode << "\n" << LogLevel::RESET;
+		return;
+	}
+	sounds.push_back(soundData->sound);
 	playSoundCollection(sounds, aWaitUntilDone);
 }
 
@@ -343,7 +370,7 @@ void Annunciator::playSound(ma_sound* aSound) noexcept {
 	ma_sound_start(aSound);
 }
 
-void Annunciator::playSoundCollection(std::vector<ma_sound*>& aSounds, const bool aWaitUntilDone) noexcept {
+void Annunciator::playSoundCollection(std::vector<ma_sound*>& aSounds, const bool aWaitUntilDone, ma_sound* aRepeatingSound) noexcept {
 	//aAmount should be non-zero
 
 	//for each possible sound
@@ -352,8 +379,18 @@ void Annunciator::playSoundCollection(std::vector<ma_sound*>& aSounds, const boo
 	// (saving at beginning would require another struct + when we dont use it we set to zero which massively simplifies calculations later on)
 	//  - set that it is last
 
+	ma_uint64 repeatTimeOffset = 0;
+	bool repeatFirstPassed = false;
+	ma_sound_set_end_callback(aRepeatingSound, [](void* aInt, ma_sound* aSound) {
+		ma_sound_set_start_time_in_pcm_frames(aSound, *((ma_uint64*)aInt));
+		ma_sound_set_end_callback(aSound, NULL , NULL);
+		ma_sound_seek_to_pcm_frame(aSound, 0);
+		ma_sound_start(aSound);
+	}, &repeatTimeOffset);
+
 	ma_sound* lastSound = aSounds[0];
 	std::vector<ma_uint64> timeOffsets;
+	timeOffsets.reserve(aSounds.size());
 
 	for(uint64_t i = 0; i < aSounds.size(); i++) {
 		ma_uint64 PCMLength = 0;
@@ -368,7 +405,17 @@ void Annunciator::playSoundCollection(std::vector<ma_sound*>& aSounds, const boo
 
 	uint64_t timeOffset = 0;
 	for(uint64_t i = 0; i < aSounds.size(); i++) {
+		//first time play as normal, then change
+		if(aSounds[i] == aRepeatingSound && repeatFirstPassed) {
+			repeatTimeOffset = currentPCMTime + timeOffset;
+			timeOffset += timeOffsets[i];
+			continue;
+		}
+		else if(aSounds[i] == aRepeatingSound) repeatFirstPassed = true;
+		else {}
+
 		ma_sound_set_start_time_in_pcm_frames(aSounds[i], currentPCMTime + timeOffset);
+
 		timeOffset += timeOffsets[i];
 		this->playSound(aSounds[i]);
 	}

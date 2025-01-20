@@ -33,6 +33,7 @@ const STATION_ENTRY_METRO_TRANSFER    = 0b00000001;
 const STATION_ENTRY_TRAIN_TRANSFER    = 0b00000010;
 const STATION_ENTRY_FUNICULAR_CLOSURE = 0b00000100;
 const STATION_ENTRY_ON_REQUEST        = 0b00001000;
+const STATION_ENTRY_METRO_CLOSURE     = 0b00010000;
 
 function serialize() {
 	let numberValuesArray = [];
@@ -89,6 +90,7 @@ function serialize() {
 	let stationOnRequest = document.querySelectorAll(".srequest");
 	let stationMetroTransfer = document.querySelectorAll(".smetro");
 	let stationRailTransfer = document.querySelectorAll(".srail");
+	let stationMetroClosed = document.querySelectorAll(".snometro");
 	let stationFunicular = document.querySelectorAll(".sfunicular");
 
 	stations.forEach((v, i, a) => {
@@ -137,10 +139,13 @@ function serialize() {
 		if(stationRailTransfer[i].checked) {
 			flagValue |= STATION_ENTRY_TRAIN_TRANSFER;
 		}
+		if(stationMetroClosed[i].checked) {
+			flagValue |= STATION_ENTRY_METRO_CLOSURE;
+		}
 		if(stationFunicular[i].checked) {
 			flagValue |= STATION_ENTRY_FUNICULAR_CLOSURE;
 		}
-		
+
 		numberValuesArray.push(flagValue);
 	});
 
@@ -290,7 +295,8 @@ function deserialize(afiledata) {
 		elems[5].checked = (flags & STATION_ENTRY_ON_REQUEST) > 0;
 		elems[6].checked = (flags & STATION_ENTRY_METRO_TRANSFER) > 0;
 		elems[7].checked = (flags & STATION_ENTRY_TRAIN_TRANSFER) > 0;
-		elems[8].checked = (flags & STATION_ENTRY_FUNICULAR_CLOSURE) > 0;
+		elems[8].checked = (flags & STATION_ENTRY_METRO_CLOSURE) > 0;
+		elems[9].checked = (flags & STATION_ENTRY_FUNICULAR_CLOSURE) > 0;
 	}
 }
 

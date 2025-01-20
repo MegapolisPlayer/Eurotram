@@ -79,16 +79,18 @@ int main() {
 
 	{
 		Annunciator a("Linka13.etanc");
-		a.setVolume(0.3);
+		a.setVolume(0.7);
+		a.playAnnouncementNext("RADH", true);
+		a.playAnnouncementCurrent("RADH", true);
+		a.playAnnouncementNext("MUZM", true);
 		a.playAnnouncementCurrent("MUZM", true);
 		a.playAnnouncementLineChange("MUZM", 23, "ZVON", true);
 		a.playAnnouncementNext("IPPV", true);
 		a.playAnnouncementCurrent("IPPV", true);
-		a.playAnnouncementNext("BRUS", true);
-		a.playAnnouncementCurrent("BRUS", true);
-		a.playAnnouncementNext("ZVON", true);
-		a.playAnnouncementCurrent("ZVON", true);
+		a.playAnnouncementNext("TEST", true);
+		a.playAnnouncementCurrent("TEST", true);
 		a.playAnnouncementTerminus(true);
+		a.playAnnouncementStart(13, "OLSH", true);
 	}
 
 	terminateAudioEngine();

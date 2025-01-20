@@ -6,6 +6,7 @@ const baseNames = [
 	"Exit to road",
 	"Terminus",
 	"Terminus/EN",
+	"Line",
 	"Transfer to metro",
 	"Transfer to rail",
 	"Line route change",
@@ -97,13 +98,20 @@ function newElement() {
 	let labelHasRail = document.createElement("label");
 	labelHasRail.appendChild(document.createTextNode("Has rail?"));
 
+	let stationMetroClosed = document.createElement("input");
+	stationMetroClosed.classList.add("snometro");
+	stationMetroClosed.type = "checkbox";
+
+	let labelMetroClosed = document.createElement("label");
+	labelMetroClosed.appendChild(document.createTextNode("Is metro closed?"));
+
 	let stationFunicularFail = document.createElement("input");
 	stationFunicularFail.classList.add("sfunicular");
 	stationFunicularFail.type = "checkbox";
 
 	let labelFunicularFail = document.createElement("label");
 	labelFunicularFail.appendChild(document.createTextNode("Announce funicular closure?"));
-	
+
 	let removeButton = document.createElement("button");
 	removeButton.setAttribute("id", "b"+uniqueId);
 	removeButton.addEventListener("click", (e) => {
@@ -125,6 +133,8 @@ function newElement() {
 	container.appendChild(labelHasMetro);
 	container.appendChild(stationHasRail);
 	container.appendChild(labelHasRail);
+	container.appendChild(stationMetroClosed);
+	container.appendChild(labelMetroClosed);
 	container.appendChild(stationFunicularFail);
 	container.appendChild(labelFunicularFail);
 	container.appendChild(document.createElement("br"));
@@ -146,6 +156,7 @@ function newElement() {
 		stationOnRequest,
 		stationHasMetro,
 		stationHasRail,
+		stationMetroClosed,
 		stationFunicularFail
 	];
 }
