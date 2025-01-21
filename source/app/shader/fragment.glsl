@@ -46,7 +46,6 @@ out vec4 oColor;
 in vec2 pTexCoord;
 in vec3 pNormals;
 in vec3 pFragmentPos;
-in vec4 pLightFragmentPos;
 
 layout(std430, binding = 50) readonly buffer sMaterial {
 	layout(align = 16) Material mat1;
@@ -112,17 +111,6 @@ vec3 calculateSpot(float aDst, vec3 aNormalizedNormal, vec3 aLightDirection, vec
 	return aLight.color.xyz * attenuation(aDst, aLight.constant, aLight.linear, aLight.quadratic) * diffuseComp(aNormalizedNormal, aLightDirection);
 }
 
-float calculateShadow(vec3 aNormalizedNormal, vec3 aLightDirection) {
-	//copy some internal openGL step (convert to normalized device coords)
-	vec3 projectedCoords = pLightFragmentPos.xyz / pLightFragmentPos.w; //range -1 to +1
-	//convert to 0, 1
-	projectedCoords = (projectedCoords * 0.5) + 0.5;
-
-	float bias = max(0.05 * (1.0 - dot(aNormalizedNormal, aLightDirection)), 0.005);
-	//our depth in NDC > depth in map
-	return 1.0-float(projectedCoords.z > texture(uTextures[1], projectedCoords.xy).r);
-}
-
 void main() {
 	vec4 baseColor = mix(mat1.color, texture(uTextures[mat1.textureSlot], pTexCoord), mat1.textureAmount);
 
@@ -158,7 +146,8 @@ void main() {
 		) * strength;
 	}
 
+	//oColor = vec4(vec3(1.0 - calculateShadow(normalizedNormal, directionalLightDirection)), 1.0);
 	oColor = vec4(
-		baseColor.xyz * clamp(uAmbientLight + (lighting + lightingSpecular) * calculateShadow(normalizedNormal, directionalLightDirection), 0.0, 1.0),
+		baseColor.xyz * clamp(uAmbientLight + (lighting + lightingSpecular), 0.0, 1.0),
 		mat1.textureOpacity); //normal calc
 };

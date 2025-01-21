@@ -30,7 +30,6 @@ add_executable(eurotram
 "app/base/Transformation.cpp"
 
 "app/model/Lighting.cpp"
-"app/model/Shadows.cpp"
 "app/model/Sky.cpp"
 "app/model/Material.cpp"
 "app/model/ModelLoading.cpp"

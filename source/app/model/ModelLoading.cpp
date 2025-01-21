@@ -14,9 +14,27 @@ Model::Model(std::string_view aPath) noexcept {
 	//move transparent objects to back
 	uint64_t swapCounter = 0;
 	for(uint64_t i = 0; i < this->mMeshes.size(); i++) {
-		if(this->mMeshes[i].mMaterial.textureOpacity != 1.0) {
+		if(this->mMeshes[i].mEntry->material.textureOpacity != 1.0) {
 			std::iter_swap(this->mMeshes.begin()+i, (this->mMeshes.end()-1-swapCounter));
 		}
+	}
+}
+
+void Model::addVariant(const std::string_view aMaterialName, const std::string_view aTexturePath, const std::string_view aIdentificator) noexcept {
+	GMSEntry* variant = GlobalMaterialStore::copyStandard(aMaterialName);
+	variant->texture = Texture(aTexturePath);
+	variant->variant = aIdentificator;
+}
+void Model::setVariant(const std::string_view aMaterialName, const std::string_view aIdentificator) noexcept {
+	for(Mesh& m : mMeshes) {
+		//only the meshes with the material name
+		if(m.mEntry->name == aMaterialName) { m.setEntry(GlobalMaterialStore::get(aMaterialName, aIdentificator)); }
+	}
+}
+void Model::resetVariant(const std::string_view aMaterialName) noexcept {
+	for(Mesh& m : mMeshes) {
+		//only the meshes with the material name
+		if(m.mEntry->name == aMaterialName) { m.resetEntry(); }
 	}
 }
 
@@ -74,9 +92,13 @@ void Model::processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiS
 		}
 	}
 
+	GMSEntry* texture = GlobalMaterialStore::add();
+	apMesh->emplace_back(vertices, indices, texture); //texture path may be null
+
 	//texture of material
 	if(apMeshLoad->mMaterialIndex >= 0) {
 		aiMaterial* mat = apScene->mMaterials[apMeshLoad->mMaterialIndex];
+		texture->name = mat->GetName().C_Str();
 
 		aiString texturePath;
 		bool hasTexture = false;
@@ -84,52 +106,57 @@ void Model::processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiS
 		if(mat->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
 			hasTexture = true;
 			mat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+			GMSEntry* existingEntry = GlobalMaterialStore::getByPath(texturePath.C_Str());
+			if(existingEntry) {
+				texture = existingEntry;
+				apMesh->back().mEntry = existingEntry; //same texture = same entry = same material in blender (usually, at least)
+			}
+			else {
+				texture->texture = Texture(texturePath.C_Str());
+				texture->path = texturePath.C_Str();
+				std::cout << texture->name << '\n';
+			}
 		}
-
-		apMesh->emplace_back(vertices, indices, texturePath.C_Str()); //texture path may be null
 
 		aiColor3D tempValue;
 		float opacity;
 
 		mat->Get(AI_MATKEY_OPACITY, opacity);
-		apMesh->back().mMaterial.textureOpacity = opacity;
+		texture->material.textureOpacity = opacity;
 
 		mat->Get(AI_MATKEY_COLOR_DIFFUSE, tempValue);
-		apMesh->back().mMaterial.color.x = tempValue.r;
-		apMesh->back().mMaterial.color.y = tempValue.g;
-		apMesh->back().mMaterial.color.z = tempValue.b;
-		apMesh->back().mMaterial.color.w = 1.0;
+		texture->material.color.x = tempValue.r;
+		texture->material.color.y = tempValue.g;
+		texture->material.color.z = tempValue.b;
+		texture->material.color.w = 1.0;
 
 		mat->Get(AI_MATKEY_COLOR_SPECULAR, tempValue);
-		apMesh->back().mMaterial.specular.x = tempValue.r;
-		apMesh->back().mMaterial.specular.y = tempValue.g;
-		apMesh->back().mMaterial.specular.z = tempValue.b;
-		apMesh->back().mMaterial.specular.w = 1.0;
+		texture->material.specular.x = tempValue.r;
+		texture->material.specular.y = tempValue.g;
+		texture->material.specular.z = tempValue.b;
+		texture->material.specular.w = 1.0;
 
-		mat->Get(AI_MATKEY_REFRACTI,  apMesh->back().mMaterial.ior);
+		mat->Get(AI_MATKEY_REFRACTI,  texture->material.ior);
 
-		mat->Get(AI_MATKEY_SHININESS, apMesh->back().mMaterial.shininess);
+		mat->Get(AI_MATKEY_SHININESS, texture->material.shininess);
 
-		apMesh->back().mMaterial.textureSlot = 0;
-		apMesh->back().mMaterial.textureAmount = (float)hasTexture;
+		texture->material.textureSlot = 0;
+		texture->material.textureAmount = (float)hasTexture;
 		mat->Get(AI_MATKEY_COLOR_EMISSIVE, tempValue);
-		apMesh->back().mMaterial.brightness =
+		texture->material.brightness =
 			std::max(std::max(tempValue.r, tempValue.g), tempValue.b);
 	}
 	//no material present - use default purple color
 	else {
-		//setup mesh from data
-		apMesh->emplace_back(vertices, indices, "");
-
 		//material properties
-		apMesh->back().mMaterial.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-		apMesh->back().mMaterial.specular = glm::vec4(0.5f);
-		apMesh->back().mMaterial.shininess = 0.0f;
-		apMesh->back().mMaterial.ior = 1.0f;
-		apMesh->back().mMaterial.textureAmount = 0.0f; //1.0 texture only, 0.0 color only
-		apMesh->back().mMaterial.textureSlot = 0;
-		apMesh->back().mMaterial.textureOpacity = 1.0f;
-		apMesh->back().mMaterial.brightness = 0.0f; //below this brightness render as normal, above it is brighter
+		texture->material.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+		texture->material.specular = glm::vec4(0.5f);
+		texture->material.shininess = 0.0f;
+		texture->material.ior = 1.0f;
+		texture->material.textureAmount = 0.0f; //1.0 texture only, 0.0 color only
+		texture->material.textureSlot = 0;
+		texture->material.textureOpacity = 1.0f;
+		texture->material.brightness = 0.0f; //below this brightness render as normal, above it is brighter
 	}
 }
 

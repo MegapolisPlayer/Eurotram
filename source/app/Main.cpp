@@ -77,6 +77,7 @@ int main() {
 
 	initAudioEngine();
 
+	/*
 	{
 		Annunciator a("Linka13.etanc");
 		a.setVolume(0.7);
@@ -92,9 +93,10 @@ int main() {
 		a.playAnnouncementTerminus(true);
 		a.playAnnouncementStart(13, "OLSH", true);
 	}
+	*/
 
 	terminateAudioEngine();
-	return 0;
+	//return 0;
 
 	std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
 	float daylightIndex = 1.0f;
@@ -110,10 +112,6 @@ int main() {
 	uint32_t mouseClickHandle = mainWindow.registerClickCallback(MouseClick);
 	mainWindow.hideCursor();
 
-	Shader lss("shader/shadowVertex.glsl", "shader/shadowFragment.glsl");
-	LightShadow ls(lss);
-	UniformMat4 lssMatModel(&lss, 70);
-
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 	shader.bind();
 
@@ -122,7 +120,6 @@ int main() {
 	UniformVec3 cameraPosUniform(&shader, 210);
 	UniformMat4 matModelUniform(&shader, 11);
 	UniformMat3 matNormalUniform(&shader, 12);
-	UniformMat4 matLightUniform(&shader, 13);
 
 	Dirlight d;
 	d.color = {208.0f/255.0f, 128.0f/255.0f, 0.0f, 1.0f};
@@ -168,24 +165,16 @@ int main() {
 	Transform t1;
 	//t1.setRotationY(45.0f);
 
-	//Transform t2;
-	//t2.setPosition(glm::vec3(2.0f));
-
-	//Transform t3;
-	//t3.setScale(0.2f);
-
 	std::cout << "Loading T3R.P model...\n";
 	Model t3rp("T3.obj");
+	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
+	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 	std::cout << "Model loaded!\n";
+
+	//TODO add shadows - https://www.youtube.com/watch?v=9g-4aJhCnyY WITH BIAS
 
     while (mainWindow.isOpen()) {
 		loopTimer.start();
-
-		glClear(GL_DEPTH_BUFFER_BIT);
-		ls.bind(mainWindow, d);
-		lssMatModel.set(glm::mat4(1.0f));
-		t3rp.draw(uMaterial);
-		ls.unbind(mainWindow);
 
 		mainWindow.beginFrame();
 
@@ -194,9 +183,6 @@ int main() {
 		s.position = glm::vec4(mainWindow.getCamera()->getPosition(), 1.0);
 		s.direction = glm::vec4(mainWindow.getCamera()->getDirection(), 1.0);
 		uSpots.update(&s);
-
-		ls.bindMap(1);
-		matLightUniform.set(ls.getMatrix());
 
 		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
@@ -285,6 +271,20 @@ int main() {
 
 		if(ImGui::Button("Next announcement")) {
 			//TODO next announcement
+		};
+
+		ImGui::End();
+
+		ImGui::Begin("Visual");
+
+		if(ImGui::Button("Change livery to normal")) {
+			t3rp.resetVariant("Material.paint");
+		};
+		if(ImGui::Button("Change livery to PLF")) {
+			t3rp.setVariant("Material.paint", "PLF");
+		};
+		if(ImGui::Button("Change livery to PID")) {
+			t3rp.setVariant("Material.paint", "PID");
 		};
 
 		ImGui::End();

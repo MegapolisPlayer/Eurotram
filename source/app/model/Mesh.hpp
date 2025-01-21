@@ -15,13 +15,17 @@ std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept;
 class Mesh {
 	friend class Model;
 public:
-	Mesh(std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, std::string_view aTexturePath) noexcept;
+	Mesh(std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept;
 	Mesh(Mesh&& aOther) noexcept;
 	Mesh& operator=(Mesh&& aOther) noexcept;
 	Mesh(Mesh& aOther) noexcept = delete;
 	Mesh& operator=(Mesh& aOther) noexcept = delete;
 
 	void draw(UniformMaterial& aUniform) noexcept;
+
+	 //DO NOT set entry with different material name
+	void setEntry(GMSEntry* aEntry) noexcept;
+	void resetEntry() noexcept;
 
 	~Mesh() noexcept;
 private:
@@ -30,8 +34,7 @@ private:
 	VertexBuffer mVBO;
 	IndexBuffer mIBO;
 
-	Material mMaterial;
-	Texture mTexture; //we only expect one - combined diffuse + opacity
+	GMSEntry* mEntry; //1 entry is enough - variant data in GMS itself, when reset just find one with same name and standard ID
 };
 
 #endif

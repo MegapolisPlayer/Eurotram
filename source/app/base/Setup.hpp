@@ -42,6 +42,7 @@ r Raw Arrays
 #include <csignal> //extra helpful to raise interrupts when debugging
 #include <clocale>
 #include <thread>
+#include <list>
 
 using namespace std::chrono_literals;
 

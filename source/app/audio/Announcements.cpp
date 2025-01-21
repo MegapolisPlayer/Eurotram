@@ -202,7 +202,7 @@ void Annunciator::playAnnouncementCurrent(const std::string_view aStationCode, c
 		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::FUNICULAR_CLOSED));
 	}
 
-	playSoundCollection(sounds, aWaitUntilDone);
+	this->playSoundCollection(sounds, aWaitUntilDone);
 }
 void Annunciator::playAnnouncementNext(const std::string_view aNextStationCode, const bool aWaitUntilDone) noexcept {
 	//next stop + station name + sometimes on request, closure announcement
@@ -234,7 +234,7 @@ void Annunciator::playAnnouncementNext(const std::string_view aNextStationCode, 
 		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::FUNICULAR_CLOSED));
 	}
 
-	playSoundCollection(sounds, aWaitUntilDone, ((soundData->flags & STATION_FLAG_METRO_CLOSURE) != 0) ? soundData->sound : nullptr);
+	this->playSoundCollection(sounds, aWaitUntilDone, ((soundData->flags & STATION_FLAG_METRO_CLOSURE) != 0) ? soundData->sound : nullptr);
 }
 void Annunciator::playAnnouncement(const std::string_view aStationCode,const std::string_view aNextStationCode, const bool aWaitUntilDone) noexcept {
 	this->playAnnouncementCurrent(aStationCode);
@@ -271,13 +271,13 @@ void Annunciator::playAnnouncementLineChange(const std::string_view aStationCode
 	}
 	sounds.push_back(endStationData->sound);
 
-	playSoundCollection(sounds, aWaitUntilDone);
+	this->playSoundCollection(sounds, aWaitUntilDone);
 }
 void Annunciator::playAnnouncementTerminus(const bool aWaitUntilDone) {
 	std::vector<ma_sound*> sounds;
 	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::TERMINUS));
 	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::TERMINUS_OTHER_LANGUAGE));
-	playSoundCollection(sounds, aWaitUntilDone);
+	this->playSoundCollection(sounds, aWaitUntilDone);
 }
 void Annunciator::playAnnouncementStart(const uint8_t aNewLine, const std::string_view aEndStationCode, const bool aWaitUntilDone) {
 	std::vector<ma_sound*> sounds;
@@ -295,7 +295,7 @@ void Annunciator::playAnnouncementStart(const uint8_t aNewLine, const std::strin
 		return;
 	}
 	sounds.push_back(soundData->sound);
-	playSoundCollection(sounds, aWaitUntilDone);
+	this->playSoundCollection(sounds, aWaitUntilDone);
 }
 
 void Annunciator::setVolume(const float aVolume) noexcept {

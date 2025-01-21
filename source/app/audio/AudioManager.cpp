@@ -6,13 +6,13 @@ static bool sInitialized = false;
 
 void initAudioEngine() noexcept  {
 	if(sInitialized) {
-		std::cerr << LogLevel::WARNING << "Audio engine already initialized!" << LogLevel::RESET;
+		std::cerr << LogLevel::WARNING << "Audio engine already initialized!\n" << LogLevel::RESET;
 		return;
 	}
 
 	ma_result result = ma_engine_init(NULL, &sEngine);
 	if(result != MA_SUCCESS) {
-		std::cerr << LogLevel::ERROR << "Audio engine initialization failed!" << LogLevel::RESET;
+		std::cerr << LogLevel::ERROR << "Audio engine initialization failed!\n" << LogLevel::RESET;
 		return;
 	}
 	sInitialized = true;
@@ -27,7 +27,7 @@ void terminateAudioEngine() noexcept {
 		return;
 	}
 
-	std::cerr << LogLevel::WARNING << "Audio engine already terminated!" << LogLevel::RESET;
+	std::cerr << LogLevel::WARNING << "Audio engine already terminated!\n" << LogLevel::RESET;
 }
 
 uint64_t getSoundLengthMs(ma_sound* aSound) noexcept {

@@ -49,16 +49,16 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 
 	glPointSize(10); //set size of points
 
-	glEnable(GL_BLEND); //texture blending
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_BLEND); //texture blending
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_DEPTH_TEST); //depth testing
 	glDepthFunc(GL_LESS);
 	glDepthMask(true);
 
-	glEnable(GL_CULL_FACE); //backface culling
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
+	//glEnable(GL_CULL_FACE); //backface culling
+	//glCullFace(GL_BACK);
+	//glFrontFace(GL_CCW);
 
 	glEnable(GL_MULTISAMPLE); //anti aliasing
 
