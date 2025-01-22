@@ -28,4 +28,22 @@ private:
 	int32_t mWidth, mHeight, mChannels;
 };
 
+//TODO implement abstractions for stbi image write
+
+template<uint8_t tAmount = 32>
+class TextureSamplerArray {
+public:
+	TextureSamplerArray(const Shader& aShader, const uint64_t aSamplerArrayLocation) noexcept;
+	TextureSamplerArray(const Shader& aShader, const std::string_view aSamplerArrayName) noexcept;
+
+	void set() noexcept;
+
+	UniformIntMultiple<std::array<GLint, tAmount>>& getUniform() noexcept;
+
+	~TextureSamplerArray() noexcept;
+private:
+	UniformIntMultiple<std::array<GLint, tAmount>&> mUniform;
+	std::array<GLint, tAmount> mArray;
+};
+
 #endif

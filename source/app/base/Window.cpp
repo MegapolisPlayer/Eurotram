@@ -40,7 +40,7 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 		std::exit(EXIT_FAILURE);
 	}
 
-	//glViewport(0, 0, this->mWidth, this->mHeight);
+	glViewport(0, 0, this->mWidth, this->mHeight);
 
 	if(this->mDebugEnabled) {
 		glEnable(GL_DEBUG_OUTPUT);
@@ -49,16 +49,15 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 
 	glPointSize(10); //set size of points
 
-	//glEnable(GL_BLEND); //texture blending
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND); //texture blending
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_DEPTH_TEST); //depth testing
 	glDepthFunc(GL_LESS);
-	glDepthMask(true);
 
-	//glEnable(GL_CULL_FACE); //backface culling
-	//glCullFace(GL_BACK);
-	//glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE); //backface culling
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 	glEnable(GL_MULTISAMPLE); //anti aliasing
 
@@ -167,6 +166,13 @@ void Window::bindCamera(Camera* const aCamera) noexcept {
 }
 Camera* Window::getCamera() const noexcept {
 	return this->mReferencedCamera;
+}
+
+uint64_t Window::getWidth() const noexcept {
+	return this->mWidth;
+}
+uint64_t Window::getHeight() const noexcept {
+	return this->mHeight;
 }
 
 Window::~Window() noexcept {

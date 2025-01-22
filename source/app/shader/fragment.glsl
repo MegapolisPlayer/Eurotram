@@ -46,6 +46,7 @@ out vec4 oColor;
 in vec2 pTexCoord;
 in vec3 pNormals;
 in vec3 pFragmentPos;
+in vec4 pFragmentLightPos;
 
 layout(std430, binding = 50) readonly buffer sMaterial {
 	layout(align = 16) Material mat1;
@@ -111,6 +112,34 @@ vec3 calculateSpot(float aDst, vec3 aNormalizedNormal, vec3 aLightDirection, vec
 	return aLight.color.xyz * attenuation(aDst, aLight.constant, aLight.linear, aLight.quadratic) * diffuseComp(aNormalizedNormal, aLightDirection);
 }
 
+float calculateShadows(vec3 aNormalizedNormal, vec3 aLightDirection) {
+	float shadow = 0.0;
+	vec3 coords = pFragmentLightPos.xyz / pFragmentLightPos.w;
+	//only if within frustum
+	if(coords.z <= 1.0) {
+		vec2 texelSize = 1.0 / textureSize(uTextures[1], 0); //divide max coord by amount of texels in texture (as vec2)
+
+		coords = (coords * 0.5) + 0.5; //convert from OpenGL render coords to UV coords
+
+		//PCF - percentage-closer filtering - adding softer shadows
+
+		//average from neighboring texels
+		for(int x = -1; x < 2; x++) {
+			for(int y = -1; y < 2; y++) {
+				float closest = texture(uTextures[1], coords.xy + (vec2(x, y) * texelSize)).r; //single-dimensional texture
+				float current = coords.z;
+				float bias = max(0.05 * (1.0 - dot(aNormalizedNormal, aLightDirection)), 0.005);
+
+				shadow += float(current - bias > closest);
+			}
+		}
+
+		shadow /= 9.0; //average it
+	}
+
+	return 1.0 - shadow;
+}
+
 void main() {
 	vec4 baseColor = mix(mat1.color, texture(uTextures[mat1.textureSlot], pTexCoord), mat1.textureAmount);
 
@@ -146,8 +175,7 @@ void main() {
 		) * strength;
 	}
 
-	//oColor = vec4(vec3(1.0 - calculateShadow(normalizedNormal, directionalLightDirection)), 1.0);
 	oColor = vec4(
-		baseColor.xyz * clamp(uAmbientLight + (lighting + lightingSpecular), 0.0, 1.0),
+		baseColor.xyz * clamp(uAmbientLight + (lighting + lightingSpecular) * calculateShadows(normalizedNormal, directionalLightDirection), 0.0, 1.0),
 		mat1.textureOpacity); //normal calc
 };

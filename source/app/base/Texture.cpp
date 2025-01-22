@@ -1,5 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "Texture.hpp"
+#include "TextureIm.hpp"
 
 Texture::Texture(std::string_view aFilename) noexcept
 	: mHandle(0), mpData(nullptr), mPath(aFilename), mWidth(0), mHeight(0), mChannels(0) {

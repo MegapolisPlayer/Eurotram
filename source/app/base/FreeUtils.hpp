@@ -118,10 +118,15 @@ private:
 void readBytesToString(std::ifstream& aStream, std::string& aBuffer, const uint64_t aBytes) noexcept;
 
 template<typename tType>
+concept ContiguousStandardNotationContainer = requires(tType a) {
+	{ a.data() } -> std::same_as<typename std::remove_reference<tType>::type::value_type *>;
+	{ a.size() } -> std::same_as<size_t>;
+};
+
+template<typename tType>
 concept MultipliableByFloat = requires(tType a, float b) {
 	a * b;
 };
-
 
 template<typename tType>
 concept Multipliable = requires(tType a, tType b) {

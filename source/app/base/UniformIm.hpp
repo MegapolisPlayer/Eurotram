@@ -3,15 +3,15 @@
 #include "Uniform.hpp"
 
 template<typename tType>
-Uniform<tType>::Uniform(const Shader* const aShader, const char* aUniformName) noexcept {
-		this->mHandle = glGetUniformLocation(aShader->getHandle(), aUniformName);
+Uniform<tType>::Uniform(const Shader& aShader, const std::string_view aUniformName) noexcept {
+		this->mHandle = glGetUniformLocation(aShader.getHandle(), aUniformName.data());
 		if(this->mHandle == -1) {
 			std::cerr << LogLevel::ERROR << "Could not find uniform \"" << aUniformName << "\"\n" << LogLevel::RESET;
 			std::exit(EXIT_FAILURE);
 		}
 }
 template<typename tType>
-Uniform<tType>::Uniform(const Shader* const aShader, const uint64_t aLocationOverride) noexcept {
+Uniform<tType>::Uniform(const Shader& aShader, const uint64_t aLocationOverride) noexcept {
 	this->mHandle = aLocationOverride;
 }
 
@@ -40,5 +40,18 @@ void StructUniform<tType>::set() noexcept {
 }
 template<typename tType>
 StructUniform<tType>::~StructUniform() noexcept {}
+
+template <ContiguousStandardNotationContainer tType>
+UniformIntMultiple<tType>::UniformIntMultiple(const Shader& aShader, const uint64_t aLocationOverride) noexcept
+: Uniform<tType>(aShader, aLocationOverride) {}
+
+template <ContiguousStandardNotationContainer tType>
+UniformIntMultiple<tType>::UniformIntMultiple(const Shader& aShader, const std::string_view aUniformName) noexcept
+: Uniform<tType>(aShader, aUniformName) {}
+
+template <ContiguousStandardNotationContainer tType>
+void UniformIntMultiple<tType>::set(tType aValue) noexcept {
+	glUniform1iv(this->mHandle, aValue.size(), aValue.data());
+}
 
 #endif

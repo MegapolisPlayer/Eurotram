@@ -147,6 +147,13 @@ void Framebuffer::unbind() noexcept {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void Framebuffer::bindAsRead() noexcept {
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, this->mHandle);
+}
+void Framebuffer::unbindAsRead() noexcept {
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+}
+
 uint64_t Framebuffer::getHandle() const noexcept {
 	return this->mHandle;
 }

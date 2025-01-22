@@ -23,6 +23,7 @@ r Raw Arrays
 #include <glm/geometric.hpp>
 
 #include <stbi/stb_image.h>
+#include <stbi/stb_image_write.h>
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>

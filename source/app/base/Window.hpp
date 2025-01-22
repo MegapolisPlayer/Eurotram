@@ -48,6 +48,9 @@ public:
 	void bindCamera(Camera* const aCamera) noexcept;
 	Camera* getCamera() const noexcept;
 
+	uint64_t getWidth() const noexcept;
+	uint64_t getHeight() const noexcept;
+
 	~Window() noexcept;
 private:
 	GLFWwindow* mpHandle;

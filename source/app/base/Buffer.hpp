@@ -84,6 +84,9 @@ public:
 	void bind() noexcept;
 	void unbind() noexcept;
 
+	void bindAsRead() noexcept;
+	void unbindAsRead() noexcept;
+
 	uint64_t getHandle() const noexcept;
 
 	~Framebuffer() noexcept;
