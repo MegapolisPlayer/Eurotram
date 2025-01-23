@@ -67,4 +67,11 @@ public:
 private:
 };
 
+// shadows
+
+class DirlightShadows {
+public:
+private:
+};
+
 #endif

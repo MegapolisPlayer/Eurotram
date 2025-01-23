@@ -312,6 +312,20 @@ int main() {
 
 		ImGui::End();
 
+		ImGui::Begin("Visual");
+
+		if(ImGui::Button("Change livery to normal")) {
+			t3rp.resetVariant("Material.paint");
+		};
+		if(ImGui::Button("Change livery to PLF")) {
+			t3rp.setVariant("Material.paint", "PLF");
+		};
+		if(ImGui::Button("Change livery to PID")) {
+			t3rp.setVariant("Material.paint", "PID");
+		};
+
+		ImGui::End();
+
 		ImGui::Begin("Announcements");
 
 		if(ImGui::Button("Next announcement")) {
@@ -353,20 +367,6 @@ int main() {
 			}
 			announcerId++;
 			if(announcerId == 11) announcerId = 0;
-		};
-
-		ImGui::End();
-
-		ImGui::Begin("Visual");
-
-		if(ImGui::Button("Change livery to normal")) {
-			t3rp.resetVariant("Material.paint");
-		};
-		if(ImGui::Button("Change livery to PLF")) {
-			t3rp.setVariant("Material.paint", "PLF");
-		};
-		if(ImGui::Button("Change livery to PID")) {
-			t3rp.setVariant("Material.paint", "PID");
 		};
 
 		ImGui::End();

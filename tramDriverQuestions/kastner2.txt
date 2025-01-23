@@ -1,36 +1,65 @@
-Návěstidla? Jsou-li správná?
+zajištovací - i to i to - vrátí zpátky do polohy která přijela
+sjezdová výhybka - spojuje trasy
+rozjezdová - rozpujuje trasy
 
-Návěsti?
+Návěstidla? Jsou-li správná?
+pražcový návěstidla - narozdíl od čoček provozované podnikem a né zákonem o komunikaci
+pražcová návěstidla - použita pro vnitřní potřebu, bez kontakt s silnicí = podjezdy na barandove
+kulička, připrava
+nahoře čára , stůj
+
+Návěsti? ok
 
 Výhybky - pokud je jich v úseku několik a jsou různé?
 (např odklon 18 na Myslíkovu po Nár. třídě)
    Jak tramvaj ví že výhybku přejela a musí vyslat jiný signál pro výhybku následující?
    Je v kabině nějaké tlačítko nebo ví tramvaj kdy její signál byl přijat automaticky
 
-Zvuková hlášení? Jsou normální?
+síťový řežím - stavět sami traťovou cestu, možnosti kam chci
+2 možnosti - dané doplňkové čidlo,  informuje že projelo
+potřeba hlídat - může se podělat
 
-Výhybky rádiové/elektrické, zajišťovací?
+zdvojí výhybky, načtou za sebou
+občas pokud blízko - nepoužitý příznak se přemapuje
+
+Zvuková hlášení? Jsou normální? ano
+
+Výhybky rádiové/elektrické, zajišťovací? ano
 
 "Odjezd z konečné za jednu minutu", "příští zastávka kontrolní bod" - používá se to ještě někde nebo už všude zrušeno? Bylo to užitečné?
+používá - KB nehlásí
 
 Nějaká služební hlášení stále v běžném použítí?
+asi nic
 
 Pořaďová čísla z vozoven?
+první čislo vozovna
+vozovny podle abecedy
+číslice
 
-Jak často se opakují pořaďová čísla z vozoven?
+pořadí na lince, nemusí být za sebou
 
-Schůzka pro testování?
+Jak často se opakují pořaďová čísla z vozoven? ignor
 
-Schůzka na obratišti nějakém - nahrání zvuků?
+Schůzka pro testování? pak bude
 
-Nejlepší způsob jak (ne)naštvat tramvajáka?
+Schůzka na obratišti nějakém - nahrání zvuků? pak bude
+
+fotku pak uděláme
+
+Nejlepší způsob jak (ne)naštvat tramvajáka? dá se domluvit pokud potřeba
 
 Typy cestujících které vás štvou?
+v ruce mobil - ten kdo čumí a vnímá
 
-Hypoteticky - pokud bych na noční tramvaji (s rodičem teda, sám po Praze nebudu v 5:00 běhat) oslovil nějakého tramvajáka zda bych mohl nahrát zvuky, jakou reakci můžu čekat?
+Hypoteticky - pokud bych na noční tramvaji (s rodičem teda, sám po Praze nebudu v 5:00 běhat) oslovil nějakého tramvajáka zda bych mohl nahrát zvuky, jakou reakci můžu čekat? domluvíme
 
 Názor na nové 52T které by měli za pár měsíců přijet?
+nevím
 
 Jednokolejné TT, např. Jarov?
+šotouši budou mít orgasmus
 
 Jízdní řády - KB/neKB, orientační které jsou vidět pro cestující?
+kontrolní body závisí na lince
+

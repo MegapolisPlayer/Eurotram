@@ -176,6 +176,6 @@ void main() {
 	}
 
 	oColor = vec4(
-		baseColor.xyz * clamp(uAmbientLight + (lighting + lightingSpecular) * calculateShadows(normalizedNormal, directionalLightDirection), 0.0, 1.0),
+		baseColor.xyz * clamp(uAmbientLight + ((lighting + lightingSpecular) * calculateShadows(normalizedNormal, directionalLightDirection)), 0.0, 1.0),
 		mat1.textureOpacity); //normal calc
 };
