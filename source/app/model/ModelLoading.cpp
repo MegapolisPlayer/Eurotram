@@ -44,6 +44,14 @@ void Model::draw(UniformMaterial& aUniform) noexcept {
 		m.draw(aUniform);
 	}
 }
+void Model::drawSolidOnly(UniformMaterial& aUniform) noexcept {
+	for(Mesh& m : this->mMeshes) {
+		if(m.mEntry->material.textureOpacity == 1.0) {
+			m.draw(aUniform);
+		}
+	}
+}
+
 Model::~Model() noexcept {}
 
 void Model::processNode(aiNode* apNode, const aiScene* apScene) noexcept {

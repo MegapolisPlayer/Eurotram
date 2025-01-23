@@ -15,7 +15,7 @@ void MouseClick(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModi
 	}
 }
 
-static glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 10.0f);
+static glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
 
 void KeyWASDRFQ(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) {
 	if(aAction == GLFW_RELEASE || !aWindow->isCursorHidden()) return;
@@ -100,7 +100,7 @@ int main() {
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 	shader.bind();
 
-	TextureSamplerArray<32> tsa(shader, 232);
+	TextureSamplerArray<16> tsa(shader, 232);
 	tsa.set();
 
 	UniformMat4 matCameraUniform(shader, 10);
@@ -114,6 +114,11 @@ int main() {
 	glm::mat4 rotationMatrix = glm::mat4(1.0);
 	d.direction = glm::vec4(0.0f, -1.0f, 0.0f, 1.0f);
 
+	DirectionalShadows ds(lightPos, glm::vec3(0.0f), 20.0f, 0.1f, 30.0f);
+
+	UniformMat4 spu(shader, 13);
+	spu.set(ds.getProjectionMatrix());
+
 	UniformDirlight uDirlight(51);
 	uDirlight.update(&d);
 	uDirlight.set();
@@ -123,19 +128,19 @@ int main() {
 	p.position = {0.0f, 5.0f, 0.0f, 0.0f};
 	setAttenuation(AttenuationValues::DISTANCE_100, &p.constant, &p.linear, &p.quadratic);
 
-	Spotlight s;
-	s.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	//Spotlight s;
+	//s.color = {1.0f, 1.0f, 1.0f, 1.0f};
 
-	setAttenuation(AttenuationValues::DISTANCE_100, &s.constant, &s.linear, &s.quadratic);
-	setSpotlightRadius(&s, 15.0, 10.0);
+	//setAttenuation(AttenuationValues::DISTANCE_100, &s.constant, &s.linear, &s.quadratic);
+	//setSpotlightRadius(&s, 15.0, 10.0);
 
 	UniformPointlight uPoints(52, 0);
 	uPoints.update(&p);
 	uPoints.set();
 
-	UniformSpotlight uSpots(53, 1);
-	uSpots.update(&s);
-	uSpots.set();
+	//UniformSpotlight uSpots(53, 1);
+	//uSpots.update(&s);
+	//uSpots.set();
 
 	UniformFloat ambientLightStrength(shader, 200);
 	ambientLightStrength.set(daylightIndex);
@@ -159,62 +164,34 @@ int main() {
 	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 	std::cout << "Model loaded!\n";
 
-	Framebuffer fbo;
-
-	unsigned int shadowMap;
-	glGenTextures(1, &shadowMap);
-	glBindTexture(GL_TEXTURE_2D, shadowMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, mainWindow.getWidth(), mainWindow.getHeight(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-	float clampColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clampColor);
-
-	fbo.bind();
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	fbo.unbind();
-
-	glm::mat4 orthgonalProjection = glm::ortho(-15.0f, 15.0f, -15.0f, 15.0f, 0.1f, 35.0f);
-	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 lightProjection = orthgonalProjection * lightView;
-
 	Shader shadowMapProgram("shader/shadowVertex.glsl", "shader/shadowFragment.glsl");
 	shadowMapProgram.bind();
-	UniformMat4 lpu(shadowMapProgram, "lightProjection");
-	lpu.set(lightProjection);
-	UniformMat4 lmod(shadowMapProgram, "model");
+	UniformMat4 lpu(shadowMapProgram, 90);
+	UniformMat4 lmod(shadowMapProgram, 91);
 	lmod.set(t1.getMatrix());
 
-	shader.bind();
-	UniformMat4 spu(shadowMapProgram, 13);
-	spu.set(lightProjection);
-
-	int announcerId = 0;
+	int announcerId = 7;
     while (mainWindow.isOpen()) {
 		loopTimer.start();
 
 		shadowMapProgram.bind();
+		ds.beginPass(mainWindow, lpu);
+		lmod.set(t1.getMatrix());
 
-		fbo.bind();
-		glClear(GL_DEPTH_BUFFER_BIT);
+		t3rp.drawSolidOnly(uMaterial);
 
-		t3rp.draw(uMaterial);
+		ds.endPass(mainWindow);
 
-		fbo.unbind();
+		// main draw
 
 		mainWindow.beginFrame();
 
 		shader.bind();
-		spu.set(lightProjection);
+		spu.set(ds.getProjectionMatrix());
 
-		s.position = glm::vec4(mainWindow.getCamera()->getPosition(), 1.0);
-		s.direction = glm::vec4(mainWindow.getCamera()->getDirection(), 1.0);
-		uSpots.update(&s);
+		//s.position = glm::vec4(mainWindow.getCamera()->getPosition(), 1.0);
+		//s.direction = glm::vec4(mainWindow.getCamera()->getDirection(), 1.0);
+		//uSpots.update(&s);
 
 		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
@@ -222,11 +199,10 @@ int main() {
 		matModelUniform.set(t1.getMatrix());
 		matNormalUniform.set(t1.getNormalMatrix());
 
-		glActiveTexture(GL_TEXTURE0 + 1);
-		glBindTexture(GL_TEXTURE_2D, shadowMap);
+		ds.bindMap(1);
 		drawTimer.start();
 
-		t3rp.draw(uMaterial);
+		t3rp.drawSolidOnly(uMaterial);
 
 		drawTimer.end();
 
@@ -245,16 +221,14 @@ int main() {
 		}
 		if(ImGui::SliderFloat("Sun angle",  &sunAngle, 0.0, 360.0)) {
 			rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(sunAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-			d.direction = rotationMatrix * glm::vec4(0.0f, -1.0f, 0.0f, 1.0f);
 
 			lightPos = glm::vec3(rotationMatrix * glm::vec4(glm::vec3(0.0f, 0.0f, 20.0f), 1.0f));
+
+			d.direction = glm::normalize(glm::vec4(lightPos, 1.0));
 			//mainWindow.getCamera()->moveTo(lightPos);
 
-			lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			lightProjection = orthgonalProjection * lightView;
+			ds.setPos(lightPos);
 
-			shadowMapProgram.bind();
-			lpu.set(lightProjection);
 			shader.bind();
 
 			uDirlight.update(&d);
@@ -362,11 +336,14 @@ int main() {
 					a.playAnnouncementTerminus();
 					break;
 				case(10):
+					a.playBaseAnnouncement(AnnunciatorBaseSound::DEPARTURE_FROM_TERMINUS);
+					break;
+				case(11):
 					a.playAnnouncementStart(13, "OLSH");
 					break;
 			}
 			announcerId++;
-			if(announcerId == 11) announcerId = 0;
+			if(announcerId == 12) announcerId = 0;
 		};
 
 		ImGui::End();

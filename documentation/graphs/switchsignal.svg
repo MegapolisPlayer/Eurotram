@@ -27,9 +27,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showguides="false"
-     inkscape:zoom="2.8284271"
-     inkscape:cx="261.09918"
-     inkscape:cy="406.76317"
+     inkscape:zoom="0.5"
+     inkscape:cx="683.00001"
+     inkscape:cy="477"
      inkscape:window-width="1920"
      inkscape:window-height="1008"
      inkscape:window-x="1920"
@@ -236,6 +236,14 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
+       style="fill:#ffffff;stroke-width:1;stroke-linecap:square"
+       id="rect10"
+       width="297"
+       height="209.83484"
+       x="0"
+       y="0.16515885"
+       inkscape:label="bg" />
+    <rect
        style="fill:#808080;stroke-width:1.541"
        id="rect1"
        width="297"
@@ -253,9 +261,9 @@
        inkscape:label="title"><tspan
          x="19.869141"
          y="36.175099"
-         id="tspan4"><tspan
+         id="tspan31"><tspan
            style="font-weight:bold;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan3">Možné stavy výhybkových návěstidel v tramvajovém simulátoru</tspan></tspan></text>
+           id="tspan2">Možné stavy výhybkových návěstidel v tramvajovém simulátoru</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,2.1166667,2.6458334)"
@@ -265,9 +273,9 @@
        inkscape:label="subtitle"><tspan
          x="28.003906"
          y="65.922557"
-         id="tspan6"><tspan
+         id="tspan33"><tspan
            style="font-weight:normal;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans'"
-           id="tspan5">Výhybková návěstidla určují směr a stav postavení tramvajové výhybky.</tspan></tspan></text>
+           id="tspan32">Výhybková návěstidla určují směr a stav postavení tramvajové výhybky.</tspan></tspan></text>
     <rect
        style="fill:#ff0000;stroke-width:1.65012"
        id="rect4"
@@ -315,7 +323,7 @@
        inkscape:label="l1"><tspan
          x="21.529297"
          y="214.62282"
-         id="tspan7">L</tspan></text>
+         id="tspan34">L</tspan></text>
     <path
        style="opacity:1;fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:5.91702;stroke-dasharray:none;stroke-opacity:1"
        d="M 87.604281,38.199481 45.845973,53.878235 87.527382,69.432441"
@@ -360,7 +368,7 @@
        inkscape:label="l2"><tspan
          x="21.529297"
          y="214.62282"
-         id="tspan8">L</tspan></text>
+         id="tspan35">L</tspan></text>
     <rect
        style="fill:#808080;stroke-width:1.05548"
        id="rect5-9"
@@ -399,7 +407,7 @@
        inkscape:label="l3"><tspan
          x="21.529297"
          y="214.62282"
-         id="tspan9">L</tspan></text>
+         id="tspan36">L</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:5.85625;stroke-dasharray:none;stroke-opacity:1"
        d="M 234.41156,38.117333 275.10259,53.878514 234.4865,69.514492"
@@ -450,7 +458,7 @@
        inkscape:label="l4"><tspan
          x="21.529297"
          y="214.62282"
-         id="tspan10">L</tspan></text>
+         id="tspan37">L</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:7.871;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#CapRibbon1-7-1);marker-end:url(#CapTriangle-7-8);paint-order:normal"
        d="m 65.243601,144.37918 c 0,-27.64809 0,-27.64809 0,-27.64809"
@@ -653,7 +661,7 @@
        inkscape:label="l6"><tspan
          x="21.529297"
          y="214.62282"
-         id="tspan11">L</tspan></text>
+         id="tspan38">L</tspan></text>
     <rect
        style="fill:#808080;stroke-width:1.05548"
        id="rect5-4-2-6-0"
@@ -692,7 +700,7 @@
        inkscape:label="l5"><tspan
          x="21.529297"
          y="214.62282"
-         id="tspan12">L</tspan></text>
+         id="tspan39">L</tspan></text>
     <rect
        style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        id="rect26"
@@ -711,14 +719,14 @@
        y="0"><tspan
          x="45.276698"
          y="316.67445"
-         id="tspan14"><tspan
+         id="tspan41"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan13">Neblikající šipka ukazující směr označuje že výhybka je do dané strany přehozena a je </tspan></tspan><tspan
+           id="tspan40">Neblikající šipka ukazující směr označuje že výhybka je do dané strany přehozena a je </tspan></tspan><tspan
          x="455.12748"
          y="350.00782"
-         id="tspan16"><tspan
+         id="tspan43"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan15">možné na ní vjet.</tspan></tspan></text>
+           id="tspan42">možné na ní vjet.</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,29.339644,0.20825846)"
@@ -729,9 +737,9 @@
        y="0"><tspan
          x="52.090453"
          y="316.67445"
-         id="tspan18"><tspan
+         id="tspan57"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan17">Vlevo</tspan></tspan></text>
+           id="tspan44">Vlevo</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,138.08174,0.15417048)"
@@ -742,7 +750,7 @@
        y="0"><tspan
          x="19.171875"
          y="316.67445"
-         id="tspan19">Rovně</tspan></text>
+         id="tspan58">Rovně</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,232.20908,0.15417048)"
@@ -753,7 +761,7 @@
        y="0"><tspan
          x="19.171875"
          y="316.67445"
-         id="tspan20">Vpravo</tspan></text>
+         id="tspan59">Vpravo</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,4.4101073,86.180209)"
@@ -764,67 +772,62 @@
        y="0"><tspan
          x="38.908006"
          y="316.67445"
-         id="tspan22"><tspan
+         id="tspan61"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan21">Blikající šipka ukazující do </tspan></tspan><tspan
+           id="tspan60">Blikající šipka ukazující do </tspan></tspan><tspan
          x="30.743934"
          y="350.00782"
-         id="tspan24"><tspan
+         id="tspan63"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan23">jakéhokoliv směru označuje </tspan></tspan><tspan
+           id="tspan62">jakéhokoliv směru označuje </tspan></tspan><tspan
          x="29.246536"
          y="383.34119"
-         id="tspan26"><tspan
+         id="tspan65"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan25">že výhybka se přehazuje do </tspan></tspan><tspan
+           id="tspan64">že výhybka se přehazuje do </tspan></tspan><tspan
          x="36.648889"
          y="416.67457"
-         id="tspan28"><tspan
+         id="tspan67"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan27">daného směru a není ještě </tspan></tspan><tspan
+           id="tspan66">daného směru a není ještě </tspan></tspan><tspan
          x="138.20501"
          y="450.00794"
-         id="tspan30"><tspan
+         id="tspan69"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan29">zajištěna. </tspan></tspan></text>
+           id="tspan68">zajištěna. </tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,98.621174,79.275631)"
+       transform="matrix(0.26458333,0,0,0.26458333,98.621174,85.096468)"
        id="text27-7-3"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect28-5-3);display:inline;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:3.77953;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        inkscape:label="descLinetwoM"
        x="0"
        y="0"><tspan
-         x="22.637154"
+         x="101.21147"
          y="316.67445"
-         id="tspan34"><tspan
+         id="tspan71"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan31">Prázdné návěstidlo označuje </tspan></tspan><tspan
-         x="25.612419"
+           id="tspan70">Tečka označuje </tspan></tspan><tspan
+         x="24.154083"
          y="350.00782"
-         id="tspan36"><tspan
+         id="tspan73"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan35">že je výhybka nefunkční a je </tspan></tspan><tspan
-         x="38.470508"
+           id="tspan72">neuzamčenost výhybky kvůli </tspan></tspan><tspan
+         x="28.607214"
          y="383.34119"
-         id="tspan38"><tspan
+         id="tspan75"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan37">jí možné projíždět. Taková </tspan></tspan><tspan
-         x="50.091616"
+           id="tspan74">nějaké fyzické poruše - řidič </tspan></tspan><tspan
+         x="56.777823"
          y="416.67457"
-         id="tspan40"><tspan
+         id="tspan77"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan39">situace může nastat je-li </tspan></tspan><tspan
-         x="27.819453"
+           id="tspan76">tramvaje musí výhybku </tspan></tspan><tspan
+         x="84.193222"
          y="450.00794"
-         id="tspan42"><tspan
+         id="tspan79"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan41">nastaven na výhybce pouze </tspan></tspan><tspan
-         x="124.19327"
-         y="483.34132"
-         id="tspan44"><tspan
-           style="text-align:center;text-anchor:middle"
-           id="tspan43">jeden směr.</tspan></tspan></text>
+           id="tspan78">vyčistit či přehodit.</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,196.94114,78.605039)"
@@ -835,34 +838,42 @@
        y="0"><tspan
          x="64.876791"
          y="316.67445"
-         id="tspan46"><tspan
+         id="tspan81"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan45">Vodorovná úsečka na </tspan></tspan><tspan
+           id="tspan80">Vodorovná úsečka na </tspan></tspan><tspan
          x="44.134577"
          y="350.00782"
-         id="tspan48"><tspan
+         id="tspan83"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan47">návěstidle označuje že je </tspan></tspan><tspan
+           id="tspan82">návěstidle označuje že je </tspan></tspan><tspan
          x="44.857235"
          y="383.34119"
-         id="tspan50"><tspan
+         id="tspan85"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan49">výhybka neplatná a bude </tspan></tspan><tspan
+           id="tspan84">výhybka neplatná a bude </tspan></tspan><tspan
          x="19.700953"
          y="416.67457"
-         id="tspan52"><tspan
+         id="tspan87"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan51">scénář v simulátoru ukončen.
+           id="tspan86">scénář v simulátoru ukončen.
 </tspan></tspan><tspan
          x="30.046018"
          y="450.00794"
-         id="tspan54"><tspan
+         id="tspan89"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan53">Pochopitelně taková návěst </tspan></tspan><tspan
+           id="tspan88">Pochopitelně taková návěst </tspan></tspan><tspan
          x="73.040864"
          y="483.34132"
-         id="tspan56"><tspan
+         id="tspan91"><tspan
            style="text-align:center;text-anchor:middle"
-           id="tspan55">není v reálu použita.</tspan></tspan></text>
+           id="tspan90">není v reálu použita.</tspan></tspan></text>
+    <ellipse
+       style="fill:#ff0000;stroke-width:0.606582;stroke-linecap:square"
+       id="path1"
+       cx="160.67996"
+       cy="131.23439"
+       rx="4.9972725"
+       ry="4.8689337"
+       inkscape:label="p5" />
   </g>
 </svg>

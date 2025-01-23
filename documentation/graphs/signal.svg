@@ -27,8 +27,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="0.5"
-     inkscape:cx="603"
-     inkscape:cy="309"
+     inkscape:cx="347"
+     inkscape:cy="317"
      inkscape:window-width="1920"
      inkscape:window-height="1008"
      inkscape:window-x="1920"
@@ -133,6 +133,14 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
+       style="fill:#ffffff;stroke-width:1;stroke-linecap:square"
+       id="rect7"
+       width="297"
+       height="210"
+       x="0"
+       y="0"
+       inkscape:label="bg" />
+    <rect
        style="fill:#808080;stroke-width:1.541"
        id="rect1"
        width="297"
@@ -150,9 +158,9 @@
        inkscape:label="title"><tspan
          x="19.869141"
          y="36.175099"
-         id="tspan7"><tspan
+         id="tspan2"><tspan
            style="font-weight:bold;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan5">Možné stavy křižovatkových návěstidel v tram. simulátoru</tspan></tspan></text>
+           id="tspan1">Možné stavy křižovatkových návěstidel v tram. simulátoru</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,2.1166809,2.4806746)"
@@ -162,9 +170,9 @@
        inkscape:label="subtitle"><tspan
          x="28.003906"
          y="65.922557"
-         id="tspan9"><tspan
+         id="tspan4"><tspan
            style="font-weight:normal;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans'"
-           id="tspan8">Křiž. náv. fungují stejně jako semafory pro auta - určují zda, a kam, mohou právě odbočit. </tspan></tspan></text>
+           id="tspan3">Křiž. náv. fungují stejně jako semafory pro auta - určují zda, a kam, mohou právě odbočit. </tspan></tspan></text>
     <rect
        style="fill:#ff0000;stroke-width:1.65012"
        id="rect4"
@@ -470,7 +478,7 @@
        style="font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6);display:inline;fill:#1a1a1a;stroke-width:3.77953;stroke-linecap:square"><tspan
          x="246.02515"
          y="168.86585"
-         id="tspan10">Návěst stůj - tramvají nesmí jet.</tspan></text>
+         id="tspan5">Návěst stůj - tramvají nesmí jet.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-7.566716,97.488167)"
@@ -478,10 +486,10 @@
        style="font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6-4-2);display:inline;fill:#1a1a1a;stroke-width:3.77953;stroke-linecap:square"><tspan
          x="246.77778"
          y="168.86585"
-         id="tspan11">Tramvaj smí odbočit vpravo. </tspan><tspan
+         id="tspan6">Tramvaj smí odbočit vpravo. </tspan><tspan
          x="304.06952"
          y="202.19923"
-         id="tspan12">Má (návěst) volno.</tspan></text>
+         id="tspan7">Má (návěst) volno.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-7.2789505,139.96649)"
@@ -489,10 +497,10 @@
        style="font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6-4-2-1);display:inline;fill:#1a1a1a;stroke-width:3.77953;stroke-linecap:square"><tspan
          x="251.31263"
          y="168.86585"
-         id="tspan13">Tramvaj smí odbočit vlevo. </tspan><tspan
+         id="tspan8">Tramvaj smí odbočit vlevo. </tspan><tspan
          x="299.71112"
          y="202.19923"
-         id="tspan14">Má (návěst) volno.</tspan></text>
+         id="tspan9">Má (návěst) volno.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,1.9054408,55.376213)"
@@ -500,10 +508,10 @@
        style="font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6-4-2-2);display:inline;fill:#1a1a1a;stroke-width:3.77953;stroke-linecap:square"><tspan
          x="244.85726"
          y="168.86585"
-         id="tspan15">Tramvaj smí jet rovně. </tspan><tspan
+         id="tspan10">Tramvaj smí jet rovně. </tspan><tspan
          x="266.56952"
          y="202.19923"
-         id="tspan16">Má (návěst) volno.</tspan></text>
+         id="tspan11">Má (návěst) volno.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,149.29498,10.928102)"
@@ -511,14 +519,14 @@
        style="font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6-4-2-2-8);display:inline;fill:#1a1a1a;stroke-width:3.77953;stroke-linecap:square"><tspan
          x="250.20231"
          y="168.86585"
-         id="tspan17">Tramvaj smí jet rovně </tspan><tspan
+         id="tspan12">Tramvaj smí jet rovně </tspan><tspan
          x="254.09555"
          y="202.19923"
-         id="tspan18">nebo odbočit vpravo.
+         id="tspan13">nebo odbočit vpravo.
 </tspan><tspan
          x="268.21015"
          y="235.5326"
-         id="tspan19">Má (návěst) volno.</tspan></text>
+         id="tspan14">Má (návěst) volno.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,149.29498,51.268204)"
@@ -526,14 +534,14 @@
        style="font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6-4-2-2-8-6);display:inline;fill:#1a1a1a;stroke-width:3.77953;stroke-linecap:square"><tspan
          x="250.20231"
          y="168.86585"
-         id="tspan20">Tramvaj smí jet rovně </tspan><tspan
+         id="tspan15">Tramvaj smí jet rovně </tspan><tspan
          x="262.98879"
          y="202.19923"
-         id="tspan21">nebo odbočit vlevo.
+         id="tspan16">nebo odbočit vlevo.
 </tspan><tspan
          x="268.21015"
          y="235.5326"
-         id="tspan22">Má (návěst) volno.</tspan></text>
+         id="tspan17">Má (návěst) volno.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,149.29498,94.665918)"
@@ -541,14 +549,14 @@
        style="font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6-4-2-2-8-6-3);display:inline;fill:#1a1a1a;stroke-width:3.77953;stroke-linecap:square"><tspan
          x="239.81167"
          y="168.86585"
-         id="tspan23">Tramvaj smí odbočit do </tspan><tspan
+         id="tspan18">Tramvaj smí odbočit do </tspan><tspan
          x="311.17244"
          y="202.19923"
-         id="tspan24">obou stran.
+         id="tspan19">obou stran.
 </tspan><tspan
          x="268.21015"
          y="235.5326"
-         id="tspan25">Má (návěst) volno.</tspan></text>
+         id="tspan20">Má (návěst) volno.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,149.29498,135.14112)"
@@ -556,15 +564,15 @@
        style="font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6-4-2-2-8-6-3-7);display:inline;fill:#1a1a1a;stroke-width:3.77953;stroke-linecap:square"><tspan
          x="268.72447"
          y="168.86585"
-         id="tspan26">Tramvaj smí jet do
+         id="tspan21">Tramvaj smí jet do
 </tspan><tspan
          x="306.00316"
          y="202.19923"
-         id="tspan27">všech stran.
+         id="tspan22">všech stran.
 </tspan><tspan
          x="268.21015"
          y="235.5326"
-         id="tspan28">Má (návěst) volno.</tspan></text>
+         id="tspan23">Má (návěst) volno.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-40.061533,-8.5691219)"
@@ -572,9 +580,9 @@
        style="font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6-7);display:inline;fill:#1a1a1a;stroke-width:3.77953;stroke-linecap:square"><tspan
          x="251.18141"
          y="168.86585"
-         id="tspan30"><tspan
+         id="tspan25"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan29">Návěsti ukazující jeden směr</tspan></tspan></text>
+           id="tspan24">Návěsti ukazující jeden směr</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,111.80914,-8.5691219)"
@@ -582,8 +590,8 @@
        style="font-size:26.6667px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6-7-5);display:inline;fill:#1a1a1a;stroke-width:3.77953;stroke-linecap:square"><tspan
          x="251.91058"
          y="168.86585"
-         id="tspan32"><tspan
+         id="tspan27"><tspan
            style="font-weight:bold;-inkscape-font-specification:'Liberation Sans Bold'"
-           id="tspan31">Návěsti ukazující více směrů</tspan></tspan></text>
+           id="tspan26">Návěsti ukazující více směrů</tspan></tspan></text>
   </g>
 </svg>

@@ -379,14 +379,25 @@ void Annunciator::playSoundCollection(std::vector<ma_sound*>& aSounds, const boo
 	// (saving at beginning would require another struct + when we dont use it we set to zero which massively simplifies calculations later on)
 	//  - set that it is last
 
-	ma_uint64 repeatTimeOffset = 0;
+	ma_uint64* repeatOffset = nullptr;
 	bool repeatFirstPassed = false;
-	ma_sound_set_end_callback(aRepeatingSound, [](void* aInt, ma_sound* aSound) {
-		ma_sound_set_start_time_in_pcm_frames(aSound, *((ma_uint64*)aInt));
-		ma_sound_set_end_callback(aSound, NULL , NULL);
-		ma_sound_seek_to_pcm_frame(aSound, 0);
-		ma_sound_start(aSound);
-	}, &repeatTimeOffset);
+
+	if(aRepeatingSound != nullptr) {
+		//have to allocate on heap - repeat may play after end of function
+		//end of functions unallocates stack
+		//have to allocate here since we take pointer
+		repeatOffset = new ma_uint64;
+		ma_sound_set_end_callback(aRepeatingSound, [](void* aInt, ma_sound* aSound) {
+			if(aInt == nullptr) { return; } //repeat already called or doesnt exist
+			ma_sound_set_start_time_in_pcm_frames(aSound, *(ma_uint64*)aInt);
+			delete (ma_uint64*)aInt;
+			aInt = nullptr;
+			ma_sound_seek_to_pcm_frame(aSound, 0);
+			ma_sound_start(aSound);
+			//force callback to be called only once
+			ma_sound_set_end_callback(aSound, NULL, NULL);
+		}, repeatOffset);
+	}
 
 	ma_sound* lastSound = aSounds[0];
 	std::vector<ma_uint64> timeOffsets;
@@ -407,11 +418,11 @@ void Annunciator::playSoundCollection(std::vector<ma_sound*>& aSounds, const boo
 	for(uint64_t i = 0; i < aSounds.size(); i++) {
 		//first time play as normal, then change
 		if(aSounds[i] == aRepeatingSound && repeatFirstPassed) {
-			repeatTimeOffset = currentPCMTime + timeOffset;
+			*repeatOffset = currentPCMTime + timeOffset;
 			timeOffset += timeOffsets[i];
 			continue;
 		}
-		else if(aSounds[i] == aRepeatingSound) repeatFirstPassed = true;
+		else if(aSounds[i] == aRepeatingSound) { repeatFirstPassed = true; }
 		else {}
 
 		ma_sound_set_start_time_in_pcm_frames(aSounds[i], currentPCMTime + timeOffset);

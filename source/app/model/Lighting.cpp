@@ -43,3 +43,67 @@ UniformPointlight::~UniformPointlight() noexcept {}
 UniformSpotlight::UniformSpotlight(const uint64_t aLocation, const uint64_t aAmount) noexcept
 	: StructUniform(aLocation, aAmount) {}
 UniformSpotlight::~UniformSpotlight() noexcept {}
+
+DirectionalShadows::DirectionalShadows(
+	const glm::vec3& aPos, const glm::vec3& aSceneCenter,
+	const float aProjectionSize, const float aNear, const float aFar
+) noexcept
+	: mFBO(), mTexture(
+		DirectionalShadowMapWidth, DirectionalShadowMapHeight,
+		GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,
+		TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE
+	) {
+	this->mTexture.setOutOfBoundsColor(1.0, 1.0, 1.0); //out of bounds - no shadow
+	this->mFBO.bind();
+	this->mFBO.bindTexture(this->mTexture, GL_DEPTH_ATTACHMENT);
+	this->mView = glm::lookAt(aPos, aSceneCenter, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->mProjection = glm::ortho(-aProjectionSize/2.0f, aProjectionSize/2.0f, -aProjectionSize/2.0f, aProjectionSize/2.0f, aNear, aFar);
+	this->mLightMatrix = this->mProjection * this->mView;
+	this->mFBO.unbind();
+}
+DirectionalShadows::DirectionalShadows(DirectionalShadows&& aOther) noexcept
+	: mFBO(std::move(aOther.mFBO)), mTexture(std::move(aOther.mTexture)) {
+	this->mView = std::move(aOther.mView);
+	this->mProjection = std::move(aOther.mProjection);
+	this->mLightMatrix = std::move(aOther.mLightMatrix);
+}
+DirectionalShadows& DirectionalShadows::operator=(DirectionalShadows&& aOther) noexcept {
+	this->mFBO = std::move(aOther.mFBO);
+	this->mTexture = std::move(aOther.mTexture);
+	this->mView = std::move(aOther.mView);
+	this->mProjection = std::move(aOther.mProjection);
+	this->mLightMatrix = std::move(aOther.mLightMatrix);
+	return *this;
+}
+
+void DirectionalShadows::beginPass(Window& aWindow, UniformMat4& aLightMatrixUniform) noexcept {
+	aWindow.setViewport(DirectionalShadowMapWidth, DirectionalShadowMapHeight);
+	this->mFBO.bind();
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glCullFace(GL_FRONT);
+	aLightMatrixUniform.set(this->mLightMatrix);
+}
+void DirectionalShadows::endPass(Window& aWindow) noexcept {
+	glCullFace(GL_BACK);
+	this->mFBO.unbind();
+	aWindow.resetViewport();
+}
+
+void DirectionalShadows::setPos(const glm::vec3& aPos, const glm::vec3& aSceneCenter) noexcept {
+	this->mView = glm::lookAt(aPos, aSceneCenter, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->mLightMatrix = this->mProjection * this->mView;
+}
+void DirectionalShadows::setProjection(const float aProjectionSize, const float aNear, const float aFar) noexcept {
+	this->mProjection = glm::ortho(-aProjectionSize/2.0f, aProjectionSize/2.0f, -aProjectionSize/2.0f, aProjectionSize/2.0f, aNear, aFar);
+	this->mLightMatrix = this->mProjection * this->mView;
+}
+
+void DirectionalShadows::bindMap(const uint64_t aTextureSlot) noexcept {
+	this->mTexture.bind(aTextureSlot);
+}
+
+const glm::mat4& DirectionalShadows::getProjectionMatrix() const noexcept {
+	return this->mLightMatrix;
+}
+
+DirectionalShadows::~DirectionalShadows() noexcept {}

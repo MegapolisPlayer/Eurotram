@@ -14,6 +14,7 @@ public:
 	void resetVariant(const std::string_view aMaterialName) noexcept;
 
 	void draw(UniformMaterial& aUniform) noexcept;
+	void drawSolidOnly(UniformMaterial& aUniform) noexcept;
 
 	~Model() noexcept;
 private:

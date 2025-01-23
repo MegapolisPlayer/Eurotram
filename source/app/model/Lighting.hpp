@@ -69,9 +69,49 @@ private:
 
 // shadows
 
-class DirlightShadows {
+constexpr uint64_t DirectionalShadowMapWidth = 2048;
+constexpr uint64_t DirectionalShadowMapHeight = 2048;
+
+class DirectionalShadows {
 public:
+	DirectionalShadows(
+		const glm::vec3& aPos, const glm::vec3& aSceneCenter,
+		const float aProjectionSize, const float aNear, const float aFar
+	) noexcept;
+	DirectionalShadows(DirectionalShadows& aOther) noexcept = delete;
+	DirectionalShadows(DirectionalShadows&& aOther) noexcept;
+	DirectionalShadows& operator=(DirectionalShadows& aOther) noexcept = delete;
+	DirectionalShadows& operator=(DirectionalShadows&& aOther) noexcept;
+
+	void beginPass(Window& aWindow, UniformMat4& aLightMatrixUniform) noexcept;
+	void endPass(Window& aWindow) noexcept;
+
+	//we need a position and center for the shadow map
+	void setPos(const glm::vec3& aPos, const glm::vec3& aSceneCenter = glm::vec3(0.0f, 0.0f, 0.0f)) noexcept;
+	void setProjection(const float aProjectionSize, const float aNear = 0.1, const float aFar = 30.0) noexcept;
+
+	void bindMap(const uint64_t aTextureSlot) noexcept;
+
+	const glm::mat4& getProjectionMatrix() const noexcept;
+
+	~DirectionalShadows() noexcept;
 private:
+	Framebuffer mFBO;
+	Texture mTexture;
+
+	glm::mat4 mProjection;
+	glm::mat4 mView;
+	glm::mat4 mLightMatrix;
+};
+
+constexpr uint64_t StandardShadowMapWidth = 2048;
+constexpr uint64_t StandardShadowMapHeight = 2048;
+
+class SpotlightShadows {
+public:
+
+private:
+
 };
 
 #endif

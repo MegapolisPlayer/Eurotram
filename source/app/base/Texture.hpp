@@ -2,15 +2,29 @@
 #define EUROTRAM_TEXTURE
 #include "Uniform.hpp"
 #include "UniformIm.hpp"
+#include "Buffer.hpp"
+
+enum class TextureBorder : uint8_t {
+	REPEAT = 0,
+	FILL_OUT_OF_RANGE
+};
+
+enum class TextureScale : uint8_t {
+	LINEAR = 0,
+	NEAREST_NEIGHBOR
+};
 
 class Texture {
 public:
 	//channels = bits per pixel
-	Texture(std::string_view aFilename) noexcept;
+	Texture(const std::string_view aFilename, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
+	Texture(const uint64_t aWidth, const uint64_t aHeight, const uint64_t aInternalFormat, const uint64_t aFormat, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
 	Texture(Texture&& aOther) noexcept;
 	Texture& operator=(Texture&& aOther) noexcept;
 	Texture(Texture& aOther) noexcept = delete;
 	Texture& operator=(Texture& aOther) noexcept = delete;
+
+	void setOutOfBoundsColor(const float aR, const float aG, const float aB, const float aA = 1.0f) noexcept;
 
 	void bind(const uint64_t aId) noexcept;
 	void unbind() noexcept;

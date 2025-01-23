@@ -2,18 +2,50 @@
 #include "Texture.hpp"
 #include "TextureIm.hpp"
 
-Texture::Texture(std::string_view aFilename) noexcept
+void Framebuffer::bindTexture(const Texture& aTexture, const uint64_t aFormat, const bool aRead, const bool aDraw) noexcept {
+	this->bind();
+	glFramebufferTexture2D(GL_FRAMEBUFFER, aFormat, GL_TEXTURE_2D, aTexture.getHandle(), 0);
+	if(!aDraw) glDrawBuffer(GL_NONE);
+	if(!aRead) glReadBuffer(GL_NONE);
+}
+
+Texture::Texture(const std::string_view aFilename, TextureScale aScaling, TextureBorder aBorder) noexcept
 	: mHandle(0), mpData(nullptr), mPath(aFilename), mWidth(0), mHeight(0), mChannels(0) {
 	if(this->mPath.empty()) {
 		return;
 	}
 
+	GLint glTextureScaleValue = 0;
+	GLint glTextureScaleValue2 = 0;
+	switch(aScaling) {
+		case(TextureScale::LINEAR):
+			glTextureScaleValue = GL_LINEAR;
+			glTextureScaleValue2 = GL_LINEAR_MIPMAP_LINEAR;
+			break;
+		case(TextureScale::NEAREST_NEIGHBOR):
+		default:
+			glTextureScaleValue = GL_NEAREST;
+			glTextureScaleValue2 = GL_NEAREST;
+			break;
+	}
+
+	GLint glTextureBorderValue = 0;
+	switch(aBorder) {
+		case(TextureBorder::FILL_OUT_OF_RANGE):
+			glTextureBorderValue = GL_CLAMP_TO_BORDER;
+			break;
+		case(TextureBorder::REPEAT):
+		default:
+			glTextureBorderValue = GL_REPEAT;
+			break;
+	}
+
 	glGenTextures(1, &this->mHandle);
 	glBindTexture(GL_TEXTURE_2D, this->mHandle);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glTextureBorderValue);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glTextureBorderValue);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glTextureScaleValue2);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glTextureScaleValue);
 
 	stbi_set_flip_vertically_on_load(true);
 	this->mpData = stbi_load(mPath.data(), &this->mWidth, &this->mHeight, &this->mChannels, 4);
@@ -24,6 +56,44 @@ Texture::Texture(std::string_view aFilename) noexcept
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->mWidth, this->mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, this->mpData);
 	glGenerateMipmap(GL_TEXTURE_2D);
+}
+Texture::Texture(
+	const uint64_t aWidth, const uint64_t aHeight,
+	const uint64_t aInternalFormat, const uint64_t aFormat,
+	TextureScale aScaling, TextureBorder aBorder) noexcept
+	: mPath(""), mHandle(0), mpData(nullptr), mWidth(aHeight), mHeight(aHeight), mChannels(0)  {
+	GLint glTextureScaleValue = 0;
+	GLint glTextureScaleValue2 = 0;
+	switch(aScaling) {
+		case(TextureScale::LINEAR):
+			glTextureScaleValue = GL_LINEAR;
+			glTextureScaleValue2 = GL_LINEAR_MIPMAP_LINEAR;
+			break;
+		case(TextureScale::NEAREST_NEIGHBOR):
+		default:
+			glTextureScaleValue = GL_NEAREST;
+			glTextureScaleValue2 = GL_NEAREST;
+			break;
+	}
+
+	GLint glTextureBorderValue = 0;
+	switch(aBorder) {
+		case(TextureBorder::FILL_OUT_OF_RANGE):
+			glTextureBorderValue = GL_CLAMP_TO_BORDER;
+			break;
+		case(TextureBorder::REPEAT):
+		default:
+			glTextureBorderValue = GL_REPEAT;
+			break;
+	}
+
+	glGenTextures(1, &this->mHandle);
+	glBindTexture(GL_TEXTURE_2D, this->mHandle);
+	glTexImage2D(GL_TEXTURE_2D, 0, aInternalFormat, this->mWidth, this->mHeight, 0, aFormat, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glTextureBorderValue);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glTextureBorderValue);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glTextureScaleValue2);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glTextureScaleValue);
 }
 Texture::Texture(Texture&& aOther) noexcept
 	: mPath(std::move(aOther.mPath)), mHandle(aOther.mHandle), mpData(aOther.mpData),
@@ -42,6 +112,11 @@ Texture& Texture::operator=(Texture&& aOther) noexcept {
 	aOther.mHandle = 0;
 	aOther.mpData = nullptr;
 	return *this;
+}
+
+void Texture::setOutOfBoundsColor(const float aR, const float aG, const float aB, const float aA) noexcept {
+	float clampColor[4] = { aR, aG, aB, aA };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clampColor);
 }
 
 void Texture::bind(const uint64_t aId) noexcept {

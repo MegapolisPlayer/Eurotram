@@ -24,7 +24,7 @@ void VertexArray::unbind() noexcept {
 	glBindVertexArray(0);
 }
 
-GLuint VertexArray::getHandle() noexcept {
+GLuint VertexArray::getHandle() const noexcept {
 	return this->mHandle;
 }
 VertexArray::~VertexArray() noexcept {
@@ -76,6 +76,9 @@ void VertexBuffer::unbind() noexcept {
 void VertexBuffer::drawPoints() noexcept {
 	glDrawArrays(GL_POINTS, 0, this->mVertices);
 }
+GLuint VertexBuffer::getHandle() const noexcept {
+	return this->mHandle;
+}
 uint64_t VertexBuffer::getVerticesAmount() const noexcept {
 	return this->mVertices;
 }
@@ -115,7 +118,7 @@ void IndexBuffer::unbind() noexcept {
 void IndexBuffer::draw() noexcept {
 	glDrawElements(GL_TRIANGLES, this->mSize, GL_UNSIGNED_INT, nullptr);
 }
-uint64_t IndexBuffer::getHandle() const noexcept {
+GLuint IndexBuffer::getHandle() const noexcept {
 	return this->mHandle;
 }
 uint64_t IndexBuffer::getSize() const noexcept {
@@ -125,7 +128,7 @@ IndexBuffer::~IndexBuffer() noexcept {
 	glDeleteBuffers(1, &this->mHandle);
 }
 
-Framebuffer::Framebuffer() noexcept {
+Framebuffer::Framebuffer() noexcept : mHandle(0) {
 	glGenFramebuffers(1, &this->mHandle);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->mHandle);
 }
@@ -154,9 +157,11 @@ void Framebuffer::unbindAsRead() noexcept {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 }
 
-uint64_t Framebuffer::getHandle() const noexcept {
+GLuint Framebuffer::getHandle() const noexcept {
 	return this->mHandle;
 }
+
+//bind texture defined in texture.cpp
 
 Framebuffer::~Framebuffer() noexcept {
 	glDeleteFramebuffers(1, &this->mHandle);

@@ -24,6 +24,7 @@ enum class AnnunciatorBaseSound : uint8_t {
 	CONTINUES_JOURNEY_AS,
 	DIRECTION,
 	FUNICULAR_CLOSED,
+	DEPARTURE_FROM_TERMINUS,
 	AMOUNT_SOUNDS, //not real sound, just says how many sounds are there
 };
 

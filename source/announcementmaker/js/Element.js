@@ -18,6 +18,7 @@ const baseNames = [
 	"...is changed to line...",
 	"Direction",
 	"Funicular closure",
+	"Departure from terminus in 1 minute",
 ];
 
 const BASE_NAMES_AMOUNT = baseNames.length;

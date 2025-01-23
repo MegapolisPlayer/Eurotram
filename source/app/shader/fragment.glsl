@@ -63,7 +63,7 @@ layout(std430, binding = 53) readonly buffer sSpotlights {
 
 layout(location = 200) uniform float uAmbientLight;
 layout(location = 210) uniform vec3 uCameraPosition;
-layout(location = 232) uniform sampler2D uTextures[32];
+layout(location = 232) uniform sampler2D uTextures[16];
 
 float attenuation(float aDistance, float aConstant, float aLinear, float aQuadratic) {
 	return 1.0/(aConstant + aLinear*aDistance + aQuadratic*aDistance*aDistance);
@@ -112,23 +112,28 @@ vec3 calculateSpot(float aDst, vec3 aNormalizedNormal, vec3 aLightDirection, vec
 	return aLight.color.xyz * attenuation(aDst, aLight.constant, aLight.linear, aLight.quadratic) * diffuseComp(aNormalizedNormal, aLightDirection);
 }
 
+const float bias_coef = 0.05;
+
 float calculateShadows(vec3 aNormalizedNormal, vec3 aLightDirection) {
 	float shadow = 0.0;
 	vec3 coords = pFragmentLightPos.xyz / pFragmentLightPos.w;
 	//only if within frustum
 	if(coords.z <= 1.0) {
-		vec2 texelSize = 1.0 / textureSize(uTextures[1], 0); //divide max coord by amount of texels in texture (as vec2)
-
 		coords = (coords * 0.5) + 0.5; //convert from OpenGL render coords to UV coords
+
+		//float closest = texture(uTextures[1], coords.xy).r; //single-dimensional texture
+		float current = coords.z;
+		float bias = max(bias_coef * (dot(aNormalizedNormal, aLightDirection)), bias_coef/10.0);
+		//shadow = float(current - bias > closest);
+
+		vec2 texelSize = vec2(1.0) / textureSize(uTextures[1], 0); //divide max coord by amount of texels in texture (as vec2)
 
 		//PCF - percentage-closer filtering - adding softer shadows
 
 		//average from neighboring texels
-		for(int x = -1; x < 2; x++) {
-			for(int y = -1; y < 2; y++) {
+		for(int x = -1; x <= 1; x++) {
+			for(int y = -1; y <= 1; y++) {
 				float closest = texture(uTextures[1], coords.xy + (vec2(x, y) * texelSize)).r; //single-dimensional texture
-				float current = coords.z;
-				float bias = max(0.05 * (1.0 - dot(aNormalizedNormal, aLightDirection)), 0.005);
 
 				shadow += float(current - bias > closest);
 			}
@@ -174,6 +179,8 @@ void main() {
 			normalizedNormal, lightDirection, viewDirection, mat1
 		) * strength;
 	}
+
+	//TODO calculate shadows for multiple lights
 
 	oColor = vec4(
 		baseColor.xyz * clamp(uAmbientLight + ((lighting + lightingSpecular) * calculateShadows(normalizedNormal, directionalLightDirection)), 0.0, 1.0),

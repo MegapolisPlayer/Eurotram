@@ -14,7 +14,7 @@ public:
 	void bind() noexcept;
 	void unbind() noexcept;
 
-	GLuint getHandle() noexcept;
+	GLuint getHandle() const noexcept;
 
 	~VertexArray() noexcept;
 private:
@@ -39,6 +39,7 @@ public:
 	//use as debug
 	void drawPoints() noexcept;
 
+	GLuint getHandle() const noexcept;
 	uint64_t getVerticesAmount() const noexcept;
 	uint64_t getVertexSize() const noexcept;
 
@@ -63,7 +64,7 @@ public:
 
 	void draw() noexcept;
 
-	uint64_t getHandle() const noexcept;
+	GLuint getHandle() const noexcept;
 	uint64_t getSize() const noexcept;
 
 	~IndexBuffer() noexcept;
@@ -71,6 +72,8 @@ private:
 	GLuint mHandle;
 	uint64_t mSize;
 };
+
+class Texture;
 
 //used for implementing mirrors and shadows
 class Framebuffer {
@@ -87,7 +90,9 @@ public:
 	void bindAsRead() noexcept;
 	void unbindAsRead() noexcept;
 
-	uint64_t getHandle() const noexcept;
+	void bindTexture(const Texture& aTexture, const uint64_t aFormat, const bool aRead = false, const bool aDraw = false) noexcept;
+
+	GLuint getHandle() const noexcept;
 
 	~Framebuffer() noexcept;
 private:
