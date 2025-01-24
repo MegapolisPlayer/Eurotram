@@ -123,24 +123,24 @@ int main() {
 	uDirlight.update(&d);
 	uDirlight.set();
 
-	Pointlight p;
-	p.color = {1.0f, 0.0f, 1.0f, 1.0f};
-	p.position = {0.0f, 5.0f, 0.0f, 0.0f};
-	setAttenuation(AttenuationValues::DISTANCE_100, &p.constant, &p.linear, &p.quadratic);
+	//Pointlight p;
+	//p.color = {1.0f, 0.0f, 1.0f, 1.0f};
+	//p.position = {0.0f, 5.0f, 0.0f, 0.0f};
+	//setAttenuation(AttenuationValues::DISTANCE_100, &p.constant, &p.linear, &p.quadratic);
 
-	//Spotlight s;
-	//s.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	Spotlight s;
+	s.color = {1.0f, 1.0f, 1.0f, 1.0f};
 
-	//setAttenuation(AttenuationValues::DISTANCE_100, &s.constant, &s.linear, &s.quadratic);
-	//setSpotlightRadius(&s, 15.0, 10.0);
+	setAttenuation(AttenuationValues::DISTANCE_100, &s.constant, &s.linear, &s.quadratic);
+	setSpotlightRadius(&s, 15.0, 10.0);
 
-	UniformPointlight uPoints(52, 0);
-	uPoints.update(&p);
-	uPoints.set();
+	//UniformPointlight uPoints(52, 0);
+	//uPoints.update(&p);
+	//uPoints.set();
 
-	//UniformSpotlight uSpots(53, 1);
-	//uSpots.update(&s);
-	//uSpots.set();
+	UniformSpotlight uSpots(53, 1);
+	uSpots.update(&s);
+	uSpots.set();
 
 	UniformFloat ambientLightStrength(shader, 200);
 	ambientLightStrength.set(daylightIndex);
@@ -189,9 +189,9 @@ int main() {
 		shader.bind();
 		spu.set(ds.getProjectionMatrix());
 
-		//s.position = glm::vec4(mainWindow.getCamera()->getPosition(), 1.0);
-		//s.direction = glm::vec4(mainWindow.getCamera()->getDirection(), 1.0);
-		//uSpots.update(&s);
+		s.position = glm::vec4(mainWindow.getCamera()->getPosition(), 1.0);
+		s.direction = glm::vec4(mainWindow.getCamera()->getDirection(), 1.0);
+		uSpots.update(&s);
 
 		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
@@ -234,10 +234,10 @@ int main() {
 			uDirlight.update(&d);
 			uDirlight.set();
 		}
-		if(ImGui::SliderFloat3("Point light position", glm::value_ptr(p.position), -10.0, 10.0)) {
-			uPoints.update(&p);
-			uPoints.set();
-		}
+		//if(ImGui::SliderFloat3("Point light position", glm::value_ptr(p.position), -10.0, 10.0)) {
+		//	uPoints.update(&p);
+		//	uPoints.set();
+		//}
 
 		ImGui::End();
 

@@ -80,7 +80,7 @@ float diffuseComp(vec3 aNormalizedNormal, vec3 aLightDirection) {
 //shininess
 float specularComp(vec3 aNormalizedNormal, vec3 aLightDirection, vec3 aViewDirection, float aShininess) {
 	vec3 halfwayDir = normalize(aLightDirection + aViewDirection); //halfway direction - Blinn-Phong
-	return pow(max(dot(aNormalizedNormal, halfwayDir), 0.0), aShininess);
+	return pow((dot(aNormalizedNormal, halfwayDir) + 1.0) / 2.0, aShininess);
 }
 
 //calculate specular only if some diffuse present
@@ -139,7 +139,7 @@ float calculateShadows(vec3 aNormalizedNormal, vec3 aLightDirection) {
 			}
 		}
 
-		shadow /= 9.0; //average it
+		shadow /= 9.0; //average it, clamp to 0 - 1
 	}
 
 	return 1.0 - shadow;
@@ -151,9 +151,10 @@ void main() {
 	vec3 normalizedNormal = normalize(pNormals);
 	vec3 viewDirection = normalize(uCameraPosition - pFragmentPos);
 
-	vec3 lighting = calculateDirectional(dl.color.xyz, normalizedNormal, viewDirection, mat1, dl);
 	vec3 directionalLightDirection = normalize(-dl.direction.xyz); //vector from (NOT TO) the light
-	vec3 lightingSpecular = getSpecular(dl.color.xyz, 0.0, 1.0, 0.0, 0.0, normalizedNormal, directionalLightDirection, viewDirection, mat1);
+	float directionalShadow = calculateShadows(normalizedNormal, directionalLightDirection);
+	vec3 lighting = calculateDirectional(dl.color.xyz, normalizedNormal, viewDirection, mat1, dl) * directionalShadow;
+	vec3 lightingSpecular = getSpecular(dl.color.xyz, 0.0, 1.0, 0.0, 0.0, normalizedNormal, directionalLightDirection, viewDirection, mat1) * directionalShadow;
 
 	//putting together
 	for(int i = 0; i < pointlights.length(); i++) {
@@ -182,7 +183,5 @@ void main() {
 
 	//TODO calculate shadows for multiple lights
 
-	oColor = vec4(
-		baseColor.xyz * clamp(uAmbientLight + ((lighting + lightingSpecular) * calculateShadows(normalizedNormal, directionalLightDirection)), 0.0, 1.0),
-		mat1.textureOpacity); //normal calc
+	oColor = vec4(baseColor.xyz * clamp(uAmbientLight + (lighting + lightingSpecular), 0.0, 1.0), mat1.textureOpacity); //normal calc
 };
