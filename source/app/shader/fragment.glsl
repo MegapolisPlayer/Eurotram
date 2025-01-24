@@ -40,13 +40,20 @@ struct Spotlight {
 	float constant;
 	float linear;
 	float quadratic;
+
+	int lightType;
 };
 
 out vec4 oColor;
 in vec2 pTexCoord;
 in vec3 pNormals;
 in vec3 pFragmentPos;
-in vec4 pFragmentLightPos;
+
+//for shadows
+in vec4 pFragmentDirectionalLightPos;
+in vec4 pFragmentFlashlightLightPos;
+in vec4 pFragmentLeftFrontLightPos;
+in vec4 pFragmentRightFrontLightPos;
 
 layout(std430, binding = 50) readonly buffer sMaterial {
 	layout(align = 16) Material mat1;
@@ -112,34 +119,37 @@ vec3 calculateSpot(float aDst, vec3 aNormalizedNormal, vec3 aLightDirection, vec
 	return aLight.color.xyz * attenuation(aDst, aLight.constant, aLight.linear, aLight.quadratic) * diffuseComp(aNormalizedNormal, aLightDirection);
 }
 
-const float bias_coef = 0.05;
+const float BIAS_COEF = 0.05;
+const float SPECULAR_SHADOW_CUTOFF = 0.01;
 
-float calculateShadows(vec3 aNormalizedNormal, vec3 aLightDirection) {
+float calculateShadows(int aTextureId, vec4 aCoords, vec3 aNormalizedNormal, vec3 aLightDirection) {
 	float shadow = 0.0;
-	vec3 coords = pFragmentLightPos.xyz / pFragmentLightPos.w;
+	vec3 coords = aCoords.xyz / aCoords.w;
 	//only if within frustum
 	if(coords.z <= 1.0) {
 		coords = (coords * 0.5) + 0.5; //convert from OpenGL render coords to UV coords
 
 		//float closest = texture(uTextures[1], coords.xy).r; //single-dimensional texture
 		float current = coords.z;
-		float bias = max(bias_coef * (dot(aNormalizedNormal, aLightDirection)), bias_coef/10.0);
+		float bias = max(BIAS_COEF * (dot(aNormalizedNormal, aLightDirection)), BIAS_COEF/10.0);
 		//shadow = float(current - bias > closest);
 
-		vec2 texelSize = vec2(1.0) / textureSize(uTextures[1], 0); //divide max coord by amount of texels in texture (as vec2)
+		vec2 texelSize = vec2(1.0) / textureSize(uTextures[aTextureId], 0); //divide max coord by amount of texels in texture (as vec2)
 
 		//PCF - percentage-closer filtering - adding softer shadows
+		//this is a kind of "fake" PCF implementation - we dont have an explicit boolean field, but we are based on a condition
+		//we use a 5x5 kernel
 
 		//average from neighboring texels
-		for(int x = -1; x <= 1; x++) {
-			for(int y = -1; y <= 1; y++) {
-				float closest = texture(uTextures[1], coords.xy + (vec2(x, y) * texelSize)).r; //single-dimensional texture
+		for(int x = -2; x <= 1; x++) {
+			for(int y = -2; y <= 2; y++) {
+				float closest = texture(uTextures[aTextureId], coords.xy + (vec2(x, y) * texelSize)).r; //single-dimensional texture
 
 				shadow += float(current - bias > closest);
 			}
 		}
 
-		shadow /= 9.0; //average it, clamp to 0 - 1
+		shadow /= 25.0; //average it, clamp to 0 - 1
 	}
 
 	return 1.0 - shadow;
@@ -152,14 +162,16 @@ void main() {
 	vec3 viewDirection = normalize(uCameraPosition - pFragmentPos);
 
 	vec3 directionalLightDirection = normalize(-dl.direction.xyz); //vector from (NOT TO) the light
-	float directionalShadow = calculateShadows(normalizedNormal, directionalLightDirection);
-	vec3 lighting = calculateDirectional(dl.color.xyz, normalizedNormal, viewDirection, mat1, dl) * directionalShadow;
-	vec3 lightingSpecular = getSpecular(dl.color.xyz, 0.0, 1.0, 0.0, 0.0, normalizedNormal, directionalLightDirection, viewDirection, mat1) * directionalShadow;
+	float directionShadow = calculateShadows(15, pFragmentDirectionalLightPos, normalizedNormal, directionalLightDirection);
+	vec3 lighting = calculateDirectional(dl.color.xyz, normalizedNormal, viewDirection, mat1, dl) * directionShadow;
+	vec3 lightingSpecular = getSpecular(dl.color.xyz, 0.0, 1.0, 0.0, 0.0, normalizedNormal, directionalLightDirection, viewDirection, mat1) * float(directionShadow >= SPECULAR_SHADOW_CUTOFF);
 
 	//putting together
 	for(int i = 0; i < pointlights.length(); i++) {
 		vec3 lightDirection = normalize(pointlights[i].position.xyz - pFragmentPos);
 		float dst = length(pointlights[i].position.xyz - pFragmentPos);
+
+		//pointlights have no shadows
 
 		lighting += calculatePoint(dst, normalizedNormal, lightDirection, viewDirection, mat1, pointlights[i]);
 		lightingSpecular += getSpecular(
@@ -168,20 +180,47 @@ void main() {
 			normalizedNormal, lightDirection, viewDirection, mat1
 		);
 	}
+
 	for(int i = 0; i < spotlights.length(); i++) {
 		vec3 lightDirection = normalize(spotlights[i].position.xyz - pFragmentPos);
 		float dst = length(spotlights[i].position.xyz - pFragmentPos);
 		float strength = calculateSpotStrength(lightDirection, spotlights[i]);
 
-		lighting += calculateSpot(dst, normalizedNormal, lightDirection, viewDirection, mat1, spotlights[i]) * strength;
+		//spotlight shadows
+		//calculate normal lighting values, then multiply by shadow value if applicable
+
+		float shadow = 1.0;
+
+		switch(spotlights[i].lightType) {
+			case(1):
+				shadow = calculateShadows(12, pFragmentFlashlightLightPos, normalizedNormal, lightDirection);
+				break;
+			case(2):
+				shadow = calculateShadows(13, pFragmentLeftFrontLightPos, normalizedNormal, lightDirection);
+				break;
+			case(3):
+				shadow = calculateShadows(14, pFragmentRightFrontLightPos, normalizedNormal, lightDirection);
+				break;
+		}
+
+		lighting += calculateSpot(
+			dst, normalizedNormal, lightDirection, viewDirection, mat1, spotlights[i]
+		) * strength * shadow;
 		lightingSpecular += getSpecular(
 			spotlights[i].color.xyz, dst,
 			spotlights[i].constant, spotlights[i].linear, spotlights[i].quadratic,
 			normalizedNormal, lightDirection, viewDirection, mat1
-		) * strength;
+		) * strength * float(shadow >= SPECULAR_SHADOW_CUTOFF);
 	}
 
-	//TODO calculate shadows for multiple lights
+	float shadow = 0.0;
 
-	oColor = vec4(baseColor.xyz * clamp(uAmbientLight + (lighting + lightingSpecular), 0.0, 1.0), mat1.textureOpacity); //normal calc
+	calculateShadows(14, pFragmentFlashlightLightPos, normalizedNormal, directionalLightDirection);
+	calculateShadows(13, pFragmentRightFrontLightPos, normalizedNormal, directionalLightDirection);
+	calculateShadows(12, pFragmentLeftFrontLightPos, normalizedNormal, directionalLightDirection);
+
+	//specular present only if no shadow
+	oColor = vec4(
+		baseColor.xyz * clamp(uAmbientLight + lighting + lightingSpecular, 0.0, 1.0),
+		mat1.textureOpacity); //normal calc
 };

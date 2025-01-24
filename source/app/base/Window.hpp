@@ -15,6 +15,9 @@ class Window {
 public:
 	Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, const bool aFullscreen = false, const bool aDebug = false) noexcept;
 
+	void enableVSync() noexcept;
+	void disableVSync() noexcept;
+
 	void setBackgroundColor(const std::array<float, 4>& aArray) noexcept;
 
 	void setViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept;

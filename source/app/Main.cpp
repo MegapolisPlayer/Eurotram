@@ -16,6 +16,7 @@ void MouseClick(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModi
 }
 
 static glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
+static bool moveWithSpotlight = true;
 
 void KeyWASDRFQ(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) {
 	if(aAction == GLFW_RELEASE || !aWindow->isCursorHidden()) return;
@@ -48,6 +49,9 @@ void KeyWASDRFQ(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModi
 		case GLFW_KEY_X:
 			aWindow->close();
 			break;
+		case GLFW_KEY_P:
+			moveWithSpotlight = !moveWithSpotlight;
+			break;
 	}
 }
 
@@ -75,9 +79,9 @@ void MouseCallback(Window* aWindow, double aX, double aY) {
 }
 
 int main() {
+	//TODO move to EurotramInit::mainInit();
 	static_assert(sizeof(glm::vec3) == sizeof(GLfloat)*3, "Test failed: glm::vec3 has wrong size!");
 	setUTF8Encoding();
-
 	initAudioEngine();
 
 	Annunciator a("Linka13.etanc");
@@ -88,6 +92,7 @@ int main() {
 
     Window mainWindow("Eurotram", 1000, 1000, false, true);
 	mainWindow.setBackgroundColor(daylightColor);
+	mainWindow.enableVSync();
 
 	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 10000.0f, 0.05f);
 
@@ -119,6 +124,7 @@ int main() {
 	UniformMat4 spu(shader, 13);
 	spu.set(ds.getProjectionMatrix());
 
+
 	UniformDirlight uDirlight(51);
 	uDirlight.update(&d);
 	uDirlight.set();
@@ -130,6 +136,7 @@ int main() {
 
 	Spotlight s;
 	s.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	s.lightType = LIGHT_TYPE_FLASHLIGHT;
 
 	setAttenuation(AttenuationValues::DISTANCE_100, &s.constant, &s.linear, &s.quadratic);
 	setSpotlightRadius(&s, 15.0, 10.0);
@@ -141,6 +148,10 @@ int main() {
 	UniformSpotlight uSpots(53, 1);
 	uSpots.update(&s);
 	uSpots.set();
+
+	SpotlightShadows ss(lightPos, s.direction, 0.1, 30.0, *mainWindow.getCamera()->getFOVPointer());
+	UniformMat4 fpu(shader, 14);
+	fpu.set(ss.getProjectionMatrix());
 
 	UniformFloat ambientLightStrength(shader, 200);
 	ambientLightStrength.set(daylightIndex);
@@ -175,11 +186,15 @@ int main() {
 		loopTimer.start();
 
 		shadowMapProgram.bind();
+
+		ss.beginPass(mainWindow, lpu);
+		lmod.set(t1.getMatrix());
+		t3rp.drawSolidOnly(uMaterial);
+		ss.endPass(mainWindow);
+
 		ds.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
-
 		t3rp.drawSolidOnly(uMaterial);
-
 		ds.endPass(mainWindow);
 
 		// main draw
@@ -188,10 +203,14 @@ int main() {
 
 		shader.bind();
 		spu.set(ds.getProjectionMatrix());
+		fpu.set(ss.getProjectionMatrix());
 
-		s.position = glm::vec4(mainWindow.getCamera()->getPosition(), 1.0);
-		s.direction = glm::vec4(mainWindow.getCamera()->getDirection(), 1.0);
+		if(moveWithSpotlight) {
+			s.position = glm::vec4(mainWindow.getCamera()->getPosition(), 1.0);
+			s.direction = glm::vec4(mainWindow.getCamera()->getDirection(), 1.0);
+		}
 		uSpots.update(&s);
+		ss.setPosDirection(s.position, s.direction);
 
 		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
@@ -199,10 +218,11 @@ int main() {
 		matModelUniform.set(t1.getMatrix());
 		matNormalUniform.set(t1.getNormalMatrix());
 
-		ds.bindMap(1);
+		ss.bindMap(12);
+		ds.bindMap(15);
 		drawTimer.start();
 
-		t3rp.drawSolidOnly(uMaterial);
+		t3rp.draw(uMaterial);
 
 		drawTimer.end();
 
@@ -227,7 +247,7 @@ int main() {
 			d.direction = glm::normalize(glm::vec4(lightPos, 1.0));
 			//mainWindow.getCamera()->moveTo(lightPos);
 
-			ds.setPos(lightPos);
+			ds.setPosDirection(lightPos, -d.direction);
 
 			shader.bind();
 

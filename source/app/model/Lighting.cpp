@@ -89,7 +89,11 @@ void DirectionalShadows::endPass(Window& aWindow) noexcept {
 	aWindow.resetViewport();
 }
 
-void DirectionalShadows::setPos(const glm::vec3& aPos, const glm::vec3& aSceneCenter) noexcept {
+void DirectionalShadows::setPosDirection(const glm::vec3& aPos, const glm::vec3& aDirection) noexcept {
+	this->mView = glm::lookAt(aPos, aPos + aDirection, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->mLightMatrix = this->mProjection * this->mView;
+}
+void DirectionalShadows::setPosCenter(const glm::vec3& aPos, const glm::vec3& aSceneCenter) noexcept {
 	this->mView = glm::lookAt(aPos, aSceneCenter, glm::vec3(0.0f, 1.0f, 0.0f));
 	this->mLightMatrix = this->mProjection * this->mView;
 }
@@ -107,3 +111,70 @@ const glm::mat4& DirectionalShadows::getProjectionMatrix() const noexcept {
 }
 
 DirectionalShadows::~DirectionalShadows() noexcept {}
+
+SpotlightShadows::SpotlightShadows(
+	const glm::vec3& aPos, const glm::vec3& aDirection,
+	const float aNear, const float aFar, const float aFOV
+) noexcept : mFBO(), mTexture(
+	DirectionalShadowMapWidth, DirectionalShadowMapHeight,
+	GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,
+	TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE
+) {
+	this->mTexture.setOutOfBoundsColor(1.0, 1.0, 1.0); //out of bounds - no shadow
+	this->mFBO.bind();
+	this->mFBO.bindTexture(this->mTexture, GL_DEPTH_ATTACHMENT);
+	this->mProjection = glm::perspective(glm::radians(aFOV), (float)StandardShadowMapWidth/StandardShadowMapHeight, aNear, aFar);
+	this->mView = glm::lookAt(aPos, aPos + aDirection, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->mLightMatrix = this->mProjection * this->mView;
+	this->mFBO.unbind();
+}
+SpotlightShadows::SpotlightShadows(SpotlightShadows&& aOther) noexcept
+	: mFBO(std::move(aOther.mFBO)), mTexture(std::move(aOther.mTexture)) {
+	this->mView = std::move(aOther.mView);
+	this->mProjection = std::move(aOther.mProjection);
+	this->mLightMatrix = std::move(aOther.mLightMatrix);
+}
+SpotlightShadows& SpotlightShadows::operator=(SpotlightShadows&& aOther) noexcept {
+	this->mFBO = std::move(aOther.mFBO);
+	this->mTexture = std::move(aOther.mTexture);
+	this->mView = std::move(aOther.mView);
+	this->mProjection = std::move(aOther.mProjection);
+	this->mLightMatrix = std::move(aOther.mLightMatrix);
+	return *this;
+}
+
+void SpotlightShadows::beginPass(Window& aWindow, UniformMat4& aLightMatrixUniform) noexcept {
+	aWindow.setViewport(StandardShadowMapWidth, StandardShadowMapHeight);
+	this->mFBO.bind();
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glCullFace(GL_FRONT);
+	aLightMatrixUniform.set(this->mLightMatrix);
+}
+void SpotlightShadows::endPass(Window& aWindow) noexcept {
+	glCullFace(GL_BACK);
+	this->mFBO.unbind();
+	aWindow.resetViewport();
+}
+
+void SpotlightShadows::setPosDirection(const glm::vec3& aPos, const glm::vec3& aDirection) noexcept {
+	this->mView = glm::lookAt(aPos, aPos + aDirection, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->mLightMatrix = this->mProjection * this->mView;
+}
+void SpotlightShadows::setPosCenter(const glm::vec3& aPos, const glm::vec3& aSceneCenter) noexcept {
+	this->mView = glm::lookAt(aPos, aSceneCenter, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->mLightMatrix = this->mProjection * this->mView;
+}
+void SpotlightShadows::setProjection(const float aNear, const float aFar, const float aFOV) noexcept {
+	this->mProjection = glm::perspective(glm::radians(aFOV), (float)StandardShadowMapWidth/StandardShadowMapHeight, aNear, aFar);
+	this->mLightMatrix = this->mProjection * this->mView;
+}
+
+void SpotlightShadows::bindMap(const uint64_t aTextureSlot) noexcept {
+	this->mTexture.bind(aTextureSlot);
+}
+
+const glm::mat4& SpotlightShadows::getProjectionMatrix() const noexcept {
+	return this->mLightMatrix;
+}
+
+SpotlightShadows::~SpotlightShadows() noexcept {}

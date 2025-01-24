@@ -122,7 +122,6 @@ void Model::processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiS
 			else {
 				texture->texture = Texture(texturePath.C_Str());
 				texture->path = texturePath.C_Str();
-				std::cout << texture->name << '\n';
 			}
 		}
 

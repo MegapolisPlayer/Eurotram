@@ -72,6 +72,14 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	ImGui_ImplOpenGL3_Init("#version 450 core");
 }
 
+void Window::enableVSync() noexcept {
+	glfwSwapInterval(1);
+}
+
+void Window::disableVSync() noexcept {
+	glfwSwapInterval(0);
+}
+
 void Window::setBackgroundColor(const std::array<float, 4>& aArray) noexcept {
 	this->mBackgroundColor = aArray;
 }
