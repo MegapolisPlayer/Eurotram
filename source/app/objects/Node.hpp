@@ -1,0 +1,4 @@
+#ifndef EUROTRAM_OBJECT_NODE
+#define EUROTRAM_OBJECT_NODE
+
+#endif

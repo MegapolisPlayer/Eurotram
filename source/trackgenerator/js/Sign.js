@@ -10,8 +10,6 @@ class Sign extends RotatedStandardPoint{
 		this.pointSizeY = NODE_SIZE/2;
 	}
 
-	//same as station pillar - TODO abstract these functions at some point
-
 	draw(aStyle = "#008000") {
 		abstractDrawPoint(aStyle, this, () => {
 			canvasData.context.strokeStyle = SELECT_COLOR;

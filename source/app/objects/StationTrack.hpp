@@ -1,4 +1,5 @@
 #ifndef EUROTRAM_OBJECTS_STATION_TRACK
 #define EUROTRAM_OBJECTS_STATION_TRACK
+#include "Track.hpp"
 
 #endif

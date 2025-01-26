@@ -92,6 +92,7 @@ void Line::open(const std::string_view aFilename, Annunciator* aAnnunciator) noe
 
 	//loops
 	this->mLoops.reserve(loopAmount);
+	uint64_t timePassed = 0; //station time is save as time from previous - we convert to absolute value
 	for(uint8_t i = 0; i < loopAmount; i++) {
 		this->mLoops.push_back({});
 
@@ -133,7 +134,8 @@ void Line::open(const std::string_view aFilename, Annunciator* aAnnunciator) noe
 
 			//T
 			readBytesToString(fileHandle, buffer, 2);
-			this->mLoops.back().stations.back().arrivalTime = *(uint16_t*)buffer.data();
+			timePassed += *(uint16_t*)buffer.data();
+			this->mLoops.back().stations.back().arrivalTime = timePassed;
 
 			//M
 			readBytesToString(fileHandle, buffer, 2);
@@ -377,7 +379,11 @@ namespace UI {
 		ImGui::Text("Starting stop: %s (%s)", aLine.getFirstStationName().data(), aLine.getFirstStationCode().data());
 		ImGui::Text("Final stop: %s (%s)", aLine.getLastStationName().data(), aLine.getLastStationCode().data());
 		ImGui::Text("Next stop: %s (%s)", aLine.getNextStationName().data(), aLine.getNextStationCode().data());
-		//ImGui::Text("Control points: %s", "IPPV, FLOR"); //TODO
+
+		std::string controlPoints;
+		controlPoints.reserve(1000);
+
+		ImGui::Text("Control points: %s", "IPPV, FLOR");
 
 		ImGui::End();
 	}

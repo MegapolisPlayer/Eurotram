@@ -48,6 +48,7 @@ add_executable(eurotram
 "app/objects/Button.cpp"
 "app/objects/Landmark.cpp"
 "app/objects/Lightpole.cpp"
+"app/objects/Node.cpp"
 "app/objects/Presignal.cpp"
 "app/objects/Radiobox.cpp"
 "app/objects/Sign.cpp"
