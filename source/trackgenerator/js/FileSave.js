@@ -41,6 +41,7 @@ function lineSave(ablob) {
 
 	let url = URL.createObjectURL(ablob);
 	let elem = document.createElement("a");
+	elem.href = url;
 	let name = document.getElementById("linename").value;
 	elem.download = ((name.length == 0) ? "line" : name)+".etscr";
 	elem.click();

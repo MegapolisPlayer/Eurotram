@@ -1,0 +1,4 @@
+#ifndef EUROTRAM_OBJECTS_SWITCH
+#define EUROTRAM_OBJECTS_SWITCH
+
+#endif

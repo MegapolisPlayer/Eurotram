@@ -1,0 +1,4 @@
+#ifndef EUROTRAM_PHYSICS
+#define EUROTRAM_PHYSICS
+
+#endif

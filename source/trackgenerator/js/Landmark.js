@@ -169,6 +169,8 @@ function landmarkEditMenu(aID) {
 
 	let dfcopy = landmarkTypeSelector.cloneNode(true);
 	canvasData.edit.append(dfcopy);
+	
+	canvasData.edit.appendChild(document.createElement("br"));
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";

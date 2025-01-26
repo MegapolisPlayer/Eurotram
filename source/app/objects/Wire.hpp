@@ -1,0 +1,4 @@
+#ifndef EUROTRAM_OBJECTS_WIRE
+#define EUROTRAM_OBJECTS_WIRE
+
+#endif

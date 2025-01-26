@@ -65,15 +65,21 @@ public:
 
 	void open(const std::string_view aFilename) noexcept;
 
-	void playBaseAnnouncement(const AnnunciatorBaseSound aSound, const bool aWaitUntilDone = false) noexcept;
+	//daisy-chaining
+	//Annuciator.addBaseSound().addAnother().play();
 
-	void playAnnouncementCurrent(const std::string_view aStationCode, const bool aWaitUntilDone = false) noexcept;
-	void playAnnouncementNext(const std::string_view aNextStationCode, const bool aWaitUntilDone = false) noexcept;
-	void playAnnouncement(const std::string_view aStationCode, const std::string_view aNextStationCode, const bool aWaitUntilDone = false) noexcept;
+	Annunciator& addBaseAnnouncement(const AnnunciatorBaseSound aSound) noexcept;
 
-	void playAnnouncementLineChange(const std::string_view aStationCode, const uint8_t aNewLine, const std::string_view aNewEndStationCode, const bool aWaitUntilDone = false) noexcept;
-	void playAnnouncementTerminus(const bool aWaitUntilDone = false); //only plays the terminus announcement - not the station one
-	void playAnnouncementStart(const uint8_t aNewLine, const std::string_view aEndStationCode, const bool aWaitUntilDone = false);
+	Annunciator& addAnnouncementCurrent(const std::string_view aStationCode) noexcept;
+	Annunciator& addAnnouncementNext(const std::string_view aNextStationCode) noexcept;
+	Annunciator& addAnnouncement(const std::string_view aStationCode, const std::string_view aNextStationCode) noexcept;
+
+	Annunciator& addAnnouncementLineChange(const std::string_view aStationCode, const uint8_t aNewLine, const std::string_view aNewEndStationCode) noexcept;
+	Annunciator& addAnnouncementTerminus(); //only plays the terminus announcement - not the station one
+	Annunciator& addAnnouncementStart(const uint8_t aNewLine, const std::string_view aEndStationCode);
+
+	void play(bool aWaitUntilDone = false);
+	void clearQueue();
 
 	void setVolume(const float aVolume) noexcept;
 
@@ -91,6 +97,8 @@ private:
 
 	ma_sound_group mGroup;
 
+	std::vector<ma_sound*> mQueue;
+
 	std::vector<ma_sound*> mBaseSounds; //base sounds have well-defined (i.e. it is explicitly written in the spec) order
 	std::vector<AnnunciatorStationSound> mStationSounds;
 	std::vector<AnnunciatorLineSound> mLineSounds; //line numbers and names
@@ -102,7 +110,7 @@ private:
 	AnnunciatorLineSound* getDataFromLine(const uint8_t aLine) noexcept;
 
 	void playSound(ma_sound* aSound) noexcept;
-	void playSoundCollection(std::vector<ma_sound*>& arSounds, const bool aWaitUntilDone = false, ma_sound* aRepeatingSound = nullptr) noexcept;
+	void playSoundCollection(std::vector<ma_sound*>& arSounds, const bool aWaitUntilDone = false) noexcept;
 };
 
 #endif

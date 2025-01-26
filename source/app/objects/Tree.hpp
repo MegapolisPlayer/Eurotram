@@ -1,0 +1,4 @@
+#ifndef EUROTRAM_OBJECTS_TREE
+#define EUROTRAM_OBJECTS_TREE
+
+#endif

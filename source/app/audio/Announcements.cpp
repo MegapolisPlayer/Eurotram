@@ -11,6 +11,8 @@ Annunciator::Annunciator(const std::string_view aFilename) noexcept
 }
 
 void Annunciator::open(const std::string_view aFilename) noexcept {
+	this->destroy();
+
 	ma_sound_group_init(getAudioEngine(), 0, NULL, &this->mGroup);
 
 	std::ifstream fileHandle;
@@ -42,7 +44,7 @@ void Annunciator::open(const std::string_view aFilename) noexcept {
 
 	//D
 	readBytesToString(fileHandle, buffer, 8);
-	std::cout << "File edit unix time: " << *((uint64_t*)buffer.data()) << '\n';
+	std::cout << "Annunciator file edit unix time: " << *((uint64_t*)buffer.data()) << '\n';
 
 	//J
 	std::getline(fileHandle, this->mAnnunciatorName, '\0');
@@ -64,6 +66,7 @@ void Annunciator::open(const std::string_view aFilename) noexcept {
 	std::cout << "Number line amount: " << (uint16_t)lineAmount << '\n';
 
 	//L...L - lines
+	this->mLineSounds.reserve(lineAmount);
 	for(uint64_t j = 0; j < lineAmount; j++) {
 		this->mLineSounds.push_back({});
 		std::string filename = linePrefix;
@@ -83,6 +86,7 @@ void Annunciator::open(const std::string_view aFilename) noexcept {
 	std::cout << "Non-numbered line amount: " << (uint16_t)specialLineAmount << '\n';
 
 	//N...N - special lines
+	this->mLineSounds.reserve(lineAmount + specialLineAmount);
 	buffer.clear();
 	for(uint64_t j = 0; j < specialLineAmount; j++) {
 		std::getline(fileHandle, buffer, '\0');
@@ -170,132 +174,134 @@ void Annunciator::open(const std::string_view aFilename) noexcept {
 	this->mInitialized = true;
 }
 
-void Annunciator::playBaseAnnouncement(const AnnunciatorBaseSound aSound, const bool aWaitUntilDone) noexcept {
-	ma_sound* soundPtr = getSoundFromBase(aSound);
-	this->playSound(soundPtr);
-	if(aWaitUntilDone) {
-		while(!ma_sound_at_end(soundPtr)) std::this_thread::sleep_for(5us);
-	}
+Annunciator& Annunciator::addBaseAnnouncement(const AnnunciatorBaseSound aSound) noexcept {
+	this->mQueue.push_back(this->getSoundFromBase(aSound));
+	return *this;
 }
-void Annunciator::playAnnouncementCurrent(const std::string_view aStationCode, const bool aWaitUntilDone) noexcept {
+Annunciator& Annunciator::addAnnouncementCurrent(const std::string_view aStationCode) noexcept {
 	//jingle + station name + this stop on request + transfer to metro, rail + closure announcement - IN THIS ORDER
 
-	std::vector<ma_sound*> sounds;
-	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::JINGLE));
-
-	AnnunciatorStationSound* soundData = getDataFromStationCode(aStationCode);
-	if(soundData == nullptr) {
-		std::cerr << LogLevel::ERROR << "No sound found for station code " << aStationCode << "\n" << LogLevel::RESET; return;
-	}
-	sounds.push_back(soundData->sound);
-
-	if((soundData->flags & STATION_FLAG_ON_REQUEST) != 0) {
-		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::THIS_STOP_ON_REQUEST));
-	}
-	if((soundData->flags & STATION_FLAG_METRO_TRANSFER) != 0) {
-		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::TRANSFER_TO_METRO));
-	}
-	if((soundData->flags & STATION_FLAG_TRAIN_TRANSFER) != 0) {
-		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::TRANSFER_TO_RAIL));
-	}
-	if((soundData->flags & STATION_FLAG_FUNICULAR_CLOSURE) != 0) {
-		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::FUNICULAR_CLOSED));
-	}
-
-	this->playSoundCollection(sounds, aWaitUntilDone);
-}
-void Annunciator::playAnnouncementNext(const std::string_view aNextStationCode, const bool aWaitUntilDone) noexcept {
-	//next stop + station name + sometimes on request, closure announcement
-	//work in similar fashion to playAnnouncementCurrent
-
-	std::vector<ma_sound*> sounds;
-
-	AnnunciatorStationSound* soundData = getDataFromStationCode(aNextStationCode);
-	if(soundData == nullptr) {
-		std::cerr << LogLevel::ERROR << "No sound found for station code " << aNextStationCode << "\n" << LogLevel::RESET; return;
-	}
-
-	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::NEXT_STOP));
-	sounds.push_back(soundData->sound);
-
-	if((soundData->flags & STATION_FLAG_ON_REQUEST) != 0) {
-		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::NEXT_STOP_ON_REQUEST));
-	}
-
-	//same sound cannot have 2 starting points - we set after it played
-	if((soundData->flags & STATION_FLAG_METRO_CLOSURE) != 0) {
-		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::WARNING_FOR_PASSENGERS));
-		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::THE_METRO_STATION_IS));
-		sounds.push_back(soundData->sound); //TODO later add separate name for metro
-		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::CURRENTLY_CLOSED));
-	}
-
-	if((soundData->flags & STATION_FLAG_FUNICULAR_CLOSURE) != 0) {
-		sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::FUNICULAR_CLOSED));
-	}
-
-	this->playSoundCollection(sounds, aWaitUntilDone, ((soundData->flags & STATION_FLAG_METRO_CLOSURE) != 0) ? soundData->sound : nullptr);
-}
-void Annunciator::playAnnouncement(const std::string_view aStationCode,const std::string_view aNextStationCode, const bool aWaitUntilDone) noexcept {
-	this->playAnnouncementCurrent(aStationCode);
-	this->playAnnouncementNext(aNextStationCode);
-}
-
-void Annunciator::playAnnouncementLineChange(const std::string_view aStationCode, const uint8_t aNewLine, const std::string_view aNewEndStationCode, const bool aWaitUntilDone) noexcept {
-	//line change + from station + STATION + is routed as line + LINE + in the direction of + ENDSTOP
-
-	std::vector<ma_sound*> sounds;
-	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::LINE_ROUTE_CHANGE));
-	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::FROM_THE_STATION));
+	this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::JINGLE));
 
 	AnnunciatorStationSound* soundData = getDataFromStationCode(aStationCode);
 	if(soundData == nullptr) {
 		std::cerr << LogLevel::ERROR << "No sound found for station code " << aStationCode << "\n" << LogLevel::RESET;
-		return;
+		return *this;
 	}
-	sounds.push_back(soundData->sound);
-	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::CONTINUES_JOURNEY_AS));
+	this->mQueue.push_back(soundData->sound);
+
+	if((soundData->flags & STATION_FLAG_ON_REQUEST) != 0) {
+		this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::THIS_STOP_ON_REQUEST));
+	}
+	if((soundData->flags & STATION_FLAG_METRO_TRANSFER) != 0) {
+		this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::TRANSFER_TO_METRO));
+	}
+	if((soundData->flags & STATION_FLAG_TRAIN_TRANSFER) != 0) {
+		this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::TRANSFER_TO_RAIL));
+	}
+	if((soundData->flags & STATION_FLAG_FUNICULAR_CLOSURE) != 0) {
+		this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::FUNICULAR_CLOSED));
+	}
+
+	return *this;
+}
+Annunciator& Annunciator::addAnnouncementNext(const std::string_view aNextStationCode) noexcept {
+	//next stop + station name + sometimes on request, closure announcement
+	//work in similar fashion to playAnnouncementCurrent
+
+	AnnunciatorStationSound* soundData = getDataFromStationCode(aNextStationCode);
+	if(soundData == nullptr) {
+		std::cerr << LogLevel::ERROR << "No sound found for station code " << aNextStationCode << "\n" << LogLevel::RESET;
+		return *this;
+	}
+
+	this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::NEXT_STOP));
+	this->mQueue.push_back(soundData->sound);
+
+	if((soundData->flags & STATION_FLAG_ON_REQUEST) != 0) {
+		this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::NEXT_STOP_ON_REQUEST));
+	}
+
+	//same sound cannot have 2 starting points - we set after it played
+	if((soundData->flags & STATION_FLAG_METRO_CLOSURE) != 0) {
+		this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::WARNING_FOR_PASSENGERS));
+		this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::THE_METRO_STATION_IS));
+		this->mQueue.push_back(soundData->sound); //TODO later add separate name for metro
+		this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::CURRENTLY_CLOSED));
+	}
+
+	if((soundData->flags & STATION_FLAG_FUNICULAR_CLOSURE) != 0) {
+		this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::FUNICULAR_CLOSED));
+	}
+
+	return *this;
+}
+
+Annunciator& Annunciator::addAnnouncement(const std::string_view aStationCode,const std::string_view aNextStationCode) noexcept {
+	this->addAnnouncementCurrent(aStationCode);
+	this->addAnnouncementNext(aNextStationCode);
+	return *this;
+}
+
+Annunciator& Annunciator::addAnnouncementLineChange(const std::string_view aStationCode, const uint8_t aNewLine, const std::string_view aNewEndStationCode) noexcept {
+	//line change + from station + STATION + is routed as line + LINE + in the direction of + ENDSTOP
+
+	this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::LINE_ROUTE_CHANGE));
+	this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::FROM_THE_STATION));
+
+	AnnunciatorStationSound* soundData = getDataFromStationCode(aStationCode);
+	if(soundData == nullptr) {
+		std::cerr << LogLevel::ERROR << "No sound found for station code " << aStationCode << "\n" << LogLevel::RESET;
+		return *this;
+	}
+	this->mQueue.push_back(soundData->sound);
+	this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::CONTINUES_JOURNEY_AS));
 
 	AnnunciatorLineSound* lineSoundData = getDataFromLine(aNewLine);
 	if(lineSoundData == nullptr) {
 		std::cerr << LogLevel::ERROR << "No sound found for line " << aNewLine << "\n" << LogLevel::RESET;
-		return;
+		return *this;
 	}
-	sounds.push_back(lineSoundData->sound);
-	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::DIRECTION));
+	this->mQueue.push_back(lineSoundData->sound);
+	this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::DIRECTION));
 
 	AnnunciatorStationSound* endStationData = getDataFromStationCode(aNewEndStationCode);
 	if(endStationData == nullptr) {
 		std::cerr << LogLevel::ERROR << "No sound found for end station code " << aNewEndStationCode << "\n" << LogLevel::RESET;
-		return;
+		return *this;
 	}
-	sounds.push_back(endStationData->sound);
+	this->mQueue.push_back(endStationData->sound);
 
-	this->playSoundCollection(sounds, aWaitUntilDone);
+	return *this;
 }
-void Annunciator::playAnnouncementTerminus(const bool aWaitUntilDone) {
-	std::vector<ma_sound*> sounds;
-	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::TERMINUS));
-	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::TERMINUS_OTHER_LANGUAGE));
-	this->playSoundCollection(sounds, aWaitUntilDone);
+Annunciator& Annunciator::addAnnouncementTerminus() {
+	this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::TERMINUS));
+	this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::TERMINUS_OTHER_LANGUAGE));
+	return *this;
 }
-void Annunciator::playAnnouncementStart(const uint8_t aNewLine, const std::string_view aEndStationCode, const bool aWaitUntilDone) {
-	std::vector<ma_sound*> sounds;
-	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::LINE));
+Annunciator& Annunciator::addAnnouncementStart(const uint8_t aNewLine, const std::string_view aEndStationCode) {
+	this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::LINE));
 	AnnunciatorLineSound* lineSoundData = getDataFromLine(aNewLine);
 	if(lineSoundData == nullptr) {
 		std::cerr << LogLevel::ERROR << "No sound found for line " << aNewLine << "\n" << LogLevel::RESET;
-		return;
+		return *this;
 	}
-	sounds.push_back(lineSoundData->sound);
-	sounds.push_back(getSoundFromBase(AnnunciatorBaseSound::DIRECTION));
+	this->mQueue.push_back(lineSoundData->sound);
+	this->mQueue.push_back(getSoundFromBase(AnnunciatorBaseSound::DIRECTION));
 	AnnunciatorStationSound* soundData = getDataFromStationCode(aEndStationCode);
 	if(soundData == nullptr) {
 		std::cerr << LogLevel::ERROR << "No sound found for station code " << aEndStationCode << "\n" << LogLevel::RESET;
-		return;
+		return *this;
 	}
-	sounds.push_back(soundData->sound);
-	this->playSoundCollection(sounds, aWaitUntilDone);
+	this->mQueue.push_back(soundData->sound);
+	return *this;
+}
+
+void Annunciator::play(bool aWaitUntilDone) {
+	this->playSoundCollection(this->mQueue, aWaitUntilDone);
+}
+void Annunciator::clearQueue() {
+	this->mQueue.clear();
 }
 
 void Annunciator::setVolume(const float aVolume) noexcept {
@@ -370,7 +376,30 @@ void Annunciator::playSound(ma_sound* aSound) noexcept {
 	ma_sound_start(aSound);
 }
 
-void Annunciator::playSoundCollection(std::vector<ma_sound*>& aSounds, const bool aWaitUntilDone, ma_sound* aRepeatingSound) noexcept {
+struct LatePlaybackInfo {
+	std::vector<uint64_t> offsets;
+	uint64_t currentRepeat = 0;
+};
+
+static void soundPlayEndCallback(void* aDataStruct, ma_sound* aSound) noexcept {
+	LatePlaybackInfo* structPtr = (LatePlaybackInfo*)aDataStruct;
+
+	ma_sound_set_start_time_in_pcm_frames(aSound, structPtr->offsets[structPtr->currentRepeat]);
+	ma_sound_seek_to_pcm_frame(aSound, 0);
+	ma_sound_start(aSound);
+	structPtr->currentRepeat++;
+
+	//if last playback
+	if(structPtr->offsets.size() == structPtr->currentRepeat) {
+		ma_sound_set_end_callback(aSound, NULL, NULL);
+		delete structPtr;
+	}
+	else {
+		ma_sound_set_end_callback(aSound, soundPlayEndCallback, structPtr);
+	}
+}
+
+void Annunciator::playSoundCollection(std::vector<ma_sound*>& aSounds, const bool aWaitUntilDone) noexcept {
 	//aAmount should be non-zero
 
 	//for each possible sound
@@ -379,57 +408,50 @@ void Annunciator::playSoundCollection(std::vector<ma_sound*>& aSounds, const boo
 	// (saving at beginning would require another struct + when we dont use it we set to zero which massively simplifies calculations later on)
 	//  - set that it is last
 
-	ma_uint64* repeatOffset = nullptr;
-	bool repeatFirstPassed = false;
-
-	if(aRepeatingSound != nullptr) {
-		//have to allocate on heap - repeat may play after end of function
-		//end of functions unallocates stack
-		//have to allocate here since we take pointer
-		repeatOffset = new ma_uint64;
-		ma_sound_set_end_callback(aRepeatingSound, [](void* aInt, ma_sound* aSound) {
-			if(aInt == nullptr) { return; } //repeat already called or doesnt exist
-			ma_sound_set_start_time_in_pcm_frames(aSound, *(ma_uint64*)aInt);
-			delete (ma_uint64*)aInt;
-			aInt = nullptr;
-			ma_sound_seek_to_pcm_frame(aSound, 0);
-			ma_sound_start(aSound);
-			//force callback to be called only once
-			ma_sound_set_end_callback(aSound, NULL, NULL);
-		}, repeatOffset);
-	}
+	//have to allocate on heap - repeat may play after end of function
+	//end of functions unallocates stack
+	//have to allocate here since we take pointer
+	std::vector<LatePlaybackInfo*> soundInfo;
+	soundInfo.resize(aSounds.size());
 
 	ma_sound* lastSound = aSounds[0];
-	std::vector<ma_uint64> timeOffsets;
-	timeOffsets.reserve(aSounds.size());
-
-	for(uint64_t i = 0; i < aSounds.size(); i++) {
-		ma_uint64 PCMLength = 0;
-		ma_sound_get_length_in_pcm_frames(aSounds[i], &PCMLength);
-		timeOffsets.push_back(PCMLength);
-		lastSound = aSounds[i];
-	}
-
-	//processing and time set split so PCM time is after we did the intensive part
-
 	ma_uint64 currentPCMTime = ma_engine_get_time_in_pcm_frames(getAudioEngine());
 
 	uint64_t timeOffset = 0;
 	for(uint64_t i = 0; i < aSounds.size(); i++) {
+		ma_uint64 PCMLength = 0;
+		ma_sound_get_length_in_pcm_frames(aSounds[i], &PCMLength);
+		lastSound = aSounds[i];
+
+		bool isRepeating = false;
 		//first time play as normal, then change
-		if(aSounds[i] == aRepeatingSound && repeatFirstPassed) {
-			*repeatOffset = currentPCMTime + timeOffset;
-			timeOffset += timeOffsets[i];
-			continue;
+		//find if sound was played before
+		for(uint64_t j = 0; j < i; j++) {
+			if(aSounds[i] == aSounds[j]) {
+				//sound is repeated - j is id of first repeat, i of current
+
+				if(soundInfo[j] == nullptr) {
+					soundInfo[j] = new LatePlaybackInfo;
+					ma_sound_set_end_callback(aSounds[j], soundPlayEndCallback, soundInfo[j]);
+				}
+
+				soundInfo[j]->offsets.push_back(currentPCMTime + timeOffset);
+
+				isRepeating = true;
+				break;
+			}
 		}
-		else if(aSounds[i] == aRepeatingSound) { repeatFirstPassed = true; }
-		else {}
 
-		ma_sound_set_start_time_in_pcm_frames(aSounds[i], currentPCMTime + timeOffset);
+		if(!isRepeating) {
+			//do not override repeating sounds
+			ma_sound_set_start_time_in_pcm_frames(aSounds[i], currentPCMTime + timeOffset);
+			this->playSound(aSounds[i]);
+		}
 
-		timeOffset += timeOffsets[i];
-		this->playSound(aSounds[i]);
+		timeOffset += PCMLength;
 	}
+
+	this->mQueue.clear();
 
 	if(aWaitUntilDone) {
 		while(!ma_sound_at_end(lastSound)) std::this_thread::sleep_for(5us);

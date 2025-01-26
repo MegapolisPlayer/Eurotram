@@ -427,6 +427,11 @@ function lineFinalize() {
 	lineButton.textContent = "Exit";
 	lineButton.addEventListener("click", lineEnd);
 	canvasData.canvasmenu.appendChild(lineButton);
+
+	canvasData.canvasmenu.appendChild(document.createElement("br"));
+	let info = document.createElement("em");
+	info.textContent = "Everything until the first station will be ignored on save!";
+	canvasData.canvasmenu.appendChild(info);
 }
 
 function lineSerialize() {
@@ -499,18 +504,16 @@ function lineSerialize() {
 	loops.forEach((v, i, a) => {
 		//header
 
+		//normal line
 		if(v.lineType == 0) {
-			//normal line
-			if(isNaN(v.line)) {
-				//numbered (13, 23...)
-				numberValuesArray.push(v.line); //L
-				numberValuesArray.push(0); //M
-			}
-			else {
-				//lettered (XC, X6...)
-				numberValuesArray.push(v.line[0]); //L
-				numberValuesArray.push(v.line[1]); //M
-			}
+			//numbered (13, 23...)
+			numberValuesArray.push(Number(v.line)); //L
+			numberValuesArray.push(0); //M
+		}
+		else if(v.lineType >= 6) {
+			//lettered (XC, X6...)
+			numberValuesArray.push(v.line[0]); //L
+			numberValuesArray.push(v.line[1]); //M
 		}
 		else {
 			//not normal
@@ -521,19 +524,22 @@ function lineSerialize() {
 		//I
 		numberValuesArray.push(...numberToByteArray(v.lineId, 2));
 
-		let stationAmount = v.tracks.filter((x) => {
+		let stationAmount = v.tracks.map(v => trackList[v]).filter((x) => {
 			return x instanceof StationTrack;
 		}).length;
-		let switchAmount = v.nodes.filter((x) => {
-			return x instanceof Switch;
-		}).length;
+		console.log("Loop station amount "+stationAmount);
+		//let switchAmount = v.nodes.filter((x) => {
+		//	return x instanceof Switch;
+		//}).length;
 
 		//N
-		numberValuesArray.push(...numberToByteArray(stationAmount + switchAmount, 2));
+		numberValuesArray.push(...numberToByteArray(stationAmount, 2));
 
 		//objects
 		
 		let inputIndex = 0;
+
+		let canAddPoints = false; //switch cannot be first
 
 		for(let i = 0; i < v.tracks.length; i++) {
 			//n + 1 nodes, n tracks
@@ -548,24 +554,39 @@ function lineSerialize() {
 				numberValuesArray.push(...stationCodeToArray(trackList[v.tracks[i]].stationCode));
 
 				//T
-				numberValuesArray.push(...numberToByteArray(Number(stationTimes[inputIndex].t), 4));
+				numberValuesArray.push(...numberToByteArray(Number(stationTimes[inputIndex].t), 2));
 			
 				//M
-				numberValuesArray.push(...numberToByteArray(Number(stationTimes[inputIndex].m), 4));
+				numberValuesArray.push(...numberToByteArray(Number(stationTimes[inputIndex].m), 2));
 				
 				//K
 				numberValuesArray.push(Number(stationTimes[inputIndex].c));
 
+				//N
+				//if node immediately after is switch
+				let amountSwitchesToNext = Number(nodeList[v.nodes[i + 1]] instanceof Switch);
+				for(let j = i + 1; j < v.tracks.length; j++) {
+					if(trackList[v.tracks[j]] instanceof StationTrack) {
+						break;
+					}
+					if(nodeList[v.nodes[j+1]] instanceof Switch) {
+						amountSwitchesToNext++;
+					}
+				}
+				numberValuesArray.push(amountSwitchesToNext);
+
 				inputIndex++;
+
+				canAddPoints = true;
 			}
 
-			if(nodeList[v.nodes[i + 1]] instanceof Switch) {
+			if(nodeList[v.nodes[i + 1]] instanceof Switch && canAddPoints) {
 				numberValuesArray.push('W'.codePointAt());
-				numberValuesArray.push(v.nodes[i + 1]);
+				numberValuesArray.push(numberToByteArray(v.nodes[i + 1], 4)); //I
 
 				//switch is last
 				if(!v.nodes[i + 2]) { 
-					numberValuesArray.push(0b111111);
+					numberValuesArray.push(0b11111111);
 				}
 				//next is front
 				else if(nodeList[v.nodes[i + 1]].frontId == v.nodes[i + 2]) {

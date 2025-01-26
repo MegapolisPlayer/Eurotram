@@ -1,0 +1,4 @@
+#ifndef EUROTRAM_OBJECTS_SIGN
+#define EUROTRAM_OBJECTS_SIGN
+
+#endif

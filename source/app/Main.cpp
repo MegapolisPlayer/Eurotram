@@ -1,6 +1,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "model/Model.hpp"
 #include "audio/Audio.hpp"
+#include "area/Area.hpp"
 
 static bool FirstMove = true;
 static double LastX = 400, LastY = 400;
@@ -86,6 +87,9 @@ int main() {
 
 	Annunciator a("Linka13.etanc");
 	a.setVolume(0.7);
+
+	Line l;
+	l.open("Linka13-test.etscr", &a);
 
 	std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
 	float daylightIndex = 1.0f;
@@ -181,7 +185,7 @@ int main() {
 	UniformMat4 lmod(shadowMapProgram, 91);
 	lmod.set(t1.getMatrix());
 
-	int announcerId = 7;
+	bool lineStart = false;
     while (mainWindow.isOpen()) {
 		loopTimer.start();
 
@@ -270,16 +274,7 @@ int main() {
 
 		ImGui::End();
 
-		ImGui::Begin("Line");
-
-		ImGui::Text("Line: %d/%d", 13, 2);
-		ImGui::Text("Starting stop: %s", "Zvonarka (ZVON)");
-		ImGui::Text("Final stop: %s", "Olsanske hrbitovy (OLHR)");
-		ImGui::Text("Next stop: %s", "Muzeum (A/C)");
-		ImGui::Text("Vehicle no. %d", 8316);
-		ImGui::Text("Control points: %s", "IPPV, FLOR");
-
-		ImGui::End();
+		UI::drawLineInfoWindow(l);
 
 		ImGui::Begin("Physics");
 
@@ -323,47 +318,7 @@ int main() {
 		ImGui::Begin("Announcements");
 
 		if(ImGui::Button("Next announcement")) {
-			//TODO load line file and play from it
-			switch(announcerId) {
-				case(0):
-					a.playAnnouncementNext("RADH");
-					break;
-				case(1):
-					a.playAnnouncementCurrent("RADH");
-					break;
-				case(2):
-					a.playAnnouncementNext("MUZM");
-					break;
-				case(3):
-					a.playAnnouncementCurrent("MUZM");
-					break;
-				case(4):
-					a.playAnnouncementLineChange("MUZM", 23, "ZVON");
-					break;
-				case(5):
-					a.playAnnouncementNext("IPPV");
-					break;
-				case(6):
-					a.playAnnouncementCurrent("IPPV");
-					break;
-				case(7):
-					a.playAnnouncementNext("TEST");
-					break;
-				case(8):
-					a.playAnnouncementCurrent("TEST");
-					break;
-				case(9):
-					a.playAnnouncementTerminus();
-					break;
-				case(10):
-					a.playBaseAnnouncement(AnnunciatorBaseSound::DEPARTURE_FROM_TERMINUS);
-					break;
-				case(11):
-					a.playAnnouncementStart(13, "OLSH");
-					break;
-			}
-			announcerId++;
-			if(announcerId == 12) announcerId = 0;
+			l.next(1);
 		};
 
 		ImGui::End();

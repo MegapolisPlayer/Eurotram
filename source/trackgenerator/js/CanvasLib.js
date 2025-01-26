@@ -341,10 +341,3 @@ function canvasInit() {
 
 	canvasClear();
 }
-
-//TODO remove code duplication in update, edit menu and remove functions
-//TODO add utils for creating buttons
-//TODO fix GUI of app
-//TODO enforce coding conventions
-//TODO abstract translations in draw calls
-//TODO make all objects inherit from base XYHR/XYH
