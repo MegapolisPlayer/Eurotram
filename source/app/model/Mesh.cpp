@@ -15,9 +15,18 @@ Mesh::Mesh(std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aE
 
 	this->mVAO.bind();
 	this->mVBO.bind();
+	//pos
 	this->mVBO.enableAttribute(&this->mVAO, 3);
+	//normal vector
 	this->mVBO.enableAttribute(&this->mVAO, 3);
+	//tex coords
 	this->mVBO.enableAttribute(&this->mVAO, 2);
+
+	//bone ids
+	this->mVBO.enableAttribute(&this->mVAO, MAX_BONES_PER_VERTEX);
+	//bone weights
+	this->mVBO.enableAttribute(&this->mVAO, MAX_BONES_PER_VERTEX);
+
 	this->mIBO.bind();
 }
 

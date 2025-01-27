@@ -2,10 +2,15 @@
 #define EUROTRAM_MESH
 #include "Sky.hpp"
 
+#define MAX_BONES_PER_VERTEX 4
+
 struct Vertex {
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 texCoords;
+
+	GLfloat boneIds[MAX_BONES_PER_VERTEX]; //we save as float but IDs are integers
+	GLfloat boneWeights[MAX_BONES_PER_VERTEX];
 };
 
 std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept;

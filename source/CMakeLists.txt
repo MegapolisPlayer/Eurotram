@@ -39,7 +39,7 @@ add_executable(eurotram
 "app/model/Material.cpp"
 "app/model/ModelLoading.cpp"
 "app/model/Mesh.cpp"
-"app/model/Bones.cpp"
+"app/model/Animation.cpp"
 
 "app/objects/vehicles/APEX.cpp"
 "app/objects/vehicles/BUSE.cpp"

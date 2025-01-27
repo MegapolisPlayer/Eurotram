@@ -1,6 +1,7 @@
 #ifndef EUROTRAM_MODELLOAD
 #define EUROTRAM_MODELLOAD
 #include "Mesh.hpp"
+#include "Animation.hpp"
 
 class Model {
 public:

@@ -55,8 +55,6 @@ void Model::drawSolidOnly(UniformMaterial& aUniform) noexcept {
 Model::~Model() noexcept {}
 
 void Model::processNode(aiNode* apNode, const aiScene* apScene) noexcept {
-	//TODO later make use of parent-child system to apply translations
-
 	for(uint64_t i = 0; i < apNode->mNumMeshes; i++) {
 		this->processMesh(&this->mMeshes, apScene->mMeshes[apNode->mMeshes[i]], apScene);
 	}
