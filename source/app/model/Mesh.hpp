@@ -2,7 +2,8 @@
 #define EUROTRAM_MESH
 #include "Sky.hpp"
 
-#define MAX_BONES_PER_VERTEX 4
+constexpr uint64_t MAX_BONES_PER_VERTEX = 4;
+constexpr uint64_t STANDARD_MODEL_VERTEX_FLOAT_AMOUNT = 8+MAX_BONES_PER_VERTEX+MAX_BONES_PER_VERTEX;
 
 struct Vertex {
 	glm::vec3 position;
@@ -14,8 +15,6 @@ struct Vertex {
 };
 
 std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept;
-
-#define STANDARD_MODEL_VERTEX_FLOAT_AMOUNT 8
 
 class Mesh {
 	friend class Model;
