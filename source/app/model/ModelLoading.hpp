@@ -3,6 +3,9 @@
 #include "Mesh.hpp"
 #include "Animation.hpp"
 
+glm::mat4 convertToGLM(const aiMatrix4x4& aFrom) noexcept;
+glm::quat convertToGLM(const aiQuaternion& aFrom) noexcept;
+
 class Model {
 public:
 	Model(std::string_view aPath) noexcept;
@@ -17,12 +20,17 @@ public:
 	void draw(UniformMaterial& aUniform) noexcept;
 	void drawSolidOnly(UniformMaterial& aUniform) noexcept;
 
+	//void setAnimation() noexcept;
+
 	~Model() noexcept;
 private:
 	std::vector<Mesh> mMeshes;
+	std::vector<Animation> mAnimations;
 
 	void processNode(aiNode* apNode, const aiScene* apScene) noexcept;
 	void processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiScene* apScene) noexcept;
+
+	void processAnimation(aiAnimation* apAnimation) noexcept;
 };
 
 #endif

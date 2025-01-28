@@ -1,5 +1,20 @@
 #include "ModelLoading.hpp"
 
+glm::mat4 convertToGLM(const aiMatrix4x4& aFrom) noexcept {
+	glm::mat4 result;
+	//abcd in assimp is row - GLM uses more normal structure
+	//convert from row-major to column-major
+	result[0][0] = aFrom.a1; result[1][0] = aFrom.a2; result[2][0] = aFrom.a3; result[3][0] = aFrom.a4;
+	result[0][1] = aFrom.b1; result[1][1] = aFrom.b2; result[2][1] = aFrom.b3; result[3][1] = aFrom.b4;
+	result[0][2] = aFrom.c1; result[1][2] = aFrom.c2; result[2][2] = aFrom.c3; result[3][2] = aFrom.c4;
+	result[0][3] = aFrom.d1; result[1][3] = aFrom.d2; result[2][3] = aFrom.d3; result[3][3] = aFrom.d4;
+	return result;
+}
+
+glm::quat convertToGLM(const aiQuaternion& aFrom) noexcept {
+	return glm::quat(aFrom.w, aFrom.x, aFrom.y, aFrom.z);
+}
+
 Model::Model(std::string_view aPath) noexcept {
 	Assimp::Importer mload;
 	const aiScene* scene = mload.ReadFile(aPath.data(), aiProcess_Triangulate);
@@ -9,7 +24,15 @@ Model::Model(std::string_view aPath) noexcept {
 		std::exit(EXIT_FAILURE);
 	}
 
+	//process meshes and materials
 	processNode(scene->mRootNode, scene);
+
+	//process animations
+	for(uint64_t i = 0; i < scene->mNumAnimations; i++) {
+		processAnimation(scene->mAnimations[i]);
+	}
+
+	this->mBoneOffsets = ShaderBuffer(,);
 
 	//move transparent objects to back
 	uint64_t swapCounter = 0;
@@ -99,7 +122,8 @@ void Model::processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiS
 	}
 
 	GMSEntry* texture = GlobalMaterialStore::add();
-	apMesh->emplace_back(vertices, indices, texture); //texture path may be null
+
+	//material
 
 	//texture of material
 	if(apMeshLoad->mMaterialIndex >= 0) {
@@ -115,41 +139,42 @@ void Model::processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiS
 			GMSEntry* existingEntry = GlobalMaterialStore::getByPath(texturePath.C_Str());
 			if(existingEntry) {
 				texture = existingEntry;
-				apMesh->back().mEntry = existingEntry; //same texture = same entry = same material in blender (usually, at least)
 			}
 			else {
 				texture->texture = Texture(texturePath.C_Str());
 				texture->path = texturePath.C_Str();
+
+				//sample only if new texture
+
+				aiColor3D tempValue;
+				float opacity;
+
+				mat->Get(AI_MATKEY_OPACITY, opacity);
+				texture->material.textureOpacity = opacity;
+
+				mat->Get(AI_MATKEY_COLOR_DIFFUSE, tempValue);
+				texture->material.color.x = tempValue.r;
+				texture->material.color.y = tempValue.g;
+				texture->material.color.z = tempValue.b;
+				texture->material.color.w = 1.0;
+
+				mat->Get(AI_MATKEY_COLOR_SPECULAR, tempValue);
+				texture->material.specular.x = tempValue.r;
+				texture->material.specular.y = tempValue.g;
+				texture->material.specular.z = tempValue.b;
+				texture->material.specular.w = 1.0;
+
+				mat->Get(AI_MATKEY_REFRACTI,  texture->material.ior);
+
+				mat->Get(AI_MATKEY_SHININESS, texture->material.shininess);
+
+				texture->material.textureSlot = 0;
+				texture->material.textureAmount = (float)hasTexture;
+				mat->Get(AI_MATKEY_COLOR_EMISSIVE, tempValue);
+				texture->material.brightness =
+				std::max(std::max(tempValue.r, tempValue.g), tempValue.b);
 			}
 		}
-
-		aiColor3D tempValue;
-		float opacity;
-
-		mat->Get(AI_MATKEY_OPACITY, opacity);
-		texture->material.textureOpacity = opacity;
-
-		mat->Get(AI_MATKEY_COLOR_DIFFUSE, tempValue);
-		texture->material.color.x = tempValue.r;
-		texture->material.color.y = tempValue.g;
-		texture->material.color.z = tempValue.b;
-		texture->material.color.w = 1.0;
-
-		mat->Get(AI_MATKEY_COLOR_SPECULAR, tempValue);
-		texture->material.specular.x = tempValue.r;
-		texture->material.specular.y = tempValue.g;
-		texture->material.specular.z = tempValue.b;
-		texture->material.specular.w = 1.0;
-
-		mat->Get(AI_MATKEY_REFRACTI,  texture->material.ior);
-
-		mat->Get(AI_MATKEY_SHININESS, texture->material.shininess);
-
-		texture->material.textureSlot = 0;
-		texture->material.textureAmount = (float)hasTexture;
-		mat->Get(AI_MATKEY_COLOR_EMISSIVE, tempValue);
-		texture->material.brightness =
-			std::max(std::max(tempValue.r, tempValue.g), tempValue.b);
 	}
 	//no material present - use default purple color
 	else {
@@ -163,5 +188,45 @@ void Model::processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiS
 		texture->material.textureOpacity = 1.0f;
 		texture->material.brightness = 0.0f; //below this brightness render as normal, above it is brighter
 	}
+
+	//bones and weights
+
+	std::vector<Bone> bones;
+	for(uint64_t b = 0; b < apMeshLoad->mNumBones; b++) {
+		bones.push_back({});
+		bones.back().name = apMeshLoad->mBones[b]->mName.C_Str();
+		bones.back().offset = convertToGLM(apMeshLoad->mBones[b]->mOffsetMatrix);
+
+		for(uint64_t i = 0; i < apMeshLoad->mBones[b]->mNumWeights; i++) {
+			if(apMeshLoad->mBones[b]->mWeights[i].mWeight < 0.01) { continue; }
+			for(uint64_t j = 0; j < MAX_BONES_PER_VERTEX; j++) {
+				if(vertices[apMeshLoad->mBones[b]->mWeights[i].mVertexId].boneIds[j] != -1.0) {
+					vertices[apMeshLoad->mBones[b]->mWeights[i].mVertexId].boneIds[j] = b;
+					vertices[apMeshLoad->mBones[b]->mWeights[i].mVertexId].boneWeights[j] = apMeshLoad->mBones[b]->mWeights[i].mWeight;
+				}
+			}
+		}
+	}
+
+	apMesh->emplace_back(vertices, indices, texture, bones); //texture path may be null
 }
 
+void Model::processAnimation(aiAnimation* apAnimation) noexcept {
+	this->mAnimations.push_back({});
+	double duration = apAnimation->mDuration;
+	double tps = apAnimation->mTicksPerSecond;
+
+	this->mAnimations.back().mTickAmount = (uint64_t)duration/tps;
+
+	for(uint64_t i = 0; i < apAnimation->mNumChannels; i++) {
+		for(uint64_t j = 0; j < apAnimation->mChannels[i]->mNumPositionKeys; j++) {
+
+		}
+		for(uint64_t j = 0; j < apAnimation->mChannels[i]->mNumRotationKeys; j++) {
+
+		}
+		for(uint64_t j = 0; j < apAnimation->mChannels[i]->mNumRotationKeys; j++) {
+
+		}
+	}
+}

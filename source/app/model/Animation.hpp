@@ -4,28 +4,44 @@
 
 namespace Keyframe {
 	struct Position {
-		glm::vec3 positionChange;
-		GLfloat time;
+		glm::vec3 position;
+		uint64_t frame = 0;
 	};
 	struct Rotation {
 		glm::quat rotation; //quaternions...
-		GLfloat time;
+		uint64_t frame = 0;
 	};
 	struct Scale {
 		glm::vec3 scale;
-		GLfloat time;
+		uint64_t frame = 0;
 	};
 }
 
-class Bone {
-public:
-private:
+struct Bone {
+	std::string name;
+	glm::mat4 offset;
 };
 
 class Animation {
+	friend class Model;
 public:
-private:
+	Animation() noexcept;
 
+	void setStateAtFrame(const uint64_t aFrame) noexcept;
+
+	void advance() noexcept; //to next tick
+
+	uint64_t getTickAmount() const noexcept;
+	uint64_t getTicksPerSecond() const noexcept;
+
+	~Animation() noexcept;
+private:
+	std::vector<Keyframe::Position> mPositions;
+	std::vector<Keyframe::Rotation> mRotation;
+	std::vector<Keyframe::Scale> mScale;
+
+	uint64_t mTickAmount;
+	uint64_t mTicksPerSecond;
 };
 
 #endif
