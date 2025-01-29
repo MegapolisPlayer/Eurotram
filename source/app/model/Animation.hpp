@@ -29,10 +29,14 @@ public:
 
 	void setStateAtFrame(const uint64_t aFrame) noexcept;
 
-	void advance() noexcept; //to next tick
-
 	uint64_t getTickAmount() const noexcept;
 	uint64_t getTicksPerSecond() const noexcept;
+
+	float getAnimationTime(const uint64_t aFrame) const noexcept; //for interpolation
+
+	std::vector<Keyframe::Position>& getPositionKeyframes() noexcept;
+	std::vector<Keyframe::Rotation>& getRotationKeyframes() noexcept;
+	std::vector<Keyframe::Scale>& getScaleKeyframes() noexcept;
 
 	~Animation() noexcept;
 private:
@@ -40,6 +44,7 @@ private:
 	std::vector<Keyframe::Rotation> mRotation;
 	std::vector<Keyframe::Scale> mScale;
 
+	std::string mName;
 	uint64_t mTickAmount;
 	uint64_t mTicksPerSecond;
 };

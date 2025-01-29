@@ -8,9 +8,9 @@ std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept 
 	return aStream;
 }
 
-Mesh::Mesh(std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aEntry, std::vector<Bone>& aBones) noexcept
+Mesh::Mesh(std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept
 	: mVBO((GLfloat*)aVerts.data(), aVerts.size(), STANDARD_MODEL_VERTEX_FLOAT_AMOUNT),
-	mIBO((GLuint*)aInds.data(), aInds.size()), mEntry(aEntry), mBones(aBones)
+	mIBO((GLuint*)aInds.data(), aInds.size()), mEntry(aEntry)
 	{
 
 	this->mVAO.bind();

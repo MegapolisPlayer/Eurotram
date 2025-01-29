@@ -174,7 +174,7 @@ int main() {
 	//t1.setRotationY(45.0f);
 
 	std::cout << "Loading T3R.P model...\n";
-	Model t3rp("T3.obj");
+	Model t3rp("T3.glb");
 	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
 	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 	std::cout << "Model loaded!\n";

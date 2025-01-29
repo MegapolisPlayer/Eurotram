@@ -19,6 +19,10 @@ public:
 	//channels = bits per pixel
 	Texture(const std::string_view aFilename, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
 	Texture(const uint64_t aWidth, const uint64_t aHeight, const uint64_t aInternalFormat, const uint64_t aFormat, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
+
+	//embedded textures are a pain
+	Texture(const aiTexture* aAssimpTexture, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
+
 	Texture(Texture&& aOther) noexcept;
 	Texture& operator=(Texture&& aOther) noexcept;
 	Texture(Texture& aOther) noexcept = delete;

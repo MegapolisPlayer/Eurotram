@@ -61,7 +61,7 @@ Texture::Texture(
 	const uint64_t aWidth, const uint64_t aHeight,
 	const uint64_t aInternalFormat, const uint64_t aFormat,
 	TextureScale aScaling, TextureBorder aBorder) noexcept
-	: mPath(""), mHandle(0), mpData(nullptr), mWidth(aHeight), mHeight(aHeight), mChannels(0)  {
+	: mPath(""), mHandle(0), mpData(nullptr), mWidth(aHeight), mHeight(aHeight), mChannels(0) {
 	GLint glTextureScaleValue = 0;
 	GLint glTextureScaleValue2 = 0;
 	switch(aScaling) {
@@ -95,13 +95,69 @@ Texture::Texture(
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glTextureScaleValue2);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glTextureScaleValue);
 }
+
+Texture::Texture(const aiTexture* aAssimpTexture, TextureScale aScaling, TextureBorder aBorder) noexcept
+	: mPath(""), mHandle(0), mpData(nullptr), mWidth(aAssimpTexture->mWidth), mHeight(aAssimpTexture->mHeight), mChannels(4) {
+	GLint glTextureScaleValue = 0;
+	GLint glTextureScaleValue2 = 0;
+	switch(aScaling) {
+		case(TextureScale::LINEAR):
+			glTextureScaleValue = GL_LINEAR;
+			glTextureScaleValue2 = GL_LINEAR_MIPMAP_LINEAR;
+			break;
+		case(TextureScale::NEAREST_NEIGHBOR):
+		default:
+			glTextureScaleValue = GL_NEAREST;
+			glTextureScaleValue2 = GL_NEAREST;
+			break;
+	}
+
+	GLint glTextureBorderValue = 0;
+	switch(aBorder) {
+		case(TextureBorder::FILL_OUT_OF_RANGE):
+			glTextureBorderValue = GL_CLAMP_TO_BORDER;
+			break;
+		case(TextureBorder::REPEAT):
+		default:
+			glTextureBorderValue = GL_REPEAT;
+			break;
+	}
+
+	glGenTextures(1, &this->mHandle);
+	glBindTexture(GL_TEXTURE_2D, this->mHandle);
+
+	uint64_t height = aAssimpTexture->mHeight == 0 ? 1 : aAssimpTexture->mHeight;
+	stbi_set_flip_vertically_on_load(true);
+	this->mpData = stbi_load_from_memory((stbi_uc*)aAssimpTexture->pcData, aAssimpTexture->mWidth*height, &this->mWidth, &this->mHeight, &this->mChannels, 4);
+	if(!this->mpData) {
+		std::cerr << LogLevel::ERROR << "STBI failed to load image from memory!\n" << LogLevel::RESET;
+		return;
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->mWidth, this->mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, this->mpData);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glTextureBorderValue);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glTextureBorderValue);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glTextureScaleValue2);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glTextureScaleValue);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+}
+
 Texture::Texture(Texture&& aOther) noexcept
-	: mPath(std::move(aOther.mPath)), mHandle(aOther.mHandle), mpData(aOther.mpData),
-	mWidth(aOther.mWidth), mHeight(aOther.mHeight), mChannels(aOther.mChannels) {
+	: mPath(std::move(aOther.mPath)), mWidth(aOther.mWidth), mHeight(aOther.mHeight), mChannels(aOther.mChannels) {
+	glDeleteTextures(1, &this->mHandle);
+	this->mHandle = aOther.mHandle;
+	stbi_image_free(this->mpData);
+	this->mpData = aOther.mpData;
 	aOther.mHandle = 0;
 	aOther.mpData = nullptr;
 }
 Texture& Texture::operator=(Texture&& aOther) noexcept {
+	glDeleteTextures(1, &this->mHandle);
+	this->mHandle = aOther.mHandle;
+	stbi_image_free(this->mpData);
+	this->mpData = aOther.mpData;
+
 	this->mPath = std::move(aOther.mPath);
 	this->mHandle = aOther.mHandle;
 	this->mpData = aOther.mpData;
