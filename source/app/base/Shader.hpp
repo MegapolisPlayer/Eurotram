@@ -20,25 +20,4 @@ private:
 	GLuint mHandle;
 };
 
-class ShaderBuffer {
-public:
-	ShaderBuffer(const void* const arData, const uint64_t aSizeBytes) noexcept;
-	ShaderBuffer(ShaderBuffer&& aOther) noexcept;
-	ShaderBuffer& operator=(ShaderBuffer&& aOther) noexcept;
-	ShaderBuffer(ShaderBuffer& aOther) noexcept = delete;
-	ShaderBuffer& operator=(ShaderBuffer& aOther) noexcept = delete;
-
-	void update(const void* const arData, const uint64_t aSizeBytes, const uint64_t aOffset = 0) noexcept;
-
-	void bind(const uint64_t aBindLocation) noexcept;
-	void unbind() noexcept;
-
-	GLuint getHandle() const noexcept;
-
-	~ShaderBuffer() noexcept;
-private:
-	GLuint mHandle;
-	uint64_t mSizeBytes;
-};
-
 #endif

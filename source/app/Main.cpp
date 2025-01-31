@@ -160,8 +160,6 @@ int main() {
 	UniformFloat ambientLightStrength(shader, 200);
 	ambientLightStrength.set(daylightIndex);
 
-	UniformMaterial uMaterial(50);
-
 	Timer loopTimer;
 	Timer guiTimer;
 	Timer drawTimer;
@@ -175,9 +173,15 @@ int main() {
 
 	std::cout << "Loading T3R.P model...\n";
 	Model t3rp("T3.glb");
+	std::cout << "Model loaded!\n";
+	t3rp.setAnimation("door1Action", 20);
+	t3rp.setAnimation("door2Action", 40);
 	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
 	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
-	std::cout << "Model loaded!\n";
+
+	shader.bind();
+	UniformMaterial uMaterial(50);
+	StructUniform<glm::mat4> uModelMat(40, 0);
 
 	Shader shadowMapProgram("shader/shadowVertex.glsl", "shader/shadowFragment.glsl");
 	shadowMapProgram.bind();
@@ -185,7 +189,6 @@ int main() {
 	UniformMat4 lmod(shadowMapProgram, 91);
 	lmod.set(t1.getMatrix());
 
-	bool lineStart = false;
     while (mainWindow.isOpen()) {
 		loopTimer.start();
 
@@ -193,12 +196,12 @@ int main() {
 
 		ss.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
-		t3rp.drawSolidOnly(uMaterial);
+		t3rp.drawSolidOnly(uMaterial, uModelMat);
 		ss.endPass(mainWindow);
 
 		ds.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
-		t3rp.drawSolidOnly(uMaterial);
+		t3rp.drawSolidOnly(uMaterial, uModelMat);
 		ds.endPass(mainWindow);
 
 		// main draw
@@ -226,7 +229,7 @@ int main() {
 		ds.bindMap(15);
 		drawTimer.start();
 
-		t3rp.draw(uMaterial);
+		t3rp.draw(uMaterial, uModelMat);
 
 		drawTimer.end();
 
@@ -312,6 +315,30 @@ int main() {
 		if(ImGui::Button("Change livery to PID")) {
 			t3rp.setVariant("Material.paint", "PID");
 		};
+
+		if(ImGui::Button("Open driver door")) {
+			t3rp.setAnimation("driverDoorAction", 40);
+		};
+		if(ImGui::Button("Close driver door")) {
+			t3rp.setAnimation("driverDoorAction", 0);
+		};
+
+		if(ImGui::Button("Open doors")) {
+			t3rp.setAnimation("door1Action", 40);
+			t3rp.setAnimation("door2Action", 40);
+		};
+		if(ImGui::Button("Close doors")) {
+			t3rp.setAnimation("door1Action", 0);
+			t3rp.setAnimation("door2Action", 0);
+		};
+
+		if(ImGui::Button("Raise pantograph")) {
+			t3rp.setAnimation("pantographAction", 0);
+		};
+		if(ImGui::Button("Lower pantograph")) {
+			t3rp.setAnimation("pantographAction", 40);
+		};
+
 
 		ImGui::End();
 

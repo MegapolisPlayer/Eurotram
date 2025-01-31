@@ -5,6 +5,8 @@ VertexArray::VertexArray() noexcept
 	glGenVertexArrays(1, &this->mHandle);
 	glBindVertexArray(this->mHandle);
 }
+VertexArray::VertexArray(const bool aMakeDead) noexcept
+	: mHandle(UINT32_MAX), mAttributeCounter(0) {}
 VertexArray::VertexArray(VertexArray&& aOther) noexcept
 	: mHandle(aOther.mHandle), mAttributeCounter(aOther.mAttributeCounter) {
 	aOther.mHandle = 0;
@@ -165,4 +167,50 @@ GLuint Framebuffer::getHandle() const noexcept {
 
 Framebuffer::~Framebuffer() noexcept {
 	glDeleteFramebuffers(1, &this->mHandle);
+}
+
+ShaderBuffer::ShaderBuffer(const void* const arData, const uint64_t aSizeBytes) noexcept
+: mHandle(0), mSizeBytes(aSizeBytes) {
+	glGenBuffers(1, &this->mHandle);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, aSizeBytes, arData, GL_DYNAMIC_DRAW);
+}
+
+ShaderBuffer::ShaderBuffer(ShaderBuffer&& aOther) noexcept
+: mHandle(aOther.mHandle), mSizeBytes(aOther.mSizeBytes) {
+	aOther.mHandle = 0;
+}
+ShaderBuffer& ShaderBuffer::operator=(ShaderBuffer&& aOther) noexcept {
+	this->mHandle = aOther.mHandle;
+	this->mSizeBytes = aOther.mSizeBytes;
+
+	aOther.mHandle = 0;
+
+	return *this;
+}
+
+void ShaderBuffer::setNewData(const void* const arData, const uint64_t aSizeBytes) noexcept {
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, aSizeBytes, arData, GL_DYNAMIC_DRAW); //reallocate
+}
+void ShaderBuffer::update(const void* const arData, const uint64_t aSizeBytes, const uint64_t aOffset) noexcept {
+	if(aOffset+aSizeBytes > this->mSizeBytes) {
+		std::cerr << LogLevel::ERROR << "SSBO read out of range!\n" << LogLevel::RESET;
+		std::exit(EXIT_FAILURE);
+	}
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, aOffset, aSizeBytes-aOffset, arData);
+}
+void ShaderBuffer::bind(const uint64_t aBindLocation) noexcept {
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, aBindLocation, this->mHandle);
+}
+void ShaderBuffer::unbind() noexcept {
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+GLuint ShaderBuffer::getHandle() const noexcept {
+	return this->mHandle;
+}
+ShaderBuffer::~ShaderBuffer() noexcept {
+	glDeleteBuffers(1, &this->mHandle);
 }

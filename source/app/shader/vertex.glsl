@@ -22,13 +22,30 @@ out vec4 pFragmentFlashlightLightPos;
 out vec4 pFragmentLeftFrontLightPos;
 out vec4 pFragmentRightFrontLightPos;
 
+const int MAX_BONES_PER_VERTEX = 4;
+
+layout(std430, binding = 40) readonly buffer sBoneMatrices {
+	mat4 boneMatrices[];
+};
+
 void main() {
 	pTexCoord = iTexCoord;
 	pNormals = uMatrixNormal * iNormals;
-	pFragmentPos = vec3(uMatrixModel * vec4(iPosition, 1.0));
 
-	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * vec4(iPosition, 1.0);
-	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * vec4(iPosition, 1.0);
+	vec4 finalPosition = vec4(iPosition, 0.0);
+
+	/*
+	vec4 finalPosition = vec4(0.0);
+
+	for(int i = 0; i < MAX_BONES_PER_VERTEX; i++) {
+		if(iBoneIds[i] < -0.01) { continue; }
+		finalPosition += (boneMatrices[int(iBoneIds[i])] * vec4(iPosition, 1.0) * iBoneWeights[i]);
+	}
+	*/
+
+	pFragmentPos = vec3(uMatrixModel * finalPosition);
+	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * finalPosition;
+	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * finalPosition;
 
 	gl_Position = uCamera * vec4(pFragmentPos, 1.0);
 };

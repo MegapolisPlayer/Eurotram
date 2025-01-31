@@ -27,7 +27,9 @@ std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept;
 class Mesh {
 	friend class Model;
 public:
-	Mesh(std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept;
+	Mesh() noexcept;
+
+	Mesh(const std::string_view aName, std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept;
 	Mesh(Mesh&& aOther) noexcept;
 	Mesh& operator=(Mesh&& aOther) noexcept;
 	Mesh(Mesh& aOther) noexcept = delete;
@@ -41,14 +43,14 @@ public:
 
 	~Mesh() noexcept;
 private:
+	std::string mName;
+
 	//vao 1 per model
 	VertexArray mVAO;
 	VertexBuffer mVBO;
 	IndexBuffer mIBO;
 
 	GMSEntry* mEntry; //1 entry is enough - variant data in GMS itself, when reset just find one with same name and standard ID
-
-	std::vector<uint64_t> mBones; //list of bones id (actual array in model itself)
 };
 
 #endif

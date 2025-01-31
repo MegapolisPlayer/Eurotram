@@ -1,5 +1,6 @@
 #ifndef EUROTRAM_UNIFORM
 #define EUROTRAM_UNIFORM
+#include "Buffer.hpp"
 #include "Shader.hpp"
 
 template<typename tType>
@@ -20,8 +21,12 @@ template<typename tType>
 class StructUniform {
 public:
 	StructUniform(const uint64_t aLocation, const uint64_t aAmount) noexcept;
+
+	//resizes buffer, use only if size change required
+	void setNewData(const tType* const aValue, const uint64_t aAmount);
 	//last element NON inclusive
 	void update(const tType* const aValue, const uint64_t aFirstElem = 0, const uint64_t aLastElem = 0) noexcept;
+
 	void set() noexcept;
 	virtual ~StructUniform() noexcept;
 private:

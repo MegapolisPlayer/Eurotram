@@ -33,6 +33,7 @@ add_executable(eurotram
 "app/base/Uniform.cpp"
 "app/base/Transformation.cpp"
 "app/base/Text.cpp"
+"app/base/Ray.cpp"
 
 "app/model/Lighting.cpp"
 "app/model/Sky.cpp"

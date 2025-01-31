@@ -8,8 +8,11 @@ std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept 
 	return aStream;
 }
 
-Mesh::Mesh(std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept
-	: mVBO((GLfloat*)aVerts.data(), aVerts.size(), STANDARD_MODEL_VERTEX_FLOAT_AMOUNT),
+Mesh::Mesh() noexcept
+	: mVAO(false), mVBO(nullptr, 0, 0), mIBO(nullptr, 0), mEntry(nullptr) {}
+
+Mesh::Mesh(const std::string_view aName, std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept
+	: mName(aName.data()), mVBO((GLfloat*)aVerts.data(), aVerts.size(), STANDARD_MODEL_VERTEX_FLOAT_AMOUNT),
 	mIBO((GLuint*)aInds.data(), aInds.size()), mEntry(aEntry)
 	{
 
@@ -31,15 +34,15 @@ Mesh::Mesh(std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aE
 }
 
 Mesh::Mesh(Mesh&& aOther) noexcept
-	: mVAO(std::move(aOther.mVAO)), mVBO(std::move(aOther.mVBO)), mIBO(std::move(aOther.mIBO)),
-	mEntry(aOther.mEntry), mBones(aOther.mBones) {}
+	: mName(std::move(aOther.mName)), mVAO(std::move(aOther.mVAO)), mVBO(std::move(aOther.mVBO)), mIBO(std::move(aOther.mIBO)),
+	mEntry(aOther.mEntry) {}
 
 Mesh& Mesh::operator=(Mesh&& aOther) noexcept {
+	this->mName = std::move(aOther.mName);
 	this->mVAO = std::move(aOther.mVAO);
 	this->mVBO = std::move(aOther.mVBO);
 	this->mIBO = std::move(aOther.mIBO);
 	this->mEntry = std::move(aOther.mEntry);
-	this->mBones = std::move(aOther.mBones);
 	aOther.mEntry = nullptr;
 
 	return *this;

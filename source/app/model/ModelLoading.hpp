@@ -7,6 +7,10 @@ glm::mat4 convertToGLM(const aiMatrix4x4& aFrom) noexcept;
 glm::quat convertToGLM(const aiQuaternion& aFrom) noexcept;
 glm::vec3 convertToGLM(const aiVector3D& aFrom) noexcept;
 
+//during loading - we load children's names for each bone
+//in separate step - convert children data to parent pointer
+typedef std::vector<std::string> BoneChildrenData;
+
 class Model {
 public:
 	Model(std::string_view aPath) noexcept;
@@ -18,10 +22,10 @@ public:
 	void setVariant(const std::string_view aMaterialName, const std::string_view aIdentificator) noexcept;
 	void resetVariant(const std::string_view aMaterialName) noexcept;
 
-	void draw(UniformMaterial& aUniform) noexcept;
+	void draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
 
-	void drawSolidOnly(UniformMaterial& aUniform) noexcept;
-	void drawTransparentOnly(UniformMaterial& aUniform) noexcept;
+	void drawSolidOnly(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
+	void drawTransparentOnly(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
 
 	void setAnimation(std::string_view aAnimationName, const uint64_t aFrame) noexcept;
 
@@ -30,11 +34,11 @@ private:
 	std::vector<Mesh> mMeshes;
 	std::vector<Bone> mBones;
 	std::vector<Animation> mAnimations;
+	std::vector<glm::mat4> mBoneMatrices;
 
-	void processNode(aiNode* apNode, const aiScene* apScene, glm::mat4& aTransform) noexcept;
-	void processMesh(std::vector<Mesh>* apMesh, aiMesh* apMeshLoad, const aiScene* apScene, glm::mat4& aTransform) noexcept;
-
-	void processAnimation(aiAnimation* apAnimation, glm::mat4& aTransform) noexcept;
+	void processNode(aiNode* apParent, aiNode* apNode, const aiScene* apScene, glm::mat4& aTransform, std::vector<BoneChildrenData>& aBoneParentVector) noexcept;
+	void processMesh(aiNode* apParent, const uint64_t aMeshId, const aiScene* apScene, glm::mat4& aTransform, std::vector<BoneChildrenData>& aBoneParentVector) noexcept;
+	void processAnimation(aiAnimation* apAnimation, const aiScene* apScene,glm::mat4& aTransform) noexcept;
 };
 
 #endif
