@@ -2,6 +2,9 @@
 #define EUROTRAM_ANIMATION
 #include "../base/Base.hpp"
 
+//assimp is weird and loads like 3333 frames - solution to just hard-code it
+constexpr double ANIMATION_FRAME_PER_FRAME_AMOUNT = 41.6625;
+
 namespace Keyframe {
 	struct Position {
 		glm::vec3 position;
@@ -19,8 +22,8 @@ namespace Keyframe {
 
 struct Bone {
 	std::string name;
-	glm::mat4 local;
 	glm::mat4 offset;
+	glm::mat4 local;
 	glm::mat4* transformation; //write data to pointer
 	Bone* parent;
 };
@@ -63,7 +66,7 @@ private:
 	uint64_t getScaleIndex(const uint64_t aFrame) noexcept;
 
 	//interpolate between last and next frame - get value at current frame
-	float getScaleFactor(const uint64_t aLastFrame, const uint64_t aNextFrame, const uint64_t aCurrentFrame) noexcept;
+	float lerp(const uint64_t aLastFrame, const uint64_t aNextFrame, const uint64_t aCurrentFrame) noexcept;
 
 	glm::mat4 interpolatePosition(const uint64_t aFrame) noexcept;
 	glm::mat4 interpolateRotation(const uint64_t aFrame) noexcept;

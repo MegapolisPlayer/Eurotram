@@ -138,3 +138,12 @@ void readBytesToString(std::ifstream& aStream, std::string& aBuffer, const uint6
 		aBuffer.resize(0); //make buffer empty
 	}
 }
+
+std::ostream& operator<< (std::ostream& aStream, const glm::vec3& aVector) noexcept {
+	aStream << '[' << aVector.x << ',' << aVector.y << ',' << aVector.z << ']';
+	return aStream;
+}
+std::ostream& operator<<(std::ostream& aStream, const glm::vec4& aVector) noexcept {
+	aStream << '[' << aVector.x << ',' << aVector.y << ',' << aVector.z << ',' << aVector.w << ']';
+	return aStream;
+}

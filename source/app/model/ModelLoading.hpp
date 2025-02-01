@@ -3,6 +3,8 @@
 #include "Mesh.hpp"
 #include "Animation.hpp"
 
+//TODO move to tinygltf!!!!
+
 glm::mat4 convertToGLM(const aiMatrix4x4& aFrom) noexcept;
 glm::quat convertToGLM(const aiQuaternion& aFrom) noexcept;
 glm::vec3 convertToGLM(const aiVector3D& aFrom) noexcept;

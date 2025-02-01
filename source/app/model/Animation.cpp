@@ -11,9 +11,18 @@ void Animation::addBones(std::vector<Bone*>& aBones) noexcept {
 }
 
 void Animation::setStateAtFrame(const uint64_t aFrame) noexcept {
+	std::cout << "Animation " << this->mName << "; TPS: " << this->mTicksPerSecond << "; ticks: " << this->mTickAmount << '\n';
+
 	for(Bone* b : this->mBonesRef) {
-		//for each bone - update matrix
-		*(b->transformation) = getBoneTransformation(b, aFrame%this->mTickAmount);
+		std::cout << b->name << " ";
+		if(b->parent != nullptr) {
+			std::cout << "(parent " << b->parent->name << ')';
+		}
+		std::cout << '\n';
+	}
+
+	for(Bone* b : this->mBonesRef) {
+		*(b->transformation) = getBoneTransformation(b, aFrame);
 	}
 }
 
@@ -41,47 +50,103 @@ std::vector<Keyframe::Scale>& Animation::getScaleKeyframes() noexcept {
 Animation::~Animation() noexcept {}
 
 glm::mat4 Animation::getBoneTransformation(Bone* aBone, const uint64_t aFrame) noexcept {
-	glm::mat4 result = glm::mat4(1.0f);
 	Bone* tempBone = aBone;
+	std::vector<Bone*> path;
 
+	//make path from list of parents
 	while(tempBone != nullptr) {
-		//we go from bottom to top - reverse matrix multiplication order!
-		result = result * tempBone->offset;
-		std::cout << ">" << tempBone->name;
+		path.push_back(tempBone);
 		tempBone = tempBone->parent;
 	}
+
+	//next element child of previous
+
+	glm::mat4 result = glm::mat4(1.0f);
+	for(uint64_t i = 0; i < path.size(); i++) {
+		path[i]->local = interpolatePosition(aFrame) * interpolateRotation(aFrame) * interpolateScale(aFrame);
+		if(i >= 1) {
+			result *= glm::inverse(path[i-1]->offset);
+		}
+		result *= path[i]->offset;
+		result *= path[i]->local;
+	}
+
+	std::cout << "Resulting transform from world origin for " << aBone->name << ": " << (result * glm::vec4(1.0f)) << "\n";
+
 	std::cout << "\n";
 
 	return result;
 }
 
-//TODO finish animation
-
 uint64_t Animation::getPositionIndex(const uint64_t aFrame) noexcept {
-	return {};
+	for(uint64_t i = 0; i < this->mPositions.size()-1; i++) {
+		if(this->mPositions[i+1].frame > aFrame) return i;
+	}
+	return UINT64_MAX;
 }
 uint64_t Animation::getRotationIndex(const uint64_t aFrame) noexcept {
-	return {};
+	for(uint64_t i = 0; i < this->mRotation.size()-1; i++) {
+		if(this->mRotation[i+1].frame > aFrame) return i;
+	}
+	return UINT64_MAX;
 }
 uint64_t Animation::getScaleIndex(const uint64_t aFrame) noexcept {
-	return {};
+	for(uint64_t i = 0; i < this->mScale.size()-1; i++) {
+		if(this->mScale[i+1].frame > aFrame) return i;
+	}
+	return UINT64_MAX;
 }
 
-//linear interpolation
-float Animation::getScaleFactor(const uint64_t aLastFrame, const uint64_t aNextFrame, const uint64_t aCurrentFrame) noexcept {
-	return {};
+//linear interpolation - lerp
+float Animation::lerp(const uint64_t aLastFrame, const uint64_t aNextFrame, const uint64_t aCurrentFrame) noexcept {
+	std::cout << "lerp - LF " << aLastFrame << " NF " << aNextFrame << " CF " << aCurrentFrame << '\n';
+	return ((float)aCurrentFrame - (float)aLastFrame)/((float)aNextFrame - (float)aLastFrame); //should be in range 0-1
 }
 
 glm::mat4 Animation::interpolatePosition(const uint64_t aFrame) noexcept {
-	int p0Index = getPositionIndex(aFrame);
-	int p1Index = p0Index + 1;
-	float scale = getScaleFactor(this->mPositions[p0Index].frame, this->mPositions[p1Index].frame, aFrame);
-	glm::vec3 position = glm::mix(this->mPositions[p0Index].position, this->mPositions[p1Index].position, scale);
-	return glm::translate(glm::mat4(1.0f), position);
+	if(this->mPositions.size() == 1) {
+		std::cout << "no pos!\n";
+		return glm::translate(glm::mat4(1.0f), this->mPositions[0].position);
+	}
+
+	uint64_t start = getPositionIndex(aFrame);
+	uint64_t end = start + 1;
+	float weight = this->lerp(this->mPositions[start].frame, this->mPositions[end].frame, aFrame);
+	std::cout << "pos from " << this->mPositions[start].position << '\n';
+	std::cout << "pos to " << this->mPositions[end].position << '\n';
+	std::cout << "pos weight " << weight << '\n';
+	glm::vec3 pos = glm::mix(this->mPositions[start].position, this->mPositions[end].position, weight);
+	std::cout << "pos " << pos << '\n';
+	return glm::translate(glm::mat4(1.0f), pos);
 }
 glm::mat4 Animation::interpolateRotation(const uint64_t aFrame) noexcept {
-	return {};
+	if(this->mRotation.size() == 1) {
+		std::cout << "no rot!\n";
+		return glm::mat4_cast(glm::normalize(this->mRotation[0].rotation));
+	}
+
+	uint64_t start = getPositionIndex(aFrame);
+	uint64_t end = start + 1;
+	float weight = this->lerp(this->mRotation[start].frame, this->mRotation[end].frame, aFrame);
+	std::cout << "rot weight " << weight << '\n';
+
+	//slerp - lerp for rotations
+	//get quaternion - normalize - cast to matrix
+	return glm::mat4_cast(glm::normalize(glm::slerp(this->mRotation[start].rotation, this->mRotation[end].rotation, weight)));
 }
 glm::mat4 Animation::interpolateScale(const uint64_t aFrame) noexcept {
-	return {};
+	if(this->mScale.size() == 1) {
+		std::cout << "no scale!\n";
+		return glm::scale(glm::mat4(1.0f), this->mScale[0].scale);
+	}
+
+	uint64_t start = getPositionIndex(aFrame);
+	uint64_t end = start + 1;
+	float weight = this->lerp(this->mScale[start].frame, this->mScale[end].frame, aFrame);
+	std::cout << "scale from " << this->mScale[start].scale << '\n';
+	std::cout << "scale to " << this->mScale[end].scale << '\n';
+	std::cout << "scale weight " << weight << '\n';
+	glm::vec3 scale = glm::mix(this->mScale[start].scale, this->mScale[end].scale, weight);
+	std::cout << "scale " << scale << '\n';
+	return glm::scale(glm::mat4(1.0f), scale);
 }

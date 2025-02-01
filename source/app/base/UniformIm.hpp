@@ -25,6 +25,7 @@ StructUniform<tType>::StructUniform(const uint64_t aLocation, const uint64_t aAm
 }
 template<typename tType>
 void StructUniform<tType>::setNewData(const tType* const aValue, const uint64_t aAmount) {
+	this->mBuffer.bind(this->mLocation);
 	this->mBuffer.setNewData(aValue, sizeof(tType)*aAmount);
 }
 template<typename tType>

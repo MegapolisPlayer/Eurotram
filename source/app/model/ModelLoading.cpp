@@ -21,7 +21,8 @@ glm::vec3 convertToGLM(const aiVector3D& aFrom) noexcept {
 Model::Model(std::string_view aPath) noexcept {
 	Assimp::Importer mload;
 	const aiScene* scene = mload.ReadFile(aPath.data(),
-		aiProcess_Triangulate |  aiProcess_SplitLargeMeshes | aiProcess_LimitBoneWeights | aiProcess_OptimizeGraph | aiProcess_ValidateDataStructure | aiProcess_PopulateArmatureData
+		aiProcess_Triangulate |  aiProcess_SplitLargeMeshes | aiProcess_LimitBoneWeights |
+		aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes | aiProcess_ValidateDataStructure | aiProcess_PopulateArmatureData
 	);
 
 	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
@@ -276,16 +277,13 @@ void Model::processMesh(aiNode* apParent, const uint64_t aMeshId, const aiScene*
 			aBoneParentVector.push_back({});
 
 			this->mBones.back().name = mesh->mBones[b]->mName.C_Str();
-			this->mBones.back().local = convertToGLM(mesh->mBones[b]->mNode->mTransformation);
 			this->mBones.back().offset = convertToGLM(mesh->mBones[b]->mOffsetMatrix);
+			this->mBones.back().local = convertToGLM(mesh->mBones[b]->mNode->mTransformation);
 			this->mBones.back().transformation = &this->mBoneMatrices.back();
 
-			std::cout << "New bone: " << mesh->mBones[b]->mName.C_Str() << " of mesh " << mesh->mName.C_Str() << " with children " << '\n';
 			for(uint64_t k = 0; k < mesh->mBones[b]->mNode->mNumChildren; k++) {
-				std::cout << "--> " << mesh->mBones[b]->mNode->mChildren[k]->mName.C_Str() << '\n';
 				aBoneParentVector.back().push_back(mesh->mBones[b]->mNode->mChildren[k]->mName.C_Str());
 			}
-			std::cout << "----\n";
 		}
 
 		//add weights to vertices
@@ -299,6 +297,7 @@ void Model::processMesh(aiNode* apParent, const uint64_t aMeshId, const aiScene*
 				if(vertices[mesh->mBones[b]->mWeights[i].mVertexId].boneIds[j] <= -0.01) {
 					vertices[mesh->mBones[b]->mWeights[i].mVertexId].boneIds[j] = b;
 					vertices[mesh->mBones[b]->mWeights[i].mVertexId].boneWeights[j] = mesh->mBones[b]->mWeights[i].mWeight;
+					break;
 				}
 			}
 		}
@@ -307,14 +306,16 @@ void Model::processMesh(aiNode* apParent, const uint64_t aMeshId, const aiScene*
 	this->mMeshes[aMeshId] = std::move(Mesh(mesh->mName.C_Str(), vertices, indices, texture)); //texture path may be null
 }
 
+
+
 void Model::processAnimation(aiAnimation* apAnimation, const aiScene* apScene, glm::mat4& aTransform) noexcept {
 	this->mAnimations.push_back({});
-	double duration = apAnimation->mDuration;
-	double tps = apAnimation->mTicksPerSecond;
 
 	this->mAnimations.back().mName = apAnimation->mName.C_Str();
-	this->mAnimations.back().mTickAmount = duration*tps; //seconds * tps
-	this->mAnimations.back().mTicksPerSecond = tps;
+	this->mAnimations.back().mTickAmount = apAnimation->mDuration/ANIMATION_FRAME_PER_FRAME_AMOUNT; //in ticks!
+	this->mAnimations.back().mTicksPerSecond = apAnimation->mTicksPerSecond;
+
+	std::cout << "DUR " << this->mAnimations.back().mTickAmount << " TPS" << apAnimation->mTicksPerSecond << '\n';
 
 	for(uint64_t i = 0; i < apAnimation->mNumChannels; i++) {
 		//link to bones
@@ -322,27 +323,28 @@ void Model::processAnimation(aiAnimation* apAnimation, const aiScene* apScene, g
 			if(b.name == apAnimation->mChannels[i]->mNodeName.C_Str()) {
 				//found our bone - add it
 				this->mAnimations.back().addBone(&b);
-				std::cout << apAnimation->mName.C_Str() << " bone ref: " << apAnimation->mChannels[i]->mNodeName.C_Str() << '\n';
 			}
 		}
 
 		//keyframes
+		std::cout << "KF amount " << apAnimation->mChannels[i]->mNumPositionKeys << "\n";
 		for(uint64_t j = 0; j < apAnimation->mChannels[i]->mNumPositionKeys; j++) {
 			Keyframe::Position temp;
 			temp.position = convertToGLM(apAnimation->mChannels[i]->mPositionKeys[j].mValue);
-			temp.frame = (uint64_t)apAnimation->mChannels[i]->mPositionKeys[j].mTime*tps;
+			std::cout << "KF" << apAnimation->mChannels[i]->mNodeName.C_Str() << "@" << (uint64_t)(apAnimation->mChannels[i]->mPositionKeys[j].mTime/ANIMATION_FRAME_PER_FRAME_AMOUNT) << ":" << temp.position << '\n';
+			temp.frame = apAnimation->mChannels[i]->mPositionKeys[j].mTime/ANIMATION_FRAME_PER_FRAME_AMOUNT;
 			this->mAnimations.back().mPositions.push_back(temp);
 		}
 		for(uint64_t j = 0; j < apAnimation->mChannels[i]->mNumRotationKeys; j++) {
 			Keyframe::Rotation temp;
-			temp.rotation = convertToGLM(apAnimation->mChannels[i]->mPositionKeys[j].mValue);
-			temp.frame = (uint64_t)apAnimation->mChannels[i]->mPositionKeys[j].mTime*tps;
+			temp.rotation = convertToGLM(apAnimation->mChannels[i]->mRotationKeys[j].mValue);
+			temp.frame = apAnimation->mChannels[i]->mRotationKeys[j].mTime/ANIMATION_FRAME_PER_FRAME_AMOUNT;
 			this->mAnimations.back().mRotation.push_back(temp);
 		}
-		for(uint64_t j = 0; j < apAnimation->mChannels[i]->mNumRotationKeys; j++) {
+		for(uint64_t j = 0; j < apAnimation->mChannels[i]->mNumScalingKeys; j++) {
 			Keyframe::Scale temp;
-			temp.scale = convertToGLM(apAnimation->mChannels[i]->mPositionKeys[j].mValue);
-			temp.frame = (uint64_t)apAnimation->mChannels[i]->mPositionKeys[j].mTime*tps;
+			temp.scale = convertToGLM(apAnimation->mChannels[i]->mScalingKeys[j].mValue);
+			temp.frame = apAnimation->mChannels[i]->mScalingKeys[j].mTime/ANIMATION_FRAME_PER_FRAME_AMOUNT;
 			this->mAnimations.back().mScale.push_back(temp);
 		}
 	}

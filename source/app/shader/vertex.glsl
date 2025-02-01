@@ -32,20 +32,14 @@ void main() {
 	pTexCoord = iTexCoord;
 	pNormals = uMatrixNormal * iNormals;
 
-	vec4 finalPosition = vec4(iPosition, 0.0);
+	mat4 boneTransform = (boneMatrices[int(iBoneIds[0])] * iBoneWeights[0]);
+	boneTransform += (boneMatrices[int(iBoneIds[1])] * iBoneWeights[1]);
+	boneTransform += (boneMatrices[int(iBoneIds[2])] * iBoneWeights[2]);
+	boneTransform += (boneMatrices[int(iBoneIds[3])] * iBoneWeights[3]);
 
-	/*
-	vec4 finalPosition = vec4(0.0);
-
-	for(int i = 0; i < MAX_BONES_PER_VERTEX; i++) {
-		if(iBoneIds[i] < -0.01) { continue; }
-		finalPosition += (boneMatrices[int(iBoneIds[i])] * vec4(iPosition, 1.0) * iBoneWeights[i]);
-	}
-	*/
-
-	pFragmentPos = vec3(uMatrixModel * finalPosition);
-	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * finalPosition;
-	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * finalPosition;
+	pFragmentPos = vec3(uMatrixModel *  boneTransform * vec4(iPosition, 1.0));
+	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * boneTransform * vec4(iPosition, 1.0);
+	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * boneTransform * vec4(iPosition, 1.0);
 
 	gl_Position = uCamera * vec4(pFragmentPos, 1.0);
 };

@@ -189,6 +189,7 @@ int main() {
 	UniformMat4 lmod(shadowMapProgram, 91);
 	lmod.set(t1.getMatrix());
 
+	uint64_t i = 0;
     while (mainWindow.isOpen()) {
 		loopTimer.start();
 
@@ -317,28 +318,15 @@ int main() {
 		};
 
 		if(ImGui::Button("Open driver door")) {
-			t3rp.setAnimation("driverDoorAction", 40);
+			t3rp.setAnimation("driverDoorAction", i);
+			i++;
+			if(i == 80) { i = 0; }
 		};
 		if(ImGui::Button("Close driver door")) {
-			t3rp.setAnimation("driverDoorAction", 0);
+			t3rp.setAnimation("driverDoorAction", i);
+			if(i == 0) { i = 40; }
+			i--;
 		};
-
-		if(ImGui::Button("Open doors")) {
-			t3rp.setAnimation("door1Action", 40);
-			t3rp.setAnimation("door2Action", 40);
-		};
-		if(ImGui::Button("Close doors")) {
-			t3rp.setAnimation("door1Action", 0);
-			t3rp.setAnimation("door2Action", 0);
-		};
-
-		if(ImGui::Button("Raise pantograph")) {
-			t3rp.setAnimation("pantographAction", 0);
-		};
-		if(ImGui::Button("Lower pantograph")) {
-			t3rp.setAnimation("pantographAction", 40);
-		};
-
 
 		ImGui::End();
 
