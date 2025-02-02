@@ -2,6 +2,8 @@
 #define EUROTRAM_FREEUTILS
 #include "Setup.hpp"
 
+#define DISCARD(x) (void)x
+
 //IO UTILITIES
 
 namespace ConsoleColor {

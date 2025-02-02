@@ -100,23 +100,23 @@ int main() {
 
 	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 10000.0f, 0.05f);
 
-	uint32_t mouseCallbackHandle = mainWindow.registerMouseCallback(MouseCallback);
+	mainWindow.registerMouseCallback(MouseCallback);
 	mainWindow.registerKeyCallback(GLFW_KEY_ESCAPE, KeyEsc);
-	uint32_t genericKeyHandle = mainWindow.registerGenericKeyCallback(KeyWASDRFQ);
-	uint32_t mouseClickHandle = mainWindow.registerClickCallback(MouseClick);
+	mainWindow.registerGenericKeyCallback(KeyWASDRFQ);
+	mainWindow.registerClickCallback(MouseClick);
 	mainWindow.hideCursor();
 
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 	shader.bind();
 
-	TextureSamplerArray<16> tsa(shader, 232);
+	TextureSamplerArray<16> tsa(232);
 	tsa.set();
 
-	UniformMat4 matCameraUniform(shader, 10);
+	UniformMat4 matCameraUniform(10);
 	matCameraUniform.set(mainWindow.getCamera()->getMatrix());
-	UniformVec3 cameraPosUniform(shader, 210);
-	UniformMat4 matModelUniform(shader, 11);
-	UniformMat3 matNormalUniform(shader, 12);
+	UniformVec3 cameraPosUniform(210);
+	UniformMat4 matModelUniform(11);
+	UniformMat3 matNormalUniform(12);
 
 	Dirlight d;
 	d.color = {208.0f/255.0f, 128.0f/255.0f, 0.0f, 1.0f};
@@ -125,7 +125,7 @@ int main() {
 
 	DirectionalShadows ds(lightPos, glm::vec3(0.0f), 20.0f, 0.1f, 30.0f);
 
-	UniformMat4 spu(shader, 13);
+	UniformMat4 spu(13);
 	spu.set(ds.getProjectionMatrix());
 
 
@@ -154,10 +154,10 @@ int main() {
 	uSpots.set();
 
 	SpotlightShadows ss(lightPos, s.direction, 0.1, 30.0, *mainWindow.getCamera()->getFOVPointer());
-	UniformMat4 fpu(shader, 14);
+	UniformMat4 fpu(14);
 	fpu.set(ss.getProjectionMatrix());
 
-	UniformFloat ambientLightStrength(shader, 200);
+	UniformFloat ambientLightStrength(200);
 	ambientLightStrength.set(daylightIndex);
 
 	Timer loopTimer;
@@ -174,8 +174,6 @@ int main() {
 	std::cout << "Loading T3R.P model...\n";
 	Model t3rp(std::filesystem::path("./T3.glb"));
 	std::cout << "Model loaded!\n";
-	//t3rp.setAnimation("door1Action", 20);
-	//t3rp.setAnimation("door2Action", 40);
 	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
 	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 
@@ -185,13 +183,17 @@ int main() {
 
 	Shader shadowMapProgram("shader/shadowVertex.glsl", "shader/shadowFragment.glsl");
 	shadowMapProgram.bind();
-	UniformMat4 lpu(shadowMapProgram, 90);
-	UniformMat4 lmod(shadowMapProgram, 91);
+	UniformMat4 lpu(90);
+	UniformMat4 lmod(91);
 	lmod.set(t1.getMatrix());
 
 	uint64_t i = 0;
     while (mainWindow.isOpen()) {
 		loopTimer.start();
+
+ 		std::cout << "GLFW anim time " << std::fmod(glfwGetTime(), 3.0) << '\n';
+		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.0));
+		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.0));
 
 		shadowMapProgram.bind();
 
@@ -230,7 +232,6 @@ int main() {
 		ds.bindMap(15);
 		drawTimer.start();
 
-		//t3rp.draw(uMaterial, uModelMat);
 		t3rp.draw(uMaterial, uModelMat);
 
 		drawTimer.end();
@@ -263,10 +264,6 @@ int main() {
 			uDirlight.update(&d);
 			uDirlight.set();
 		}
-		//if(ImGui::SliderFloat3("Point light position", glm::value_ptr(p.position), -10.0, 10.0)) {
-		//	uPoints.update(&p);
-		//	uPoints.set();
-		//}
 
 		ImGui::End();
 
@@ -353,53 +350,3 @@ int main() {
 
     return 0;
 }
-
-/*
- // flip X on opposite faces! (mirror of mirror is no mirror)
- //posX, posY, posZ, texCoord, texCoord, normalX, normalY, normalZ
- GLfloat vertices[] = {
- //upper square
- -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,  1.0f, 1.0f,
--0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-
-//lower square
-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,  1.0f, 0.0f,
--0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
--0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-
-//front
--0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
--0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-
-//back
-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,  0.0f, 1.0f,
--0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
--0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,  0.0f, 0.0f,
-
-//left
--0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
--0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
--0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
--0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-
-//right
-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-};
-GLuint indices[] = {
-0, 1, 2, 2, 3, 0,
-4, 5, 6, 6, 7, 4,
-8, 9, 10, 10, 11, 8,
-12, 13, 14, 14, 15, 12,
-16, 17, 18, 18, 19, 16,
-20, 21, 22, 22, 23, 20,
-};
-*/

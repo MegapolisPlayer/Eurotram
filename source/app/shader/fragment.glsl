@@ -223,5 +223,5 @@ void main() {
 	//oColor = vec4(1.0, 0.0, 1.0, 1.0);
 	oColor = vec4(
 		baseColor.xyz * clamp(uAmbientLight + lighting + lightingSpecular, 0.0, 1.0),
-		baseColor.w); //normal calc
+		1.0); //normal calc TODO transparency
 };

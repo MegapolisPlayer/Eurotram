@@ -1,49 +1,82 @@
 #include "Animation.hpp"
 
+#include "ModelLoading.hpp" //so model class works
+
 Animation::Animation() noexcept  {}
+void Animation::setStateAtTime(Model& aModel, const float aTime) noexcept {
+	//calculate matrices
+	std::vector<TRSData> data;
+	data.resize(aModel.mNodes.size());
+	for(uint64_t i = 0; i < this->mSamplers.size(); i++) {
+		this->getBoneTransformations(aModel, i, aTime, data);
+	}
 
-void Animation::setStateAtFrame(const uint64_t aFrame) noexcept {
+	//multiply
+	for(uint64_t i = 0; i < data.size(); i++) {
+		aModel.mNodes[i].localMatrix = data[i].s * data[i].r * data[i].t;
+	}
 
+	//set data of nodes
+	for(GLTFNode& n : aModel.mNodes) {
+		if(n.idOfSkin == -1) continue;
+		//inverse bind - from bone to world
+		//aModel.mBoneMatrices[n.boneOutputMatrixId] = n.localMatrix;
+		aModel.mBoneMatrices[n.boneOutputMatrixId] = glm::inverse(n.transformMatrix) * n.localMatrix * n.inverseBindMatrix;
+		std::cout << n.name << '@' << aTime << ": " << 	aModel.mBoneMatrices[n.boneOutputMatrixId] * glm::vec4(1.0) << '\n';
+	}
 }
 
 Animation::~Animation() noexcept {}
 
-//TODO calculate this
-//jointMatrix[j] = inverse(globalTransform) * globalJointTransform[j] * inverseBindMatrix[j]
-//https://github.com/KhronosGroup/glTF/issues/1630
-//jointMatrix[j] = inverse(localNodeTransform) * worldTransform[j] * inverseBindMatrix[j]
-//localNodeTransform - from node
-//worldTransform -- also from node
-//
-//getting which bone -> node can reference skin (node.second - the id of the "skin")
-
 float Animation::lerp(float aLast, float aNext, float aCurrent) noexcept {
+	if(aCurrent < aLast || aCurrent > aNext) return 0.0; //should not happen
 	return ((float)aCurrent - (float)aLast)/((float)aNext - (float)aLast); //should be in range 0-1
 }
-uint64_t Animation::getPositionIndex(const uint64_t aFrame) noexcept {
-	return {}; //TODO
+uint64_t Animation::getIndex(const SamplerData& aSampler, const float aTime) noexcept {
+	for(uint64_t i = 0; i < aSampler.time.size()-1; i++) {
+		if(aTime < aSampler.time[i+1]) return i;
+	}
+	return UINT64_MAX;
 }
-uint64_t Animation::getRotationIndex(const uint64_t aFrame) noexcept {
-	return {}; //TODO
+glm::mat4 Animation::interpolatePosition(const SamplerData& aSampler, const float aTime) noexcept {
+	uint64_t start = getIndex(aSampler, aTime);
+	uint64_t end = start+1;
+	float weight = lerp(aSampler.time[start], aSampler.time[end], aTime);
+	glm::vec3 position = glm::vec3(glm::mix(aSampler.value[start], aSampler.value[end], weight));
+	return glm::translate(glm::mat4(1.0), position);
 }
-uint64_t Animation::getScaleIndex(const uint64_t aFrame) noexcept {
-	return {}; //TODO
+glm::mat4 Animation::interpolateRotation(const SamplerData& aSampler, const float aTime) noexcept {
+	uint64_t start = getIndex(aSampler, aTime);
+	uint64_t end = start+1;
+	float weight = lerp(aSampler.time[start], aSampler.time[end], aTime);
+	glm::quat rotation = glm::normalize(glm::slerp(glm::quat(aSampler.value[start]), glm::quat(aSampler.value[end]), weight));
+	return glm::mat4_cast(rotation);
 }
-glm::mat4 Animation::interpolatePosition(const uint64_t aFrame) noexcept {
-	return {}; //TODO
-}
-glm::mat4 Animation::interpolateRotation(const uint64_t aFrame) noexcept {
-	return {}; //TODO
-}
-glm::mat4 Animation::interpolateScale(const uint64_t aFrame) noexcept {
-	return {}; //TODO
+glm::mat4 Animation::interpolateScale(const SamplerData& aSampler, const float aTime) noexcept {
+	uint64_t start = getIndex(aSampler, aTime);
+	uint64_t end = start+1;
+	float weight = lerp(aSampler.time[start], aSampler.time[end], aTime);
+	glm::vec3 scale = glm::vec3(glm::mix(aSampler.value[start], aSampler.value[end], weight));
+	return glm::scale(glm::mat4(1.0), scale);
 }
 
-glm::mat4 Animation::getBoneTransformations(Skin* aSkin, const uint64_t aFrame) noexcept {
-	//Joint* tempBone = aBone;
-	glm::mat4 result = glm::mat4(1.0f);
+void Animation::getBoneTransformations(Model& aModel, const uint64_t aSamplerId, const float aTime, std::vector<TRSData>& aTRSData) noexcept {
+	auto& sampler = this->mSamplers[aSamplerId];
 
-	std::cout << "Resulting transform from world origin for " <<  ": " << (result * glm::vec4(1.0f)) << "\n";
+	//enforce TRS
 
-	return result;
+	switch(sampler.type) {
+		case(fastgltf::AnimationPath::Translation):
+			aTRSData[sampler.nodeIndex].t = interpolatePosition(sampler, aTime);
+			break;
+		case(fastgltf::AnimationPath::Rotation):
+			aTRSData[sampler.nodeIndex].r = interpolateRotation(sampler, aTime);
+			break;
+		case(fastgltf::AnimationPath::Scale):
+			aTRSData[sampler.nodeIndex].s = interpolateScale(sampler, aTime);
+			break;
+		default:
+			std::cerr << LogLevel::ERROR << "Weight animation is not supported!\n" << LogLevel::RESET;
+			break;
+	}
 }

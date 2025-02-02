@@ -32,14 +32,24 @@ void main() {
 	pTexCoord = iTexCoord;
 	pNormals = uMatrixNormal * iNormals;
 
-	mat4 boneTransform = (boneMatrices[int(iBoneIds[0])] * iBoneWeights[0]);
-	boneTransform += (boneMatrices[int(iBoneIds[1])] * iBoneWeights[1]);
-	boneTransform += (boneMatrices[int(iBoneIds[2])] * iBoneWeights[2]);
-	boneTransform += (boneMatrices[int(iBoneIds[3])] * iBoneWeights[3]);
+	mat4 boneTransform = mat4(1.0); //identity
 
-	pFragmentPos = vec3(uMatrixModel * vec4(iPosition, 1.0));
-	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * vec4(iPosition, 1.0);
-	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * vec4(iPosition, 1.0);
+	if(iBoneIds[0] >= 0.0) {
+		boneTransform = (boneMatrices[int(iBoneIds[0])] * iBoneWeights[0]);
+	}
+	if(iBoneIds[1] >= 0.0) {
+		boneTransform += (boneMatrices[int(iBoneIds[1])] * iBoneWeights[1]);
+	}
+	if(iBoneIds[2] >= 0.0) {
+		boneTransform += (boneMatrices[int(iBoneIds[2])] * iBoneWeights[2]);
+	}
+	if(iBoneIds[3] >= 0.0) {
+		boneTransform += (boneMatrices[int(iBoneIds[3])] * iBoneWeights[3]);
+	}
+
+	pFragmentPos = vec3(uMatrixModel * boneTransform * vec4(iPosition, 1.0));
+	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * boneTransform * vec4(iPosition, 1.0);
+	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * boneTransform * vec4(iPosition, 1.0);
 
 	gl_Position = uCamera * vec4(pFragmentPos, 1.0);
 };

@@ -1,8 +1,8 @@
 #include "Window.hpp"
 
 Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, const bool aFullscreen, const bool aDebug) noexcept
-	: mpHandle(nullptr), mBackgroundColor({1.0f, 0.0f, 1.0f, 1.0f}), mDebugEnabled(aDebug), mExitOverride(false), mCursorHidden(false),
-	mWidth(aWidth), mHeight(aHeight), mReferencedCamera(NULL) {
+	: mpHandle(nullptr), mReferencedCamera(NULL), mDebugEnabled(aDebug), mExitOverride(false), mCursorHidden(false), mWidth(aWidth), mHeight(aHeight),
+	 mBackgroundColor({1.0f, 0.0f, 1.0f, 1.0f}) {
 	if(glfwInit() != GLFW_TRUE) {
 		std::cerr << LogLevel::ERROR << "GLFW failed to initialize." << LogLevel::RESET;
 		std::exit(EXIT_FAILURE);
@@ -203,7 +203,7 @@ void Window::KeyCallback(GLFWwindow* aWindow, int aKey, int aScancode, int aActi
 		Callback(ClassPointer, aKey, aAction, aModifiers);
 	}
 	for(uint64_t Id = 0; Id < ClassPointer->mKeyCallbacks.size(); Id++) {
-		if(ClassPointer->mKeyCallbacks[Id].first == aKey) {
+		if(ClassPointer->mKeyCallbacks[Id].first == (uint32_t)aKey) {
 			ClassPointer->mKeyCallbacks[Id].second(ClassPointer, aKey, aAction, aModifiers);
 		}
 	}

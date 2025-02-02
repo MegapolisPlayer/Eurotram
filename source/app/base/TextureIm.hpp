@@ -3,8 +3,8 @@
 #include "Texture.hpp"
 
 template<uint8_t tAmount>
-TextureSamplerArray<tAmount>::TextureSamplerArray(const Shader& aShader, const uint64_t aSamplerArrayLocation) noexcept
-: mUniform(aShader, aSamplerArrayLocation) {
+TextureSamplerArray<tAmount>::TextureSamplerArray(const uint64_t aSamplerArrayLocation) noexcept
+: mUniform(aSamplerArrayLocation) {
 	for(uint8_t i = 0; i < tAmount; i++) this->mArray[i] = i;
 }
 template<uint8_t tAmount>

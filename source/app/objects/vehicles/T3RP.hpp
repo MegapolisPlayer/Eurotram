@@ -20,7 +20,7 @@ class T3RP {
 public:
 
 private:
-	VehiclePhysicsData mVPD;
+	//VehiclePhysicsData mVPD;
 };
 
 #endif

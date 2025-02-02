@@ -7,8 +7,7 @@ set(CMAKE_C_STANDARD_REQUIRED TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall" "-g")
-set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall")
+add_compile_options(-Wall -Wextra -g -g3 -fno-omit-frame-pointer -fsanitize=address -Wno-unused-parameter -Wno-reorder-ctor) # disable for release mode
 
 project(eurotram VERSION 0.1.0)
 add_compile_definitions(GLEW_NO_GLU)
@@ -92,6 +91,7 @@ add_executable(eurotram
 "depend/fastgltf/io.cpp"
 "depend/fastgltf/simdjson.cpp"
 )
+
 target_include_directories(eurotram PUBLIC
 "depend/"
 "depend/imgui/"
@@ -100,7 +100,8 @@ target_include_directories(eurotram PUBLIC
 "depend/glad/include/"
 )
 target_link_directories(eurotram PUBLIC "depend/")
-target_link_libraries(eurotram PUBLIC -lGL -lglfw)
+
+target_link_libraries(eurotram PUBLIC -lGL -lglfw -fsanitize=address)
 
 
 

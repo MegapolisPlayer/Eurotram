@@ -14,7 +14,7 @@ enum class BUSEPanelType {
 class BUSEPanel {
 public:
 private:
-	BUSEPanelType mType;
+	//BUSEPanelType mType;
 };
 
 //TODO add DO NOT ENTER sign at end

@@ -1,8 +1,9 @@
 #include "ModelLoading.hpp"
 
 glm::mat4 convertToGLM(const fastgltf::math::fmat4x4& aFrom) noexcept {
-	//convert from column-major to row-major
 	glm::mat4 result;
+
+	//convert from column-major to row-major
 	//each line - glm row
 	result[0][0] = aFrom[0][0]; result[0][1] = aFrom[1][0]; result[0][2] = aFrom[2][0]; result[0][3] = aFrom[3][0];
 	result[1][0] = aFrom[0][1]; result[1][1] = aFrom[1][1]; result[1][2] = aFrom[2][1]; result[1][3] = aFrom[3][1];
@@ -41,7 +42,8 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 		fastgltf::Options::DontRequireValidAssetMember |
 		fastgltf::Options::LoadExternalBuffers |
 		fastgltf::Options::LoadExternalImages |
-		fastgltf::Options::GenerateMeshIndices
+		fastgltf::Options::GenerateMeshIndices |
+		fastgltf::Options::DecomposeNodeMatrices
 	;
 
 	//we need to pass directory
@@ -100,7 +102,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 					auto& buffer = model->buffers[bufferView.bufferIndex];
 
 					std::visit(fastgltf::visitor {
-						[](auto& arg) {},
+						[&](auto& arg) {},
 						[&](fastgltf::sources::Array& aData) {
 							material->texture = Texture(aData.bytes.data() + bufferView.byteOffset, bufferView.byteLength);
 						}
@@ -115,10 +117,21 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 
 	std::vector<glm::mat4> meshMatrices;
 	meshMatrices.resize(model->meshes.size());
+
+	this->mNodes.reserve(model->nodes.size());
 	this->mMeshes.reserve(model->meshes.size());
 
 	fastgltf::iterateSceneNodes(*model, 0, fastgltf::math::fmat4x4(),
 		[&](fastgltf::Node& node, fastgltf::math::fmat4x4 matrix) {
+			this->mBoneMatrices.push_back(glm::mat4(1.0));
+			glm::mat4 nodeTransform = glm::mat4(1.0);
+			if(std::get_if<fastgltf::TRS>(&node.transform)) {
+				fastgltf::TRS trs = *std::get_if<fastgltf::TRS>(&node.transform);
+				nodeTransform = glm::scale(nodeTransform, convertToGLM(trs.scale));
+				nodeTransform *= glm::mat4_cast(convertToGLM(trs.rotation));
+				nodeTransform = glm::translate(nodeTransform, convertToGLM(trs.translation));
+			}
+
 			if (node.meshIndex.has_value()) {
 				std::cout << "Node name:" << node.name.c_str() << "; mesh name: " << model->meshes[node.meshIndex.value()].name;
 				meshMatrices[node.meshIndex.value()] = convertToGLM(matrix);
@@ -128,8 +141,16 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 				std::cout << "Node name:" << node.name.c_str() << '\n';
 			}
 
-			if(node.skinIndex.has_value()) { this->mNodeTransforms.push_back(std::make_pair(convertToGLM(matrix), node.skinIndex.value())); }
-			else { this->mNodeTransforms.push_back(std::make_pair(convertToGLM(matrix), -1)); }
+			if(node.skinIndex.has_value()) {
+				this->mNodes.emplace_back(node.name.c_str(), convertToGLM(matrix), nodeTransform, node.skinIndex.value(), this->mBoneMatrices.size()-1);
+			}
+			else {
+				this->mNodes.emplace_back(node.name.c_str(), convertToGLM(matrix), nodeTransform, -1, -1);
+			}
+
+			for(auto& c : node.children) {
+				this->mNodes.back().children.push_back(c);
+			}
 		});
 
 	//meshes
@@ -197,11 +218,11 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			{
 				fastgltf::Accessor& jointsAccess = model->accessors[p.findAttribute("JOINTS_0")->accessorIndex];
 				if(p.findAttribute("JOINTS_0") != p.attributes.end()) {
-					fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec4>(*model, jointsAccess, [&](fastgltf::math::fvec4 aV, GLuint aId) {
-						vertices[initialId+aId].boneIds[0] = aV.x();
-						vertices[initialId+aId].boneIds[1] = aV.y();
-						vertices[initialId+aId].boneIds[2] = aV.z();
-						vertices[initialId+aId].boneIds[3] = aV.w();
+					fastgltf::iterateAccessorWithIndex<fastgltf::math::u8vec4>(*model, jointsAccess, [&](fastgltf::math::u8vec4 aV, GLuint aId) {
+						vertices[initialId+aId].boneIds[0] = (GLfloat)aV.x();
+						vertices[initialId+aId].boneIds[1] = (GLfloat)aV.y();
+						vertices[initialId+aId].boneIds[2] = (GLfloat)aV.z();
+						vertices[initialId+aId].boneIds[3] = (GLfloat)aV.w();
 					});
 				}
 			}
@@ -231,14 +252,17 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 	//process bones
 	for(fastgltf::Skin& s : model->skins) {
 		this->mBones.push_back({});
-		this->mBoneMatrices.push_back({});
 		this->mBones.back().name = s.name.c_str();
-		this->mBones.back().output = &this->mBoneMatrices.back();
 
-		this->mBones.back().inverseBindMatrix = convertToGLM(fastgltf::getAccessorElement<fastgltf::math::fmat4x4>(*model, model->accessors[s.inverseBindMatrices.value()], s.inverseBindMatrices.value()));
-		std::cout << this->mBones.back().name << " IBM transform " << glm::vec3(this->mBones.back().inverseBindMatrix * glm::vec4(1.0f)) << '\n';
+		fastgltf::Accessor& ibmAccess =  model->accessors[s.inverseBindMatrices.value()];
+		fastgltf::iterateAccessorWithIndex<fastgltf::math::fmat4x4>(*model, ibmAccess, [&](fastgltf::math::fmat4x4 aV, GLuint aId) {
+			this->mNodes[aId].inverseBindMatrix = convertToGLM(aV);
+			std::cout << this->mBones.back().name << " IBM transform " << aId << ": " << glm::vec3(this->mNodes[aId].inverseBindMatrix * glm::vec4(1.0f)) << '\n';
+
+		});
+
 		for(size_t j : s.joints) {
-			this->mBones.back().joints.push_back(j);
+			this->mBones.back().joints.push_back(j); //nodes!
 		}
 	}
 
@@ -256,18 +280,18 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 
 			//input - keyframe times
 
-			fastgltf::iterateAccessorWithIndex<GLfloat>(*model, samplerInputAccess, [&](float aV, GLuint aId) {
+			fastgltf::iterateAccessor<GLfloat>(*model, samplerInputAccess, [&](float aV) {
 				anim.mSamplers.back().time.push_back(aV);
 			});
 
 			//output - property (vec3 for transform, scale - vec4 for rotation quaternion
 			if(samplerOutputAccess.type == fastgltf::AccessorType::Vec3) {
-				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, samplerOutputAccess, [&](glm::vec3 aV, GLuint aId) {
+				fastgltf::iterateAccessor<glm::vec3>(*model, samplerOutputAccess, [&](glm::vec3 aV) {
 					anim.mSamplers.back().value.push_back(glm::vec4(aV, 1.0));
 				});
 			}
 			else if(samplerOutputAccess.type == fastgltf::AccessorType::Vec4) {
-				fastgltf::iterateAccessorWithIndex<glm::vec4>(*model, samplerOutputAccess, [&](glm::vec4 aV, GLuint aId) {
+				fastgltf::iterateAccessor<glm::vec4>(*model, samplerOutputAccess, [&](glm::vec4 aV) {
 					anim.mSamplers.back().value.push_back(aV);
 				});
 			}
@@ -275,6 +299,12 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 		}
 		for(fastgltf::AnimationChannel& c : a.channels) {
 			anim.mSamplers[c.samplerIndex].type = c.path;
+			if(c.nodeIndex.has_value()) {
+				anim.mSamplers[c.samplerIndex].nodeIndex = c.nodeIndex.value();
+			}
+			else {
+				anim.mSamplers[c.samplerIndex].nodeIndex = -1;
+			}
 		}
 	}
 }
@@ -305,10 +335,10 @@ void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatri
 	}
 }
 
-void Model::setAnimation(std::string_view aAnimationName, const uint64_t aFrame) noexcept {
+void Model::setAnimation(std::string_view aAnimationName, const float aTime) noexcept {
 	for(Animation& a : this->mAnimations) {
 		if(a.mName == aAnimationName) {
-			a.setStateAtFrame(aFrame);
+			a.setStateAtTime(*this, aTime);
 			return;
 		}
 	}

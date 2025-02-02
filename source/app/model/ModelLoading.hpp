@@ -8,7 +8,23 @@ glm::quat convertToGLM(const fastgltf::math::quat<float>& aFrom) noexcept;
 glm::vec3 convertToGLM(const fastgltf::math::vec<float, 3> aFrom) noexcept;
 glm::vec4 convertToGLM(const fastgltf::math::vec<float, 4> aFrom) noexcept;
 
+struct GLTFNode {
+	std::string name;
+	glm::mat4 transformMatrix;
+	glm::mat4 localMatrix;
+	glm::mat4 inverseBindMatrix;
+	int64_t idOfSkin = -1;
+	int64_t boneOutputMatrixId = -1;
+	std::vector<uint64_t> children;
+
+	GLTFNode() noexcept {};
+	GLTFNode(const std::string& aName, const glm::mat4& aMatrix, const glm::mat4& aLocal, const int64_t aIdOfSkin, const int64_t aBoneOutputMatrixId) noexcept
+		: name(aName), transformMatrix(aMatrix), localMatrix(aLocal), idOfSkin(aIdOfSkin), boneOutputMatrixId(aBoneOutputMatrixId) {};
+	~GLTFNode() noexcept {};
+};
+
 class Model {
+	friend class Animation;
 public:
 	Model(const std::filesystem::path& aPath) noexcept;
 
@@ -21,14 +37,15 @@ public:
 
 	void draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
 
-	void setAnimation(std::string_view aAnimationName, const uint64_t aFrame) noexcept;
+	void setAnimation(std::string_view aAnimationName, const float aTime) noexcept;
 
 	~Model() noexcept;
 private:
-	std::vector<std::pair<glm::mat4, int64_t>> mNodeTransforms;
 	std::vector<Mesh> mMeshes;
-	std::vector<Skin> mBones;
 	std::vector<Animation> mAnimations;
+
+	std::vector<Skin> mBones;
+	std::vector<GLTFNode> mNodes; //pair of node world transform and id of skin
 	std::vector<glm::mat4> mBoneMatrices;
 };
 

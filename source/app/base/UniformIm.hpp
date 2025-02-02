@@ -11,7 +11,7 @@ Uniform<tType>::Uniform(const Shader& aShader, const std::string_view aUniformNa
 		}
 }
 template<typename tType>
-Uniform<tType>::Uniform(const Shader& aShader, const uint64_t aLocationOverride) noexcept {
+Uniform<tType>::Uniform(const uint64_t aLocationOverride) noexcept {
 	this->mHandle = aLocationOverride;
 }
 
@@ -47,8 +47,8 @@ template<typename tType>
 StructUniform<tType>::~StructUniform() noexcept {}
 
 template <ContiguousStandardNotationContainer tType>
-UniformIntMultiple<tType>::UniformIntMultiple(const Shader& aShader, const uint64_t aLocationOverride) noexcept
-: Uniform<tType>(aShader, aLocationOverride) {}
+UniformIntMultiple<tType>::UniformIntMultiple(const uint64_t aLocationOverride) noexcept
+: Uniform<tType>(aLocationOverride) {}
 
 template <ContiguousStandardNotationContainer tType>
 UniformIntMultiple<tType>::UniformIntMultiple(const Shader& aShader, const std::string_view aUniformName) noexcept

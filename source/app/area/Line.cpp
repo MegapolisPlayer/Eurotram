@@ -361,7 +361,7 @@ uint64_t Line::getStartDate() const noexcept {
 
 bool Line::isStationLast() const noexcept {
 	if(!this->mInitialized) return true;
-	return this->mCurrentStationId >= this->mLoops[this->mCurrentLoopId].stations.size() - 1;
+	return this->mCurrentStationId >= (int64_t)this->mLoops[this->mCurrentLoopId].stations.size() - 1;
 }
 bool Line::isLoopLast() const noexcept {
 	return this->mCurrentLoopId >= this->mLoops.size() - 1;
