@@ -3,19 +3,14 @@
 #include "Mesh.hpp"
 #include "Animation.hpp"
 
-//TODO move to tinygltf!!!!
-
-glm::mat4 convertToGLM(const aiMatrix4x4& aFrom) noexcept;
-glm::quat convertToGLM(const aiQuaternion& aFrom) noexcept;
-glm::vec3 convertToGLM(const aiVector3D& aFrom) noexcept;
-
-//during loading - we load children's names for each bone
-//in separate step - convert children data to parent pointer
-typedef std::vector<std::string> BoneChildrenData;
+glm::mat4 convertToGLM(const fastgltf::math::fmat4x4& aFrom) noexcept;
+glm::quat convertToGLM(const fastgltf::math::quat<float>& aFrom) noexcept;
+glm::vec3 convertToGLM(const fastgltf::math::vec<float, 3> aFrom) noexcept;
+glm::vec4 convertToGLM(const fastgltf::math::vec<float, 4> aFrom) noexcept;
 
 class Model {
 public:
-	Model(std::string_view aPath) noexcept;
+	Model(const std::filesystem::path& aPath) noexcept;
 
 	//creates copy of existing material (its standard variant) and adds different texture
 	//Standard identificator defined as MODEL_STANDARD_IDENTIFICATOR
@@ -26,21 +21,23 @@ public:
 
 	void draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
 
-	void drawSolidOnly(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
-	void drawTransparentOnly(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
-
 	void setAnimation(std::string_view aAnimationName, const uint64_t aFrame) noexcept;
 
 	~Model() noexcept;
 private:
+	std::vector<std::pair<glm::mat4, int64_t>> mNodeTransforms;
 	std::vector<Mesh> mMeshes;
-	std::vector<Bone> mBones;
+	std::vector<Skin> mBones;
 	std::vector<Animation> mAnimations;
 	std::vector<glm::mat4> mBoneMatrices;
+};
 
-	void processNode(aiNode* apParent, aiNode* apNode, const aiScene* apScene, glm::mat4& aTransform, std::vector<BoneChildrenData>& aBoneParentVector) noexcept;
-	void processMesh(aiNode* apParent, const uint64_t aMeshId, const aiScene* apScene, glm::mat4& aTransform, std::vector<BoneChildrenData>& aBoneParentVector) noexcept;
-	void processAnimation(aiAnimation* apAnimation, const aiScene* apScene,glm::mat4& aTransform) noexcept;
+class ModelInstancer {
+public:
+	ModelInstancer() noexcept;
+	~ModelInstancer() noexcept;
+private:
+	std::vector<glm::mat4> mTransforms;
 };
 
 #endif

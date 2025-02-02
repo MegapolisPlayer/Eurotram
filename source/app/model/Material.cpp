@@ -2,6 +2,11 @@
 
 GMSEntry::GMSEntry() noexcept : texture("") {}
 
+std::ostream& operator<<(std::ostream& aStream, const GMSEntry& aEntry) noexcept {
+	aStream << '[' << aEntry.name << '@' << aEntry.path << ':' << aEntry.variant << ']';
+	return aStream;
+}
+
 std::list<GMSEntry> GlobalMaterialStore::msContainer;
 
 GMSEntry* GlobalMaterialStore::add() noexcept {
@@ -42,8 +47,26 @@ GMSEntry* GlobalMaterialStore::getStandard(const std::string_view aMaterialName)
 	return nullptr;
 }
 
+GMSEntry* GlobalMaterialStore::getById(const uint64_t aId) noexcept {
+	uint64_t i = 0;
+	for(GMSEntry& m : msContainer) {
+		if(i == aId) return &m;
+		i++;
+	}
+	return nullptr;
+}
+
 uint64_t GlobalMaterialStore::getLength() noexcept {
 	return msContainer.size();
+}
+
+std::ostream& GlobalMaterialStore::printData(std::ostream& aStream) noexcept {
+	aStream << '{';
+	for(GMSEntry& m : msContainer) {
+		aStream << m << ',';
+	}
+	aStream << '}';
+	return aStream;
 }
 
 GlobalMaterialStore::~GlobalMaterialStore() noexcept {}

@@ -26,6 +26,8 @@ struct GMSEntry {
 	GMSEntry() noexcept;
 };
 
+std::ostream& operator<<(std::ostream& aStream, const GMSEntry& aEntry) noexcept;
+
 class GlobalMaterialStore {
 public:
 	GlobalMaterialStore(GlobalMaterialStore&) noexcept = delete;
@@ -42,7 +44,11 @@ public:
 	static GMSEntry* get(const std::string_view aMaterialName, const std::string_view aVariant) noexcept;
 	static GMSEntry* getStandard(const std::string_view aMaterialName) noexcept;
 
+	static GMSEntry* getById(const uint64_t aId) noexcept;
+
 	static uint64_t getLength() noexcept;
+
+	static std::ostream& printData(std::ostream& aStream = std::cout) noexcept;
 
 	~GlobalMaterialStore() noexcept;
 private:
@@ -50,6 +56,7 @@ private:
 
 	static std::list<GMSEntry> msContainer;
 };
+
 
 class UniformMaterial : public StructUniform<Material> {
 public:

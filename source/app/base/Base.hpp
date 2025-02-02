@@ -1,6 +1,8 @@
 #ifndef EUROTRAM_BASE
 #define EUROTRAM_BASE
-#include "Instancer.hpp"
+#include "Event.hpp"
+#include "Texture.hpp"
+#include "TextureIm.hpp"
 #include "Transformation.hpp"
 #include "Camera.hpp"
 

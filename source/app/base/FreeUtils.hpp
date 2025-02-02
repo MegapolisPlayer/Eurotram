@@ -146,6 +146,7 @@ std::array<tType, tAmount> operator*(std::array<tType, tAmount> aArray1, std::ar
 	return {aArray1[0] * aArray2[0], aArray1[1] * aArray2[1], aArray1[2]*aArray2[2], aArray1[3]*aArray1[3]};
 }
 
+std::ostream& operator<<(std::ostream& aStream, const glm::vec2& aVector) noexcept;
 std::ostream& operator<<(std::ostream& aStream, const glm::vec3& aVector) noexcept;
 std::ostream& operator<<(std::ostream& aStream, const glm::vec4& aVector) noexcept;
 

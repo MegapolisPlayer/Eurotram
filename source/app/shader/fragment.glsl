@@ -220,7 +220,8 @@ void main() {
 	calculateShadows(12, pFragmentLeftFrontLightPos, normalizedNormal, directionalLightDirection);
 
 	//specular present only if no shadow
+	//oColor = vec4(1.0, 0.0, 1.0, 1.0);
 	oColor = vec4(
 		baseColor.xyz * clamp(uAmbientLight + lighting + lightingSpecular, 0.0, 1.0),
-		mat1.textureOpacity); //normal calc
+		baseColor.w); //normal calc
 };

@@ -1,4 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
+#define STBI_WINDOWS_UTF8
+#define STBI_FAILURE_USERMSG
 #include "Texture.hpp"
 #include "TextureIm.hpp"
 
@@ -9,7 +11,7 @@ void Framebuffer::bindTexture(const Texture& aTexture, const uint64_t aFormat, c
 	if(!aRead) glReadBuffer(GL_NONE);
 }
 
-Texture::Texture(const std::string_view aFilename, TextureScale aScaling, TextureBorder aBorder) noexcept
+Texture::Texture(const std::string_view aFilename, const bool aFlip, TextureScale aScaling, TextureBorder aBorder) noexcept
 	: mHandle(0), mpData(nullptr), mPath(aFilename), mWidth(0), mHeight(0), mChannels(0) {
 	if(this->mPath.empty()) {
 		return;
@@ -47,7 +49,7 @@ Texture::Texture(const std::string_view aFilename, TextureScale aScaling, Textur
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glTextureScaleValue2);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glTextureScaleValue);
 
-	stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(aFlip);
 	this->mpData = stbi_load(mPath.data(), &this->mWidth, &this->mHeight, &this->mChannels, 4);
 	if(!this->mpData) {
 		std::cerr << LogLevel::ERROR << "STBI failed to load image " << aFilename << "!\n" << LogLevel::RESET;
@@ -96,8 +98,8 @@ Texture::Texture(
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glTextureScaleValue);
 }
 
-Texture::Texture(const aiTexture* aAssimpTexture, TextureScale aScaling, TextureBorder aBorder) noexcept
-	: mPath(""), mHandle(0), mpData(nullptr), mWidth(aAssimpTexture->mWidth), mHeight(aAssimpTexture->mHeight), mChannels(4) {
+Texture::Texture(const void* aData, const size_t aPixelAmount, const bool aFlip, TextureScale aScaling, TextureBorder aBorder) noexcept
+	: mPath(""), mHandle(0), mpData(nullptr), mChannels(4) {
 	GLint glTextureScaleValue = 0;
 	GLint glTextureScaleValue2 = 0;
 	switch(aScaling) {
@@ -126,9 +128,8 @@ Texture::Texture(const aiTexture* aAssimpTexture, TextureScale aScaling, Texture
 	glGenTextures(1, &this->mHandle);
 	glBindTexture(GL_TEXTURE_2D, this->mHandle);
 
-	uint64_t height = aAssimpTexture->mHeight == 0 ? 1 : aAssimpTexture->mHeight;
-	stbi_set_flip_vertically_on_load(true);
-	this->mpData = stbi_load_from_memory((stbi_uc*)aAssimpTexture->pcData, aAssimpTexture->mWidth*height, &this->mWidth, &this->mHeight, &this->mChannels, 4);
+	stbi_set_flip_vertically_on_load(aFlip);
+	this->mpData = stbi_load_from_memory((stbi_uc*)aData, aPixelAmount, &this->mWidth, &this->mHeight, &this->mChannels, 4);
 	if(!this->mpData) {
 		std::cerr << LogLevel::ERROR << "STBI failed to load image from memory!\n" << LogLevel::RESET;
 		return;

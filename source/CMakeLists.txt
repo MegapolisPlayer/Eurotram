@@ -7,7 +7,7 @@ set(CMAKE_C_STANDARD_REQUIRED TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall")
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall" "-g")
 set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall")
 
 project(eurotram VERSION 0.1.0)
@@ -22,7 +22,6 @@ add_executable(eurotram
 "app/audio/AudioManager.cpp"
 "app/audio/SoundTransform.cpp"
 
-"app/base/Instancer.cpp"
 "app/base/Buffer.cpp"
 "app/base/Shader.cpp"
 "app/base/Texture.cpp"
@@ -35,6 +34,7 @@ add_executable(eurotram
 "app/base/Text.cpp"
 "app/base/Ray.cpp"
 
+"app/model/Instancer.cpp"
 "app/model/Lighting.cpp"
 "app/model/Sky.cpp"
 "app/model/Material.cpp"
@@ -86,16 +86,21 @@ add_executable(eurotram
 "depend/imgui/imgui_draw.cpp"
 "depend/imgui/backends/imgui_impl_opengl3.cpp"
 "depend/imgui/backends/imgui_impl_glfw.cpp"
+
+"depend/fastgltf/base64.cpp"
+"depend/fastgltf/fastgltf.cpp"
+"depend/fastgltf/io.cpp"
+"depend/fastgltf/simdjson.cpp"
 )
 target_include_directories(eurotram PUBLIC
 "depend/"
 "depend/imgui/"
 "depend/imgui/backends/"
-"depend/assimp/"
+"depend/fastgltf/"
 "depend/glad/include/"
 )
 target_link_directories(eurotram PUBLIC "depend/")
-target_link_libraries(eurotram PUBLIC -lGL -lglfw -lassimp)
+target_link_libraries(eurotram PUBLIC -lGL -lglfw)
 
 
 

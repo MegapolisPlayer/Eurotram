@@ -172,10 +172,10 @@ int main() {
 	//t1.setRotationY(45.0f);
 
 	std::cout << "Loading T3R.P model...\n";
-	Model t3rp("T3.glb");
+	Model t3rp(std::filesystem::path("./T3.glb"));
 	std::cout << "Model loaded!\n";
-	t3rp.setAnimation("door1Action", 20);
-	t3rp.setAnimation("door2Action", 40);
+	//t3rp.setAnimation("door1Action", 20);
+	//t3rp.setAnimation("door2Action", 40);
 	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
 	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 
@@ -197,12 +197,12 @@ int main() {
 
 		ss.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
-		t3rp.drawSolidOnly(uMaterial, uModelMat);
+		t3rp.draw(uMaterial, uModelMat);
 		ss.endPass(mainWindow);
 
 		ds.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
-		t3rp.drawSolidOnly(uMaterial, uModelMat);
+		t3rp.draw(uMaterial, uModelMat);
 		ds.endPass(mainWindow);
 
 		// main draw
@@ -230,6 +230,7 @@ int main() {
 		ds.bindMap(15);
 		drawTimer.start();
 
+		//t3rp.draw(uMaterial, uModelMat);
 		t3rp.draw(uMaterial, uModelMat);
 
 		drawTimer.end();

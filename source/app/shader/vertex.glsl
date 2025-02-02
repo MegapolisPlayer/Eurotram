@@ -37,9 +37,9 @@ void main() {
 	boneTransform += (boneMatrices[int(iBoneIds[2])] * iBoneWeights[2]);
 	boneTransform += (boneMatrices[int(iBoneIds[3])] * iBoneWeights[3]);
 
-	pFragmentPos = vec3(uMatrixModel *  boneTransform * vec4(iPosition, 1.0));
-	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * boneTransform * vec4(iPosition, 1.0);
-	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * boneTransform * vec4(iPosition, 1.0);
+	pFragmentPos = vec3(uMatrixModel * vec4(iPosition, 1.0));
+	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * vec4(iPosition, 1.0);
+	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * vec4(iPosition, 1.0);
 
 	gl_Position = uCamera * vec4(pFragmentPos, 1.0);
 };

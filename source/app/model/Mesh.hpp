@@ -24,12 +24,21 @@ struct Vertex {
 
 std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept;
 
+struct MeshBlueprint {
+	std::string name;
+	std::string materialName; //every mesh has to have 1 material
+	std::vector<Vertex> vertices;
+	std::vector<GLuint> indices;
+	GMSEntry* entry;
+};
+
 class Mesh {
 	friend class Model;
 public:
 	Mesh() noexcept;
+	Mesh(const std::string_view aName, const std::vector<Vertex>& aVerts, const std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept;
+	Mesh(const MeshBlueprint& aBP) noexcept;
 
-	Mesh(const std::string_view aName, std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept;
 	Mesh(Mesh&& aOther) noexcept;
 	Mesh& operator=(Mesh&& aOther) noexcept;
 	Mesh(Mesh& aOther) noexcept = delete;

@@ -1,71 +1,281 @@
 #include "ModelLoading.hpp"
 
-glm::mat4 convertToGLM(const aiMatrix4x4& aFrom) noexcept {
+glm::mat4 convertToGLM(const fastgltf::math::fmat4x4& aFrom) noexcept {
+	//convert from column-major to row-major
 	glm::mat4 result;
-	//abcd in assimp is row - GLM uses more normal structure
-	//convert from row-major to column-major
-	result[0][0] = aFrom.a1; result[1][0] = aFrom.a2; result[2][0] = aFrom.a3; result[3][0] = aFrom.a4;
-	result[0][1] = aFrom.b1; result[1][1] = aFrom.b2; result[2][1] = aFrom.b3; result[3][1] = aFrom.b4;
-	result[0][2] = aFrom.c1; result[1][2] = aFrom.c2; result[2][2] = aFrom.c3; result[3][2] = aFrom.c4;
-	result[0][3] = aFrom.d1; result[1][3] = aFrom.d2; result[2][3] = aFrom.d3; result[3][3] = aFrom.d4;
+	//each line - glm row
+	result[0][0] = aFrom[0][0]; result[0][1] = aFrom[1][0]; result[0][2] = aFrom[2][0]; result[0][3] = aFrom[3][0];
+	result[1][0] = aFrom[0][1]; result[1][1] = aFrom[1][1]; result[1][2] = aFrom[2][1]; result[1][3] = aFrom[3][1];
+	result[2][0] = aFrom[0][2]; result[2][1] = aFrom[1][2]; result[2][2] = aFrom[2][2]; result[2][3] = aFrom[3][2];
+	result[3][0] = aFrom[0][3]; result[3][1] = aFrom[1][3]; result[3][2] = aFrom[2][3]; result[3][3] = aFrom[3][3];
+
 	return result;
 }
-glm::quat convertToGLM(const aiQuaternion& aFrom) noexcept {
-	return glm::quat(aFrom.w, aFrom.x, aFrom.y, aFrom.z);
+glm::quat convertToGLM(const fastgltf::math::quat<float>& aFrom) noexcept {
+	return glm::quat(aFrom.x(), aFrom.y(), aFrom.z(), aFrom.w());
 }
-glm::vec3 convertToGLM(const aiVector3D& aFrom) noexcept {
-	return glm::vec3(aFrom.x, aFrom.y, aFrom.z);
+glm::vec3 convertToGLM(const fastgltf::math::vec<float, 3> aFrom) noexcept {
+	return glm::vec3(aFrom.x(), aFrom.y(), aFrom.z());
+}
+glm::vec4 convertToGLM(const fastgltf::math::vec<float, 4> aFrom) noexcept {
+	return glm::vec4(aFrom.x(), aFrom.y(), aFrom.z(), aFrom.w());
 }
 
 //temp init of bone matrix buffer
-Model::Model(std::string_view aPath) noexcept {
-	Assimp::Importer mload;
-	const aiScene* scene = mload.ReadFile(aPath.data(),
-		aiProcess_Triangulate |  aiProcess_SplitLargeMeshes | aiProcess_LimitBoneWeights |
-		aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes | aiProcess_ValidateDataStructure | aiProcess_PopulateArmatureData
-	);
+Model::Model(const std::filesystem::path& aPath) noexcept {
+	constexpr auto extensions =
+		fastgltf::Extensions::KHR_materials_ior |
+		fastgltf::Extensions::KHR_materials_specular |
+		fastgltf::Extensions::KHR_materials_emissive_strength |
+		fastgltf::Extensions::KHR_materials_sheen
+	;
 
-	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-		std::cerr << LogLevel::ERROR << "Error: Model load failed! " << mload.GetErrorString() << '\n' << LogLevel::RESET;
+	auto gdb = fastgltf::GltfDataBuffer::FromPath(aPath);
+	if(!gdb) {
+		std::cerr << LogLevel::ERROR << "Error: GLTF2 model load failed!\n" << LogLevel::RESET;
+		std::exit(EXIT_FAILURE);
+	}
+	fastgltf::Parser parse(extensions);
+
+	constexpr auto importOptions =
+		fastgltf::Options::DontRequireValidAssetMember |
+		fastgltf::Options::LoadExternalBuffers |
+		fastgltf::Options::LoadExternalImages |
+		fastgltf::Options::GenerateMeshIndices
+	;
+
+	//we need to pass directory
+	auto loadState = parse.loadGltfBinary(gdb.get(), aPath.parent_path(), importOptions);
+	fastgltf::Asset* model = loadState.get_if();
+	if(!model) {
+		std::cerr <<
+			LogLevel::ERROR << "Error: GLTF2 model data load failed! " <<
+			fastgltf::getErrorMessage(loadState.error()) <<
+			"(parent path: " <<aPath.parent_path() << ", current: " << aPath << ")\n"
+		<< LogLevel::RESET;
 		std::exit(EXIT_FAILURE);
 	}
 
-	//process meshes, materials, transforms and bones with weights
+	//material
+	for(fastgltf::Material& m : model->materials) {
+		std::cout << "Material: " << m.name.c_str() << '\n';
+		GMSEntry* material = GlobalMaterialStore::add();
+		material->name = m.name.c_str();
+		material->material.color = convertToGLM(m.pbrData.baseColorFactor);
+		material->material.specular = glm::vec4(1.0f); //TODO add specular color read without segfault...
+		material->material.ior = m.ior;
+		material->material.shininess = m.pbrData.metallicFactor;
+		material->material.textureAmount = 0.0f;
+		material->material.textureSlot = 0;
+		//transparency data stored in colors themselves
+		material->material.textureOpacity = 1.0f;
+		material->material.brightness = m.emissiveStrength;
 
-	std::vector<BoneChildrenData> bpd;
-	bpd.reserve(100);
-	this->mBones.reserve(50); //TODO rewrite pointer system since this is invalidated if more bones
-	this->mBoneMatrices.reserve(50);
+		auto& texInfo = m.pbrData.baseColorTexture;
+		if(texInfo.has_value()) {
+			material->material.textureAmount = 1.0f;
+			auto& texture = model->textures[texInfo->textureIndex];
+			if(texture.imageIndex.has_value()) {
+				auto& image = model->images[texture.imageIndex.value()];
 
-	this->mMeshes.resize(scene->mNumMeshes);
+				//for each variant possibility - call correct function
 
-	glm::mat4 modelTransform = convertToGLM(scene->mRootNode->mTransformation);
-	processNode(nullptr, scene->mRootNode, scene, modelTransform, bpd);
+				fastgltf::sources::URI* uriData = std::get_if<fastgltf::sources::URI>(&image.data);
+				fastgltf::sources::Array* arrayData = std::get_if<fastgltf::sources::Array>(&image.data);
+				fastgltf::sources::BufferView* bufData = std::get_if<fastgltf::sources::BufferView>(&image.data);
 
-	//set parents of bones
-	//for each parent of each bone - find and set pointer
+				if(arrayData) {
+					material->path = m.name.c_str();
+					material->texture = Texture(arrayData->bytes.data(), arrayData->bytes.size());
+				}
+				else if(uriData) {
+					material->path = uriData->uri.c_str();
+					material->texture = Texture(material->path);
+				}
+				else if(bufData) {
+					//every texture loaded here...
+					material->path = m.name.c_str();
 
-	std::cout << "Bone amount: " << this->mBones.size() << " BPD " << bpd.size() << '\n';
+					auto& bufferView = model->bufferViews[bufData->bufferViewIndex];
+					auto& buffer = model->buffers[bufferView.bufferIndex];
 
-	for(uint64_t i = 0; i < this->mBones.size(); i++) {
-		//for each child name
-		for(uint64_t j = 0; j < bpd[i].size(); j++) {
-			std::cout << bpd[i][j] << '/';
-			//find id
-			for(uint64_t f = 0; f < this->mBones.size(); f++) {
-				if(this->mBones[f].name == bpd[i][j]) {
-					this->mBones[f].parent = &this->mBones[i]; //set parent of child to our node
-					std::cout << '\n' <<this->mBones[f].name << ">>>" << this->mBones[i].name << '\n';
-					std::cout << "---(" <<this->mBones[f].parent->name << ">>>" << ((this->mBones[i].parent == nullptr) ? "null" : this->mBones[i].parent->name) << ")\n";
+					std::visit(fastgltf::visitor {
+						[](auto& arg) {},
+						[&](fastgltf::sources::Array& aData) {
+							material->texture = Texture(aData.bytes.data() + bufferView.byteOffset, bufferView.byteLength);
+						}
+					}, buffer.data);
+				}
+				else {
+					std::cerr << LogLevel::ERROR << "Error: texture type undefined!\n" << LogLevel::RESET;
 				}
 			}
-			std::cout << '\n';
+		}
+	}
+
+	std::vector<glm::mat4> meshMatrices;
+	meshMatrices.resize(model->meshes.size());
+	this->mMeshes.reserve(model->meshes.size());
+
+	fastgltf::iterateSceneNodes(*model, 0, fastgltf::math::fmat4x4(),
+		[&](fastgltf::Node& node, fastgltf::math::fmat4x4 matrix) {
+			if (node.meshIndex.has_value()) {
+				std::cout << "Node name:" << node.name.c_str() << "; mesh name: " << model->meshes[node.meshIndex.value()].name;
+				meshMatrices[node.meshIndex.value()] = convertToGLM(matrix);
+				std::cout << " Point offset " << glm::vec3(glm::vec4(glm::vec3(2.0), 1.0) * meshMatrices[node.meshIndex.value()]) << '\n';
+			}
+			else {
+				std::cout << "Node name:" << node.name.c_str() << '\n';
+			}
+
+			if(node.skinIndex.has_value()) { this->mNodeTransforms.push_back(std::make_pair(convertToGLM(matrix), node.skinIndex.value())); }
+			else { this->mNodeTransforms.push_back(std::make_pair(convertToGLM(matrix), -1)); }
+		});
+
+	//meshes
+	uint64_t meshMatrixId = 0;
+	for(fastgltf::Mesh& m : model->meshes) {
+		//split meshes based on their material
+		std::vector<MeshBlueprint> mbp;
+		for(fastgltf::Material& mat : model->materials) {
+			mbp.push_back({});
+			mbp.back().materialName = mat.name.c_str(); //name of mesh is also name of material of mesh
+			mbp.back().entry = GlobalMaterialStore::getByName(mat.name.c_str());
+		}
+
+		for(fastgltf::Primitive& p : m.primitives) {
+			//id of split
+			uint64_t meshSplitId = 0;
+			for(uint64_t i = 0; i < mbp.size(); i++) {
+				if(model->materials[p.materialIndex.value()].name.c_str() == mbp[i].materialName) {
+					meshSplitId = i; break;
+				}
+			}
+
+			//aliases
+			auto& vertices = mbp[meshSplitId].vertices;
+			auto& indices = mbp[meshSplitId].indices;
+
+			size_t initialId = vertices.size();
+
+			//indices
+			{
+				fastgltf::Accessor& indicesAccess = model->accessors[p.indicesAccessor.value()];
+				indices.reserve(indices.size() + indicesAccess.count);
+				fastgltf::iterateAccessor<GLuint>(*model, indicesAccess, [&](GLuint aId) {
+					indices.push_back(aId + initialId);
+				});
+			}
+
+			//vertices
+			{
+				fastgltf::Accessor& verticesAccess = model->accessors[p.findAttribute("POSITION")->accessorIndex];
+				vertices.resize(vertices.size() + verticesAccess.count);
+				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, verticesAccess, [&](glm::vec3 aV, GLuint aId) {
+					vertices[aId + initialId].position = glm::vec3(meshMatrices[meshMatrixId] * glm::vec4(aV, 1.0));
+				});
+			}
+
+			//normals
+			{
+				fastgltf::Accessor& normalAccess = model->accessors[p.findAttribute("NORMAL")->accessorIndex];
+				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, normalAccess, [&](glm::vec3 aV, GLuint aId) {
+					vertices[initialId+aId].normal = aV;
+				});
+			}
+
+			//UVs
+			{
+				fastgltf::Accessor& uvAccess = model->accessors[p.findAttribute("TEXCOORD_0")->accessorIndex];
+				fastgltf::iterateAccessorWithIndex<glm::vec2>(*model, uvAccess, [&](glm::vec2 aV, GLuint aId) {
+					vertices[initialId+aId].texCoords.x = aV.x;
+					vertices[initialId+aId].texCoords.y = 1.0 - aV.y; //flipping UVs Y simpler than flipping every image!
+				});
+			}
+
+			//joints
+			{
+				fastgltf::Accessor& jointsAccess = model->accessors[p.findAttribute("JOINTS_0")->accessorIndex];
+				if(p.findAttribute("JOINTS_0") != p.attributes.end()) {
+					fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec4>(*model, jointsAccess, [&](fastgltf::math::fvec4 aV, GLuint aId) {
+						vertices[initialId+aId].boneIds[0] = aV.x();
+						vertices[initialId+aId].boneIds[1] = aV.y();
+						vertices[initialId+aId].boneIds[2] = aV.z();
+						vertices[initialId+aId].boneIds[3] = aV.w();
+					});
+				}
+			}
+
+			//weights
+			{
+				fastgltf::Accessor& jointsAccess = model->accessors[p.findAttribute("WEIGHTS_0")->accessorIndex];
+				if(p.findAttribute("WEIGHTS_0") != p.attributes.end()) {
+					fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec4>(*model, jointsAccess, [&](fastgltf::math::fvec4 aV, GLuint aId) {
+						vertices[initialId+aId].boneWeights[0] = aV.x();
+						vertices[initialId+aId].boneWeights[1] = aV.y();
+						vertices[initialId+aId].boneWeights[2] = aV.z();
+						vertices[initialId+aId].boneWeights[3] = aV.w();
+					});
+				}
+			}
+		}
+
+		meshMatrixId++;
+
+		for(MeshBlueprint& bp : mbp) {
+			if(bp.vertices.size() == 0 || bp.indices.size() == 0) continue;
+			this->mMeshes.emplace_back(bp);
+		}
+	}
+
+	//process bones
+	for(fastgltf::Skin& s : model->skins) {
+		this->mBones.push_back({});
+		this->mBoneMatrices.push_back({});
+		this->mBones.back().name = s.name.c_str();
+		this->mBones.back().output = &this->mBoneMatrices.back();
+
+		this->mBones.back().inverseBindMatrix = convertToGLM(fastgltf::getAccessorElement<fastgltf::math::fmat4x4>(*model, model->accessors[s.inverseBindMatrices.value()], s.inverseBindMatrices.value()));
+		std::cout << this->mBones.back().name << " IBM transform " << glm::vec3(this->mBones.back().inverseBindMatrix * glm::vec4(1.0f)) << '\n';
+		for(size_t j : s.joints) {
+			this->mBones.back().joints.push_back(j);
 		}
 	}
 
 	//process animations
-	for(uint64_t i = 0; i < scene->mNumAnimations; i++) {
-		processAnimation(scene->mAnimations[i], scene, modelTransform);
+	for(fastgltf::Animation& a : model->animations) {
+		this->mAnimations.emplace_back();
+		auto& anim = this->mAnimations.back();
+		anim.mName = a.name.c_str();
+
+		for(fastgltf::AnimationSampler& s : a.samplers) {
+			anim.mSamplers.push_back({});
+
+			fastgltf::Accessor& samplerInputAccess = model->accessors[s.inputAccessor];
+			fastgltf::Accessor& samplerOutputAccess = model->accessors[s.outputAccessor];
+
+			//input - keyframe times
+
+			fastgltf::iterateAccessorWithIndex<GLfloat>(*model, samplerInputAccess, [&](float aV, GLuint aId) {
+				anim.mSamplers.back().time.push_back(aV);
+			});
+
+			//output - property (vec3 for transform, scale - vec4 for rotation quaternion
+			if(samplerOutputAccess.type == fastgltf::AccessorType::Vec3) {
+				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, samplerOutputAccess, [&](glm::vec3 aV, GLuint aId) {
+					anim.mSamplers.back().value.push_back(glm::vec4(aV, 1.0));
+				});
+			}
+			else if(samplerOutputAccess.type == fastgltf::AccessorType::Vec4) {
+				fastgltf::iterateAccessorWithIndex<glm::vec4>(*model, samplerOutputAccess, [&](glm::vec4 aV, GLuint aId) {
+					anim.mSamplers.back().value.push_back(aV);
+				});
+			}
+			else {} //should never happen GLTF stores "keyframes" only as vec3 or vec4
+		}
+		for(fastgltf::AnimationChannel& c : a.channels) {
+			anim.mSamplers[c.samplerIndex].type = c.path;
+		}
 	}
 }
 
@@ -88,26 +298,10 @@ void Model::resetVariant(const std::string_view aMaterialName) noexcept {
 }
 
 void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept {
-	this->drawSolidOnly(aUniform, aBoneMatrices);
-	this->drawTransparentOnly(aUniform, aBoneMatrices);
-}
-void Model::drawSolidOnly(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept {
-	//range based for loop calls destructor - USE REFERENCES
 	aBoneMatrices.setNewData(this->mBoneMatrices.data(), this->mBoneMatrices.size());
 	aBoneMatrices.set();
 	for(Mesh& m : this->mMeshes) {
-		if(m.mEntry->material.textureOpacity == 1.0) {
-			m.draw(aUniform);
-		}
-	}
-}
-void Model::drawTransparentOnly(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept {
-	aBoneMatrices.setNewData(this->mBoneMatrices.data(), this->mBoneMatrices.size());
-	aBoneMatrices.set();
-	for(Mesh& m : this->mMeshes) {
-		if(m.mEntry->material.textureOpacity != 1.0) {
-			m.draw(aUniform);
-		}
+		m.draw(aUniform);
 	}
 }
 
@@ -123,229 +317,13 @@ void Model::setAnimation(std::string_view aAnimationName, const uint64_t aFrame)
 
 Model::~Model() noexcept {}
 
-void Model::processNode(aiNode* apParent, aiNode* apNode, const aiScene* apScene, glm::mat4& aTransform, std::vector<BoneChildrenData>& aBoneParentVector) noexcept {
-	glm::mat4 nodeOffset = aTransform * convertToGLM(apNode->mTransformation);
-	for(uint64_t i = 0; i < apNode->mNumMeshes; i++) {
-		this->processMesh(apNode, apNode->mMeshes[i], apScene, nodeOffset, aBoneParentVector);
-	}
-	for(uint64_t i = 0; i < apNode->mNumChildren; i++) {
-		this->processNode(apNode, apNode->mChildren[i], apScene, nodeOffset, aBoneParentVector);
-	}
+//--
+//MODEL INSTANCING
+//--
+
+ModelInstancer::ModelInstancer() noexcept {
 
 }
+ModelInstancer::~ModelInstancer() noexcept {
 
-void Model::processMesh(aiNode* apParent, const uint64_t aMeshId, const aiScene* apScene, glm::mat4& aTransform, std::vector<BoneChildrenData>& aBoneParentVector) noexcept {
-	//vertices
-	std::vector<Vertex> vertices;
-	std::vector<GLuint> indices;
-
-	aiMesh* mesh = apScene->mMeshes[aMeshId];
-
-	vertices.reserve(mesh->mNumVertices);
-	indices.reserve(mesh->mNumFaces*3);
-
-	for(uint64_t v = 0; v < mesh->mNumVertices; v++) {
-		vertices.push_back({});
-
-		vertices.back().position.x = mesh->mVertices[v].x;
-		vertices.back().position.y = mesh->mVertices[v].y;
-		vertices.back().position.z = mesh->mVertices[v].z;
-
-		vertices.back().position = glm::vec3(glm::vec4(vertices.back().position, 1.0) * aTransform);
-
-		vertices.back().normal.x = mesh->mNormals[v].x;
-		vertices.back().normal.y = mesh->mNormals[v].y;
-		vertices.back().normal.z = mesh->mNormals[v].z;
-
-		//if textures present set texture coords, otherwise set to -1
-		if(mesh->mTextureCoords[0]) {
-			vertices.back().texCoords.x = mesh->mTextureCoords[0][v].x,
-			vertices.back().texCoords.y = mesh->mTextureCoords[0][v].y;
-		}
-		else { vertices.back().texCoords = glm::vec2(-1.0f); }
-	}
-
-	//indices (we load as faces)
-	for(uint64_t f = 0; f < mesh->mNumFaces; f++) {
-		aiFace fc = mesh->mFaces[f];
-		if(fc.mNumIndices < 3) { continue; } //ignore small faces (2 and 1 )
-
-		for(uint64_t i = 0; i < fc.mNumIndices; i++) {
-			indices.push_back(fc.mIndices[i]);
-		}
-	}
-
-	//material
-	GMSEntry* texture = nullptr;
-
-	//texture of material
-	if(mesh->mMaterialIndex >= 0) {
-		aiMaterial* mat = apScene->mMaterials[mesh->mMaterialIndex];
-
-		aiString texturePath;
-		bool hasTexture = false;
-
-		texture = GlobalMaterialStore::add();
-
-		if(mat->GetTextureCount(aiTextureType_BASE_COLOR) > 0) {
-			//has texture and texture path
-			hasTexture = true;
-			mat->GetTexture(aiTextureType_BASE_COLOR, 0, &texturePath);
-			GMSEntry* existingEntry = GlobalMaterialStore::getByPath(texturePath.C_Str());
-			if(existingEntry != nullptr) {
-				texture = existingEntry;
-			}
-			else {
-				texture->name = mat->GetName().C_Str();
-				texture->path = texturePath.C_Str();
-
-				const aiTexture* loaderTexture = apScene->GetEmbeddedTexture(texturePath.C_Str());
-				if(loaderTexture != nullptr) {
-					//embedded
-					texture->texture = Texture(loaderTexture);
-				}
-				else {
-					//in file - load properly
-					texture->texture = Texture(texturePath.C_Str());
-				}
-			}
-		}
-		else {
-			//set path to name - is unique identifier
-			texture->path = mat->GetName().C_Str();
-		}
-
-		//material values texture
-		aiColor3D tempValue;
-		float opacity;
-
-		mat->Get(AI_MATKEY_OPACITY, opacity);
-		texture->material.textureOpacity = opacity;
-
-		mat->Get(AI_MATKEY_COLOR_DIFFUSE, tempValue);
-		texture->material.color.x = tempValue.r;
-		texture->material.color.y = tempValue.g;
-		texture->material.color.z = tempValue.b;
-		texture->material.color.w = 1.0;
-
-		mat->Get(AI_MATKEY_COLOR_SPECULAR, tempValue);
-		texture->material.specular.x = tempValue.r;
-		texture->material.specular.y = tempValue.g;
-		texture->material.specular.z = tempValue.b;
-		texture->material.specular.w = 1.0;
-
-		mat->Get(AI_MATKEY_REFRACTI,  texture->material.ior);
-
-		mat->Get(AI_MATKEY_SHININESS, texture->material.shininess);
-
-		texture->material.textureSlot = 0;
-		texture->material.textureAmount = (float)hasTexture;
-		mat->Get(AI_MATKEY_COLOR_EMISSIVE, tempValue);
-		texture->material.brightness = std::max(std::max(tempValue.r, tempValue.g), tempValue.b);
-	}
-	//no material present - use default purple color
-	else {
-		texture = GlobalMaterialStore::add();
-		texture->name = "UndefinedGMSMaterial";
-		//material properties
-		texture->material.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-		texture->material.specular = glm::vec4(0.5f);
-		texture->material.shininess = 0.0f;
-		texture->material.ior = 1.0f;
-		texture->material.textureAmount = 0.0f; //1.0 texture only, 0.0 color only
-		texture->material.textureSlot = 0;
-		texture->material.textureOpacity = 1.0f;
-		texture->material.brightness = 0.0f; //below this brightness render as normal, above it is brighter
-	}
-
-	//add weights of bones
-
-	for(uint64_t b = 0; b < mesh->mNumBones; b++) {
-		bool exists = false;
-
-		//check if bone exists
-		for(Bone& c : this->mBones) {
-			if(mesh->mBones[b]->mName.C_Str() == c.name) {
-				exists = true; break;
-			}
-		}
-
-		if(!exists) {
-			//add bone
-			this->mBones.push_back({});
-			this->mBoneMatrices.emplace_back(glm::mat4(1.0f));
-			aBoneParentVector.push_back({});
-
-			this->mBones.back().name = mesh->mBones[b]->mName.C_Str();
-			this->mBones.back().offset = convertToGLM(mesh->mBones[b]->mOffsetMatrix);
-			this->mBones.back().local = convertToGLM(mesh->mBones[b]->mNode->mTransformation);
-			this->mBones.back().transformation = &this->mBoneMatrices.back();
-
-			for(uint64_t k = 0; k < mesh->mBones[b]->mNode->mNumChildren; k++) {
-				aBoneParentVector.back().push_back(mesh->mBones[b]->mNode->mChildren[k]->mName.C_Str());
-			}
-		}
-
-		//add weights to vertices
-
-		for(uint64_t i = 0; i < mesh->mBones[b]->mNumWeights; i++) {
-			//if basically no weight
-			if(mesh->mBones[b]->mWeights[i].mWeight < 0.05) { continue; }
-			//set weight of bones
-			for(uint64_t j = 0; j < MAX_BONES_PER_VERTEX; j++) {
-				//set first "available" slot
-				if(vertices[mesh->mBones[b]->mWeights[i].mVertexId].boneIds[j] <= -0.01) {
-					vertices[mesh->mBones[b]->mWeights[i].mVertexId].boneIds[j] = b;
-					vertices[mesh->mBones[b]->mWeights[i].mVertexId].boneWeights[j] = mesh->mBones[b]->mWeights[i].mWeight;
-					break;
-				}
-			}
-		}
-	}
-
-	this->mMeshes[aMeshId] = std::move(Mesh(mesh->mName.C_Str(), vertices, indices, texture)); //texture path may be null
-}
-
-
-
-void Model::processAnimation(aiAnimation* apAnimation, const aiScene* apScene, glm::mat4& aTransform) noexcept {
-	this->mAnimations.push_back({});
-
-	this->mAnimations.back().mName = apAnimation->mName.C_Str();
-	this->mAnimations.back().mTickAmount = apAnimation->mDuration/ANIMATION_FRAME_PER_FRAME_AMOUNT; //in ticks!
-	this->mAnimations.back().mTicksPerSecond = apAnimation->mTicksPerSecond;
-
-	std::cout << "DUR " << this->mAnimations.back().mTickAmount << " TPS" << apAnimation->mTicksPerSecond << '\n';
-
-	for(uint64_t i = 0; i < apAnimation->mNumChannels; i++) {
-		//link to bones
-		for(Bone& b : this->mBones) {
-			if(b.name == apAnimation->mChannels[i]->mNodeName.C_Str()) {
-				//found our bone - add it
-				this->mAnimations.back().addBone(&b);
-			}
-		}
-
-		//keyframes
-		std::cout << "KF amount " << apAnimation->mChannels[i]->mNumPositionKeys << "\n";
-		for(uint64_t j = 0; j < apAnimation->mChannels[i]->mNumPositionKeys; j++) {
-			Keyframe::Position temp;
-			temp.position = convertToGLM(apAnimation->mChannels[i]->mPositionKeys[j].mValue);
-			std::cout << "KF" << apAnimation->mChannels[i]->mNodeName.C_Str() << "@" << (uint64_t)(apAnimation->mChannels[i]->mPositionKeys[j].mTime/ANIMATION_FRAME_PER_FRAME_AMOUNT) << ":" << temp.position << '\n';
-			temp.frame = apAnimation->mChannels[i]->mPositionKeys[j].mTime/ANIMATION_FRAME_PER_FRAME_AMOUNT;
-			this->mAnimations.back().mPositions.push_back(temp);
-		}
-		for(uint64_t j = 0; j < apAnimation->mChannels[i]->mNumRotationKeys; j++) {
-			Keyframe::Rotation temp;
-			temp.rotation = convertToGLM(apAnimation->mChannels[i]->mRotationKeys[j].mValue);
-			temp.frame = apAnimation->mChannels[i]->mRotationKeys[j].mTime/ANIMATION_FRAME_PER_FRAME_AMOUNT;
-			this->mAnimations.back().mRotation.push_back(temp);
-		}
-		for(uint64_t j = 0; j < apAnimation->mChannels[i]->mNumScalingKeys; j++) {
-			Keyframe::Scale temp;
-			temp.scale = convertToGLM(apAnimation->mChannels[i]->mScalingKeys[j].mValue);
-			temp.frame = apAnimation->mChannels[i]->mScalingKeys[j].mTime/ANIMATION_FRAME_PER_FRAME_AMOUNT;
-			this->mAnimations.back().mScale.push_back(temp);
-		}
-	}
 }

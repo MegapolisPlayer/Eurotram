@@ -1,23 +1,19 @@
 #include "Mesh.hpp"
 
 std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept {
-	aStream <<
-		aVertex.position.x << ' ' << aVertex.position.y << ' ' << aVertex.position.z << ' ' <<
-		aVertex.normal.x << ' ' << aVertex.position.y << ' ' << aVertex.position.z << ' ' <<
-		aVertex.texCoords.x << ' ' << aVertex.texCoords.y;
+	aStream << '{' << aVertex.position << ';' << aVertex.normal << ';' << aVertex.texCoords << '}';
 	return aStream;
 }
 
 Mesh::Mesh() noexcept
 	: mVAO(false), mVBO(nullptr, 0, 0), mIBO(nullptr, 0), mEntry(nullptr) {}
 
-Mesh::Mesh(const std::string_view aName, std::vector<Vertex>& aVerts, std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept
+Mesh::Mesh(const std::string_view aName, const std::vector<Vertex>& aVerts, const std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept
 	: mName(aName.data()), mVBO((GLfloat*)aVerts.data(), aVerts.size(), STANDARD_MODEL_VERTEX_FLOAT_AMOUNT),
-	mIBO((GLuint*)aInds.data(), aInds.size()), mEntry(aEntry)
-	{
-
+	mIBO((GLuint*)aInds.data(), aInds.size()), mEntry(aEntry) {
 	this->mVAO.bind();
 	this->mVBO.bind();
+
 	//pos
 	this->mVBO.enableAttribute(&this->mVAO, 3);
 	//normal vector
@@ -32,6 +28,8 @@ Mesh::Mesh(const std::string_view aName, std::vector<Vertex>& aVerts, std::vecto
 
 	this->mIBO.bind();
 }
+
+Mesh::Mesh(const MeshBlueprint& aBP) noexcept : Mesh(aBP.name, aBP.vertices, aBP.indices, aBP.entry) {}
 
 Mesh::Mesh(Mesh&& aOther) noexcept
 	: mName(std::move(aOther.mName)), mVAO(std::move(aOther.mVAO)), mVBO(std::move(aOther.mVBO)), mIBO(std::move(aOther.mIBO)),
@@ -53,6 +51,7 @@ void Mesh::draw(UniformMaterial& aUniform) noexcept {
 	aUniform.update(&this->mEntry->material);
 	aUniform.set();
 	this->mEntry->texture.bind(0);
+	//this->mVBO.drawPoints();
 	this->mIBO.draw();
 	this->mVAO.unbind();
 }

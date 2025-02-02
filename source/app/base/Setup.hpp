@@ -29,9 +29,10 @@ r Raw Arrays
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include <fastgltf/core.hpp>
+#include <fastgltf/tools.hpp>
+#include <fastgltf/base64.hpp>
+#include <fastgltf/glm_element_traits.hpp>
 
 #include <miniaudio/miniaudio.h>
 
@@ -44,6 +45,7 @@ r Raw Arrays
 #include <clocale>
 #include <thread>
 #include <list>
+#include <filesystem>
 
 using namespace std::chrono_literals;
 
