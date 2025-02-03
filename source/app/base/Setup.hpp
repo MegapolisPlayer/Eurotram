@@ -46,6 +46,7 @@ r Raw Arrays
 #include <thread>
 #include <list>
 #include <filesystem>
+#include <numeric>
 
 using namespace std::chrono_literals;
 

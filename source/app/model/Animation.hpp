@@ -52,6 +52,7 @@ private:
 	std::string mName;
 
 	std::vector<SamplerData> mSamplers;
+	std::vector<uint64_t> mJoints;
 
 	float lerp(float aLast, float aNext, float aCurrent) noexcept;
 	uint64_t getIndex(const SamplerData& aSampler, const float aTime) noexcept;

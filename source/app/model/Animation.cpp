@@ -4,6 +4,8 @@
 
 Animation::Animation() noexcept  {}
 void Animation::setStateAtTime(Model& aModel, const float aTime) noexcept {
+	//TODO rewrite - animate JOINTS not all nodes!!!
+
 	//calculate matrices
 	std::vector<TRSData> data;
 	data.resize(aModel.mNodes.size());
@@ -16,11 +18,9 @@ void Animation::setStateAtTime(Model& aModel, const float aTime) noexcept {
 		aModel.mNodes[i].localMatrix = data[i].s * data[i].r * data[i].t;
 	}
 
-	//set data of nodes
+	//set data of nodes (joints)
 	for(GLTFNode& n : aModel.mNodes) {
 		if(n.idOfSkin == -1) continue;
-		//inverse bind - from bone to world
-		//aModel.mBoneMatrices[n.boneOutputMatrixId] = n.localMatrix;
 		aModel.mBoneMatrices[n.boneOutputMatrixId] = glm::inverse(n.transformMatrix) * n.localMatrix * n.inverseBindMatrix;
 		std::cout << n.name << '@' << aTime << ": " << 	aModel.mBoneMatrices[n.boneOutputMatrixId] * glm::vec4(1.0) << '\n';
 	}
@@ -68,12 +68,15 @@ void Animation::getBoneTransformations(Model& aModel, const uint64_t aSamplerId,
 	switch(sampler.type) {
 		case(fastgltf::AnimationPath::Translation):
 			aTRSData[sampler.nodeIndex].t = interpolatePosition(sampler, aTime);
+			std::cout << aModel.mNodes[sampler.nodeIndex].name << " T " << glm::vec4(1.0f) * aTRSData[sampler.nodeIndex].t << '\n';
 			break;
 		case(fastgltf::AnimationPath::Rotation):
 			aTRSData[sampler.nodeIndex].r = interpolateRotation(sampler, aTime);
+			std::cout << aModel.mNodes[sampler.nodeIndex].name << " R " << glm::vec4(1.0f) * aTRSData[sampler.nodeIndex].r << '\n';
 			break;
 		case(fastgltf::AnimationPath::Scale):
 			aTRSData[sampler.nodeIndex].s = interpolateScale(sampler, aTime);
+			std::cout << aModel.mNodes[sampler.nodeIndex].name << " S " << glm::vec4(1.0f) * aTRSData[sampler.nodeIndex].s << '\n';
 			break;
 		default:
 			std::cerr << LogLevel::ERROR << "Weight animation is not supported!\n" << LogLevel::RESET;

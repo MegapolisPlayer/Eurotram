@@ -117,41 +117,70 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 
 	std::vector<glm::mat4> meshMatrices;
 	meshMatrices.resize(model->meshes.size());
-
 	this->mNodes.reserve(model->nodes.size());
 	this->mMeshes.reserve(model->meshes.size());
 
-	fastgltf::iterateSceneNodes(*model, 0, fastgltf::math::fmat4x4(),
-		[&](fastgltf::Node& node, fastgltf::math::fmat4x4 matrix) {
-			this->mBoneMatrices.push_back(glm::mat4(1.0));
-			glm::mat4 nodeTransform = glm::mat4(1.0);
-			if(std::get_if<fastgltf::TRS>(&node.transform)) {
-				fastgltf::TRS trs = *std::get_if<fastgltf::TRS>(&node.transform);
-				nodeTransform = glm::scale(nodeTransform, convertToGLM(trs.scale));
-				nodeTransform *= glm::mat4_cast(convertToGLM(trs.rotation));
-				nodeTransform = glm::translate(nodeTransform, convertToGLM(trs.translation));
-			}
+	//nodes
+	for(fastgltf::Node& node : model->nodes) {
+		this->mBoneMatrices.push_back(glm::mat4(1.0));
 
-			if (node.meshIndex.has_value()) {
-				std::cout << "Node name:" << node.name.c_str() << "; mesh name: " << model->meshes[node.meshIndex.value()].name;
-				meshMatrices[node.meshIndex.value()] = convertToGLM(matrix);
-				std::cout << " Point offset " << glm::vec3(glm::vec4(glm::vec3(2.0), 1.0) * meshMatrices[node.meshIndex.value()]) << '\n';
-			}
-			else {
-				std::cout << "Node name:" << node.name.c_str() << '\n';
-			}
+		if(node.skinIndex.has_value()) {
+			this->mNodes.emplace_back(node.name.c_str(), convertToGLM(fastgltf::getTransformMatrix(node)), node.skinIndex.value(), this->mBoneMatrices.size()-1);
+		}
+		else {
+			this->mNodes.emplace_back(node.name.c_str(), convertToGLM(fastgltf::getTransformMatrix(node)), -1, -1);
+		}
 
-			if(node.skinIndex.has_value()) {
-				this->mNodes.emplace_back(node.name.c_str(), convertToGLM(matrix), nodeTransform, node.skinIndex.value(), this->mBoneMatrices.size()-1);
-			}
-			else {
-				this->mNodes.emplace_back(node.name.c_str(), convertToGLM(matrix), nodeTransform, -1, -1);
-			}
+		if(node.meshIndex.has_value()) {
+			this->mNodes.back().meshId = node.meshIndex.value();
+		}
 
-			for(auto& c : node.children) {
-				this->mNodes.back().children.push_back(c);
-			}
-		});
+		std::cout << node.name.c_str() << ' ' << this->mNodes.size()-1 << ')';
+		for(auto& c : node.children) {
+			std::cout << ' ' << model->nodes[c].name.c_str();
+			this->mNodes.back().children.push_back(c);
+		}
+		std::cout << '\n';
+	}
+
+	//we do not know if matrices are sorted properly and we need to apply matrices in the correct order
+
+	//set node parent attribute
+	for(uint64_t i = 0; i < this->mNodes.size(); i++) {
+		for(int64_t c : this->mNodes[i].children) {
+			this->mNodes[c].parent = i; //parent of our children is us
+		}
+	}
+
+	//calculate transform and inverseBindMatrices
+	for(uint64_t n = 0; n < this->mNodes.size(); n++) {
+		std::vector<glm::mat4> transform;
+		std::vector<glm::mat4> inverseBind;
+		uint64_t nodeId = n;
+
+		//get matrices - root first element
+		while(true) {
+			transform.insert(transform.begin(), this->mNodes[nodeId].localMatrix); //calculate transform from local!
+			inverseBind.insert(inverseBind.begin(), this->mNodes[nodeId].inverseBindMatrix);
+			if(this->mNodes[nodeId].parent == -1) { break; }
+			nodeId = this->mNodes[nodeId].parent;
+		}
+
+		//multiply them - from parent to child
+
+		this->mNodes[n].transformMatrix = glm::mat4(1.0f);
+		for(glm::mat4& mat : transform) {
+			this->mNodes[n].transformMatrix *= mat;
+		}
+		this->mNodes[n].inverseBindMatrix = glm::mat4(1.0f);
+		for(glm::mat4& mat : inverseBind) {
+			this->mNodes[n].inverseBindMatrix *= mat;
+		}
+
+		if(this->mNodes[n].meshId != -1) {
+			meshMatrices[this->mNodes[n].meshId] = this->mNodes[n].transformMatrix;
+		}
+	}
 
 	//meshes
 	uint64_t meshMatrixId = 0;
@@ -314,6 +343,12 @@ void Model::addVariant(const std::string_view aMaterialName, const std::string_v
 	variant->texture = Texture(aTexturePath);
 	variant->variant = aIdentificator;
 }
+void Model::addVariant(const std::string_view aMaterialName, const Material& aMaterialRef, const std::string_view aIdentificator) noexcept {
+	GMSEntry* variant = GlobalMaterialStore::copyStandard(aMaterialName);
+	variant->material = aMaterialRef;
+	variant->variant = aIdentificator;
+}
+
 void Model::setVariant(const std::string_view aMaterialName, const std::string_view aIdentificator) noexcept {
 	for(Mesh& m : mMeshes) {
 		//only the meshes with the material name
@@ -354,6 +389,11 @@ Model::~Model() noexcept {}
 ModelInstancer::ModelInstancer() noexcept {
 
 }
+
+void ModelInstancer::drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept {
+
+}
+
 ModelInstancer::~ModelInstancer() noexcept {
 
 }
