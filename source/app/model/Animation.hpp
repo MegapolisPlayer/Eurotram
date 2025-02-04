@@ -3,7 +3,8 @@
 #include "../base/Base.hpp"
 
 struct TRSData {
-	glm::mat4 t, r, s;
+	glm::vec3 t, s;
+	glm::quat r;
 };
 
 namespace Keyframe {
@@ -52,13 +53,12 @@ private:
 	std::string mName;
 
 	std::vector<SamplerData> mSamplers;
-	std::vector<uint64_t> mJoints;
 
 	float lerp(float aLast, float aNext, float aCurrent) noexcept;
 	uint64_t getIndex(const SamplerData& aSampler, const float aTime) noexcept;
-	glm::mat4 interpolatePosition(const SamplerData& aSampler, const float aTime) noexcept;
-	glm::mat4 interpolateRotation(const SamplerData& aSampler, const float aTime) noexcept;
-	glm::mat4 interpolateScale(const SamplerData& aSampler, const float aTime) noexcept;
+	glm::vec3 interpolatePosition(const SamplerData& aSampler, const float aTime) noexcept;
+	glm::quat interpolateRotation(const SamplerData& aSampler, const float aTime) noexcept;
+	glm::vec3 interpolateScale(const SamplerData& aSampler, const float aTime) noexcept;
 
 	void getBoneTransformations(Model& aModel, const uint64_t aSamplerId, const float aTime, std::vector<TRSData>& aTRSData) noexcept;
 };

@@ -124,15 +124,23 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 	for(fastgltf::Node& node : model->nodes) {
 		this->mBoneMatrices.push_back(glm::mat4(1.0));
 
+		fastgltf::TRS* nt = std::get_if<fastgltf::TRS>(&node.transform);
+		glm::mat4 nodeTransform = glm::scale(glm::mat4(1.0), convertToGLM(nt->scale));
+		nodeTransform *= glm::mat4_cast(convertToGLM(nt->rotation));
+		nodeTransform = glm::translate(nodeTransform, convertToGLM(nt->translation));
+
 		if(node.skinIndex.has_value()) {
-			this->mNodes.emplace_back(node.name.c_str(), convertToGLM(fastgltf::getTransformMatrix(node)), node.skinIndex.value(), this->mBoneMatrices.size()-1);
+			this->mNodes.emplace_back(node.name.c_str(), nodeTransform, node.skinIndex.value(), -1);
 		}
 		else {
-			this->mNodes.emplace_back(node.name.c_str(), convertToGLM(fastgltf::getTransformMatrix(node)), -1, -1);
+			this->mNodes.emplace_back(node.name.c_str(), nodeTransform, -1, -1);
 		}
+
+		this->mNodes.back().transformMatrix = convertToGLM(fastgltf::getTransformMatrix(node));
 
 		if(node.meshIndex.has_value()) {
 			this->mNodes.back().meshId = node.meshIndex.value();
+			meshMatrices[node.meshIndex.value()] = this->mNodes.back().transformMatrix;
 		}
 
 		std::cout << node.name.c_str() << ' ' << this->mNodes.size()-1 << ')';
@@ -143,42 +151,10 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 		std::cout << '\n';
 	}
 
-	//we do not know if matrices are sorted properly and we need to apply matrices in the correct order
-
 	//set node parent attribute
 	for(uint64_t i = 0; i < this->mNodes.size(); i++) {
 		for(int64_t c : this->mNodes[i].children) {
 			this->mNodes[c].parent = i; //parent of our children is us
-		}
-	}
-
-	//calculate transform and inverseBindMatrices
-	for(uint64_t n = 0; n < this->mNodes.size(); n++) {
-		std::vector<glm::mat4> transform;
-		std::vector<glm::mat4> inverseBind;
-		uint64_t nodeId = n;
-
-		//get matrices - root first element
-		while(true) {
-			transform.insert(transform.begin(), this->mNodes[nodeId].localMatrix); //calculate transform from local!
-			inverseBind.insert(inverseBind.begin(), this->mNodes[nodeId].inverseBindMatrix);
-			if(this->mNodes[nodeId].parent == -1) { break; }
-			nodeId = this->mNodes[nodeId].parent;
-		}
-
-		//multiply them - from parent to child
-
-		this->mNodes[n].transformMatrix = glm::mat4(1.0f);
-		for(glm::mat4& mat : transform) {
-			this->mNodes[n].transformMatrix *= mat;
-		}
-		this->mNodes[n].inverseBindMatrix = glm::mat4(1.0f);
-		for(glm::mat4& mat : inverseBind) {
-			this->mNodes[n].inverseBindMatrix *= mat;
-		}
-
-		if(this->mNodes[n].meshId != -1) {
-			meshMatrices[this->mNodes[n].meshId] = this->mNodes[n].transformMatrix;
 		}
 	}
 
@@ -230,7 +206,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			{
 				fastgltf::Accessor& normalAccess = model->accessors[p.findAttribute("NORMAL")->accessorIndex];
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, normalAccess, [&](glm::vec3 aV, GLuint aId) {
-					vertices[initialId+aId].normal = aV;
+					vertices[initialId+aId].normal = glm::vec3(meshMatrices[meshMatrixId] * glm::vec4(aV, 1.0));
 				});
 			}
 
@@ -281,31 +257,33 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 	//process bones
 	for(fastgltf::Skin& s : model->skins) {
 		this->mBones.push_back({});
-		this->mBones.back().name = s.name.c_str();
+		Skin& skin = this->mBones.back();
+		skin.name = s.name.c_str();
+
+		for(size_t j : s.joints) {
+			skin.joints.push_back(j); //nodes!
+			this->mNodes[j].boneOutputMatrixId = j;
+		}
 
 		fastgltf::Accessor& ibmAccess =  model->accessors[s.inverseBindMatrices.value()];
 		fastgltf::iterateAccessorWithIndex<fastgltf::math::fmat4x4>(*model, ibmAccess, [&](fastgltf::math::fmat4x4 aV, GLuint aId) {
-			this->mNodes[aId].inverseBindMatrix = convertToGLM(aV);
-			std::cout << this->mBones.back().name << " IBM transform " << aId << ": " << glm::vec3(this->mNodes[aId].inverseBindMatrix * glm::vec4(1.0f)) << '\n';
+			this->mNodes[skin.joints[aId]].inverseBindMatrix = convertToGLM(aV);
+			std::cout << skin.name << " IBM transform " << aId << ": " << glm::vec3(this->mNodes[skin.joints[aId]].inverseBindMatrix * glm::vec4(1.0f)) << '\n';
 
 		});
-
-		for(size_t j : s.joints) {
-			this->mBones.back().joints.push_back(j); //nodes!
-		}
 	}
 
 	//process animations
 	for(fastgltf::Animation& a : model->animations) {
-		this->mAnimations.emplace_back();
+		this->mAnimations.push_back({});
 		auto& anim = this->mAnimations.back();
 		anim.mName = a.name.c_str();
 
 		for(fastgltf::AnimationSampler& s : a.samplers) {
 			anim.mSamplers.push_back({});
 
-			fastgltf::Accessor& samplerInputAccess = model->accessors[s.inputAccessor];
-			fastgltf::Accessor& samplerOutputAccess = model->accessors[s.outputAccessor];
+			fastgltf::Accessor& samplerInputAccess = model->accessors[s.inputAccessor]; //time
+			fastgltf::Accessor& samplerOutputAccess = model->accessors[s.outputAccessor]; //value
 
 			//input - keyframe times
 

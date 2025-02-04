@@ -23,6 +23,7 @@ out vec4 pFragmentLeftFrontLightPos;
 out vec4 pFragmentRightFrontLightPos;
 
 const int MAX_BONES_PER_VERTEX = 4;
+const float MIN_NOT_IGNORE = -0.5;
 
 layout(std430, binding = 40) readonly buffer sBoneMatrices {
 	mat4 boneMatrices[];
@@ -34,16 +35,16 @@ void main() {
 
 	mat4 boneTransform = mat4(1.0); //identity
 
-	if(iBoneIds[0] >= 0.0) {
+	if(iBoneIds[0] >= MIN_NOT_IGNORE) {
 		boneTransform = (boneMatrices[int(iBoneIds[0])] * iBoneWeights[0]);
 	}
-	if(iBoneIds[1] >= 0.0) {
+	if(iBoneIds[1] >= MIN_NOT_IGNORE) {
 		boneTransform += (boneMatrices[int(iBoneIds[1])] * iBoneWeights[1]);
 	}
-	if(iBoneIds[2] >= 0.0) {
+	if(iBoneIds[2] >= MIN_NOT_IGNORE) {
 		boneTransform += (boneMatrices[int(iBoneIds[2])] * iBoneWeights[2]);
 	}
-	if(iBoneIds[3] >= 0.0) {
+	if(iBoneIds[3] >= MIN_NOT_IGNORE) {
 		boneTransform += (boneMatrices[int(iBoneIds[3])] * iBoneWeights[3]);
 	}
 

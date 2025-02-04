@@ -192,7 +192,7 @@ int main() {
 		loopTimer.start();
 
  		std::cout << "GLFW anim time " << std::fmod(glfwGetTime(), 3.0) << '\n';
-		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.0));
+		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.0));
 		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.0));
 
 		shadowMapProgram.bind();

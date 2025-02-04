@@ -4,7 +4,18 @@
 
 Animation::Animation() noexcept  {}
 void Animation::setStateAtTime(Model& aModel, const float aTime) noexcept {
-	//TODO rewrite - animate JOINTS not all nodes!!!
+	//TODO
+	//https://gamedev.stackexchange.com/questions/200973/understanding-matrix-transformations-for-skeletal-animation
+	//https://gamedev.net/forums/topic/703803-gltf-skinning-matrix-calculation/
+	//https://github.com/SaschaWillems/Vulkan/blob/master/examples/gltfskinning/README.md BEST TUTORIAL
+	//https://github.khronos.org/glTF-Tutorials/gltfTutorial/gltfTutorial_020_Skins.html
+
+	//update all node matrices (not in Animation class, in Model)
+
+	//calculate the interpolation stuff and apply here
+	//apply joint matrix (local in our terminology) from parent(s)
+
+	//end of TODO
 
 	//calculate matrices
 	std::vector<TRSData> data;
@@ -15,13 +26,17 @@ void Animation::setStateAtTime(Model& aModel, const float aTime) noexcept {
 
 	//multiply
 	for(uint64_t i = 0; i < data.size(); i++) {
-		aModel.mNodes[i].localMatrix = data[i].s * data[i].r * data[i].t;
+		if(aModel.mNodes[i].boneOutputMatrixId == -1) continue;
+		std::cout << "Animating " << aModel.mNodes[i].name << '\n';
+		aModel.mNodes[i].localMatrix = glm::scale(glm::mat4(1.0f), data[i].s);
+		aModel.mNodes[i].localMatrix *= glm::mat4_cast(data[i].r);
+		aModel.mNodes[i].localMatrix = glm::translate(aModel.mNodes[i].localMatrix, data[i].t);
 	}
 
 	//set data of nodes (joints)
 	for(GLTFNode& n : aModel.mNodes) {
-		if(n.idOfSkin == -1) continue;
-		aModel.mBoneMatrices[n.boneOutputMatrixId] = glm::inverse(n.transformMatrix) * n.localMatrix * n.inverseBindMatrix;
+		if(n.boneOutputMatrixId == -1) continue;
+		aModel.mBoneMatrices[n.boneOutputMatrixId] = glm::inverse(n.transformMatrix) * n.localMatrix * n.transformMatrix;
 		std::cout << n.name << '@' << aTime << ": " << 	aModel.mBoneMatrices[n.boneOutputMatrixId] * glm::vec4(1.0) << '\n';
 	}
 }
@@ -38,26 +53,26 @@ uint64_t Animation::getIndex(const SamplerData& aSampler, const float aTime) noe
 	}
 	return UINT64_MAX;
 }
-glm::mat4 Animation::interpolatePosition(const SamplerData& aSampler, const float aTime) noexcept {
+glm::vec3 Animation::interpolatePosition(const SamplerData& aSampler, const float aTime) noexcept {
 	uint64_t start = getIndex(aSampler, aTime);
 	uint64_t end = start+1;
 	float weight = lerp(aSampler.time[start], aSampler.time[end], aTime);
 	glm::vec3 position = glm::vec3(glm::mix(aSampler.value[start], aSampler.value[end], weight));
-	return glm::translate(glm::mat4(1.0), position);
+	return position;
 }
-glm::mat4 Animation::interpolateRotation(const SamplerData& aSampler, const float aTime) noexcept {
+glm::quat Animation::interpolateRotation(const SamplerData& aSampler, const float aTime) noexcept {
 	uint64_t start = getIndex(aSampler, aTime);
 	uint64_t end = start+1;
 	float weight = lerp(aSampler.time[start], aSampler.time[end], aTime);
 	glm::quat rotation = glm::normalize(glm::slerp(glm::quat(aSampler.value[start]), glm::quat(aSampler.value[end]), weight));
-	return glm::mat4_cast(rotation);
+	return rotation;
 }
-glm::mat4 Animation::interpolateScale(const SamplerData& aSampler, const float aTime) noexcept {
+glm::vec3 Animation::interpolateScale(const SamplerData& aSampler, const float aTime) noexcept {
 	uint64_t start = getIndex(aSampler, aTime);
 	uint64_t end = start+1;
 	float weight = lerp(aSampler.time[start], aSampler.time[end], aTime);
 	glm::vec3 scale = glm::vec3(glm::mix(aSampler.value[start], aSampler.value[end], weight));
-	return glm::scale(glm::mat4(1.0), scale);
+	return scale;
 }
 
 void Animation::getBoneTransformations(Model& aModel, const uint64_t aSamplerId, const float aTime, std::vector<TRSData>& aTRSData) noexcept {
@@ -68,15 +83,12 @@ void Animation::getBoneTransformations(Model& aModel, const uint64_t aSamplerId,
 	switch(sampler.type) {
 		case(fastgltf::AnimationPath::Translation):
 			aTRSData[sampler.nodeIndex].t = interpolatePosition(sampler, aTime);
-			std::cout << aModel.mNodes[sampler.nodeIndex].name << " T " << glm::vec4(1.0f) * aTRSData[sampler.nodeIndex].t << '\n';
 			break;
 		case(fastgltf::AnimationPath::Rotation):
 			aTRSData[sampler.nodeIndex].r = interpolateRotation(sampler, aTime);
-			std::cout << aModel.mNodes[sampler.nodeIndex].name << " R " << glm::vec4(1.0f) * aTRSData[sampler.nodeIndex].r << '\n';
 			break;
 		case(fastgltf::AnimationPath::Scale):
 			aTRSData[sampler.nodeIndex].s = interpolateScale(sampler, aTime);
-			std::cout << aModel.mNodes[sampler.nodeIndex].name << " S " << glm::vec4(1.0f) * aTRSData[sampler.nodeIndex].s << '\n';
 			break;
 		default:
 			std::cerr << LogLevel::ERROR << "Weight animation is not supported!\n" << LogLevel::RESET;
