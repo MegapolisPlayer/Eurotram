@@ -191,10 +191,6 @@ int main() {
     while (mainWindow.isOpen()) {
 		loopTimer.start();
 
- 		std::cout << "GLFW anim time " << std::fmod(glfwGetTime(), 3.0) << '\n';
-		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.0));
-		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.0));
-
 		shadowMapProgram.bind();
 
 		ss.beginPass(mainWindow, lpu);
@@ -232,6 +228,8 @@ int main() {
 		ds.bindMap(15);
 		drawTimer.start();
 
+		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.0));
+		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.0));
 		t3rp.draw(uMaterial, uModelMat);
 
 		drawTimer.end();

@@ -12,7 +12,6 @@ struct GLTFNode {
 	std::string name;
 	glm::mat4 transformMatrix = glm::mat4(1.0f);
 	glm::mat4 localMatrix = glm::mat4(1.0f);
-	glm::mat4 inverseBindMatrix = glm::mat4(1.0f);
 	int64_t idOfSkin = -1;
 	int64_t boneOutputMatrixId = -1;
 	int64_t meshId = -1;
@@ -21,9 +20,15 @@ struct GLTFNode {
 	int64_t parent = -1; //-1 if root
 
 	GLTFNode() noexcept {};
-	GLTFNode(const std::string& aName, const glm::mat4& aLocal, const int64_t aIdOfSkin, const int64_t aBoneOutputMatrixId) noexcept
-		: name(aName), localMatrix(aLocal), idOfSkin(aIdOfSkin), boneOutputMatrixId(aBoneOutputMatrixId) {};
+	GLTFNode(const std::string& aName, const glm::mat4 aGlobal, const glm::mat4& aLocal, const int64_t aIdOfSkin, const int64_t aBoneOutputMatrixId) noexcept
+		: name(aName), transformMatrix(aGlobal), localMatrix(aLocal), idOfSkin(aIdOfSkin), boneOutputMatrixId(aBoneOutputMatrixId) {};
 	~GLTFNode() noexcept {};
+};
+
+struct Skin {
+	std::string name;
+	std::vector<uint64_t> joints;
+	std::vector<glm::mat4> inverseBindMatrix;
 };
 
 class Model {
@@ -44,6 +49,8 @@ public:
 
 	void setAnimation(std::string_view aAnimationName, const float aTime) noexcept;
 
+	void updateAnimation() noexcept; //called automatically on draw
+
 	~Model() noexcept;
 private:
 	std::vector<Mesh> mMeshes;
@@ -51,18 +58,11 @@ private:
 
 	std::vector<Skin> mBones;
 	std::vector<GLTFNode> mNodes; //pair of node world transform and id of skin
-	std::vector<glm::mat4> mBoneMatrices;
-};
 
-class ModelInstancer {
-public:
-	ModelInstancer() noexcept;
+	std::vector<glm::mat4> mOutputJointMatrices;
 
-	void drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
-
-	~ModelInstancer() noexcept;
-private:
-	std::vector<glm::mat4> mTransforms;
+	glm::mat4 getNewNodeTransform(GLTFNode& aNode) noexcept;
+	void updateJoint(GLTFNode& aNode) noexcept;
 };
 
 #endif

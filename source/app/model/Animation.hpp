@@ -7,26 +7,6 @@ struct TRSData {
 	glm::quat r;
 };
 
-namespace Keyframe {
-	struct Position {
-		glm::vec3 position;
-		uint64_t frame = 0;
-	};
-	struct Rotation {
-		glm::quat rotation; //quaternions...
-		uint64_t frame = 0;
-	};
-	struct Scale {
-		glm::vec3 scale;
-		uint64_t frame = 0;
-	};
-}
-
-struct Skin {
-	std::string name;
-	std::vector<uint64_t> joints;
-};
-
 struct SamplerData {
 	fastgltf::AnimationPath type = (fastgltf::AnimationPath)0;
 	std::vector<glm::vec4> value;
@@ -60,7 +40,7 @@ private:
 	glm::quat interpolateRotation(const SamplerData& aSampler, const float aTime) noexcept;
 	glm::vec3 interpolateScale(const SamplerData& aSampler, const float aTime) noexcept;
 
-	void getBoneTransformations(Model& aModel, const uint64_t aSamplerId, const float aTime, std::vector<TRSData>& aTRSData) noexcept;
+	void getLocalSamplerTransform(const uint64_t aSamplerId, const float aTime, std::vector<TRSData>& aTRSData) noexcept;
 };
 
 #endif
