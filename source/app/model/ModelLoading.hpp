@@ -13,15 +13,14 @@ struct GLTFNode {
 	glm::mat4 transformMatrix = glm::mat4(1.0f);
 	glm::mat4 localMatrix = glm::mat4(1.0f);
 	int64_t idOfSkin = -1;
-	int64_t boneOutputMatrixId = -1;
 	int64_t meshId = -1;
 
 	std::vector<uint64_t> children;
 	int64_t parent = -1; //-1 if root
 
 	GLTFNode() noexcept {};
-	GLTFNode(const std::string& aName, const glm::mat4 aGlobal, const glm::mat4& aLocal, const int64_t aIdOfSkin, const int64_t aBoneOutputMatrixId) noexcept
-		: name(aName), transformMatrix(aGlobal), localMatrix(aLocal), idOfSkin(aIdOfSkin), boneOutputMatrixId(aBoneOutputMatrixId) {};
+	GLTFNode(const std::string& aName, const glm::mat4 aGlobal, const glm::mat4& aLocal, const int64_t aIdOfSkin) noexcept
+		: name(aName), transformMatrix(aGlobal), localMatrix(aLocal), idOfSkin(aIdOfSkin) {};
 	~GLTFNode() noexcept {};
 };
 
@@ -49,7 +48,11 @@ public:
 
 	void setAnimation(std::string_view aAnimationName, const float aTime) noexcept;
 
-	void updateAnimation() noexcept; //called automatically on draw
+	//GLTF limitation - single mesh may only have a single armature
+	//workaround: list bones to update and update just them
+	Model& setAnimationBones(std::string_view aAnimationName, const float aTime, BoneCondition aBone) noexcept;
+
+	void updateAnimation(StructUniform<glm::mat4>& aBoneMatrices) noexcept; //called automatically on draw
 
 	~Model() noexcept;
 private:
@@ -58,11 +61,10 @@ private:
 
 	std::vector<Skin> mBones;
 	std::vector<GLTFNode> mNodes; //pair of node world transform and id of skin
-
-	std::vector<glm::mat4> mOutputJointMatrices;
+	std::vector<glm::mat4> mOutput;
 
 	glm::mat4 getNewNodeTransform(GLTFNode& aNode) noexcept;
-	void updateJoint(GLTFNode& aNode) noexcept;
+	void updateJoint(GLTFNode& aNode, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
 };
 
 #endif

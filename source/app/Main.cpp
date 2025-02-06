@@ -172,10 +172,11 @@ int main() {
 	//t1.setRotationY(45.0f);
 
 	std::cout << "Loading T3R.P model...\n";
-	Model t3rp(std::filesystem::path("./T3.glb"));
+	Model t3rp(std::filesystem::path("./untitled.glb"));
+	//Model t3rp(std::filesystem::path("./T3.glb"));
 	std::cout << "Model loaded!\n";
-	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
-	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
+	//t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
+	//t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 
 	shader.bind();
 	UniformMaterial uMaterial(50);
@@ -228,8 +229,13 @@ int main() {
 		ds.bindMap(15);
 		drawTimer.start();
 
-		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.0));
+		t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.0));
+
+		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.0));
 		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.0));
+
+		t3rp.setAnimationBones("ArmatureAction", std::fmod(glfwGetTime(), 3.0), {"c", BoneConditionFilter::STARTS_WITH});
+
 		t3rp.draw(uMaterial, uModelMat);
 
 		drawTimer.end();

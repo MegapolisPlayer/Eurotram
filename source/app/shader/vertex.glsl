@@ -36,7 +36,7 @@ void main() {
 	mat4 boneTransform = mat4(1.0); //identity
 
 	if(iBoneIds[0] >= MIN_NOT_IGNORE) {
-		boneTransform = (boneMatrices[int(iBoneIds[0])] * iBoneWeights[0]);
+		boneTransform += (boneMatrices[int(iBoneIds[0])] * iBoneWeights[0]);
 	}
 	if(iBoneIds[1] >= MIN_NOT_IGNORE) {
 		boneTransform += (boneMatrices[int(iBoneIds[1])] * iBoneWeights[1]);

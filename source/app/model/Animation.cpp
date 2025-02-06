@@ -9,13 +9,59 @@ void Animation::setStateAtTime(Model& aModel, const float aTime) noexcept {
 	//rest done in model class
 
 	std::vector<TRSData> data;
-	data.resize(aModel.mNodes.size());
+	data.reserve(this->mSamplers.size());
 	for(uint64_t i = 0; i < this->mSamplers.size(); i++) {
-		this->getLocalSamplerTransform(i, aTime, data);
+		data.push_back(this->getLocalSamplerTransform(i, aTime));
+	}
+
+	//local matrix reset in Model class
+	for(uint64_t i = 0; i < data.size(); i++) {
+		auto& node = aModel.mNodes[this->mSamplers[i].nodeIndex];
+
+		switch(data[i].type) {
+			case(fastgltf::AnimationPath::Translation):
+				node.localMatrix = glm::translate(node.localMatrix, data[i].t);
+				break;
+			case(fastgltf::AnimationPath::Rotation):
+				node.localMatrix *= glm::mat4_cast(data[i].r);
+				break;
+			case(fastgltf::AnimationPath::Scale):
+				node.localMatrix = glm::scale(node.localMatrix, data[i].s);
+				break;
+			default:
+				std::cerr << LogLevel::ERROR << "Applying weight animation is not supported! (" << (uint16_t)data[i].type << ")\n" << LogLevel::RESET;
+				break;
+		}
+	}
+}
+
+void Animation::setBoneStateAtTime(Model& aModel, const float aTime, BoneCondition& aBone) noexcept {
+	std::vector<TRSData> data;
+	data.reserve(this->mSamplers.size());
+	for(uint64_t i = 0; i < this->mSamplers.size(); i++) {
+		if(Animation::fulfills(aModel.mNodes[this->mSamplers[i].nodeIndex].name, aBone)) {
+			data.push_back(this->getLocalSamplerTransform(i, aTime));
+			break;
+		}
 	}
 
 	for(uint64_t i = 0; i < data.size(); i++) {
-		aModel.mNodes[i].localMatrix = glm::translate(glm::mat4(1.0f), data[i].t) * glm::mat4_cast(data[i].r) * glm::scale(glm::mat4(1.0f), glm::vec3(1.0));
+		auto& node = aModel.mNodes[this->mSamplers[i].nodeIndex];
+
+		switch(data[i].type) {
+			case(fastgltf::AnimationPath::Translation):
+				node.localMatrix = glm::translate(node.localMatrix, data[i].t);
+				break;
+			case(fastgltf::AnimationPath::Rotation):
+				node.localMatrix *= glm::mat4_cast(data[i].r);
+				break;
+			case(fastgltf::AnimationPath::Scale):
+				node.localMatrix = glm::scale(node.localMatrix, data[i].s);
+				break;
+			default:
+				std::cerr << LogLevel::ERROR << "Applying weight animation is not supported! (" << (uint16_t)data[i].type << ")\n" << LogLevel::RESET;
+				break;
+		}
 	}
 }
 
@@ -56,23 +102,40 @@ glm::vec3 Animation::interpolateScale(const SamplerData& aSampler, const float a
 	return scale;
 }
 
-void Animation::getLocalSamplerTransform(const uint64_t aSamplerId, const float aTime, std::vector<TRSData>& aTRSData) noexcept {
+TRSData Animation::getLocalSamplerTransform(const uint64_t aSamplerId, const float aTime) noexcept {
 	auto& sampler = this->mSamplers[aSamplerId];
+	TRSData result;
+	result.type = sampler.type;
 
-	//enforce TRS
+	//TRS enforced by sampler order
 
 	switch(sampler.type) {
 		case(fastgltf::AnimationPath::Translation):
-			aTRSData[sampler.nodeIndex].t = interpolatePosition(sampler, aTime);
+			result.t = interpolatePosition(sampler, aTime);
 			break;
 		case(fastgltf::AnimationPath::Rotation):
-			aTRSData[sampler.nodeIndex].r = interpolateRotation(sampler, aTime);
+			result.r = interpolateRotation(sampler, aTime);
 			break;
 		case(fastgltf::AnimationPath::Scale):
-			aTRSData[sampler.nodeIndex].s = interpolateScale(sampler, aTime);
+			result.s = interpolateScale(sampler, aTime);
 			break;
 		default:
 			std::cerr << LogLevel::ERROR << "Weight animation is not supported!\n" << LogLevel::RESET;
 			break;
 	}
+
+	return result;
+}
+
+bool Animation::fulfills(std::string_view aName, BoneCondition aBone) noexcept {
+	switch(aBone.filter) {
+		case(BoneConditionFilter::STARTS_WITH):
+			for(uint64_t i = 0; i < aBone.value.size(); i++) {
+				if(aBone.value[i] != aName[i]) return false;
+			}
+			return true;
+		case(BoneConditionFilter::EXACT_MATCH):
+			return aBone.value == aName;
+	}
+	return false;
 }
