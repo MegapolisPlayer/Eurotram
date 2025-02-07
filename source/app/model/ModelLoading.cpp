@@ -350,13 +350,6 @@ void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatri
 	for(Mesh& m : this->mMeshes) {
 		m.draw(aUniform);
 	}
-
-	//reset local matrix so it can be recalculated later
-	for(Skin& s : this->mBones) {
-		for(uint64_t j : s.joints) {
-			this->mNodes[j].localMatrix = glm::mat4(1.0f);
-		}
-	}
 }
 
 void Model::setAnimation(std::string_view aAnimationName, const float aTime) noexcept {
@@ -367,17 +360,6 @@ void Model::setAnimation(std::string_view aAnimationName, const float aTime) noe
 		}
 	}
 	std::cerr << LogLevel::WARNING << "Animation " << aAnimationName << " not found!\n" << LogLevel::RESET;
-}
-
-Model& Model::setAnimationBones(std::string_view aAnimationName, const float aTime, BoneCondition aBone) noexcept {
-	for(Animation& a : this->mAnimations) {
-		if(a.mName == aAnimationName) {
-			a.setBoneStateAtTime(*this, aTime, aBone);
-			return *this;
-		}
-	}
-	std::cerr << LogLevel::WARNING << "Animation " << aAnimationName << " not found!\n" << LogLevel::RESET;
-	return *this;
 }
 
 void Model::updateAnimation(StructUniform<glm::mat4>& aBoneMatrices) noexcept {
@@ -402,8 +384,6 @@ glm::mat4 Model::getNewNodeTransform(GLTFNode& aNode) noexcept {
 
 	return result;
 }
-
-//TODO think of system which ignores some joints and doesnt calc them
 
 void Model::updateJoint(GLTFNode& aNode, StructUniform<glm::mat4>& aBoneMatrices) noexcept {
 	if(aNode.idOfSkin != -1) {

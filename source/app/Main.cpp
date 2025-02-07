@@ -234,7 +234,7 @@ int main() {
 		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.0));
 		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.0));
 
-		t3rp.setAnimationBones("ArmatureAction", std::fmod(glfwGetTime(), 3.0), {"c", BoneConditionFilter::STARTS_WITH});
+		//t3rp.setAnimationBones("ArmatureAction", std::fmod(glfwGetTime(), 3.0), {"c", BoneConditionFilter::STARTS_WITH});
 
 		t3rp.draw(uMaterial, uModelMat);
 

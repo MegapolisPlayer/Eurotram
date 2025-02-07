@@ -12,39 +12,11 @@ void Animation::setStateAtTime(Model& aModel, const float aTime) noexcept {
 	data.reserve(this->mSamplers.size());
 	for(uint64_t i = 0; i < this->mSamplers.size(); i++) {
 		data.push_back(this->getLocalSamplerTransform(i, aTime));
+		aModel.mNodes[this->mSamplers[i].nodeIndex].localMatrix = glm::mat4(1.0f);
 	}
+
 
 	//local matrix reset in Model class
-	for(uint64_t i = 0; i < data.size(); i++) {
-		auto& node = aModel.mNodes[this->mSamplers[i].nodeIndex];
-
-		switch(data[i].type) {
-			case(fastgltf::AnimationPath::Translation):
-				node.localMatrix = glm::translate(node.localMatrix, data[i].t);
-				break;
-			case(fastgltf::AnimationPath::Rotation):
-				node.localMatrix *= glm::mat4_cast(data[i].r);
-				break;
-			case(fastgltf::AnimationPath::Scale):
-				node.localMatrix = glm::scale(node.localMatrix, data[i].s);
-				break;
-			default:
-				std::cerr << LogLevel::ERROR << "Applying weight animation is not supported! (" << (uint16_t)data[i].type << ")\n" << LogLevel::RESET;
-				break;
-		}
-	}
-}
-
-void Animation::setBoneStateAtTime(Model& aModel, const float aTime, BoneCondition& aBone) noexcept {
-	std::vector<TRSData> data;
-	data.reserve(this->mSamplers.size());
-	for(uint64_t i = 0; i < this->mSamplers.size(); i++) {
-		if(Animation::fulfills(aModel.mNodes[this->mSamplers[i].nodeIndex].name, aBone)) {
-			data.push_back(this->getLocalSamplerTransform(i, aTime));
-			break;
-		}
-	}
-
 	for(uint64_t i = 0; i < data.size(); i++) {
 		auto& node = aModel.mNodes[this->mSamplers[i].nodeIndex];
 
@@ -125,17 +97,4 @@ TRSData Animation::getLocalSamplerTransform(const uint64_t aSamplerId, const flo
 	}
 
 	return result;
-}
-
-bool Animation::fulfills(std::string_view aName, BoneCondition aBone) noexcept {
-	switch(aBone.filter) {
-		case(BoneConditionFilter::STARTS_WITH):
-			for(uint64_t i = 0; i < aBone.value.size(); i++) {
-				if(aBone.value[i] != aName[i]) return false;
-			}
-			return true;
-		case(BoneConditionFilter::EXACT_MATCH):
-			return aBone.value == aName;
-	}
-	return false;
 }

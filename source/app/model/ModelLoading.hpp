@@ -50,7 +50,7 @@ public:
 
 	//GLTF limitation - single mesh may only have a single armature
 	//workaround: list bones to update and update just them
-	Model& setAnimationBones(std::string_view aAnimationName, const float aTime, BoneCondition aBone) noexcept;
+	//TODO
 
 	void updateAnimation(StructUniform<glm::mat4>& aBoneMatrices) noexcept; //called automatically on draw
 

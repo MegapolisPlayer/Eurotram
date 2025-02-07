@@ -2,18 +2,6 @@
 #define EUROTRAM_ANIMATION
 #include "../base/Base.hpp"
 
-enum struct BoneConditionFilter : uint8_t {
-	EXACT_MATCH = 0,
-	STARTS_WITH
-};
-
-struct BoneCondition {
-	std::string_view value;
-	BoneConditionFilter filter;
-
-	BoneCondition(std::string_view aValue, BoneConditionFilter aFilter) noexcept : value(aValue), filter(aFilter) {}
-};
-
 struct TRSData {
 	glm::vec3 t, s;
 	glm::quat r;
@@ -40,7 +28,6 @@ public:
 	Animation() noexcept;
 
 	void setStateAtTime(Model& aModel, const float aTime) noexcept;
-	void setBoneStateAtTime(Model& aModel, const float aTime, BoneCondition& aBone) noexcept; //for only selected bones
 
 	~Animation() noexcept;
 private:
@@ -55,8 +42,6 @@ private:
 	glm::vec3 interpolateScale(const SamplerData& aSampler, const float aTime) noexcept;
 
 	TRSData getLocalSamplerTransform(const uint64_t aSamplerId, const float aTime) noexcept;
-
-	static bool fulfills(std::string_view aName, BoneCondition aBone) noexcept;
 };
 
 #endif
