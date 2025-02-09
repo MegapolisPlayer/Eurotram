@@ -1,4 +1,5 @@
 #ifndef EUROTRAM_PHYSICS_FRICTION
 #define EUROTRAM_PHYSICS_FRICTION
+#include "Weather.hpp"
 
 #endif

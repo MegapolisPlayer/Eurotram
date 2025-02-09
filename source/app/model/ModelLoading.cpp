@@ -221,7 +221,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			{
 				fastgltf::Accessor& normalAccess = model->accessors[p.findAttribute("NORMAL")->accessorIndex];
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, normalAccess, [&](glm::vec3 aV, GLuint aId) {
-					vertices[initialId+aId].normal = aV; //TODO
+					vertices[initialId+aId].normal = aV;
 				});
 			}
 
@@ -244,7 +244,6 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 						vertices[initialId+aId].boneIds[1] = (GLfloat)this->mBones[this->mNodes[meshMatrices[meshMatrixId]].idOfSkin].joints[aV.y()];
 						vertices[initialId+aId].boneIds[2] = (GLfloat)this->mBones[this->mNodes[meshMatrices[meshMatrixId]].idOfSkin].joints[aV.z()];
 						vertices[initialId+aId].boneIds[3] = (GLfloat)this->mBones[this->mNodes[meshMatrices[meshMatrixId]].idOfSkin].joints[aV.w()];
-						std::cout << vertices[initialId+aId].boneIds[0] << ' ' << vertices[initialId+aId].boneIds[1] << ' ' << vertices[initialId+aId].boneIds[2] << ' ' << vertices[initialId+aId].boneIds[3] << ' '  << '\n';
 					});
 				}
 			}
@@ -341,11 +340,14 @@ void Model::resetVariant(const std::string_view aMaterialName) noexcept {
 	}
 }
 
-void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept {
-	this->updateAnimation(aBoneMatrices);
-
+void Model::sendAnimationDataToShader(StructUniform<glm::mat4>& aBoneMatrices, const bool aRecalcAnim) noexcept {
+	if(aRecalcAnim) this->updateAnimation(aBoneMatrices);
 	aBoneMatrices.setNewData(this->mOutput.data(), this->mOutput.size());
 	aBoneMatrices.set();
+}
+
+void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept {
+	sendAnimationDataToShader(aBoneMatrices);
 
 	for(Mesh& m : this->mMeshes) {
 		m.draw(aUniform);

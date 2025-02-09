@@ -1,4 +1,10 @@
 #ifndef EUROTRAM_OBJECTS_STATION_PILLAR
 #define EUROTRAM_OBJECTS_STATION_PILLAR
+#include "Node.hpp"
+
+struct StationPillar {
+	RotatedObjectLocation location;
+	StationCode code;
+};
 
 #endif

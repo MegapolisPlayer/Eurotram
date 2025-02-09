@@ -91,6 +91,9 @@ int main() {
 	Line l;
 	l.open("Linka13-test.etscr", &a);
 
+	Map m;
+	//m.open("Praha.etscr"); //TODO
+
 	std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
 	float daylightIndex = 1.0f;
 
@@ -172,11 +175,11 @@ int main() {
 	//t1.setRotationY(45.0f);
 
 	std::cout << "Loading T3R.P model...\n";
-	Model t3rp(std::filesystem::path("./untitled.glb"));
-	//Model t3rp(std::filesystem::path("./T3.glb"));
+	//Model t3rp(std::filesystem::path("./untitled.glb"));
+	Model t3rp(std::filesystem::path("./T3.glb"));
 	std::cout << "Model loaded!\n";
-	//t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
-	//t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
+	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
+	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 
 	shader.bind();
 	UniformMaterial uMaterial(50);
@@ -186,6 +189,7 @@ int main() {
 	shadowMapProgram.bind();
 	UniformMat4 lpu(90);
 	UniformMat4 lmod(91);
+	StructUniform<glm::mat4> lmat(40, 0);
 	lmod.set(t1.getMatrix());
 
 	uint64_t i = 0;
@@ -196,11 +200,13 @@ int main() {
 
 		ss.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
+		t3rp.sendAnimationDataToShader(lmat);
 		t3rp.draw(uMaterial, uModelMat);
 		ss.endPass(mainWindow);
 
 		ds.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
+		t3rp.sendAnimationDataToShader(lmat);
 		t3rp.draw(uMaterial, uModelMat);
 		ds.endPass(mainWindow);
 
@@ -229,10 +235,10 @@ int main() {
 		ds.bindMap(15);
 		drawTimer.start();
 
-		t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.0));
+		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.0));
 
-		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.0));
-		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.0));
+		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
+		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
 
 		//t3rp.setAnimationBones("ArmatureAction", std::fmod(glfwGetTime(), 3.0), {"c", BoneConditionFilter::STARTS_WITH});
 

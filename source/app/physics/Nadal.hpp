@@ -3,5 +3,6 @@
 
 #ifndef EUROTRAM_PHYSICS_NADAL
 #define EUROTRAM_PHYSICS_NADAL
+#include "Force.hpp"
 
 #endif

@@ -56,13 +56,9 @@ function makeLandmarkSelector() {
 	landmarkTypeSelector.appendChild(document.createElement("br"));
 }
 
-class Landmark {
-	xPos = 0;
-	yPos = 0;
+class Landmark extends RotatedStandardPoint  {
 	xsize = 0;
 	ysize = 0;
-	height = 0;
-	rotation = 0;
 	//no station code - always rendered
 	landmarkCode = 0;
 

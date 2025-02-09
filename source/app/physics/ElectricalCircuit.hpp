@@ -1,4 +1,5 @@
 #ifndef EUROTRAM_PHYSICS_ELECTRICAL_CIRCUIT
 #define EUROTRAM_PHYSICS_ELECTRICAL_CIRCUIT
+#include "Force.hpp"
 
 #endif

@@ -37,9 +37,9 @@ const STATION_TRACK_BYTES = STATION_TRACK_TYPE.split('').map((v) => { return v.c
 const JUNCTION_SIGNAL_BYTES = JUNCTION_SIGNAL_TYPE.split('').map((v) => { return v.charCodeAt(0); });
 const JUNCTION_PRESIGNAL_BYTES = JUNCTION_PRESIGNAL_TYPE.split('').map((v) => { return v.charCodeAt(0); });
 
-const TRACK_FLAG_FIRST_SWITCH = 0b00000001;
+const TRACK_FLAG_FIRST_SWITCH  = 0b00000001;
 const TRACK_FLAG_SECOND_SWITCH = 0b00000010;
-const TRACK_FLAG_BEZIER = 0b00000100;
+const TRACK_FLAG_BEZIER        = 0b00000100;
 
 function scenarioSerialize() {
 	let numberValuesArray = [];
@@ -265,6 +265,7 @@ function scenarioSerialize() {
 		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.height, 4));
 		numberValuesArray.push(...numberToByteArray(v.rotation, 2));
+		numberValuesArray.push(...stationCodeToArray(v.landmarkCode));
 	});
 
 	//walls
@@ -283,6 +284,7 @@ function scenarioSerialize() {
 		numberValuesArray.push(0); //null terminator
 	});
 
+	//signs
 	signList.forEach((v) => {
 		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
 		numberValuesArray.push(...numberToByteArray(v.yPos, 4));
@@ -479,7 +481,7 @@ function scenarioDeserialize(afiledata) {
 	//radioboxes
 	radioList.length = 0;
 	for(let i = 0; i < amounts[5]; i++) {
-		radioList.push(new RadioBox());
+		radioList.push(new Radiobox());
 		readXYH(numberArrayReference, radioList[i]);
 		radioList[i].stationCode = readStationCode(numberArrayReference);
 	}
@@ -523,7 +525,7 @@ function scenarioDeserialize(afiledata) {
 	for(let i = 0; i < amounts[10]; i++) {
 		landmarkList.push(new Landmark());
 		readXYHR(numberArrayReference, landmarkList[i]);
-		landmarkList[i].type = readBytesAsNumber(numberArrayReference, 2);
+		landmarkList[i].landmarkCode = readStationCode(numberArrayReference);
 		landmarkList[i].updateFromLandmarkCode();
 	}
 

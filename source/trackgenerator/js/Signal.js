@@ -1,7 +1,6 @@
 //normal semaphore for trams
 class Signal extends RotatedStandardPoint {
 	poleHeight = 2; //values <= 0 means that is hangs on catenary wire
-	rotation = 0;
 	stationCode = "";
 
 	constructor(axPos = 0, ayPos = 0) {

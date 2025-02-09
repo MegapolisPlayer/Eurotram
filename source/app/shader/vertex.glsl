@@ -31,26 +31,18 @@ layout(std430, binding = 40) readonly buffer sBoneMatrices {
 
 void main() {
 	pTexCoord = iTexCoord;
-	pNormals = uMatrixNormal * iNormals;
 
 	mat4 boneTransform = mat4(1.0); //identity
 
-	if(iBoneIds[0] >= MIN_NOT_IGNORE) {
-		boneTransform += (boneMatrices[int(iBoneIds[0])] * iBoneWeights[0]);
-	}
-	if(iBoneIds[1] >= MIN_NOT_IGNORE) {
-		boneTransform += (boneMatrices[int(iBoneIds[1])] * iBoneWeights[1]);
-	}
-	if(iBoneIds[2] >= MIN_NOT_IGNORE) {
-		boneTransform += (boneMatrices[int(iBoneIds[2])] * iBoneWeights[2]);
-	}
-	if(iBoneIds[3] >= MIN_NOT_IGNORE) {
-		boneTransform += (boneMatrices[int(iBoneIds[3])] * iBoneWeights[3]);
-	}
+	boneTransform += (boneMatrices[int(iBoneIds[0])] * max(0.0, iBoneWeights[0]));
+	boneTransform += (boneMatrices[int(iBoneIds[1])] * max(0.0, iBoneWeights[1]));
+	boneTransform += (boneMatrices[int(iBoneIds[2])] * max(0.0, iBoneWeights[2]));
+	boneTransform += (boneMatrices[int(iBoneIds[3])] * max(0.0, iBoneWeights[3]));
 
-	pFragmentPos = vec3(uMatrixModel * boneTransform * vec4(iPosition, 1.0));
-	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * boneTransform * vec4(iPosition, 1.0);
-	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * boneTransform * vec4(iPosition, 1.0);
+	pNormals = normalize(mat3(boneTransform) * uMatrixNormal * iNormals);
+	pFragmentPos = vec3(boneTransform * uMatrixModel * vec4(iPosition, 1.0));
+	pFragmentDirectionalLightPos = uMatrixDiright * boneTransform * uMatrixModel * vec4(iPosition, 1.0);
+	pFragmentFlashlightLightPos = uMatrixFlashlight * boneTransform * uMatrixModel * vec4(iPosition, 1.0);
 
 	gl_Position = uCamera * vec4(pFragmentPos, 1.0);
 };

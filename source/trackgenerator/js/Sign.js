@@ -30,8 +30,9 @@ let signTypeSelector;
 
 let signTypes = {
 	NONE: 0,
-	MANUAL_SWITCH: 1,
+	LOCKABLE_SWITCH: 1,
 	STOP: 2,
+	MAIN_ROAD: 3,
 	MAX_SPEED_UNEXPECTED: 4,
 	MAX_SPEED_UNEXPECTED_END: 5,
 	SLOW: 6,

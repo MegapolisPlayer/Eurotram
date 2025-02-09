@@ -83,7 +83,7 @@ function radioAdd() {
 	canvasData.mode.textContent = "Add radiobox";
 }
 function onclickRadioAddHandler(aX, aY) {
-	radioList.push(new RadioBox(aX, aY));
+	radioList.push(new Radiobox(aX, aY));
 	radioList.at(-1).draw();
 }
 

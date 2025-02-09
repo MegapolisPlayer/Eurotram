@@ -1,4 +1,5 @@
 #ifndef EUROTRAM_PHYSICS_DRAG
 #define EUROTRAM_PHYSICS_DRAG
+#include "Force.hpp"
 
 #endif

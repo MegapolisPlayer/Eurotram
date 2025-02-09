@@ -3,5 +3,11 @@
 
 #ifndef EUROTRAM_OBJECTS_BUTTON
 #define EUROTRAM_OBJECTS_BUTTON
+#include "Node.hpp"
+
+class Button {
+public:
+private:
+};
 
 #endif

@@ -1,4 +1,4 @@
-class RadioBox extends StandardPoint{
+class Radiobox extends StandardPoint{
 	stationCode = "";
 
 	//we dont store value of switch - switch stores our value
