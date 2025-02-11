@@ -5,5 +5,6 @@
 #include "TextureIm.hpp"
 #include "Transformation.hpp"
 #include "Camera.hpp"
+#include "Math.hpp"
 
 #endif

@@ -62,7 +62,7 @@ private:
 	ShaderBuffer mTreeIds;
 
 	Model mLightModel;
-	std::vector<Radiobox> mLights;
+	std::vector<Lightpole> mLights;
 	ShaderBuffer mLightMatrices;
 	ShaderBuffer mLightIds;
 

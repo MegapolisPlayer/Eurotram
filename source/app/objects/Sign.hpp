@@ -2,7 +2,7 @@
 #define EUROTRAM_OBJECTS_SIGN
 #include "Wire.hpp"
 
-enum struct SignType {
+enum struct SignType : uint16_t {
 	NONE = 0,
 	//zajistovaci vyhybka
 	LOCKABLE_SWITCH,

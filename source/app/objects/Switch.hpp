@@ -7,6 +7,7 @@ struct Switch {
 	ObjectLocation location;
 	StationCode code;
 	uint32_t before, left, front, right, radioBox, signal;
+	unsigned char letter;
 };
 
 #endif

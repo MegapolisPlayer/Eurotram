@@ -5,6 +5,7 @@
 struct SwitchSignal {
 	RotatedObjectLocation location;
 	StationCode code;
+	std::string letters;
 };
 
 #endif

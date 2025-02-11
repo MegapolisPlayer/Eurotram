@@ -15,6 +15,7 @@ enum struct BuildingType : uint8_t {
 struct Building {
 	RotatedObjectLocation location;
 	BuildingType type;
+	StationCode code;
 };
 
 #endif

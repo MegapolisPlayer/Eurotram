@@ -5,7 +5,9 @@
 struct Wall {
 	ObjectLocation firstPoint;
 	ObjectLocation secondPoint;
-	uint64_t height;
+	uint16_t height;
+	StationCode code;
+	std::string material;
 };
 
 #endif

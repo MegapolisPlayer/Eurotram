@@ -299,18 +299,19 @@ function scenarioSerialize() {
 	//texparcels
 	texparcelList.forEach((v) => {
 		numberValuesArray.push(...numberToByteArray(v.x1, 4));
-		numberValuesArray.push(...numberToByteArray(v.x2, 4));
-		numberValuesArray.push(...numberToByteArray(v.x3, 4));
-		numberValuesArray.push(...numberToByteArray(v.x4, 4));
-
 		numberValuesArray.push(...numberToByteArray(v.y1, 4));
-		numberValuesArray.push(...numberToByteArray(v.y2, 4));
-		numberValuesArray.push(...numberToByteArray(v.y3, 4));
-		numberValuesArray.push(...numberToByteArray(v.y4, 4));
-		
 		numberValuesArray.push(...numberToByteArray(v.h1, 4));
+
+		numberValuesArray.push(...numberToByteArray(v.x2, 4));
+		numberValuesArray.push(...numberToByteArray(v.y2, 4));
 		numberValuesArray.push(...numberToByteArray(v.h2, 4));
+
+		numberValuesArray.push(...numberToByteArray(v.x3, 4));
+		numberValuesArray.push(...numberToByteArray(v.y3, 4));
 		numberValuesArray.push(...numberToByteArray(v.h3, 4));
+
+		numberValuesArray.push(...numberToByteArray(v.x4, 4));
+		numberValuesArray.push(...numberToByteArray(v.y4, 4));
 		numberValuesArray.push(...numberToByteArray(v.h4, 4));
 
 		numberValuesArray.push(...stationCodeToArray(v.stationCode1));
@@ -562,16 +563,19 @@ function scenarioDeserialize(afiledata) {
 	for(let i = 0; i < amounts[13]; i++) {
 		texparcelList.push(new Texparcel());
 		texparcelList[i].x1 = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].x2 = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].x3 = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].x4 = readBytesAsNumber(numberArrayReference, 4);
 		texparcelList[i].y1 = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].y2 = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].y3 = readBytesAsNumber(numberArrayReference, 4);
-		texparcelList[i].y4 = readBytesAsNumber(numberArrayReference, 4);
 		texparcelList[i].h1 = readBytesAsNumber(numberArrayReference, 4);
+
+		texparcelList[i].x2 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].y2 = readBytesAsNumber(numberArrayReference, 4);
 		texparcelList[i].h2 = readBytesAsNumber(numberArrayReference, 4);
+
+		texparcelList[i].x3 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].y3 = readBytesAsNumber(numberArrayReference, 4);
 		texparcelList[i].h3 = readBytesAsNumber(numberArrayReference, 4);
+		
+		texparcelList[i].x4 = readBytesAsNumber(numberArrayReference, 4);
+		texparcelList[i].y4 = readBytesAsNumber(numberArrayReference, 4);
 		texparcelList[i].h4 = readBytesAsNumber(numberArrayReference, 4);
 
 		texparcelList[i].stationCode1 = readStationCode(numberArrayReference);
