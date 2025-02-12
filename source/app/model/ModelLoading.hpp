@@ -28,6 +28,7 @@ struct Skin {
 	std::string name;
 	std::vector<uint64_t> joints;
 	std::vector<glm::mat4> inverseBindMatrix;
+	int64_t skeleton = -1;
 };
 
 class Model {

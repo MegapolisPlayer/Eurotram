@@ -24,7 +24,7 @@ public:
 
 	void draw() noexcept; //draw map FIRST
 
-	Track& getStationByCode(std::string_view aCode) const noexcept;
+	Track* getStationByCode(std::string_view aCode) noexcept;
 
 	~Map() noexcept;
 private:

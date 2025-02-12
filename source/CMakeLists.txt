@@ -72,6 +72,7 @@ add_executable(eurotram
 "app/ui/HUD.cpp"
 "app/ui/MainMenu.cpp"
 
+"app/Application.cpp"
 "app/Main.cpp"
 
 "depend/glad/src/glad.c"

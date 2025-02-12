@@ -398,10 +398,13 @@ void Map::draw() noexcept {
 	this->mTrackIndices.draw(); //draw track last
 }
 
-Track& Map::getStationByCode(std::string_view aCode) const noexcept {
-	for(std::unique_ptr<Track>& t : this->mTracks) {
-		//
+Track* Map::getStationByCode(std::string_view aCode) noexcept {
+	for(Track& t : this->mTracks) {
+		if(t.code == *(uint32_t*)aCode.data()) {
+			return &t;
+		}
 	}
+	return nullptr;
 }
 
 Map::~Map() noexcept {

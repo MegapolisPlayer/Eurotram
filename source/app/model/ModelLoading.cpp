@@ -3,6 +3,7 @@
 glm::mat4 convertToGLM(const fastgltf::math::fmat4x4& aFrom) noexcept {
 	glm::mat4 result;
 
+	//no conversion!!!
 	result[0][0] = aFrom[0][0]; result[0][1] = aFrom[0][1]; result[0][2] = aFrom[0][2]; result[0][3] = aFrom[0][3];
 	result[1][0] = aFrom[1][0]; result[1][1] = aFrom[1][1]; result[1][2] = aFrom[1][2]; result[1][3] = aFrom[1][3];
 	result[2][0] = aFrom[2][0]; result[2][1] = aFrom[2][1]; result[2][2] = aFrom[2][2]; result[2][3] = aFrom[2][3];
@@ -214,6 +215,9 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 				vertices.resize(vertices.size() + verticesAccess.count);
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, verticesAccess, [&](glm::vec3 aV, GLuint aId) {
 					vertices[aId + initialId].position = aV;
+					//std::cout << "vertex in node " <<
+					//meshMatrices[meshMatrixId] << ": " <<
+					//aV << '\n';
 				});
 			}
 
@@ -257,6 +261,19 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 						vertices[initialId+aId].boneWeights[1] = aV.y();
 						vertices[initialId+aId].boneWeights[2] = aV.z();
 						vertices[initialId+aId].boneWeights[3] = aV.w();
+
+						//CHECKED
+						std::cout <<
+						"JOINTS_0 in node " <<
+						meshMatrices[meshMatrixId] << ": " <<
+						vertices[initialId+aId].boneIds[0] << ' ' <<
+						vertices[initialId+aId].boneIds[1] << ' ' <<
+						vertices[initialId+aId].boneIds[2] << ' ' <<
+						vertices[initialId+aId].boneIds[3] << " WEIGHTS_0: " <<
+						vertices[initialId+aId].boneWeights[0] << ' ' <<
+						vertices[initialId+aId].boneWeights[1] << ' ' <<
+						vertices[initialId+aId].boneWeights[2] << ' ' <<
+						vertices[initialId+aId].boneWeights[3] << '\n';
 					});
 				}
 			}
@@ -375,17 +392,36 @@ Model::~Model() noexcept {}
 
 //matrix multiply order - right to left
 
+//TODO bind shape matrix
+//FROM SPEC https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#skins-overview
+//The matrix defining how to pose the skin’s geometry for use with the joints
+//(also known as “Bind Shape Matrix”) should be premultiplied to mesh data or
+//to Inverse Bind Matrices.
+//
+//FROM GLTF TUTORIALS
+//Note: Vertex skinning in other contexts often involves a matrix that is called “Bind Shape Matrix”.
+//This matrix is supposed to transform the geometry of the skinned mesh into the coordinate space of the joints.
+//In glTF, this matrix is omitted, and it is assumed that this transform is either premultiplied with the mesh data,
+//or postmultiplied to the inverse bind matrices.
+
 glm::mat4 Model::getNewNodeTransform(GLTFNode& aNode) noexcept {
 	glm::mat4 result = aNode.localMatrix;
 	int64_t parent = aNode.parent;
 
 	while(parent != -1) {
-		result = this->mNodes[parent].localMatrix * result;
+		result = this->mNodes[parent].localMatrix * result; //CHECKED
 		parent = this->mNodes[parent].parent;
 	}
 
+	aNode.transformMatrix = result;
 	return result;
 }
+
+//TODO figure this out
+//ask sb
+//tried: forums, AI, teachers, math module of AI, different forums, 2 weeks of work on my own...
+//to try: university, different teachers?
+//in meantime - work on Application class, UI (menu, settings), models
 
 void Model::updateJoint(GLTFNode& aNode, StructUniform<glm::mat4>& aBoneMatrices) noexcept {
 	if(aNode.idOfSkin != -1) {
@@ -393,9 +429,13 @@ void Model::updateJoint(GLTFNode& aNode, StructUniform<glm::mat4>& aBoneMatrices
 		Skin& skin = this->mBones[aNode.idOfSkin];
 		for(uint64_t i = 0; i < skin.joints.size(); i++) {
 			uint64_t j = skin.joints[i];
+			auto& joint = this->mNodes[j];
+			auto globalJointTransform = this->getNewNodeTransform(joint);
 
-			this->mOutput[j] = this->getNewNodeTransform(this->mNodes[j]) * skin.inverseBindMatrix[i];
-			this->mOutput[j] = inverseTransform * this->mOutput[j];
+			this->mOutput[j] = inverseTransform * globalJointTransform * skin.inverseBindMatrix[i]; //OK according to docs, kind too soft (maybe joint issue?)
+
+			//output seems OK
+			//std::cout << joint.name << ": " << this->mOutput[j] *  glm::vec4(1.0) << '\n';
 		}
 	}
 

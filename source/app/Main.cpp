@@ -1,7 +1,5 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "model/Model.hpp"
-#include "audio/Audio.hpp"
-#include "area/Area.hpp"
+#include "Application.hpp"
 
 static bool FirstMove = true;
 static double LastX = 400, LastY = 400;
@@ -91,7 +89,7 @@ int main() {
 	Line l;
 	l.open("Linka13-test.etscr", &a);
 
-	Map m;
+	//Map m;
 	//m.open("Praha.etscr"); //TODO
 
 	std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
@@ -130,7 +128,6 @@ int main() {
 
 	UniformMat4 spu(13);
 	spu.set(ds.getProjectionMatrix());
-
 
 	UniformDirlight uDirlight(51);
 	uDirlight.update(&d);
@@ -175,11 +172,11 @@ int main() {
 	//t1.setRotationY(45.0f);
 
 	std::cout << "Loading T3R.P model...\n";
-	//Model t3rp(std::filesystem::path("./untitled.glb"));
-	Model t3rp(std::filesystem::path("./T3.glb"));
+	Model t3rp(std::filesystem::path("./untitled2.glb"));
+	//Model t3rp(std::filesystem::path("./T3.glb"));
 	std::cout << "Model loaded!\n";
-	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
-	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
+	//t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
+	//t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 
 	shader.bind();
 	UniformMaterial uMaterial(50);
@@ -235,12 +232,10 @@ int main() {
 		ds.bindMap(15);
 		drawTimer.start();
 
-		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.0));
+		t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
 
-		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
-		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
-
-		//t3rp.setAnimationBones("ArmatureAction", std::fmod(glfwGetTime(), 3.0), {"c", BoneConditionFilter::STARTS_WITH});
+		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
+		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
 
 		t3rp.draw(uMaterial, uModelMat);
 

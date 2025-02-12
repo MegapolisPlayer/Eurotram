@@ -11,8 +11,8 @@ void Animation::setStateAtTime(Model& aModel, const float aTime) noexcept {
 	std::vector<TRSData> data;
 	data.reserve(this->mSamplers.size());
 	for(uint64_t i = 0; i < this->mSamplers.size(); i++) {
-		data.push_back(this->getLocalSamplerTransform(i, aTime));
 		aModel.mNodes[this->mSamplers[i].nodeIndex].localMatrix = glm::mat4(1.0f);
+		data.push_back(this->getLocalSamplerTransform(i, aTime));
 	}
 
 
@@ -22,7 +22,7 @@ void Animation::setStateAtTime(Model& aModel, const float aTime) noexcept {
 
 		switch(data[i].type) {
 			case(fastgltf::AnimationPath::Translation):
-				node.localMatrix = glm::translate(node.localMatrix, data[i].t);
+				node.localMatrix = glm::translate(glm::mat4(1.0f), data[i].t);
 				break;
 			case(fastgltf::AnimationPath::Rotation):
 				node.localMatrix *= glm::mat4_cast(data[i].r);
