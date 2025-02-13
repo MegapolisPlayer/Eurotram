@@ -78,7 +78,32 @@ void MouseCallback(Window* aWindow, double aX, double aY) {
 }
 
 int main() {
-	//TODO move to EurotramInit::mainInit();
+	std::vector<glm::vec2> bezierCurve;
+	Timer t;
+	t.start();
+	bezierCurve = Math::bezier(
+		glm::vec2(0.0f, 0.0f),
+		glm::vec2(20.0f, 40.0f),
+		glm::vec2(80.0f, 40.0f),
+		glm::vec2(100.0f, 0.0f),
+		  1000
+	);
+	t.end();
+
+	for(uint64_t i = 0; i < 1000; i++) {
+		std::cout << bezierCurve[i].x << ',' << bezierCurve[i].y << '\n';
+	}
+	std::cout << "bezier in " << t.getMSfloat() << '\n';
+
+	t.start();
+	float bezierLength = Math::bezierLength(bezierCurve);
+	t.end();
+
+	std::cout << "bezier length " << bezierLength << " in " << t.getMSfloat() << '\n';
+
+	return 0;
+
+	//TODO move to application
 	static_assert(sizeof(glm::vec3) == sizeof(GLfloat)*3, "Test failed: glm::vec3 has wrong size!");
 	setUTF8Encoding();
 	initAudioEngine();
