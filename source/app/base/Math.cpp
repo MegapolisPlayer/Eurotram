@@ -32,7 +32,7 @@ namespace Math {
 		return result;
 	}
 
-	float bezierLength(std::vector<glm::vec2> aPoints) noexcept {
+	float bezierLength(const std::vector<glm::vec2>& aPoints) noexcept {
 		//simplest thing - calculate distances between points (pythagorean theorem)
 		float result = 0.0;
 
@@ -48,15 +48,16 @@ namespace Math {
 		return result;
 	}
 
-	glm::vec2 getBezierPerpendicularVector(const glm::vec2& a1, const glm::vec2& a2, const glm::vec3& a3) noexcept {
-		//TODO
-		//calculate normalized vectors a2-a1 and a3-a2 (subtract)
-		//rotate them by 90 degrees (-y, x) - no cosines/sines
-		//add those vectors and normalize again (we only care about direction)
-		//visit https://stackoverflow.com/questions/566460/how-do-i-calculate-the-average-direction-of-two-vectors - ONLY confirmation
-		//basically done?
+	glm::vec2 getPerpendicularVectorFromPoints(const glm::vec2& a1, const glm::vec2& a2) noexcept {
+		glm::vec2 directionVector = a2 - a1;
+		//[-y, x] rotates vector by 90 degrees
+		return glm::normalize(glm::vec2(-directionVector.y, directionVector.x));
+	}
 
-		//TODO as test - move bezier curve by this and plot to LO graph, test if works
+	glm::vec2 getAveragePerpendicularVectorFromPoint(const glm::vec2& a1, const glm::vec2& a2, const glm::vec2& a3) noexcept {
+		glm::vec2 a = getPerpendicularVectorFromPoints(a1, a2);
+		glm::vec2 b = getPerpendicularVectorFromPoints(a2, a3);
+		return (a + b) / glm::vec2(2.0);
 	}
 
 	glm::vec3 normals(glm::vec3 aPoint1, glm::vec3 aPoint2, glm::vec3 aPoint3, glm::vec3 aPoint4) noexcept {

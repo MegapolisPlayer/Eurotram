@@ -86,11 +86,11 @@ int main() {
 		glm::vec2(20.0f, 40.0f),
 		glm::vec2(80.0f, 40.0f),
 		glm::vec2(100.0f, 0.0f),
-		  1000
+		  100
 	);
 	t.end();
 
-	for(uint64_t i = 0; i < 1000; i++) {
+	for(uint64_t i = 0; i < 100; i++) {
 		std::cout << bezierCurve[i].x << ',' << bezierCurve[i].y << '\n';
 	}
 	std::cout << "bezier in " << t.getMSfloat() << '\n';
@@ -100,6 +100,25 @@ int main() {
 	t.end();
 
 	std::cout << "bezier length " << bezierLength << " in " << t.getMSfloat() << '\n';
+
+	std::vector<glm::vec2> movedBezierCurve;
+	movedBezierCurve.reserve(100);
+	std::vector<glm::vec2> movedBezierCurve2;
+	movedBezierCurve2.reserve(100);
+
+	t.start();
+	for(uint64_t i = 1; i < 100-1; i++) {
+		glm::vec2 translation = Math::getAveragePerpendicularVectorFromPoint(bezierCurve[i-1], bezierCurve[i], bezierCurve[i+1]);
+		movedBezierCurve.push_back(bezierCurve[i] + translation*glm::vec2(10));
+		movedBezierCurve2.push_back(bezierCurve[i] + -translation*glm::vec2(10));
+	}
+	t.end();
+
+	for(uint64_t i = 0; i < 98; i++) {
+		std::cout << movedBezierCurve2[i].x << ',' << movedBezierCurve2[i].y << '\n';
+	}
+	std::cout << "bezier move in " << t.getMSfloat() << '\n';
+
 
 	return 0;
 
