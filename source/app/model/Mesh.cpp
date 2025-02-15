@@ -1,10 +1,5 @@
 #include "Mesh.hpp"
 
-std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept {
-	aStream << '{' << aVertex.position << ';' << aVertex.normal << ';' << aVertex.texCoords << '}';
-	return aStream;
-}
-
 Mesh::Mesh() noexcept
 	: mVAO(false), mVBO(nullptr, 0, 0), mIBO(nullptr, 0), mEntry(nullptr) {}
 
@@ -14,17 +9,7 @@ Mesh::Mesh(const std::string_view aName, const std::vector<Vertex>& aVerts, cons
 	this->mVAO.bind();
 	this->mVBO.bind();
 
-	//pos
-	this->mVBO.enableAttribute(&this->mVAO, 3);
-	//normal vector
-	this->mVBO.enableAttribute(&this->mVAO, 3);
-	//tex coords
-	this->mVBO.enableAttribute(&this->mVAO, 2);
-
-	//bone ids
-	this->mVBO.enableAttribute(&this->mVAO, MAX_BONES_PER_VERTEX);
-	//bone weights
-	this->mVBO.enableAttribute(&this->mVAO, MAX_BONES_PER_VERTEX);
+	this->mVBO.enableStandardAttributes(&this->mVAO);
 
 	this->mIBO.bind();
 }

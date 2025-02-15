@@ -57,10 +57,31 @@ namespace Math {
 	glm::vec2 getAveragePerpendicularVectorFromPoint(const glm::vec2& a1, const glm::vec2& a2, const glm::vec2& a3) noexcept {
 		glm::vec2 a = getPerpendicularVectorFromPoints(a1, a2);
 		glm::vec2 b = getPerpendicularVectorFromPoints(a2, a3);
-		return (a + b) / glm::vec2(2.0);
+		return (a + b) / glm::vec2(2.0); //average of normalized vectors still normalized vector
 	}
 
+	std::vector<BezierPoint> moveBezier(std::vector<BezierPoint>& aPoints, const glm::vec2& aTranslation) noexcept {
+		std::vector<glm::vec2> resultingCurve;
+		resultingCurve.reserve(aPoints.size());
+
+		//first point - no average
+		resultingCurve.push_back(aPoints[0]+getPerpendicularVectorFromPoints(aPoints[0], aPoints[1]));
+
+		for(uint64_t i = 1; i < aPoints.size()-1; i++) {
+			glm::vec2 direction = getAveragePerpendicularVectorFromPoint(aPoints[i-1], aPoints[i], aPoints[i+1]);
+			resultingCurve.push_back(aPoints[i] + direction*aTranslation);
+		}
+
+		resultingCurve.push_back(aPoints[aPoints.size()-1]+getPerpendicularVectorFromPoints(aPoints[aPoints.size()-2], aPoints[aPoints.size()-1]));
+
+		return resultingCurve;
+	}
+
+	//cross product (vektorovy soucin) to 2 non-parallel edges of polygon
 	glm::vec3 normals(glm::vec3 aPoint1, glm::vec3 aPoint2, glm::vec3 aPoint3, glm::vec3 aPoint4) noexcept {
-		return glm::vec3(0.0f);
+		DISCARD(aPoint4);
+		glm::vec3 edge1 = aPoint2 - aPoint1;
+		glm::vec3 edge2 = aPoint3 - aPoint2;
+		return glm::cross(edge1, edge2);
 	}
 }

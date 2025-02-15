@@ -16,6 +16,7 @@ typedef uint32_t StationCode; //should be 4 8-bit chars - 1 32-bit int.
 struct Node {
 	ObjectLocation location;
 	StationCode code;
+	StationCode codeBorder;
 };
 
 #endif

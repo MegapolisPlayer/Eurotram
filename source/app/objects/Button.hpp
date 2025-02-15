@@ -7,7 +7,11 @@
 
 class Button {
 public:
+	Button() noexcept;
+	~Button() noexcept;
 private:
+	//animation bone name
+	//callback
 };
 
 #endif

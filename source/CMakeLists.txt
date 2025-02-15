@@ -12,7 +12,6 @@ add_compile_options(-Wall -Wextra -g -g3 -fno-omit-frame-pointer -fsanitize=addr
 project(eurotram VERSION 0.1.0)
 add_compile_definitions(GLEW_NO_GLU)
 add_executable(eurotram
-"app/area/Bezier.cpp"
 "app/area/Line.cpp"
 "app/area/Map.cpp"
 

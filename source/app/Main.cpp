@@ -120,7 +120,7 @@ int main() {
 	std::cout << "bezier move in " << t.getMSfloat() << '\n';
 
 
-	return 0;
+	//return 0;
 
 	//TODO move to application
 	static_assert(sizeof(glm::vec3) == sizeof(GLfloat)*3, "Test failed: glm::vec3 has wrong size!");
@@ -133,9 +133,6 @@ int main() {
 	Line l;
 	l.open("Linka13-test.etscr", &a);
 
-	//Map m;
-	//m.open("Praha.etscr"); //TODO
-
 	std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
 	float daylightIndex = 1.0f;
 
@@ -143,7 +140,10 @@ int main() {
 	mainWindow.setBackgroundColor(daylightColor);
 	mainWindow.enableVSync();
 
-	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 10000.0f, 0.05f);
+	//WINDOW MUST BE INITIALIZED FOR THIS TO WORK
+	Map m("Praha.etmap");
+
+	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 100.0f, 0.05f);
 
 	mainWindow.registerMouseCallback(MouseCallback);
 	mainWindow.registerKeyCallback(GLFW_KEY_ESCAPE, KeyEsc);
@@ -216,8 +216,8 @@ int main() {
 	//t1.setRotationY(45.0f);
 
 	std::cout << "Loading T3R.P model...\n";
-	Model t3rp(std::filesystem::path("./untitled2.glb"));
-	//Model t3rp(std::filesystem::path("./T3.glb"));
+	//Model t3rp(std::filesystem::path("./untitled2.glb"));
+	Model t3rp(std::filesystem::path("./T3.glb"));
 	std::cout << "Model loaded!\n";
 	//t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
 	//t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
@@ -276,12 +276,14 @@ int main() {
 		ds.bindMap(15);
 		drawTimer.start();
 
-		t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
+		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
 
 		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
 		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
 
-		t3rp.draw(uMaterial, uModelMat);
+		//t3rp.draw(uMaterial, uModelMat);
+
+		m.draw();
 
 		drawTimer.end();
 

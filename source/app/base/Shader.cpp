@@ -47,7 +47,17 @@ Shader::Shader(const std::string_view aVertexSource, const std::string_view aFra
 		glGetShaderInfoLog(fragment, GL_INFO_LOG_LENGTH, NULL, &message[0]);
 		std::cout << LogLevel::ERROR << aFragmentSource << " - Fragment shader compilation failed: " << message << '\n' << LogLevel::RESET;
 	}
+	glGetProgramiv(this->mHandle, GL_LINK_STATUS, &success);
+	if(success == GL_FALSE) {
+		failed = true;
+		glGetProgramiv(this->mHandle, GL_INFO_LOG_LENGTH, &success);
+		std::string message;
+		message.resize(success);
+		glGetProgramInfoLog(this->mHandle, GL_INFO_LOG_LENGTH, NULL, &message[0]);
+		std::cout << LogLevel::ERROR << "Shader link failed: " << message << '\n' << LogLevel::RESET;
+	}
 
+	//first print all messages, then exit
 	if(failed) { std::exit(EXIT_FAILURE); }
 
 	glDetachShader(this->mHandle, vertex);

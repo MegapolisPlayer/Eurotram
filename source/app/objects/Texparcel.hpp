@@ -2,7 +2,7 @@
 #define EUROTRAM_OBJECTS_TEXPARCEL
 #include "Node.hpp"
 
-class Texparcel {
+struct Texparcel {
 	ObjectLocation p1;
 	ObjectLocation p2;
 	ObjectLocation p3;

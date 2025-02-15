@@ -6,7 +6,7 @@ VertexArray::VertexArray() noexcept
 	glBindVertexArray(this->mHandle);
 }
 VertexArray::VertexArray(const bool aMakeDead) noexcept
-	: mHandle(UINT32_MAX), mAttributeCounter(0) {}
+	: mHandle(UINT32_MAX), mAttributeCounter(0) { DISCARD(aMakeDead); }
 VertexArray::VertexArray(VertexArray&& aOther) noexcept
 	: mHandle(aOther.mHandle), mAttributeCounter(aOther.mAttributeCounter) {
 	aOther.mHandle = 0;
@@ -33,8 +33,17 @@ VertexArray::~VertexArray() noexcept {
 	glDeleteVertexArrays(1, &this->mHandle);
 }
 
+std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept {
+	aStream << '{' << aVertex.position << ';' << aVertex.normal << ';' << aVertex.texCoords << '}';
+	return aStream;
+}
+
 VertexBuffer::VertexBuffer(GLfloat* const arData, const uint64_t aVertices, const uint64_t aVerticesSize) noexcept
 	: mVertices(aVertices), mVerticesSize(aVerticesSize), mHandledVertices(0) {
+	if(this->mVertices * this->mVerticesSize == 0) {
+		this->mHandle = 0;
+		return;
+	}
 	glGenBuffers(1, &this->mHandle);
 	glBindBuffer(GL_ARRAY_BUFFER, this->mHandle);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * this->mVertices * this->mVerticesSize, arData, GL_STATIC_DRAW);
@@ -69,6 +78,23 @@ void VertexBuffer::enableAttribute(VertexArray* const apVAO, const uint64_t aAmo
 	glVertexAttribPointer(aOverrideCounter, aAmount, GL_FLOAT, GL_FALSE, this->mVerticesSize * sizeof(GLfloat), (const void*)(aHandledOverride*sizeof(GLfloat)));
 	glEnableVertexAttribArray(aOverrideCounter);
 }
+void VertexBuffer::enableStandardAttributes(VertexArray* const apVAO) noexcept {
+	if(this->mVertices == 0) return; //ignore if empty buffer
+
+	apVAO->bind();
+	this->bind();
+
+	//pos
+	this->enableAttribute(apVAO, 3, 0, 0);
+	//normal vector
+	this->enableAttribute(apVAO, 3, 1, 3);
+	//tex coords
+	this->enableAttribute(apVAO, 2, 2, 6);
+	//bone ids
+	this->enableAttribute(apVAO, MAX_BONES_PER_VERTEX, 3, 8);
+	//bone weights
+	this->enableAttribute(apVAO, MAX_BONES_PER_VERTEX, 4, 12);
+}
 void VertexBuffer::bind() noexcept {
 	glBindBuffer(GL_ARRAY_BUFFER, this->mHandle);
 }
@@ -93,6 +119,10 @@ VertexBuffer::~VertexBuffer() noexcept {
 
 IndexBuffer::IndexBuffer(GLuint* const arData, const uint64_t aSize) noexcept
 	: mSize(aSize) {
+	if(aSize == 0) {
+		this->mHandle = 0;
+		return;
+	}
 	glGenBuffers(1, &this->mHandle);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->mHandle);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * this->mSize, arData, GL_STATIC_DRAW);

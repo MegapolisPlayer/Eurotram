@@ -24,6 +24,27 @@ private:
 	uint64_t mAttributeCounter;
 };
 
+constexpr uint64_t MAX_BONES_PER_VERTEX = 4;
+constexpr uint64_t STANDARD_MODEL_VERTEX_FLOAT_AMOUNT = 8+MAX_BONES_PER_VERTEX+MAX_BONES_PER_VERTEX;
+
+struct Vertex {
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 texCoords;
+
+	GLfloat boneIds[MAX_BONES_PER_VERTEX]; //we save as float but IDs are integers
+	GLfloat boneWeights[MAX_BONES_PER_VERTEX];
+
+	Vertex() noexcept {
+		for(uint64_t i = 0; i < MAX_BONES_PER_VERTEX; i++) {
+			boneIds[i] = -1.0;
+			boneWeights[i] = 0.0;
+		}
+	}
+};
+
+std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept;
+
 class VertexBuffer {
 public:
 	VertexBuffer(GLfloat* const arData, const uint64_t aVertices, const uint64_t aVerticesSize) noexcept;
@@ -34,6 +55,8 @@ public:
 
 	void enableAttribute(VertexArray* const apVAO, const uint64_t aAmount) noexcept;
 	void enableAttribute(VertexArray* const apVAO, const uint64_t aAmount, const uint64_t aOverrideCounter, const uint64_t aHandledOverride) noexcept;
+
+	void enableStandardAttributes(VertexArray* const apVAO) noexcept;
 
 	void bind() noexcept;
 	void unbind() noexcept;

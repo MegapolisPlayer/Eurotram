@@ -33,7 +33,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 	auto gdb = fastgltf::GltfDataBuffer::FromPath(aPath);
 	if(!gdb) {
 		std::cerr << LogLevel::ERROR << "Error: GLTF2 model load failed!\n" << LogLevel::RESET;
-		std::exit(EXIT_FAILURE);
+		return;
 	}
 	fastgltf::Parser parse(extensions);
 
@@ -54,7 +54,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			fastgltf::getErrorMessage(loadState.error()) <<
 			"(parent path: " <<aPath.parent_path() << ", current: " << aPath << ")\n"
 		<< LogLevel::RESET;
-		std::exit(EXIT_FAILURE);
+		return;
 	}
 
 	//material
@@ -263,17 +263,17 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 						vertices[initialId+aId].boneWeights[3] = aV.w();
 
 						//CHECKED
-						std::cout <<
-						"JOINTS_0 in node " <<
-						meshMatrices[meshMatrixId] << ": " <<
-						vertices[initialId+aId].boneIds[0] << ' ' <<
-						vertices[initialId+aId].boneIds[1] << ' ' <<
-						vertices[initialId+aId].boneIds[2] << ' ' <<
-						vertices[initialId+aId].boneIds[3] << " WEIGHTS_0: " <<
-						vertices[initialId+aId].boneWeights[0] << ' ' <<
-						vertices[initialId+aId].boneWeights[1] << ' ' <<
-						vertices[initialId+aId].boneWeights[2] << ' ' <<
-						vertices[initialId+aId].boneWeights[3] << '\n';
+						//std::cout <<
+						//"JOINTS_0 in node " <<
+						//meshMatrices[meshMatrixId] << ": " <<
+						//vertices[initialId+aId].boneIds[0] << ' ' <<
+						//vertices[initialId+aId].boneIds[1] << ' ' <<
+						//vertices[initialId+aId].boneIds[2] << ' ' <<
+						//vertices[initialId+aId].boneIds[3] << " WEIGHTS_0: " <<
+						//vertices[initialId+aId].boneWeights[0] << ' ' <<
+						//vertices[initialId+aId].boneWeights[1] << ' ' <<
+						//vertices[initialId+aId].boneWeights[2] << ' ' <<
+						//vertices[initialId+aId].boneWeights[3] << '\n';
 					});
 				}
 			}

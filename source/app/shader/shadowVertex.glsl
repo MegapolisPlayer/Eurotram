@@ -22,5 +22,6 @@ void main() {
 	boneTransform += (boneMatrices[int(iBoneIds[2])] * max(0.0, iBoneWeights[2]));
 	boneTransform += (boneMatrices[int(iBoneIds[3])] * max(0.0, iBoneWeights[3]));
 
-	gl_Position = lightProjection * boneTransform * model * vec4(iPosition, 1.0);
+	//removed bone transform
+	gl_Position = lightProjection * model * vec4(iPosition, 1.0);
 };

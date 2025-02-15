@@ -2,7 +2,7 @@
 #define EUROTRAM_OBJECTS_WIRE
 #include "Node.hpp"
 
-class OverheadWire {
+struct OverheadWire {
 public:
 private:
 };

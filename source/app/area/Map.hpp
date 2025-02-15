@@ -2,6 +2,9 @@
 #define EUROTRAM_AREA_MAP
 #include "../objects/Objects.hpp"
 
+constexpr float TRACK_GAUGE = 1.435; //standard gauge
+constexpr float TRACK_WIDTH = 0.30; //30cm width of track
+
 constexpr uint64_t MAP_FILE_FORMAT_VERSION = 0;
 
 void readLocationToString(std::ifstream& aStream, ObjectLocation& aLocation, const uint8_t aUnitsPerMeter) noexcept;
@@ -28,6 +31,9 @@ public:
 
 	~Map() noexcept;
 private:
+	VertexArray mArray;
+	Material mTrackMaterial;
+
 	std::string mMapName;
 	std::string mAuthorName;
 

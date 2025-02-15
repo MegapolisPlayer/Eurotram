@@ -39,10 +39,11 @@ void main() {
 	boneTransform += (boneMatrices[int(iBoneIds[2])] * max(0.0, iBoneWeights[2]));
 	boneTransform += (boneMatrices[int(iBoneIds[3])] * max(0.0, iBoneWeights[3]));
 
-	pNormals = normalize(mat3(boneTransform) * uMatrixNormal * iNormals);
-	pFragmentPos = vec3(boneTransform * uMatrixModel * vec4(iPosition, 1.0));
-	pFragmentDirectionalLightPos = uMatrixDiright * boneTransform * uMatrixModel * vec4(iPosition, 1.0);
-	pFragmentFlashlightLightPos = uMatrixFlashlight * boneTransform * uMatrixModel * vec4(iPosition, 1.0);
+	//removed bone transform
+	pNormals = iNormals; //normalize(mat3(boneTransform) * uMatrixNormal * iNormals);
+	pFragmentPos = vec3(uMatrixModel * vec4(iPosition, 1.0));
+	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * vec4(iPosition, 1.0);
+	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * vec4(iPosition, 1.0);
 
 	gl_Position = uCamera * vec4(pFragmentPos, 1.0);
 };

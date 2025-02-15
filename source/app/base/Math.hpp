@@ -26,8 +26,11 @@ namespace Math {
 
 	glm::vec2 getAveragePerpendicularVectorFromPoint(const glm::vec2& a1, const glm::vec2& a2, const glm::vec2& a3) noexcept;
 
+	//moves bezier points inward (negative values) or outward (positive values) by specified translation; modifies passed curve
+	std::vector<BezierPoint> moveBezier(std::vector<BezierPoint>& aPoints, const glm::vec2& aTranslation) noexcept;
 
 	//calculates normals for plane defined by 4 points
+	//front face is GL_CCW (counterclockwise), pass it as counterclockwise
 	glm::vec3 normals(glm::vec3 aPoint1, glm::vec3 aPoint2, glm::vec3 aPoint3, glm::vec3 aPoint4) noexcept;
 }
 

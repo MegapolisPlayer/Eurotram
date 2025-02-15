@@ -47,7 +47,7 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	}
 
-	glPointSize(10); //set size of points
+	glPointSize(10); //set size of points, default 10
 
 	glEnable(GL_BLEND); //texture blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -55,9 +55,9 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	glEnable(GL_DEPTH_TEST); //depth testing
 	glDepthFunc(GL_LESS);
 
-	glEnable(GL_CULL_FACE); //backface culling
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
+	//glEnable(GL_CULL_FACE); //backface culling TODO reenable
+	//glCullFace(GL_BACK);
+	//glFrontFace(GL_CCW);
 
 	glEnable(GL_MULTISAMPLE); //anti aliasing
 
