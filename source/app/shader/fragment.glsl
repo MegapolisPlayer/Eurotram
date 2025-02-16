@@ -45,7 +45,9 @@ struct Spotlight {
 };
 
 out vec4 oColor;
+
 in vec2 pTexCoord;
+flat in float pTexId; //TODO id of material in GMS
 in vec3 pNormals;
 in vec3 pFragmentPos;
 
@@ -55,6 +57,7 @@ in vec4 pFragmentFlashlightLightPos;
 in vec4 pFragmentLeftFrontLightPos;
 in vec4 pFragmentRightFrontLightPos;
 
+//TODO pass entire GMS?
 layout(std430, binding = 50) readonly buffer sMaterial {
 	layout(align = 16) Material mat1;
 };
@@ -220,8 +223,8 @@ void main() {
 	calculateShadows(12, pFragmentLeftFrontLightPos, normalizedNormal, directionalLightDirection);
 
 	//specular present only if no shadow
-	oColor = vec4(1.0, 0.0, 1.0, 1.0);
-	//oColor = vec4(
-	//	baseColor.xyz * clamp(uAmbientLight + lighting + lightingSpecular, 0.0, 1.0),
-	//	1.0); //normal calc TODO transparency
+	//oColor = vec4(1.0, 0.0, 1.0, 1.0);
+	oColor = vec4(
+		baseColor.xyz * clamp(uAmbientLight + lighting + lightingSpecular, 0.0, 1.0),
+		1.0); //normal calc TODO transparency
 };

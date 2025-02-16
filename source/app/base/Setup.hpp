@@ -5,8 +5,10 @@ m Members
 p Pointers
 a Parameters
 s Static variables
-c Constants
+c Private constants (not directly visible by user)
 r Raw Arrays
+
+PUBLIC CONSTANTS USE UPPER SNAKE CASE AND NO PREFIX
  */
 
 #ifndef EUROTRAM_BASE_SETUP

@@ -150,6 +150,7 @@ Texture::Texture(Texture&& aOther) noexcept
 	this->mHandle = aOther.mHandle;
 	stbi_image_free(this->mpData);
 	this->mpData = aOther.mpData;
+
 	aOther.mHandle = 0;
 	aOther.mpData = nullptr;
 }

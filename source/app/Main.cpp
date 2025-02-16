@@ -213,7 +213,6 @@ int main() {
 	float sunAngle = 0;
 
 	Transform t1;
-	//t1.setRotationY(45.0f);
 
 	std::cout << "Loading T3R.P model...\n";
 	//Model t3rp(std::filesystem::path("./untitled2.glb"));
@@ -269,21 +268,24 @@ int main() {
 		matCameraUniform.set(mainWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(mainWindow.getCamera()->getPosition());
 
-		matModelUniform.set(t1.getMatrix());
-		matNormalUniform.set(t1.getNormalMatrix());
-
 		ss.bindMap(12);
 		ds.bindMap(15);
 		drawTimer.start();
+
+		t1.setRotationY(45.0f);
+		matModelUniform.set(t1.getMatrix());
+		matNormalUniform.set(t1.getNormalMatrix());
 
 		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
 
 		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
 		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
 
-		//t3rp.draw(uMaterial, uModelMat);
+		t3rp.draw(uMaterial, uModelMat);
 
-		m.draw();
+		matModelUniform.set(glm::mat4(1.0));
+		matNormalUniform.set(glm::mat4(1.0));
+		m.draw(uMaterial);
 
 		drawTimer.end();
 

@@ -16,6 +16,8 @@ void readLocationToString(std::ifstream& aStream, RotatedObjectLocation& aLocati
 	aLocation.r = float(((int32_t*)buffer.data())[3]) / aUnitsPerMeter;
 }
 
+GMSEntry* Map::msTrackMaterial = nullptr;
+
 Map::Map() noexcept
 	: mTrackVertices(nullptr, 0, STANDARD_MODEL_VERTEX_FLOAT_AMOUNT), mTrackIndices(nullptr, 0),
 	mSwitchSignalModel("./SwitchSignal.glb"), mSignalModel("./Signal.glb"),
@@ -42,6 +44,21 @@ Map::Map(const std::string_view aFilename) noexcept
 }
 
 void Map::open(const std::string_view aFilename) noexcept {
+	//values for typical metal - only load once
+	if(!Map::msTrackMaterial) {
+		Map::msTrackMaterial = GlobalMaterialStore::add();
+		Map::msTrackMaterial->material.specular = glm::vec4(0.5);
+		Map::msTrackMaterial->material.ior = 1.0;
+		Map::msTrackMaterial->material.shininess = 0.5;
+		Map::msTrackMaterial->material.textureAmount = 1.0;
+		Map::msTrackMaterial->material.textureSlot = 1;
+		Map::msTrackMaterial->name = "TrackMaterial";
+		Map::msTrackMaterial->path = "RailTexture.png";
+		//we do need repeat here
+		Map::msTrackMaterial->texture = Texture("RailTexture.png", true, TextureScale::LINEAR, TextureBorder::REPEAT);
+		Map::msTrackMaterial->texture.setOutOfBoundsColor(0.5, 0.0, 0.0, 1.0);
+	}
+
 	std::ifstream fileHandle;
 	fileHandle.open(aFilename.data(), std::ios::binary | std::ios::in);
 	if(!fileHandle.is_open()) {
@@ -137,6 +154,22 @@ void Map::open(const std::string_view aFilename) noexcept {
 	//E
 	readBytesToString(fileHandle, buffer, 1);
 	uint8_t unitsPerMeter = *((uint8_t*)buffer.data());
+
+	//print header info - amounts and author
+	std::cout << "Nodes amount: " << nodeAmount << '\n';
+	std::cout << "Switch amount: " << switchAmount << '\n';
+	std::cout << "Track amount: " << trackAmount << '\n';
+	std::cout << "Switch Signal amount: " << switchSignalAmount << '\n';
+	std::cout << "Signal amount: " << signalAmount << '\n';
+	std::cout << "Radiobox amount: " << radioboxAmount << '\n';
+	std::cout << "Pillar amount: " << pillarAmount << '\n';
+	std::cout << "Tree amount: " << treeAmount << '\n';
+	std::cout << "Streetlamp amount: " << lampAmount << '\n';
+	std::cout << "Building amount: " << buildingAmount << '\n';
+	std::cout << "Landmark amount: " << landmarksAmount << '\n';
+	std::cout << "Wall amount: " << wallAmount << '\n';
+	std::cout << "Sign amount: " << signAmount << '\n';
+	std::cout << "Texparcel amount: " << texparcelAmount << '\n';
 
 	//Nodes list
 	this->mNodes.reserve(nodeAmount);
@@ -317,6 +350,8 @@ void Map::open(const std::string_view aFilename) noexcept {
 	for(uint32_t i = 0; i < landmarksAmount; i++) {
 		this->mLandmarks.push_back({});
 		readLocationToString(fileHandle, this->mLandmarks.back().location, unitsPerMeter);
+		readBytesToString(fileHandle, buffer, 4);
+		this->mLandmarks.back().landmarkCode = *(uint32_t*)buffer.data();
 	}
 
 	//Wall list
@@ -354,8 +389,8 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 		for(uint32_t i = 0; i < texparcelAmount; i++) {
 			//texparcel has 4 vertices - convert from clockwise in file to CCW in GL
-			readBytesToString(fileHandle, buffer, 48); //3 values * 4 bytes * 4 points
-			for(uint8_t j = 3; j >= 0; j--) {
+			readBytesToString(fileHandle, buffer, 48); //3 values * 4 bytes * 4 points - 12 values
+			for(int8_t j = 3; j >= 0; j--) {
 				texparcelVertices.push_back({});
 				texparcelVertices.back().position.x = ((int32_t*)buffer.data())[j*3+0]; //x
 				texparcelVertices.back().position.y = ((int32_t*)buffer.data())[j*3+2]; //h height
@@ -370,7 +405,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 			);
 
 			//normals (set same for all)
-			for(uint8_t j = 3; j >= 0; j--) {
+			for(int8_t j = 3; j >= 0; j--) {
 				texparcelVertices[texparcelVertices.size()-i-1].normal = normal;
 			}
 
@@ -379,6 +414,15 @@ void Map::open(const std::string_view aFilename) noexcept {
 			texparcelVertices[texparcelVertices.size()-3].texCoords = glm::vec2(0.0, 1.0);
 			texparcelVertices[texparcelVertices.size()-2].texCoords = glm::vec2(1.0, 1.0);
 			texparcelVertices[texparcelVertices.size()-1].texCoords = glm::vec2(0.0, 1.0);
+
+			readBytesToString(fileHandle, buffer, 8); //2 station codes
+			std::getline(fileHandle, buffer, '\0'); //material name
+
+			//TODO assign material if doesnt yet exist, otherwise assign ID
+			if(!GlobalMaterialStore::getByName(buffer)) {
+				this->mTexparcelMaterials.push_back(GlobalMaterialStore::add());
+				this->mTexparcelMaterials.back();
+			};
 		}
 
 		//generate texparcel indices
@@ -423,7 +467,20 @@ void Map::open(const std::string_view aFilename) noexcept {
 			}
 
 			if(t.flags & TRACK_FLAG_BEZIER) {
-				std::cout << "CP1 " << glm::vec2(t.point1x, t.point1y) << " CP2 " << glm::vec2(t.point2x, t.point2y) << '\n';
+				trackVertices.reserve(trackVertices.size() + Math::DEFAULT_BEZIER_PRECISION*4);
+				trackIndices.reserve(trackIndices.size() + Math::DEFAULT_BEZIER_PRECISION/4*6); //for every 4 vertices 6 indices
+
+				//join bezier from previous track
+				//[1,3,4 ; 3,6,4]
+				trackIndices.insert(trackIndices.end(), {
+					(uint32_t)trackVertices.size()-4 + 1,
+					(uint32_t)trackVertices.size()-4 + 3,
+					(uint32_t)trackVertices.size()-4 + 4,
+					(uint32_t)trackVertices.size()-4 + 3,
+					(uint32_t)trackVertices.size()-4 + 6,
+					(uint32_t)trackVertices.size()-4 + 4
+				});
+
 				std::vector<Math::BezierPoint> curve = Math::bezier(
 					firstNode,
 					glm::vec2(t.point1x, t.point1y),
@@ -431,77 +488,105 @@ void Map::open(const std::string_view aFilename) noexcept {
 					secondNode
 				);
 
-				//for(uint64_t i = 0; i < curve.size(); i++) {
-				//	std::cout << "curve " << curve[i] << '\n';
-				//}
-
 				//TODO add height loading
+				//TODO make 2 tracks instead of one
 
-				std::vector<Math::BezierPoint> topCurve = Math::moveBezier(
-					curve, glm::vec2(
-						TRACK_GAUGE/2+TRACK_WIDTH
-					)
-				);
-				std::vector<Math::BezierPoint> bottomCurve = Math::moveBezier(
-					curve, glm::vec2(
-						-TRACK_GAUGE/2-TRACK_WIDTH
-					)
-				);
+				std::vector<Math::BezierPoint> topCurve = Math::moveBezier(curve, glm::vec2(TRACK_GAUGE/2+TRACK_WIDTH/2));
+				std::vector<Math::BezierPoint> topInnerCurve = Math::moveBezier(curve, glm::vec2(TRACK_GAUGE/2));
+
+				std::vector<Math::BezierPoint> bottomCurve = Math::moveBezier(curve, glm::vec2(-TRACK_GAUGE/2-TRACK_WIDTH/2));
+				std::vector<Math::BezierPoint> bottomInnerCurve = Math::moveBezier(curve, glm::vec2(-TRACK_GAUGE/2));
 
 				//add in groups of 4 - quads
 				//2 from each bezier curve
+				//generate texcoords based on this
 
 				for(uint32_t i = 0; i < topCurve.size()-1; i+=2) {
 					//H values are Y axis
 
+					//rail 1
 					trackVertices.push_back({});
 					trackVertices.back().position = glm::vec3(topCurve[i].x, 0.0, topCurve[i].y);
 					trackVertices.push_back({});
 					trackVertices.back().position = glm::vec3(topCurve[i+1].x, 0.0, topCurve[i+1].y);
+					trackVertices.push_back({});
+					trackVertices.back().position = glm::vec3(topInnerCurve[i].x, 0.0, topInnerCurve[i].y);
+					trackVertices.push_back({});
+					trackVertices.back().position = glm::vec3(topInnerCurve[i+1].x, 0.0, topInnerCurve[i+1].y);
 
+					//rail 2
 					trackVertices.push_back({});
 					trackVertices.back().position = glm::vec3(bottomCurve[i].x, 0.0, bottomCurve[i].y);
 					trackVertices.push_back({});
 					trackVertices.back().position = glm::vec3(bottomCurve[i+1].x, 0.0, bottomCurve[i+1].y);
+					trackVertices.push_back({});
+					trackVertices.back().position = glm::vec3(bottomInnerCurve[i].x, 0.0, bottomInnerCurve[i].y);
+					trackVertices.push_back({});
+					trackVertices.back().position = glm::vec3(bottomInnerCurve[i+1].x, 0.0, bottomInnerCurve[i+1].y);
 
-					//index buffer - [0, 2, 1; 2, 3, 1] - connecting points themselves
+					//index buffer
+					//[0,2,1 ; 2,3,1] top
+					//[4,6,5 ; 6,7,5] bottom
 					trackIndices.insert(trackIndices.end(), {
-						(uint32_t)trackVertices.size()-4 + 0,
-						(uint32_t)trackVertices.size()-4 + 2,
-						(uint32_t)trackVertices.size()-4 + 1,
-						(uint32_t)trackVertices.size()-4 + 2,
-						(uint32_t)trackVertices.size()-4 + 3,
-						(uint32_t)trackVertices.size()-4 + 1
+						(uint32_t)trackVertices.size()-8 + 0,
+						(uint32_t)trackVertices.size()-8 + 2,
+						(uint32_t)trackVertices.size()-8 + 1,
+						(uint32_t)trackVertices.size()-8 + 2,
+						(uint32_t)trackVertices.size()-8 + 3,
+						(uint32_t)trackVertices.size()-8 + 1,
+
+						(uint32_t)trackVertices.size()-8 + 4,
+						(uint32_t)trackVertices.size()-8 + 6,
+						(uint32_t)trackVertices.size()-8 + 5,
+						(uint32_t)trackVertices.size()-8 + 6,
+						(uint32_t)trackVertices.size()-8 + 7,
+						(uint32_t)trackVertices.size()-8 + 5,
 					});
 					//if not last
 					if(i < topCurve.size()-3) {
-						//connect to next box - [1, 3, 4; 3, 6, 4]
+						//connect to next box
+						//[1,3,8 ; 3,10,8] top
+						//[5,7,12; 7,14,12] bottom
 						trackIndices.insert(trackIndices.end(), {
-							(uint32_t)trackVertices.size()-4 + 1,
-							(uint32_t)trackVertices.size()-4 + 3,
-							(uint32_t)trackVertices.size()-4 + 4,
-							(uint32_t)trackVertices.size()-4 + 3,
-							(uint32_t)trackVertices.size()-4 + 6,
-							(uint32_t)trackVertices.size()-4 + 4
+							(uint32_t)trackVertices.size()-8 + 1,
+							(uint32_t)trackVertices.size()-8 + 3,
+							(uint32_t)trackVertices.size()-8 + 8,
+							(uint32_t)trackVertices.size()-8 + 3,
+							(uint32_t)trackVertices.size()-8 + 10,
+							(uint32_t)trackVertices.size()-8 + 8,
+
+							(uint32_t)trackVertices.size()-8 + 5,
+							(uint32_t)trackVertices.size()-8 + 7,
+							(uint32_t)trackVertices.size()-8 + 12,
+							(uint32_t)trackVertices.size()-8 + 7,
+							(uint32_t)trackVertices.size()-8 + 14,
+							(uint32_t)trackVertices.size()-8 + 12,
 						});
 					}
+
+					trackVertices[(uint32_t)trackVertices.size()-8+0].texCoords = glm::vec2(float(i)/topCurve.size(), 1.0);
+					trackVertices[(uint32_t)trackVertices.size()-8+1].texCoords = glm::vec2(float(i+1)/topCurve.size(), 1.0);
+					trackVertices[(uint32_t)trackVertices.size()-8+2].texCoords = glm::vec2(float(i)/topCurve.size(), 0.0);
+					trackVertices[(uint32_t)trackVertices.size()-8+3].texCoords = glm::vec2(float(i+1)/topCurve.size(), 0.0);
+					trackVertices[(uint32_t)trackVertices.size()-8+4].texCoords = glm::vec2(float(i)/topCurve.size(), 1.0);
+					trackVertices[(uint32_t)trackVertices.size()-8+5].texCoords = glm::vec2(float(i+1)/topCurve.size(), 1.0);
+					trackVertices[(uint32_t)trackVertices.size()-8+6].texCoords = glm::vec2(float(i)/topCurve.size(), 0.0);
+					trackVertices[(uint32_t)trackVertices.size()-8+7].texCoords = glm::vec2(float(i+1)/topCurve.size(), 0.0);
 				}
 			}
 			else {
 				//just linear points - same order
 
-				glm::vec2 dirVector = Math::getPerpendicularVectorFromPoints(firstNode, secondNode)*(TRACK_GAUGE/2+TRACK_WIDTH);
+				glm::vec2 dirVector = Math::getPerpendicularVectorFromPoints(firstNode, secondNode);
+				glm::vec2 gaugeVector = dirVector*(TRACK_GAUGE/2);
+				glm::vec2 gaugeLongVector = dirVector*(TRACK_GAUGE/2+TRACK_WIDTH/2);
 
-				trackVertices.push_back({});
-				trackVertices.back().position = glm::vec3(firstNode.x+dirVector.x, 0.0, firstNode.y+dirVector.y);
-				trackVertices.push_back({});
-				trackVertices.back().position = glm::vec3(secondNode.x+dirVector.x, 0.0, secondNode.y+dirVector.y);
-				trackVertices.push_back({});
-				trackVertices.back().position = glm::vec3(firstNode.x-dirVector.x, 0.0, firstNode.y-dirVector.y);
-				trackVertices.push_back({});
-				trackVertices.back().position = glm::vec3(secondNode.x-dirVector.x, 0.0, secondNode.y-dirVector.y);
+				//rail 1
+				trackVertices.emplace_back(glm::vec3(firstNode.x+gaugeLongVector.x, 0.0, firstNode.y+gaugeLongVector.y));
+				trackVertices.emplace_back(glm::vec3(secondNode.x+gaugeLongVector.x, 0.0, secondNode.y+gaugeLongVector.y));
+				trackVertices.emplace_back(glm::vec3(firstNode.x+gaugeVector.x, 0.0, firstNode.y+gaugeVector.y));
+				trackVertices.emplace_back(glm::vec3(secondNode.x+gaugeVector.x, 0.0, secondNode.y+gaugeVector.y));
 
-				//index buffer - [0, 2, 1; 2, 3, 1] - connecting points themselves
 				trackIndices.insert(trackIndices.end(), {
 					(uint32_t)trackVertices.size()-4 + 0,
 					(uint32_t)trackVertices.size()-4 + 2,
@@ -510,6 +595,33 @@ void Map::open(const std::string_view aFilename) noexcept {
 					(uint32_t)trackVertices.size()-4 + 3,
 					(uint32_t)trackVertices.size()-4 + 1
 				});
+
+				//tex coords
+				trackVertices[(uint32_t)trackVertices.size()-4].texCoords = glm::vec2(0.0, 1.0);
+				trackVertices[(uint32_t)trackVertices.size()-3].texCoords = glm::vec2(1.0, 1.0);
+				trackVertices[(uint32_t)trackVertices.size()-2].texCoords = glm::vec2(0.0, 0.0);
+				trackVertices[(uint32_t)trackVertices.size()-1].texCoords = glm::vec2(1.0, 0.0);
+
+				//rail 2
+				trackVertices.emplace_back(glm::vec3(firstNode.x-gaugeVector.x, 0.0, firstNode.y-gaugeVector.y));
+				trackVertices.emplace_back(glm::vec3(secondNode.x-gaugeVector.x, 0.0, secondNode.y-gaugeVector.y));
+				trackVertices.emplace_back(glm::vec3(firstNode.x-gaugeLongVector.x, 0.0, firstNode.y-gaugeLongVector.y));
+				trackVertices.emplace_back(glm::vec3(secondNode.x-gaugeLongVector.x, 0.0, secondNode.y-gaugeLongVector.y));
+
+				trackIndices.insert(trackIndices.end(), {
+					(uint32_t)trackVertices.size()-4 + 0,
+					(uint32_t)trackVertices.size()-4 + 2,
+					(uint32_t)trackVertices.size()-4 + 1,
+					(uint32_t)trackVertices.size()-4 + 2,
+					(uint32_t)trackVertices.size()-4 + 3,
+					(uint32_t)trackVertices.size()-4 + 1
+				});
+
+				//tex coords
+				trackVertices[(uint32_t)trackVertices.size()-4].texCoords = glm::vec2(0.0, 0.0);
+				trackVertices[(uint32_t)trackVertices.size()-3].texCoords = glm::vec2(1.0, 0.0);
+				trackVertices[(uint32_t)trackVertices.size()-2].texCoords = glm::vec2(0.0, 1.0);
+				trackVertices[(uint32_t)trackVertices.size()-1].texCoords = glm::vec2(1.0, 1.0);
 			}
 		}
 
@@ -526,12 +638,6 @@ void Map::open(const std::string_view aFilename) noexcept {
 			trackVertices[i+1].normal = normal;
 			trackVertices[i+2].normal = normal;
 			trackVertices[i+3].normal = normal;
-
-			//tex coords
-			trackVertices[i+0].texCoords = glm::vec2(0.0, 1.0);
-			trackVertices[i+1].texCoords = glm::vec2(1.0, 1.0);
-			trackVertices[i+2].texCoords = glm::vec2(0.0, 0.0);
-			trackVertices[i+3].texCoords = glm::vec2(1.0, 0.0);
 		}
 
 		this->mArray.bind();
@@ -544,33 +650,25 @@ void Map::open(const std::string_view aFilename) noexcept {
 		this->mTrackIndices = IndexBuffer((GLuint*)trackIndices.data(), trackIndices.size());
 		this->mTrackIndices.bind();
 	}
-
-	//print some info - amounts and author
-	std::cout << "Nodes amount: " << this->mNodes.size() << '\n';
-	std::cout << "Switch amount: " << this->mSwitches.size() << '\n';
-	std::cout << "Track amount: " << this->mTracks.size() << '\n';
-	std::cout << "Switch Signal amount: " << this->mSwitchSignals.size() << '\n';
-	std::cout << "Signal amount: " << this->mSignals.size() << '\n';
-	std::cout << "Radiobox amount: " << this->mRadioboxes.size() << '\n';
-	std::cout << "Pillar amount: " << this->mPillars.size() << '\n';
-	std::cout << "Tree amount: " << this->mTrees.size() << '\n';
-	std::cout << "Streetlamp amount: " << this->mLights.size() << '\n';
-	std::cout << "Building amount: " << this->mBuildings.size() << '\n';
-	std::cout << "Landmark amount: " << this->mLandmarks.size() << '\n';
-	std::cout << "Wall amount: " << this->mWalls.size() << '\n';
-	std::cout << "Sign amount: " << this->mWalls.size() << '\n';
 }
 
 void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept {
 
 }
 
-void Map::draw() noexcept {
+void Map::draw(UniformMaterial& aUniform) noexcept {
 	//this->mTexparcelIndices.draw();
 
 	//this->mBuildingIds;
 
 	this->mArray.bind();
+
+	aUniform.update(&Map::msTrackMaterial->material);
+	aUniform.set();
+
+	//our bind slot is 1
+	Map::msTrackMaterial->texture.bind(1);
+
 	this->mTrackVertices.bind();
 	this->mTrackIndices.bind();
 	this->mTrackVertices.drawPoints();

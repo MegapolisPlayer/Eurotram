@@ -88,6 +88,8 @@ let buildingList = [];
 let buildingTypeSelector;
 
 function makeBuildingTypeSelector() {
+	canvasData.edit.replaceChildren();
+
 	buildingTypeSelector = new DocumentFragment();
 
 	let label = document.createElement("label");

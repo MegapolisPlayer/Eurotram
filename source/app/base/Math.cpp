@@ -49,7 +49,7 @@ namespace Math {
 	}
 
 	glm::vec2 getPerpendicularVectorFromPoints(const glm::vec2& a1, const glm::vec2& a2) noexcept {
-		glm::vec2 directionVector = a2 - a1;
+		glm::vec2 directionVector = a2 - a1; //putting glm::abs here breaks things
 		//[-y, x] rotates vector by 90 degrees
 		return glm::normalize(glm::vec2(-directionVector.y, directionVector.x));
 	}

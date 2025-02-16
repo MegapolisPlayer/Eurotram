@@ -174,6 +174,10 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 		}
 	}
 
+	//TODO dont split meshes
+	//if mesh has more than 10 materials - split
+	//else - is single mesh with some ids
+
 	//meshes
 	uint64_t meshMatrixId = 0;
 	for(fastgltf::Mesh& m : model->meshes) {

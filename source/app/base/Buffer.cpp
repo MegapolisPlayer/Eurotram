@@ -57,6 +57,8 @@ VertexBuffer::VertexBuffer(VertexBuffer&& aOther) noexcept {
 	aOther.mHandle = 0;
 }
 VertexBuffer& VertexBuffer::operator=(VertexBuffer&& aOther) noexcept {
+	glDeleteBuffers(1, &this->mHandle);
+
 	this->mHandle = aOther.mHandle;
 	this->mVertices = aOther.mVertices;
 	this->mVerticesSize = aOther.mVerticesSize;
@@ -90,10 +92,12 @@ void VertexBuffer::enableStandardAttributes(VertexArray* const apVAO) noexcept {
 	this->enableAttribute(apVAO, 3, 1, 3);
 	//tex coords
 	this->enableAttribute(apVAO, 2, 2, 6);
+	//texture id
+	this->enableAttribute(apVAO, 1, 3, 7);
 	//bone ids
-	this->enableAttribute(apVAO, MAX_BONES_PER_VERTEX, 3, 8);
+	this->enableAttribute(apVAO, MAX_BONES_PER_VERTEX, 4, 9);
 	//bone weights
-	this->enableAttribute(apVAO, MAX_BONES_PER_VERTEX, 4, 12);
+	this->enableAttribute(apVAO, MAX_BONES_PER_VERTEX, 5, 13);
 }
 void VertexBuffer::bind() noexcept {
 	glBindBuffer(GL_ARRAY_BUFFER, this->mHandle);
@@ -134,6 +138,8 @@ IndexBuffer::IndexBuffer(IndexBuffer&& aOther) noexcept {
 	aOther.mHandle = 0;
 }
 IndexBuffer& IndexBuffer::operator=(IndexBuffer&& aOther) noexcept {
+	glDeleteBuffers(1, &this->mHandle);
+
 	this->mHandle = aOther.mHandle;
 	this->mSize = aOther.mSize;
 
@@ -164,11 +170,13 @@ Framebuffer::Framebuffer() noexcept : mHandle(0) {
 	glGenFramebuffers(1, &this->mHandle);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->mHandle);
 }
-Framebuffer::Framebuffer(Framebuffer&& aOther) noexcept
-	: mHandle(aOther.mHandle) {
+Framebuffer::Framebuffer(Framebuffer&& aOther) noexcept {
+	this->mHandle = aOther.mHandle;
 	aOther.mHandle = 0;
 }
 Framebuffer& Framebuffer::operator=(Framebuffer&& aOther) noexcept {
+	glDeleteFramebuffers(1, &this->mHandle);
+
 	this->mHandle = aOther.mHandle;
 	aOther.mHandle = 0;
 

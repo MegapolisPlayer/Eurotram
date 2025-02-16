@@ -25,14 +25,13 @@ public:
 
 	void regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept; //only call on station code change
 
-	void draw() noexcept; //draw map FIRST
+	void draw(UniformMaterial& aUniform) noexcept; //draw map FIRST
 
 	Track* getStationByCode(std::string_view aCode) noexcept;
 
 	~Map() noexcept;
 private:
 	VertexArray mArray;
-	Material mTrackMaterial;
 
 	std::string mMapName;
 	std::string mAuthorName;
@@ -47,6 +46,7 @@ private:
 	std::vector<Track> mTracks;
 	VertexBuffer mTrackVertices;
 	IndexBuffer mTrackIndices;
+	static GMSEntry* msTrackMaterial; //single material entry
 
 	Model mSwitchSignalModel;
 	std::vector<SwitchSignal> mSwitchSignals;
@@ -89,8 +89,10 @@ private:
 	ShaderBuffer mSignIds;
 
 	//texparcels are also generated from vertices and textures on the fly - single draw call
+	//split per material
 	VertexBuffer mTexparcelVertices;
 	IndexBuffer mTexparcelIndices;
+	std::vector<GMSEntry*> mTexparcelMaterials;
 };
 
 namespace UI {

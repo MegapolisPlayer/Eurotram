@@ -25,17 +25,25 @@ private:
 };
 
 constexpr uint64_t MAX_BONES_PER_VERTEX = 4;
-constexpr uint64_t STANDARD_MODEL_VERTEX_FLOAT_AMOUNT = 8+MAX_BONES_PER_VERTEX+MAX_BONES_PER_VERTEX;
+constexpr uint64_t STANDARD_MODEL_VERTEX_FLOAT_AMOUNT = 9+MAX_BONES_PER_VERTEX+MAX_BONES_PER_VERTEX;
 
 struct Vertex {
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 texCoords;
+	GLfloat materialId;
 
 	GLfloat boneIds[MAX_BONES_PER_VERTEX]; //we save as float but IDs are integers
 	GLfloat boneWeights[MAX_BONES_PER_VERTEX];
 
 	Vertex() noexcept {
+		for(uint64_t i = 0; i < MAX_BONES_PER_VERTEX; i++) {
+			boneIds[i] = -1.0;
+			boneWeights[i] = 0.0;
+		}
+	}
+
+	Vertex(const glm::vec3& aPosition) noexcept : position(aPosition) {
 		for(uint64_t i = 0; i < MAX_BONES_PER_VERTEX; i++) {
 			boneIds[i] = -1.0;
 			boneWeights[i] = 0.0;

@@ -192,12 +192,16 @@ Window::~Window() noexcept {
 }
 
 void Window::MouseCallback(GLFWwindow* aWindow, double aX, double aY) noexcept {
+	if(!glfwGetWindowAttrib(aWindow, GLFW_FOCUSED)) return;
+
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
 	for(WindowMouseCallback Callback : ClassPointer->mMouseCallbacks) {
 		Callback(ClassPointer, aX, aY);
 	}
 }
 void Window::KeyCallback(GLFWwindow* aWindow, int aKey, int aScancode, int aAction, int aModifiers) noexcept {
+	if(!glfwGetWindowAttrib(aWindow, GLFW_FOCUSED)) return;
+
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
 	for(WindowActionCallback Callback : ClassPointer->mGenericKeyCallbacks) {
 		Callback(ClassPointer, aKey, aAction, aModifiers);
@@ -209,6 +213,8 @@ void Window::KeyCallback(GLFWwindow* aWindow, int aKey, int aScancode, int aActi
 	}
 }
 void Window::ClickCallback(GLFWwindow* aWindow, int aKey, int aAction, int aModifiers) noexcept {
+	if(!glfwGetWindowAttrib(aWindow, GLFW_FOCUSED)) return;
+
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
 	for(WindowActionCallback Callback : ClassPointer->mClickCallbacks) {
 		Callback(ClassPointer, aKey, aAction, aModifiers);

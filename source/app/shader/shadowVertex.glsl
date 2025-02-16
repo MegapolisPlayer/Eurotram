@@ -1,8 +1,8 @@
 #version 450 core
 
 layout(location = 0) in vec3 iPosition;
-layout(location = 3) in vec4 iBoneIds;
-layout(location = 4) in vec4 iBoneWeights;
+layout(location = 4) in vec4 iBoneIds;
+layout(location = 5) in vec4 iBoneWeights;
 
 layout(location = 90) uniform mat4 lightProjection;
 layout(location = 91) uniform mat4 model;

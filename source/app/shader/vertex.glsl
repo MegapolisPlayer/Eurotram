@@ -3,8 +3,9 @@
 layout(location = 0) in vec3 iPosition;
 layout(location = 1) in vec3 iNormals;
 layout(location = 2) in vec2 iTexCoord;
-layout(location = 3) in vec4 iBoneIds;
-layout(location = 4) in vec4 iBoneWeights;
+layout(location = 3) in float iTextureId;
+layout(location = 4) in vec4 iBoneIds;
+layout(location = 5) in vec4 iBoneWeights;
 
 layout(location = 10) uniform mat4 uCamera;
 layout(location = 11) uniform mat4 uMatrixModel;
@@ -14,6 +15,7 @@ layout(location = 13) uniform mat4 uMatrixDiright;
 layout(location = 14) uniform mat4 uMatrixFlashlight;
 
 out vec2 pTexCoord;
+flat out float pTexId;
 flat out vec3 pNormals;
 out vec3 pFragmentPos;
 
@@ -31,6 +33,7 @@ layout(std430, binding = 40) readonly buffer sBoneMatrices {
 
 void main() {
 	pTexCoord = iTexCoord;
+	pTexId = iTextureId;
 
 	mat4 boneTransform = mat4(1.0); //identity
 

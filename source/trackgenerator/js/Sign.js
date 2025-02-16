@@ -52,6 +52,8 @@ let signTypes = {
 };
 
 function makeSignTypeSelector() {
+	canvasData.edit.replaceChildren();
+
 	signTypeSelector = new DocumentFragment();
 
 	let label = document.createElement("label");

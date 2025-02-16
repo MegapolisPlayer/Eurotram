@@ -2,9 +2,20 @@
 #include "audio/Audio.hpp"
 #include "area/Area.hpp"
 
+//possible settings
+struct ApplicationSettings {
+	//enable UI elements which are not intergrated into the scenery
+	bool showHUD;
+	//set field of view
+	float FOV;
+};
+
 class Application {
 public:
 	Application(const bool aFullscreen) noexcept;
+
+	void renderMainMenu() noexcept;
+	void renderSettingsMenu() noexcept;
 
 	~Application() noexcept;
 private:

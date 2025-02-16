@@ -188,7 +188,7 @@ function texparcelEditMenu(aID) {
 	canvasData.edit.appendChild(document.createTextNode("Station code 2: "));
 	addInputPlaceholder("editsc2input", texparcelList[aID].stationCode2, "text", "XXXX");
 	canvasData.edit.appendChild(document.createTextNode("Material name: "));
-	addInputPlaceholder("editmatinput", texparcelList[aID].materialNames, "text", "Name of material");
+	addInputPlaceholder("editmatinput", texparcelList[aID].materialName, "text", "Name of material");
 
 	let updateButton = document.createElement("button");
 	updateButton.textContent = "Update";
