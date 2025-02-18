@@ -8,6 +8,12 @@ struct Signal {
 	StationCode code;
 
 	int32_t signalCopyId; //if not -1 -> is presignal, copies data from that id
+
+	Texture signalBoard;
+	Framebuffer signalRenderer;
+
+	Signal() noexcept;
+	void updateTexture() noexcept;
 };
 
 #endif

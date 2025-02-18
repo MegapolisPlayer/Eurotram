@@ -32,7 +32,14 @@ struct GMSEntry {
 
 	GMSVariant* variantData = nullptr;
 
+	GMSEntry* duplicateOf = nullptr;
+
 	GMSEntry() noexcept;
+};
+
+union GMSDataStore {
+	GMSEntry entry;
+	GMSEntry* duplicateOf = nullptr; //set for duplicates
 };
 
 std::ostream& operator<<(std::ostream& aStream, const GMSEntry& aEntry) noexcept;
@@ -74,7 +81,10 @@ public:
 	//adds new material and registers it as variant
 	static GMSEntry* addVariant(const std::string_view aMaterialName, const std::string_view aNewVariantName) noexcept;
 
-	static void setVariant(const std::string_view aMaterialName, const std::string_view aIdentificator) noexcept;
+	//converts separate material aMaterialVariantName to variant of aMaterialName
+	static GMSEntry* addVariantFromMaterial(const std::string_view aMaterialName, const std::string_view aIdentifier, const std::string_view aMaterialVariantName) noexcept;
+
+	static void setVariant(const std::string_view aMaterialName, const std::string_view aIdentifier) noexcept;
 	static void resetVariant(const std::string_view aMaterialName) noexcept;
 
 	static std::ostream& printData(std::ostream& aStream = std::cout) noexcept;

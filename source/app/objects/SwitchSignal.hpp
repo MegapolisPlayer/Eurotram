@@ -6,6 +6,12 @@ struct SwitchSignal {
 	RotatedObjectLocation location;
 	StationCode code;
 	std::string letters;
+
+	Texture switchSignalBoard;
+	Framebuffer switchSignalRenderer;
+
+	SwitchSignal() noexcept;
+	void updateTexture() noexcept;
 };
 
 #endif

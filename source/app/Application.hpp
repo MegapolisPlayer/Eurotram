@@ -8,6 +8,8 @@ struct ApplicationSettings {
 	bool showHUD;
 	//set field of view
 	float FOV;
+	//draw points for debug
+	bool drawPoints;
 };
 
 class Application {

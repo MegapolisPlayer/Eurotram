@@ -25,7 +25,12 @@ public:
 
 	void regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept; //only call on station code change
 
-	void draw(UniformMaterial& aUniform) noexcept; //draw map FIRST
+	//updates textures of signals, switch signals, station pillars
+	//only touches those which belong to the station codes passed as params
+
+	void updateTextures(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept;
+
+	void draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aInstanceBufferLocation, UniformInt& aBoolStateUniform) noexcept; //draw map FIRST
 
 	Track* getStationByCode(std::string_view aCode) noexcept;
 
@@ -49,43 +54,63 @@ private:
 
 	Model mSwitchSignalModel;
 	std::vector<SwitchSignal> mSwitchSignals;
+	ShaderBuffer mSwitchSignalMatrices;
+	ShaderBuffer mSwitchSignalIds;
+	uint64_t mSwitchSignalCount;
 
 	Model mSignalModel;
 	//signal contains presignal id
 	std::vector<Signal> mSignals;
+	ShaderBuffer mSignalMatrices;
+	ShaderBuffer mSignalIds;
+	uint64_t mSignalCount;
 
+	//also invisible
 	std::vector<Radiobox> mRadioboxes;
 
 	Model mStationPillarModel;
 	std::vector<StationPillar> mPillars;
 	ShaderBuffer mPillarMatrices;
 	ShaderBuffer mPillarIds;
+	uint64_t mPillarCount;
 
 	Model mTreeModel;
 	std::vector<Tree> mTrees;
 	ShaderBuffer mTreeMatrices;
 	ShaderBuffer mTreeIds;
+	uint64_t mTreeCount;
 
 	Model mLightModel;
 	std::vector<Lightpole> mLights;
 	ShaderBuffer mLightMatrices;
 	ShaderBuffer mLightIds;
+	uint64_t mLightCount;
 
-	std::vector<Model> mBuildingModels; //mapped to type enum
 	std::vector<Building> mBuildings;
-	ShaderBuffer mBuildingMatrices;
-	ShaderBuffer mBuildingIds;
+	std::vector<Model> mBuildingModels; //mapped to type enum
+	std::vector<ShaderBuffer> mBuildingMatrices; //mapped too
+	uint64_t mBuildingCount;
 
 	//landmarks always drawn
+	std::vector<Model> mLandmarkModels;
 	std::vector<Landmark> mLandmarks;
 
+	//walls generated
+	VertexArray mWallArray;
 	std::vector<Wall> mWalls;
-	ShaderBuffer mWallMatrices;
-	ShaderBuffer mWallIds;
+	VertexBuffer mWallVertices;
+	IndexBuffer mWallIndices;
+	uint64_t mFirstWallMaterial;
+	uint64_t mLastWallMaterial;
 
+	//signs also generated
+	VertexArray mSignArray;
 	std::vector<Sign> mSigns;
-	ShaderBuffer mSignMatrices;
-	ShaderBuffer mSignIds;
+	VertexBuffer mSignVertices;
+	IndexBuffer mSignIndices;
+	uint64_t mFirstSignMaterial;
+	uint64_t mLastSignMaterial;
+	uint64_t mSignCount;
 
 	//texparcels are also generated from vertices and textures on the fly - single draw call
 	//split per material
@@ -95,6 +120,8 @@ private:
 	std::vector<GMSEntry*> mTexparcelMaterials;
 	uint64_t mFirstTPMaterial;
 	uint64_t mLastTPMaterial;
+
+	bool mLoadedAssets;
 };
 
 namespace UI {

@@ -33,6 +33,20 @@ VertexArray::~VertexArray() noexcept {
 	glDeleteVertexArrays(1, &this->mHandle);
 }
 
+Vertex::Vertex() noexcept {
+	for(uint64_t i = 0; i < MAX_BONES_PER_VERTEX; i++) {
+		this->boneIds[i] = -1.0;
+		this->boneWeights[i] = 0.0;
+	}
+}
+
+Vertex::Vertex(const glm::vec3& aPosition) noexcept : position(aPosition) {
+	for(uint64_t i = 0; i < MAX_BONES_PER_VERTEX; i++) {
+		this->boneIds[i] = -1.0;
+		this->boneWeights[i] = 0.0;
+	}
+}
+
 std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept {
 	aStream << '{' << aVertex.position << ';' << aVertex.normal << ';' << aVertex.texCoords << '}';
 	return aStream;
@@ -155,6 +169,9 @@ void IndexBuffer::unbind() noexcept {
 }
 void IndexBuffer::draw() noexcept {
 	glDrawElements(GL_TRIANGLES, this->mSize, GL_UNSIGNED_INT, nullptr);
+}
+void IndexBuffer::drawInstanced(const uint64_t aCount) noexcept {
+	glDrawElementsInstanced(GL_TRIANGLES, this->mSize, GL_UNSIGNED_INT, nullptr, aCount);
 }
 GLuint IndexBuffer::getHandle() const noexcept {
 	return this->mHandle;

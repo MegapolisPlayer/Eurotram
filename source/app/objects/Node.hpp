@@ -11,7 +11,13 @@ struct RotatedObjectLocation : public ObjectLocation {
 	float r;
 };
 
+std::ostream& operator<<(std::ostream& aOstream, ObjectLocation& aLocation) noexcept;
+std::ostream& operator<<(std::ostream& aOstream, RotatedObjectLocation& aLocation) noexcept;
+
 typedef uint32_t StationCode; //should be 4 8-bit chars - 1 32-bit int.
+
+//accepts 4-char string
+StationCode toStationCode(std::string_view aString) noexcept;
 
 struct Node {
 	ObjectLocation location;

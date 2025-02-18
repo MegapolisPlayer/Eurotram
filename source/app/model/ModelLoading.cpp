@@ -63,7 +63,14 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 	uint64_t textureId = 0;
 	for(fastgltf::Material& m : model->materials) {
 		std::cout << "Material: " << m.name.c_str() << '\n';
+		GMSEntry* g = GlobalMaterialStore::getByName(m.name.c_str());
 		GMSEntry* material = GlobalMaterialStore::add(&this->mLastGMSMaterial);
+
+		if(g) {
+			std::cout << LogLevel::SUCCESS << "Material " << m.name.c_str() << " already present in GMS!\n" << LogLevel::RESET;
+			material->duplicateOf = g;
+		}
+
 		this->mLastGMSMaterial++; //increment
 		material->name = m.name.c_str();
 		material->material.color = convertToGLM(m.pbrData.baseColorFactor);
@@ -220,7 +227,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 				fastgltf::Accessor& verticesAccess = model->accessors[p.findAttribute("POSITION")->accessorIndex];
 				vertices.resize(vertices.size() + verticesAccess.count);
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, verticesAccess, [&](glm::vec3 aV, GLuint aId) {
-					vertices[aId + initialId].position = aV;
+					vertices[aId + initialId].position = glm::vec3(this->mNodes[meshMatrices[meshMatrixId]].transformMatrix * glm::vec4(aV, 1.0));
 					vertices[initialId+aId].materialId = matIndex;
 				});
 			}
@@ -229,7 +236,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			{
 				fastgltf::Accessor& normalAccess = model->accessors[p.findAttribute("NORMAL")->accessorIndex];
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, normalAccess, [&](glm::vec3 aV, GLuint aId) {
-					vertices[initialId+aId].normal = aV;
+					vertices[initialId+aId].normal = glm::vec3(this->mNodes[meshMatrices[meshMatrixId]].transformMatrix * glm::vec4(aV, 1.0));
 				});
 			}
 
@@ -321,17 +328,40 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 	}
 }
 
-void Model::addVariant(const std::string_view aMaterialName, const std::string_view aTexturePath, const std::string_view aIdentificator) noexcept {
-	GMSEntry* variant = GlobalMaterialStore::addVariant(aMaterialName, aIdentificator);
+Model::Model(Model&& aOther) noexcept {
+	this->mMeshes = std::move(aOther.mMeshes);
+	this->mAnimations = std::move(aOther.mAnimations);
+	this->mBones = std::move(aOther.mBones);
+	this->mNodes = std::move(aOther.mNodes);
+	this->mOutput = std::move(aOther.mOutput);
+	this->mFirstGMSMaterial = aOther.mFirstGMSMaterial;
+	this->mLastGMSMaterial = aOther.mLastGMSMaterial;
+	this->mHeight = aOther.mHeight;
+}
+Model& Model::operator=(Model&& aOther) noexcept {
+	this->mMeshes = std::move(aOther.mMeshes);
+	this->mAnimations = std::move(aOther.mAnimations);
+	this->mBones = std::move(aOther.mBones);
+	this->mNodes = std::move(aOther.mNodes);
+	this->mOutput = std::move(aOther.mOutput);
+	this->mFirstGMSMaterial = aOther.mFirstGMSMaterial;
+	this->mLastGMSMaterial = aOther.mLastGMSMaterial;
+	this->mHeight = aOther.mHeight;
+
+	return *this;
+}
+
+void Model::addVariant(const std::string_view aMaterialName, const std::string_view aTexturePath, const std::string_view aIdentifier) noexcept {
+	GMSEntry* variant = GlobalMaterialStore::addVariant(aMaterialName, aIdentifier);
 	variant->texture = Texture(aTexturePath);
 }
-void Model::addVariant(const std::string_view aMaterialName, const Material& aMaterialRef, const std::string_view aIdentificator) noexcept {
-	GMSEntry* variant = GlobalMaterialStore::addVariant(aMaterialName, aIdentificator);
+void Model::addVariant(const std::string_view aMaterialName, const Material& aMaterialRef, const std::string_view aIdentifier) noexcept {
+	GMSEntry* variant = GlobalMaterialStore::addVariant(aMaterialName, aIdentifier);
 	variant->material = aMaterialRef;
 }
 
-void Model::setVariant(const std::string_view aMaterialName, const std::string_view aIdentificator) noexcept {
-	GlobalMaterialStore::setVariant(aMaterialName, aIdentificator);
+void Model::setVariant(const std::string_view aMaterialName, const std::string_view aIdentifier) noexcept {
+	GlobalMaterialStore::setVariant(aMaterialName, aIdentifier);
 }
 void Model::resetVariant(const std::string_view aMaterialName) noexcept {
 	GlobalMaterialStore::resetVariant(aMaterialName);
@@ -350,6 +380,17 @@ void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatri
 	GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstGMSMaterial, this->mLastGMSMaterial);
 	for(Mesh& m : this->mMeshes) {
 		m.draw();
+	}
+}
+void Model::drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aCount) noexcept {
+	if(aCount == 0) return; //so we dont have to check at each call
+
+	sendAnimationDataToShader(aBoneMatrices);
+	//TODO rewrite animations so they are independent of instances
+
+	GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstGMSMaterial, this->mLastGMSMaterial);
+	for(Mesh& m : this->mMeshes) {
+		m.drawInstanced(aCount);
 	}
 }
 

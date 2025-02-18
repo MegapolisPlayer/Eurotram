@@ -35,5 +35,11 @@ void Mesh::draw() noexcept {
 	this->mIBO.draw();
 	this->mVAO.unbind();
 }
+void Mesh::drawInstanced(const uint64_t aCount) noexcept {
+	this->mVAO.bind();
+	//this->mVBO.drawPoints();
+	this->mIBO.drawInstanced(aCount);
+	this->mVAO.unbind();
+}
 
 Mesh::~Mesh() noexcept {}

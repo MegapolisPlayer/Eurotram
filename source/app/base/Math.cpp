@@ -65,14 +65,14 @@ namespace Math {
 		resultingCurve.reserve(aPoints.size());
 
 		//first point - no average
-		resultingCurve.push_back(aPoints[0]+getPerpendicularVectorFromPoints(aPoints[0], aPoints[1]));
+		resultingCurve.push_back(aPoints[0]+aTranslation*getPerpendicularVectorFromPoints(aPoints[0], aPoints[1]));
 
 		for(uint64_t i = 1; i < aPoints.size()-1; i++) {
 			glm::vec2 direction = getAveragePerpendicularVectorFromPoint(aPoints[i-1], aPoints[i], aPoints[i+1]);
 			resultingCurve.push_back(aPoints[i] + direction*aTranslation);
 		}
 
-		resultingCurve.push_back(aPoints[aPoints.size()-1]+getPerpendicularVectorFromPoints(aPoints[aPoints.size()-2], aPoints[aPoints.size()-1]));
+		resultingCurve.push_back(aPoints[aPoints.size()-1]+aTranslation*getPerpendicularVectorFromPoints(aPoints[aPoints.size()-2], aPoints[aPoints.size()-1]));
 
 		return resultingCurve;
 	}

@@ -47,9 +47,14 @@ void GlobalMaterialStore::copyDataToUniform(UniformMaterial& aUniform, uint64_t 
 		}
 		if(i >= aEnd) { break; }
 
-		if(m.variantData) {
-			if(m.variantData->currentVariant != -1) {
-				GMSEntry* variant = GlobalMaterialStore::getById(m.variantData->variants[m.variantData->currentVariant]);
+		GMSEntry* actual = &m;
+		if(m.duplicateOf) {
+			actual = m.duplicateOf;
+		}
+
+		if(actual->variantData) {
+			if(actual->variantData->currentVariant != -1) {
+				GMSEntry* variant = GlobalMaterialStore::getById(actual->variantData->variants[actual->variantData->currentVariant]);
 				variant->texture.bind(variant->material.textureSlot);
 				tempDataStore.push_back(variant->material);
 				i++;
@@ -57,8 +62,8 @@ void GlobalMaterialStore::copyDataToUniform(UniformMaterial& aUniform, uint64_t 
 			}
 		}
 
-		m.texture.bind(m.material.textureSlot);
-		tempDataStore.push_back(m.material);
+		actual->texture.bind(actual->material.textureSlot);
+		tempDataStore.push_back(actual->material);
 		i++;
 	}
 
@@ -139,9 +144,38 @@ GMSEntry* GlobalMaterialStore::addVariant(const std::string_view aMaterialName, 
 	return derived;
 }
 
-void GlobalMaterialStore::setVariant(const std::string_view aMaterialName, const std::string_view aIdentificator) noexcept {
-	GMSEntry* newVariant = get(aMaterialName, aIdentificator);
-	uint64_t id = findId(aMaterialName, aIdentificator);
+GMSEntry* GlobalMaterialStore::addVariantFromMaterial(const std::string_view aMaterialName, const std::string_view aIdentifier, const std::string_view aMaterialVariantName) noexcept {
+	GMSEntry* base = getStandard(aMaterialName);
+	GMSEntry* derived = getStandard(aMaterialVariantName);
+
+	if(!base) {
+		std::cout << LogLevel::WARNING << "[GMS] Cannot make variant for non-existing material!\n" << LogLevel::RESET;
+		return nullptr;
+	}
+	if(!derived) {
+		std::cout << LogLevel::WARNING << "[GMS] Cannot convert non-existing material to variant!\n" << LogLevel::RESET;
+		return nullptr;
+	}
+
+	derived->name = aMaterialName;
+	derived->variant = aIdentifier;
+
+	if(!base->variantData) {
+		msVariantBindings.emplace_back();
+		msVariantBindings.back().baseId = findId(aMaterialName);
+		msVariantBindings.back().currentVariant = -1;
+		base->variantData = &msVariantBindings.back();
+	}
+
+	base->variantData->variants.push_back(findId(aMaterialVariantName)); //our element
+	derived->variantData = base->variantData;
+
+	return derived;
+}
+
+void GlobalMaterialStore::setVariant(const std::string_view aMaterialName, const std::string_view aIdentifier) noexcept {
+	GMSEntry* newVariant = get(aMaterialName, aIdentifier);
+	uint64_t id = findId(aMaterialName, aIdentifier);
 
 	for(uint64_t i = 0; i < newVariant->variantData->variants.size(); i++) {
 		if(newVariant->variantData->variants[i] == id) {
@@ -154,7 +188,6 @@ void GlobalMaterialStore::resetVariant(const std::string_view aMaterialName) noe
 	GMSEntry* variant = getStandard(aMaterialName);
 	variant->variantData->currentVariant = -1;
 }
-
 std::ostream& GlobalMaterialStore::printData(std::ostream& aStream) noexcept {
 	aStream << '{';
 	for(GMSEntry& m : msContainer) {

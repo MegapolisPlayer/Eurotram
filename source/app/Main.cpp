@@ -225,6 +225,8 @@ int main() {
 	UniformMaterial uMaterial(50);
 	StructUniform<glm::mat4> uModelMat(40, 0);
 
+	UniformInt uIsInstancedRendering(36);
+
 	Shader shadowMapProgram("shader/shadowVertex.glsl", "shader/shadowFragment.glsl");
 	shadowMapProgram.bind();
 	UniformMat4 lpu(90);
@@ -234,6 +236,11 @@ int main() {
 
 	std::cout << "GMS length " << GlobalMaterialStore::getLength() << '\n';
 	uMaterial.setNewData(nullptr, GlobalMaterialStore::getLength());
+
+	GMSEntry* nightWindows = GlobalMaterialStore::addVariant("Material.windowDay", "NIGHT");
+	nightWindows->material.color = glm::vec4(231.0/255.0, 226.0/255.0, 19.0/255.0, 1.0);
+	nightWindows->material.brightness = 1.0f;
+	nightWindows->material.specular = glm::vec4(0.0);
 
 	uint64_t i = 0;
     while (mainWindow.isOpen()) {
@@ -288,7 +295,9 @@ int main() {
 
 		matModelUniform.set(glm::mat4(1.0));
 		matNormalUniform.set(glm::mat4(1.0));
-		m.draw(uMaterial);
+
+		m.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
+		m.draw(uMaterial, uModelMat, 35, uIsInstancedRendering);
 
 		drawTimer.end();
 
@@ -304,6 +313,12 @@ int main() {
 		if(ImGui::SliderFloat("Daylight index",  &daylightIndex, 0.0, 1.0)) {
 			mainWindow.setBackgroundColor(daylightColor*daylightIndex);
 			ambientLightStrength.set(daylightIndex);
+			if(daylightIndex < 0.5) {
+				GlobalMaterialStore::setVariant("Material.windowDay", "NIGHT");
+			}
+			else {
+				GlobalMaterialStore::resetVariant("Material.windowDay");
+			}
 		}
 		if(ImGui::SliderFloat("Sun angle",  &sunAngle, 0.0, 360.0)) {
 			rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(sunAngle), glm::vec3(1.0f, 0.0f, 0.0f));

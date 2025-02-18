@@ -21,33 +21,34 @@ void readLocationToString(std::ifstream& aStream, RotatedObjectLocation& aLocati
 GMSEntry* Map::msTrackMaterial = nullptr;
 
 Map::Map() noexcept
-	: mTrackVertices(nullptr, 0, STANDARD_MODEL_VERTEX_FLOAT_AMOUNT), mTrackIndices(nullptr, 0),
-	mSwitchSignalModel("./SwitchSignal.glb"), mSignalModel("./Signal.glb"),
+	: mTrackVertices(nullptr, 0, 0), mTrackIndices(nullptr, 0),
+	mSwitchSignalModel("./SwitchSignal.glb"), mSwitchSignalMatrices(nullptr, 0), mSwitchSignalIds(nullptr, 0),
+	mSignalModel("./Signal.glb"), mSignalMatrices(nullptr, 0), mSignalIds(nullptr, 0),
 	mStationPillarModel("./Stop.glb"), mPillarMatrices(nullptr, 0), mPillarIds(nullptr, 0),
 	mTreeModel("./Tree.glb"), mTreeMatrices(nullptr, 0), mTreeIds(nullptr, 0),
 	mLightModel("./Streetlamp.glb"), mLightMatrices(nullptr, 0), mLightIds(nullptr, 0),
-	mBuildingMatrices(nullptr, 0), mBuildingIds(nullptr, 0),
-	mWallMatrices(nullptr, 0), mWallIds(nullptr, 0),
-	mSignMatrices(nullptr, 0), mSignIds(nullptr, 0),
-	mTexparcelVertices(nullptr, 0, STANDARD_MODEL_VERTEX_FLOAT_AMOUNT), mTexparcelIndices(nullptr, 0) {}
+	mWallVertices(nullptr, 0, 0), mWallIndices(nullptr, 0), mFirstWallMaterial(0), mLastWallMaterial(0),
+	mSignVertices(nullptr, 0, 0), mSignIndices(nullptr, 0), mFirstSignMaterial(0), mLastSignMaterial(0),
+	mTexparcelVertices(nullptr, 0, 0), mTexparcelIndices(nullptr, 0) {}
 
 Map::Map(const std::string_view aFilename) noexcept
-	: mTrackVertices(nullptr, 0, STANDARD_MODEL_VERTEX_FLOAT_AMOUNT), mTrackIndices(nullptr, 0),
-	mSwitchSignalModel("./SwitchSignal.glb"), mSignalModel("./Signal.glb"),
+	: mTrackVertices(nullptr, 0, 0), mTrackIndices(nullptr, 0),
+	mSwitchSignalModel("./SwitchSignal.glb"), mSwitchSignalMatrices(nullptr, 0), mSwitchSignalIds(nullptr, 0),
+	mSignalModel("./Signal.glb"), mSignalMatrices(nullptr, 0), mSignalIds(nullptr, 0),
 	mStationPillarModel("./Stop.glb"), mPillarMatrices(nullptr, 0), mPillarIds(nullptr, 0),
 	mTreeModel("./Tree.glb"), mTreeMatrices(nullptr, 0), mTreeIds(nullptr, 0),
 	mLightModel("./Streetlamp.glb"), mLightMatrices(nullptr, 0), mLightIds(nullptr, 0),
-	mBuildingMatrices(nullptr, 0), mBuildingIds(nullptr, 0),
-	mWallMatrices(nullptr, 0), mWallIds(nullptr, 0),
-	mSignMatrices(nullptr, 0), mSignIds(nullptr, 0),
-	mTexparcelVertices(nullptr, 0, STANDARD_MODEL_VERTEX_FLOAT_AMOUNT), mTexparcelIndices(nullptr, 0)
+	mWallVertices(nullptr, 0, 0), mWallIndices(nullptr, 0), mFirstWallMaterial(0), mLastWallMaterial(0),
+	mSignVertices(nullptr, 0, 0), mSignIndices(nullptr, 0), mFirstSignMaterial(0), mLastSignMaterial(0),
+	mTexparcelVertices(nullptr, 0, 0), mTexparcelIndices(nullptr, 0)
 	{
 	this->open(aFilename);
 }
 
 void Map::open(const std::string_view aFilename) noexcept {
-	//values for typical metal - only load once
-	if(!Map::msTrackMaterial) {
+	//load assets only once
+	if(!this->mLoadedAssets) {
+		//values for typical metal for track
 		Map::msTrackMaterial = GlobalMaterialStore::add();
 		Map::msTrackMaterial->material.specular = glm::vec4(0.5);
 		Map::msTrackMaterial->material.ior = 1.0;
@@ -59,6 +60,21 @@ void Map::open(const std::string_view aFilename) noexcept {
 		//we do need repeat here
 		Map::msTrackMaterial->texture = Texture("RailTexture.png", true, TextureScale::LINEAR, TextureBorder::REPEAT);
 		Map::msTrackMaterial->texture.setOutOfBoundsColor(0.5, 0.0, 0.0, 1.0);
+
+		//load building models
+		this->mBuildingModels.emplace_back(std::filesystem::path("./BuildingNormal.glb"));
+		this->mBuildingModels.emplace_back(std::filesystem::path("./BuildingCorner.glb"));
+		this->mBuildingModels.emplace_back(std::filesystem::path("./BuildingFamily.glb"));
+		this->mBuildingModels.emplace_back(std::filesystem::path("./BuildingPrefab.glb"));
+
+		//amount of types
+		for(uint8_t i = 0; i < 4; i++) {
+			this->mBuildingMatrices.emplace_back(ShaderBuffer(nullptr, 0));
+		}
+
+		//other models loaded
+
+		this->mLoadedAssets = true;
 	}
 
 	std::ifstream fileHandle;
@@ -103,11 +119,11 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 	//Y
 	readBytesToString(fileHandle, buffer, 4);
-	uint32_t switchSignalAmount = *((uint32_t*)buffer.data());
+	this->mSwitchSignalCount = *((uint32_t*)buffer.data());
 
 	//S
 	readBytesToString(fileHandle, buffer, 4);
-	uint32_t signalAmount = *((uint32_t*)buffer.data());
+	this->mSignalCount = *((uint32_t*)buffer.data());
 
 	//R
 	readBytesToString(fileHandle, buffer, 4);
@@ -115,19 +131,19 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 	//P
 	readBytesToString(fileHandle, buffer, 4);
-	uint32_t pillarAmount = *((uint32_t*)buffer.data());
+	this->mPillarCount = *((uint32_t*)buffer.data());
 
 	//L
 	readBytesToString(fileHandle, buffer, 4);
-	uint32_t lampAmount = *((uint32_t*)buffer.data());
+	this->mLightCount = *((uint32_t*)buffer.data());
 
 	//G
 	readBytesToString(fileHandle, buffer, 4);
-	uint32_t treeAmount = *((uint32_t*)buffer.data());
+	this->mTreeCount = *((uint32_t*)buffer.data());
 
 	//B
 	readBytesToString(fileHandle, buffer, 4);
-	uint32_t buildingAmount = *((uint32_t*)buffer.data());
+	this->mBuildingCount = *((uint32_t*)buffer.data());
 
 	//M
 	readBytesToString(fileHandle, buffer, 4);
@@ -139,7 +155,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 	//F
 	readBytesToString(fileHandle, buffer, 4);
-	uint32_t signAmount = *((uint32_t*)buffer.data());
+	this->mSignCount = *((uint32_t*)buffer.data());
 
 	//X
 	readBytesToString(fileHandle, buffer, 4);
@@ -161,16 +177,16 @@ void Map::open(const std::string_view aFilename) noexcept {
 	std::cout << "Nodes amount: " << nodeAmount << '\n';
 	std::cout << "Switch amount: " << switchAmount << '\n';
 	std::cout << "Track amount: " << trackAmount << '\n';
-	std::cout << "Switch Signal amount: " << switchSignalAmount << '\n';
-	std::cout << "Signal amount: " << signalAmount << '\n';
+	std::cout << "Switch Signal amount: " << this->mSwitchSignalCount << '\n';
+	std::cout << "Signal amount: " << this->mSignalCount << '\n';
 	std::cout << "Radiobox amount: " << radioboxAmount << '\n';
-	std::cout << "Pillar amount: " << pillarAmount << '\n';
-	std::cout << "Tree amount: " << treeAmount << '\n';
-	std::cout << "Streetlamp amount: " << lampAmount << '\n';
-	std::cout << "Building amount: " << buildingAmount << '\n';
+	std::cout << "Pillar amount: " << this->mPillarCount << '\n';
+	std::cout << "Tree amount: " << this->mTreeCount << '\n';
+	std::cout << "Streetlamp amount: " << this->mLightCount  << '\n';
+	std::cout << "Building amount: " << this->mBuildingCount << '\n';
 	std::cout << "Landmark amount: " << landmarksAmount << '\n';
 	std::cout << "Wall amount: " << wallAmount << '\n';
-	std::cout << "Sign amount: " << signAmount << '\n';
+	std::cout << "Sign amount: " << this->mSignCount << '\n';
 	std::cout << "Texparcel amount: " << texparcelAmount << '\n';
 
 	//Nodes list
@@ -255,8 +271,8 @@ void Map::open(const std::string_view aFilename) noexcept {
 	}
 
 	//Switch signal list
-	this->mSwitchSignals.reserve(switchSignalAmount);
-	for(uint32_t i = 0; i < switchSignalAmount; i++) {
+	this->mSwitchSignals.reserve(this->mSwitchSignalCount);
+	for(uint32_t i = 0; i < this->mSwitchSignalCount; i++) {
 		this->mSwitchSignals.push_back({});
 		readLocationToString(fileHandle, this->mSwitchSignals.back().location, unitsPerMeter);
 		readBytesToString(fileHandle, buffer, 4);
@@ -269,8 +285,8 @@ void Map::open(const std::string_view aFilename) noexcept {
 	}
 
 	//Signal list
-	this->mSignals.reserve(signalAmount);
-	for(uint32_t i = 0; i < signalAmount; i++) {
+	this->mSignals.reserve(this->mSignalCount);
+	for(uint32_t i = 0; i < this->mSignalCount; i++) {
 		this->mSignals.push_back({});
 		bool isPresignal = false;
 		if(buffer == "PJ") isPresignal = true;
@@ -303,39 +319,39 @@ void Map::open(const std::string_view aFilename) noexcept {
 		this->mRadioboxes.push_back({});
 		readLocationToString(fileHandle, this->mRadioboxes.back().location, unitsPerMeter);
 		readBytesToString(fileHandle, buffer, 4);
-		this->mSwitches.back().code = *((uint32_t*)buffer.data());
+		this->mRadioboxes.back().code = *((uint32_t*)buffer.data());
 	}
 
 	//Station pillar list
-	this->mPillars.reserve(pillarAmount);
-	for(uint32_t i = 0; i < pillarAmount; i++) {
+	this->mPillars.reserve(this->mPillarCount);
+	for(uint32_t i = 0; i < this->mPillarCount; i++) {
 		this->mPillars.push_back({});
 		readLocationToString(fileHandle, this->mPillars.back().location, unitsPerMeter);
 		readBytesToString(fileHandle, buffer, 4);
-		this->mSwitches.back().code = *((uint32_t*)buffer.data());
+		this->mPillars.back().code = *((uint32_t*)buffer.data());
 	}
 
 	//Lightpost list
-	this->mLights.reserve(lampAmount);
-	for(uint32_t i = 0; i < lampAmount; i++) {
+	this->mLights.reserve(this->mLightCount);
+	for(uint32_t i = 0; i < this->mLightCount; i++) {
 		this->mLights.push_back({});
 		readLocationToString(fileHandle, this->mLights.back().location, unitsPerMeter);
 		readBytesToString(fileHandle, buffer, 4);
-		this->mSwitches.back().code = *((uint32_t*)buffer.data());
+		this->mLights.back().code = *((uint32_t*)buffer.data());
 	}
 
 	//Tree list
-	this->mTrees.reserve(treeAmount);
-	for(uint32_t i = 0; i < treeAmount; i++) {
+	this->mTrees.reserve(this->mTreeCount);
+	for(uint32_t i = 0; i < this->mTreeCount; i++) {
 		this->mTrees.push_back({});
 		readLocationToString(fileHandle, this->mTrees.back().location, unitsPerMeter);
 		readBytesToString(fileHandle, buffer, 4);
-		this->mSwitches.back().code = *((uint32_t*)buffer.data());
+		this->mTrees.back().code = *((uint32_t*)buffer.data());
 	}
 
 	//Building list
-	this->mBuildings.reserve(buildingAmount);
-	for(uint32_t i = 0; i < buildingAmount; i++) {
+	this->mBuildings.reserve(this->mBuildingCount);
+	for(uint32_t i = 0; i < this->mBuildingCount; i++) {
 		this->mBuildings.push_back({});
 		readLocationToString(fileHandle, this->mBuildings.back().location, unitsPerMeter);
 
@@ -372,15 +388,35 @@ void Map::open(const std::string_view aFilename) noexcept {
 		std::getline(fileHandle, this->mWalls.back().material, '\0');
 	}
 
-	//Sign list
-	this->mSigns.reserve(signAmount);
-	for(uint32_t i = 0; i < signAmount; i++) {
-		this->mSigns.push_back({});
-		readLocationToString(fileHandle, this->mSigns.back().location, unitsPerMeter);
-		readBytesToString(fileHandle, buffer, 4);
-		this->mSigns.back().code = *((uint32_t*)buffer.data());
-		readBytesToString(fileHandle, buffer, 2);
-		this->mSigns.back().type = (SignType)*((int16_t*)buffer.data());
+	{
+		//Sign list
+
+		std::vector<Vertex> signVertices;
+		std::vector<GLuint> signIndices;
+
+		this->mSigns.reserve(this->mSignCount);
+		for(uint32_t i = 0; i < this->mSignCount; i++) {
+			this->mSigns.push_back({});
+			readLocationToString(fileHandle, this->mSigns.back().location, unitsPerMeter);
+			readBytesToString(fileHandle, buffer, 4);
+			this->mSigns.back().code = *((uint32_t*)buffer.data());
+			readBytesToString(fileHandle, buffer, 2);
+			this->mSigns.back().type = (SignType)*((int16_t*)buffer.data());
+
+			//generate vertices
+
+			//TODO
+
+			//generate indices
+		}
+
+		this->mSignArray.bind();
+
+		this->mSignVertices = VertexBuffer((float*)signVertices.data(), signVertices.size(), STANDARD_MODEL_VERTEX_FLOAT_AMOUNT);
+		this->mSignVertices.enableStandardAttributes(&this->mSignArray);
+
+		this->mSignIndices = IndexBuffer(signIndices.data(), signIndices.size());
+		this->mSignIndices.bind();
 	}
 
 	{
@@ -496,23 +532,15 @@ void Map::open(const std::string_view aFilename) noexcept {
 				trackVertices.reserve(trackVertices.size() + Math::DEFAULT_BEZIER_PRECISION*4);
 				trackIndices.reserve(trackIndices.size() + Math::DEFAULT_BEZIER_PRECISION/4*6); //for every 4 vertices 6 indices
 
-				//join bezier from previous track
-				//[1,3,4 ; 3,6,4]
-				trackIndices.insert(trackIndices.end(), {
-					(uint32_t)trackVertices.size()-4 + 1,
-					(uint32_t)trackVertices.size()-4 + 3,
-					(uint32_t)trackVertices.size()-4 + 4,
-					(uint32_t)trackVertices.size()-4 + 3,
-					(uint32_t)trackVertices.size()-4 + 6,
-					(uint32_t)trackVertices.size()-4 + 4
-				});
-
 				std::vector<Math::BezierPoint> curve = Math::bezier(
 					firstNode,
 					glm::vec2(t.point1x, t.point1y),
 					glm::vec2(t.point2x, t.point2y),
 					secondNode
 				);
+
+				t.points = curve;
+				t.length = Math::bezierLength(t.points);
 
 				//TODO add height loading
 				//TODO make 2 tracks instead of one
@@ -532,23 +560,23 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 					//rail 1
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(topCurve[i].x, 0.0, topCurve[i].y);
+					trackVertices.back().position = glm::vec3(topCurve[i].x, 0.05, topCurve[i].y);
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(topCurve[i+1].x, 0.0, topCurve[i+1].y);
+					trackVertices.back().position = glm::vec3(topCurve[i+1].x, 0.05, topCurve[i+1].y);
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(topInnerCurve[i].x, 0.0, topInnerCurve[i].y);
+					trackVertices.back().position = glm::vec3(topInnerCurve[i].x, 0.05, topInnerCurve[i].y);
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(topInnerCurve[i+1].x, 0.0, topInnerCurve[i+1].y);
+					trackVertices.back().position = glm::vec3(topInnerCurve[i+1].x, 0.05, topInnerCurve[i+1].y);
 
 					//rail 2
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(bottomCurve[i].x, 0.0, bottomCurve[i].y);
+					trackVertices.back().position = glm::vec3(bottomCurve[i].x, 0.05, bottomCurve[i].y);
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(bottomCurve[i+1].x, 0.0, bottomCurve[i+1].y);
+					trackVertices.back().position = glm::vec3(bottomCurve[i+1].x, 0.05, bottomCurve[i+1].y);
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(bottomInnerCurve[i].x, 0.0, bottomInnerCurve[i].y);
+					trackVertices.back().position = glm::vec3(bottomInnerCurve[i].x, 0.05, bottomInnerCurve[i].y);
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(bottomInnerCurve[i+1].x, 0.0, bottomInnerCurve[i+1].y);
+					trackVertices.back().position = glm::vec3(bottomInnerCurve[i+1].x, 0.05, bottomInnerCurve[i+1].y);
 
 					//index buffer
 					//[0,2,1 ; 2,3,1] top
@@ -601,6 +629,10 @@ void Map::open(const std::string_view aFilename) noexcept {
 				}
 			}
 			else {
+				t.points.push_back(firstNode);
+				t.points.push_back(secondNode);
+				t.length = (secondNode-firstNode).length();
+
 				//just linear points - same order
 
 				glm::vec2 dirVector = Math::getPerpendicularVectorFromPoints(firstNode, secondNode);
@@ -608,10 +640,10 @@ void Map::open(const std::string_view aFilename) noexcept {
 				glm::vec2 gaugeLongVector = dirVector*(TRACK_GAUGE/2+TRACK_WIDTH/2);
 
 				//rail 1
-				trackVertices.emplace_back(glm::vec3(firstNode.x+gaugeLongVector.x, 0.0, firstNode.y+gaugeLongVector.y));
-				trackVertices.emplace_back(glm::vec3(secondNode.x+gaugeLongVector.x, 0.0, secondNode.y+gaugeLongVector.y));
-				trackVertices.emplace_back(glm::vec3(firstNode.x+gaugeVector.x, 0.0, firstNode.y+gaugeVector.y));
-				trackVertices.emplace_back(glm::vec3(secondNode.x+gaugeVector.x, 0.0, secondNode.y+gaugeVector.y));
+				trackVertices.emplace_back(glm::vec3(firstNode.x+gaugeLongVector.x, 0.05, firstNode.y+gaugeLongVector.y));
+				trackVertices.emplace_back(glm::vec3(secondNode.x+gaugeLongVector.x, 0.05, secondNode.y+gaugeLongVector.y));
+				trackVertices.emplace_back(glm::vec3(firstNode.x+gaugeVector.x, 0.05, firstNode.y+gaugeVector.y));
+				trackVertices.emplace_back(glm::vec3(secondNode.x+gaugeVector.x, 0.05, secondNode.y+gaugeVector.y));
 
 				trackIndices.insert(trackIndices.end(), {
 					(uint32_t)trackVertices.size()-4 + 0,
@@ -629,10 +661,10 @@ void Map::open(const std::string_view aFilename) noexcept {
 				trackVertices[(uint32_t)trackVertices.size()-1].texCoords = glm::vec2(1.0, 0.0);
 
 				//rail 2
-				trackVertices.emplace_back(glm::vec3(firstNode.x-gaugeVector.x, 0.0, firstNode.y-gaugeVector.y));
-				trackVertices.emplace_back(glm::vec3(secondNode.x-gaugeVector.x, 0.0, secondNode.y-gaugeVector.y));
-				trackVertices.emplace_back(glm::vec3(firstNode.x-gaugeLongVector.x, 0.0, firstNode.y-gaugeLongVector.y));
-				trackVertices.emplace_back(glm::vec3(secondNode.x-gaugeLongVector.x, 0.0, secondNode.y-gaugeLongVector.y));
+				trackVertices.emplace_back(glm::vec3(firstNode.x-gaugeVector.x, 0.05, firstNode.y-gaugeVector.y));
+				trackVertices.emplace_back(glm::vec3(secondNode.x-gaugeVector.x, 0.05, secondNode.y-gaugeVector.y));
+				trackVertices.emplace_back(glm::vec3(firstNode.x-gaugeLongVector.x, 0.05, firstNode.y-gaugeLongVector.y));
+				trackVertices.emplace_back(glm::vec3(secondNode.x-gaugeLongVector.x, 0.05, secondNode.y-gaugeLongVector.y));
 
 				trackIndices.insert(trackIndices.end(), {
 					(uint32_t)trackVertices.size()-4 + 0,
@@ -679,20 +711,124 @@ void Map::open(const std::string_view aFilename) noexcept {
 }
 
 void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept {
+	//switch signals
 
+	//signals
+
+	//pillars
+
+	//trees
+	{
+		std::vector<glm::mat4> treeInstanceTranslations;
+		for(Tree& t : this->mTrees) {
+			glm::mat4 translation = glm::translate(glm::mat4(1.0), glm::vec3(t.location.x, t.location.h, t.location.y));
+			//TODO random rotation
+			//translation = glm::rotate(translation, glm::radians(-l.location.r), glm::vec3(0.0, 1.0, 0.0));
+			treeInstanceTranslations.push_back(translation);
+		}
+		this->mTreeMatrices.setNewData(treeInstanceTranslations.data(), treeInstanceTranslations.size()*sizeof(glm::mat4));
+	}
+
+	//light
+	{
+		std::vector<glm::mat4> lightInstanceTranslations;
+		for(Lightpole& l : this->mLights) {
+			glm::mat4 translation = glm::translate(glm::mat4(1.0), glm::vec3(l.location.x, l.location.h, l.location.y));
+			translation = glm::rotate(translation, glm::radians(-l.location.r), glm::vec3(0.0, 1.0, 0.0));
+			lightInstanceTranslations.push_back(translation);
+		}
+		this->mLightMatrices.setNewData(lightInstanceTranslations.data(), lightInstanceTranslations.size()*sizeof(glm::mat4));
+	}
+
+	//buildings - split per type
+	{
+		std::vector<std::vector<glm::mat4>> buildingInstanceTranslations;
+		buildingInstanceTranslations.resize(4); //4 building types
+
+		for(uint8_t i = 0; i < 4; i++) {
+			buildingInstanceTranslations[i].clear();
+		}
+
+		for(Building& b : this->mBuildings) {
+			//TODO
+			//if(b.code == aPrev || b.code == aCurrent || b.code == aNext || b.code == aAfterNext) {
+				glm::mat4 translation = glm::translate(glm::mat4(1.0), glm::vec3(b.location.x, b.location.h, b.location.y));
+				translation = glm::rotate(translation, glm::radians(-b.location.r), glm::vec3(0.0, 1.0, 0.0));
+				buildingInstanceTranslations[(uint8_t)b.type].push_back(translation);
+			//}
+		}
+		for(uint8_t i = 0; i < 4; i++) {
+			this->mBuildingMatrices[i].setNewData(buildingInstanceTranslations[i].data(), buildingInstanceTranslations[i].size()*sizeof(glm::mat4));
+		}
+	}
 }
 
-void Map::draw(UniformMaterial& aUniform) noexcept {
-	this->mTexparcelArray.bind();
+void Map::updateTextures(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept {
+	//signals
+	for(Signal& s : this->mSignals) {
 
-	GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstTPMaterial, this->mLastTPMaterial);
+	}
 
-	this->mTexparcelVertices.bind();
-	this->mTexparcelIndices.bind();
-	//this->mTexparcelVertices.drawPoints();
-	this->mTexparcelIndices.draw();
+	//switch signals
+	for(SwitchSignal& s : this->mSwitchSignals) {
 
-	//this->mBuildingIds;
+	}
+
+	//pillars
+	for(StationPillar& p : this->mPillars) {
+
+	}
+}
+
+//TODO add drawPoints are tag in settings
+
+void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aInstanceBufferLocation, UniformInt& aBoolStateUniform) noexcept {
+	//ground (texparcels)
+
+	//no materials -> no texparcels!
+	if(this->mTexparcelMaterials.size() > 0) {
+		this->mTexparcelArray.bind();
+		GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstTPMaterial, this->mLastTPMaterial);
+		this->mTexparcelVertices.bind();
+		this->mTexparcelIndices.bind();
+		//this->mTexparcelVertices.drawPoints();
+		this->mTexparcelIndices.draw();
+	}
+
+	//all objects
+	aBoolStateUniform.set(1);
+
+	//TODO for signals and pillars -> make another bool+buffer combo: set pre-made textures for them
+
+	//signals
+	this->mSignalMatrices.bind(aInstanceBufferLocation);
+	this->mSignalModel.drawInstanced(aUniform, aBoneMatrices, this->mSignalCount);
+
+	//switch signals
+	this->mSwitchSignalMatrices.bind(aInstanceBufferLocation);
+	this->mSwitchSignalModel.drawInstanced(aUniform, aBoneMatrices, this->mSwitchSignalCount);
+
+	//pillars
+	this->mPillarMatrices.bind(aInstanceBufferLocation);
+	this->mStationPillarModel.drawInstanced(aUniform, aBoneMatrices, this->mPillarCount);
+
+	//trees
+	this->mTreeMatrices.bind(aInstanceBufferLocation);
+	this->mTreeModel.drawInstanced(aUniform, aBoneMatrices, this->mTreeCount);
+
+	//lampposts
+	this->mLightMatrices.bind(aInstanceBufferLocation);
+	this->mLightModel.drawInstanced(aUniform, aBoneMatrices, this->mLightCount);
+
+	//buildings
+	for(uint8_t i = 0; i < 4; i++) {
+		this->mBuildingMatrices[i].bind(aInstanceBufferLocation);
+		this->mBuildingModels[i].drawInstanced(aUniform, aBoneMatrices, this->mBuildingCount);
+	}
+
+	aBoolStateUniform.set(0);
+
+	//track
 
 	aUniform.update(&Map::msTrackMaterial->material, 0, 0);
 	aUniform.set();
@@ -706,6 +842,31 @@ void Map::draw(UniformMaterial& aUniform) noexcept {
 	this->mTrackIndices.bind();
 	//this->mTrackVertices.drawPoints();
 	this->mTrackIndices.draw(); //draw track last
+
+	//walls
+	if(this->mWalls.size() > 0) {
+		this->mWallArray.bind();
+		GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstWallMaterial, this->mLastWallMaterial);
+		this->mWallVertices.bind();
+		this->mWallIndices.bind();
+		//this->mWallVertices.drawPoints();
+		this->mWallIndices.draw();
+	}
+
+	//signs
+	if(this->mSigns.size() > 0) {
+		this->mSignArray.bind();
+		GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstSignMaterial, this->mLastSignMaterial);
+		this->mSignVertices.bind();
+		this->mSignIndices.bind();
+		//this->mSignVertices.drawPoints();
+		this->mSignIndices.draw();
+	}
+
+	//landmarks - should be only of each type per map
+	for(Model& m : this->mLandmarkModels) {
+		m.draw(aUniform, aBoneMatrices);
+	}
 }
 
 Track* Map::getStationByCode(std::string_view aCode) noexcept {

@@ -23,6 +23,7 @@ public:
 	Mesh& operator=(Mesh& aOther) noexcept = delete;
 
 	void draw() noexcept;
+	void drawInstanced(const uint64_t aCount) noexcept;
 
 	 //DO NOT set entry with different material name
 	void setEntry(GMSEntry* aEntry) noexcept;

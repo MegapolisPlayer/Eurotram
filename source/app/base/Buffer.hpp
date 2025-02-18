@@ -36,19 +36,8 @@ struct Vertex {
 	GLfloat boneIds[MAX_BONES_PER_VERTEX]; //we save as float but IDs are integers
 	GLfloat boneWeights[MAX_BONES_PER_VERTEX];
 
-	Vertex() noexcept {
-		for(uint64_t i = 0; i < MAX_BONES_PER_VERTEX; i++) {
-			boneIds[i] = -1.0;
-			boneWeights[i] = 0.0;
-		}
-	}
-
-	Vertex(const glm::vec3& aPosition) noexcept : position(aPosition) {
-		for(uint64_t i = 0; i < MAX_BONES_PER_VERTEX; i++) {
-			boneIds[i] = -1.0;
-			boneWeights[i] = 0.0;
-		}
-	}
+	Vertex() noexcept;
+	Vertex(const glm::vec3& aPosition) noexcept;
 };
 
 std::ostream& operator<<(std::ostream& aStream, const Vertex& aVertex) noexcept;
@@ -96,6 +85,7 @@ public:
 	void unbind() noexcept;
 
 	void draw() noexcept;
+	void drawInstanced(const uint64_t aCount) noexcept;
 
 	GLuint getHandle() const noexcept;
 	uint64_t getSize() const noexcept;

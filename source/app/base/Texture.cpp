@@ -63,7 +63,7 @@ Texture::Texture(
 	const uint64_t aWidth, const uint64_t aHeight,
 	const uint64_t aInternalFormat, const uint64_t aFormat,
 	TextureScale aScaling, TextureBorder aBorder) noexcept
-	: mPath(""), mHandle(0), mpData(nullptr), mWidth(aHeight), mHeight(aHeight), mChannels(0) {
+	: mPath(""), mHandle(0), mpData(nullptr), mWidth(aWidth), mHeight(aHeight), mChannels(0) {
 	GLint glTextureScaleValue = 0;
 	GLint glTextureScaleValue2 = 0;
 	switch(aScaling) {
