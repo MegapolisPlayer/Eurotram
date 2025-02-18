@@ -2,18 +2,20 @@
 
 void readLocationToString(std::ifstream& aStream, ObjectLocation& aLocation, const uint8_t aUnitsPerMeter) noexcept {
 	std::string buffer;
-	readBytesToString(aStream, buffer, 3*sizeof(uint32_t));
+	readBytesToString(aStream, buffer, 3*sizeof(int32_t));
 	aLocation.x = float(((int32_t*)buffer.data())[0]) / aUnitsPerMeter;
 	aLocation.y = float(((int32_t*)buffer.data())[1]) / aUnitsPerMeter;
 	aLocation.h = float(((int32_t*)buffer.data())[2]) / aUnitsPerMeter;
 }
 void readLocationToString(std::ifstream& aStream, RotatedObjectLocation& aLocation, const uint8_t aUnitsPerMeter) noexcept {
 	std::string buffer;
-	readBytesToString(aStream, buffer, 4*sizeof(uint32_t));
+	readBytesToString(aStream, buffer, 3*sizeof(int32_t));
 	aLocation.x = float(((int32_t*)buffer.data())[0]) / aUnitsPerMeter;
 	aLocation.y = float(((int32_t*)buffer.data())[1]) / aUnitsPerMeter;
 	aLocation.h = float(((int32_t*)buffer.data())[2]) / aUnitsPerMeter;
-	aLocation.r = float(((int32_t*)buffer.data())[3]) / aUnitsPerMeter;
+	//rotation only 2 bytes
+	readBytesToString(aStream, buffer, sizeof(int16_t));
+	aLocation.r = float(*((int16_t*)buffer.data()));
 }
 
 GMSEntry* Map::msTrackMaterial = nullptr;
@@ -387,14 +389,17 @@ void Map::open(const std::string_view aFilename) noexcept {
 		//generate texparcel vertices
 		std::vector<Vertex> texparcelVertices;
 
+		this->mFirstTPMaterial = GlobalMaterialStore::getLength();
 		for(uint32_t i = 0; i < texparcelAmount; i++) {
 			//texparcel has 4 vertices - convert from clockwise in file to CCW in GL
 			readBytesToString(fileHandle, buffer, 48); //3 values * 4 bytes * 4 points - 12 values
+			assert(buffer.size() == 48);
+
 			for(int8_t j = 3; j >= 0; j--) {
 				texparcelVertices.push_back({});
-				texparcelVertices.back().position.x = ((int32_t*)buffer.data())[j*3+0]; //x
-				texparcelVertices.back().position.y = ((int32_t*)buffer.data())[j*3+2]; //h height
-				texparcelVertices.back().position.z = ((int32_t*)buffer.data())[j*3+1]; //y
+				texparcelVertices.back().position.x = (((int32_t*)buffer.data())[j*3+0]) / float(unitsPerMeter); //x
+				texparcelVertices.back().position.y = (((int32_t*)buffer.data())[j*3+2]) / float(unitsPerMeter); //h height
+				texparcelVertices.back().position.z = (((int32_t*)buffer.data())[j*3+1]) / float(unitsPerMeter); //y
 			}
 			//already CCW order
 			glm::vec3 normal = Math::normals(
@@ -405,11 +410,11 @@ void Map::open(const std::string_view aFilename) noexcept {
 			);
 
 			//normals (set same for all)
-			for(int8_t j = 3; j >= 0; j--) {
-				texparcelVertices[texparcelVertices.size()-i-1].normal = normal;
+			for(int8_t j = 0; j < 4; j++) {
+				texparcelVertices[texparcelVertices.size()-4+j].normal = normal;
 			}
 
-			//tex coords - in CCW order from bottom left
+			//tex coords - in correct CCW order from bottom left
 			texparcelVertices[texparcelVertices.size()-4].texCoords = glm::vec2(0.0, 0.0);
 			texparcelVertices[texparcelVertices.size()-3].texCoords = glm::vec2(0.0, 1.0);
 			texparcelVertices[texparcelVertices.size()-2].texCoords = glm::vec2(1.0, 1.0);
@@ -418,24 +423,45 @@ void Map::open(const std::string_view aFilename) noexcept {
 			readBytesToString(fileHandle, buffer, 8); //2 station codes
 			std::getline(fileHandle, buffer, '\0'); //material name
 
-			//TODO assign material if doesnt yet exist, otherwise assign ID
-			if(!GlobalMaterialStore::getByName(buffer)) {
-				this->mTexparcelMaterials.push_back(GlobalMaterialStore::add());
-				this->mTexparcelMaterials.back();
-			};
+			//TexparcelMat is prefix for texparcels
+			GMSEntry* tpMaterial = GlobalMaterialStore::getByName("TexparcelMat."+buffer);
+			uint64_t texparcelMaterialId = 0;
+			if(!tpMaterial) {
+				GMSEntry* texparcelMaterial = GlobalMaterialStore::add(&texparcelMaterialId);
+				this->mTexparcelMaterials.push_back(texparcelMaterial);
+				texparcelMaterial->texture = Texture("tp-"+buffer+".png");
+				texparcelVertices[texparcelVertices.size()-4].materialId = texparcelMaterialId - this->mFirstTPMaterial;
+				texparcelVertices[texparcelVertices.size()-3].materialId = texparcelMaterialId - this->mFirstTPMaterial;
+				texparcelVertices[texparcelVertices.size()-2].materialId = texparcelMaterialId - this->mFirstTPMaterial;
+				texparcelVertices[texparcelVertices.size()-1].materialId = texparcelMaterialId - this->mFirstTPMaterial;
+			}
+			else {
+				texparcelMaterialId = GlobalMaterialStore::findId("TexparcelMat."+buffer); //variants will be add later
+				texparcelVertices[texparcelVertices.size()-4].materialId = texparcelMaterialId - this->mFirstTPMaterial;
+				texparcelVertices[texparcelVertices.size()-3].materialId = texparcelMaterialId - this->mFirstTPMaterial;
+				texparcelVertices[texparcelVertices.size()-2].materialId = texparcelMaterialId - this->mFirstTPMaterial;
+				texparcelVertices[texparcelVertices.size()-1].materialId = texparcelMaterialId - this->mFirstTPMaterial;
+			}
 		}
+
+		this->mLastTPMaterial = GlobalMaterialStore::getLength();
 
 		//generate texparcel indices
 		std::vector<GLuint> texparcelIndices;
 		for(uint32_t i = 0; i < texparcelVertices.size(); i+=4) {
-			texparcelIndices.insert(texparcelIndices.end(), {i, 1+i, 2+i, 2+i, 3+i, i});
+			texparcelIndices.insert(texparcelIndices.end(), {i, 1+i, 2+i, 2+i, 3+i, 0+i});
 		}
 
-		this->mArray.bind();
+		this->mTexparcelArray.bind();
+
+		std::cout << "Map texparcel vertices: " << texparcelVertices.size() << ", indices: " << texparcelIndices.size() << '\n';
+
 		//set data
 		this->mTexparcelVertices = VertexBuffer((float*)texparcelVertices.data(), texparcelVertices.size(), STANDARD_MODEL_VERTEX_FLOAT_AMOUNT);
-		this->mTexparcelVertices.enableStandardAttributes(&this->mArray);
+		this->mTexparcelVertices.enableStandardAttributes(&this->mTexparcelArray);
+
 		this->mTexparcelIndices = IndexBuffer(texparcelIndices.data(), texparcelIndices.size());
+		this->mTexparcelIndices.bind();
 	}
 
 	fileHandle.close();
@@ -640,12 +666,12 @@ void Map::open(const std::string_view aFilename) noexcept {
 			trackVertices[i+3].normal = normal;
 		}
 
-		this->mArray.bind();
+		this->mTrackArray.bind();
 
 		std::cout << "Map track vertices: " << trackVertices.size() << ", indices: " << trackIndices.size() << '\n';
 
 		this->mTrackVertices = VertexBuffer((GLfloat*)trackVertices.data(), trackVertices.size(), STANDARD_MODEL_VERTEX_FLOAT_AMOUNT);
-		this->mTrackVertices.enableStandardAttributes(&this->mArray);
+		this->mTrackVertices.enableStandardAttributes(&this->mTrackArray);
 
 		this->mTrackIndices = IndexBuffer((GLuint*)trackIndices.data(), trackIndices.size());
 		this->mTrackIndices.bind();
@@ -657,21 +683,28 @@ void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, Stati
 }
 
 void Map::draw(UniformMaterial& aUniform) noexcept {
-	//this->mTexparcelIndices.draw();
+	this->mTexparcelArray.bind();
+
+	GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstTPMaterial, this->mLastTPMaterial);
+
+	this->mTexparcelVertices.bind();
+	this->mTexparcelIndices.bind();
+	//this->mTexparcelVertices.drawPoints();
+	this->mTexparcelIndices.draw();
 
 	//this->mBuildingIds;
 
-	this->mArray.bind();
-
-	aUniform.update(&Map::msTrackMaterial->material);
+	aUniform.update(&Map::msTrackMaterial->material, 0, 0);
 	aUniform.set();
+
+	this->mTrackArray.bind();
 
 	//our bind slot is 1
 	Map::msTrackMaterial->texture.bind(1);
 
 	this->mTrackVertices.bind();
 	this->mTrackIndices.bind();
-	this->mTrackVertices.drawPoints();
+	//this->mTrackVertices.drawPoints();
 	this->mTrackIndices.draw(); //draw track last
 }
 

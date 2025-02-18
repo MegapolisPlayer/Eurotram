@@ -31,8 +31,6 @@ public:
 
 	~Map() noexcept;
 private:
-	VertexArray mArray;
-
 	std::string mMapName;
 	std::string mAuthorName;
 
@@ -43,6 +41,7 @@ private:
 	//tracks are generated from vertices and textures on the fly - single draw call
 	//here we need to keep vectors - id references from other parts, trigger boxes
 	//track contains station code
+	VertexArray mTrackArray;
 	std::vector<Track> mTracks;
 	VertexBuffer mTrackVertices;
 	IndexBuffer mTrackIndices;
@@ -72,7 +71,7 @@ private:
 	ShaderBuffer mLightMatrices;
 	ShaderBuffer mLightIds;
 
-	std::vector<Model> mBuildingModels;
+	std::vector<Model> mBuildingModels; //mapped to type enum
 	std::vector<Building> mBuildings;
 	ShaderBuffer mBuildingMatrices;
 	ShaderBuffer mBuildingIds;
@@ -90,9 +89,12 @@ private:
 
 	//texparcels are also generated from vertices and textures on the fly - single draw call
 	//split per material
+	VertexArray mTexparcelArray;
 	VertexBuffer mTexparcelVertices;
 	IndexBuffer mTexparcelIndices;
 	std::vector<GMSEntry*> mTexparcelMaterials;
+	uint64_t mFirstTPMaterial;
+	uint64_t mLastTPMaterial;
 };
 
 namespace UI {

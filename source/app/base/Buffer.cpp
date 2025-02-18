@@ -93,7 +93,7 @@ void VertexBuffer::enableStandardAttributes(VertexArray* const apVAO) noexcept {
 	//tex coords
 	this->enableAttribute(apVAO, 2, 2, 6);
 	//texture id
-	this->enableAttribute(apVAO, 1, 3, 7);
+	this->enableAttribute(apVAO, 1, 3, 8);
 	//bone ids
 	this->enableAttribute(apVAO, MAX_BONES_PER_VERTEX, 4, 9);
 	//bone weights
@@ -230,10 +230,11 @@ ShaderBuffer& ShaderBuffer::operator=(ShaderBuffer&& aOther) noexcept {
 void ShaderBuffer::setNewData(const void* const arData, const uint64_t aSizeBytes) noexcept {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->mHandle);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, aSizeBytes, arData, GL_DYNAMIC_DRAW); //reallocate
+	this->mSizeBytes = aSizeBytes;
 }
 void ShaderBuffer::update(const void* const arData, const uint64_t aSizeBytes, const uint64_t aOffset) noexcept {
 	if(aOffset+aSizeBytes > this->mSizeBytes) {
-		std::cerr << LogLevel::ERROR << "SSBO read out of range!\n" << LogLevel::RESET;
+		std::cerr << LogLevel::ERROR << "SSBO read out of range (" << aOffset+aSizeBytes << '>' << this->mSizeBytes << ")!\n" << LogLevel::RESET;
 		std::exit(EXIT_FAILURE);
 	}
 

@@ -8,14 +8,13 @@ struct MeshBlueprint {
 	std::string materialName; //every mesh has to have 1 material
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
-	GMSEntry* entry;
 };
 
 class Mesh {
 	friend class Model;
 public:
 	Mesh() noexcept;
-	Mesh(const std::string_view aName, const std::vector<Vertex>& aVerts, const std::vector<GLuint>& aInds, GMSEntry* aEntry) noexcept;
+	Mesh(const std::string_view aName, const std::vector<Vertex>& aVerts, const std::vector<GLuint>& aInds) noexcept;
 	Mesh(const MeshBlueprint& aBP) noexcept;
 
 	Mesh(Mesh&& aOther) noexcept;
@@ -23,7 +22,7 @@ public:
 	Mesh(Mesh& aOther) noexcept = delete;
 	Mesh& operator=(Mesh& aOther) noexcept = delete;
 
-	void draw(UniformMaterial& aUniform) noexcept;
+	void draw() noexcept;
 
 	 //DO NOT set entry with different material name
 	void setEntry(GMSEntry* aEntry) noexcept;
@@ -38,7 +37,7 @@ private:
 	VertexBuffer mVBO;
 	IndexBuffer mIBO;
 
-	GMSEntry* mEntry; //1 entry is enough - variant data in GMS itself, when reset just find one with same name and standard ID
+	//material id stored in vertex info
 };
 
 #endif

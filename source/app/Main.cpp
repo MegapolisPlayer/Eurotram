@@ -143,7 +143,7 @@ int main() {
 	//WINDOW MUST BE INITIALIZED FOR THIS TO WORK
 	Map m("Praha.etmap");
 
-	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 100.0f, 0.05f);
+	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 1000.0f, 0.1f);
 
 	mainWindow.registerMouseCallback(MouseCallback);
 	mainWindow.registerKeyCallback(GLFW_KEY_ESCAPE, KeyEsc);
@@ -218,8 +218,8 @@ int main() {
 	//Model t3rp(std::filesystem::path("./untitled2.glb"));
 	Model t3rp(std::filesystem::path("./T3.glb"));
 	std::cout << "Model loaded!\n";
-	//t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
-	//t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
+	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
+	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 
 	shader.bind();
 	UniformMaterial uMaterial(50);
@@ -231,6 +231,9 @@ int main() {
 	UniformMat4 lmod(91);
 	StructUniform<glm::mat4> lmat(40, 0);
 	lmod.set(t1.getMatrix());
+
+	std::cout << "GMS length " << GlobalMaterialStore::getLength() << '\n';
+	uMaterial.setNewData(nullptr, GlobalMaterialStore::getLength());
 
 	uint64_t i = 0;
     while (mainWindow.isOpen()) {
@@ -278,8 +281,8 @@ int main() {
 
 		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
 
-		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
-		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
+		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
+		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
 
 		t3rp.draw(uMaterial, uModelMat);
 

@@ -8,15 +8,17 @@ Shader::Shader(const std::string_view aVertexSource, const std::string_view aFra
 	GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
 
 	{
-		std::string Source = readFile(fileLoader, aVertexSource);
-		const char* SourcePtr =	Source.c_str();
-		glShaderSource(vertex, 1, &SourcePtr, NULL);
+		std::string source = readFile(fileLoader, aVertexSource);
+		const char* sourcePtr =	source.c_str();
+		GLint sourceSize = source.size();
+		glShaderSource(vertex, 1, &sourcePtr, &sourceSize);
 		glCompileShader(vertex);
 	}
 	{
-		std::string Source = readFile(fileLoader, aFragmentSource);
-		const char* SourcePtr =	Source.c_str();
-		glShaderSource(fragment, 1, &SourcePtr, NULL);
+		std::string source = readFile(fileLoader, aFragmentSource);
+		const char* sourcePtr =	source.c_str();
+		GLint sourceSize = source.size();
+		glShaderSource(fragment, 1, &sourcePtr, &sourceSize);
 		glCompileShader(fragment);
 	}
 

@@ -57,10 +57,14 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 		return;
 	}
 
+	this->mFirstGMSMaterial = GlobalMaterialStore::getLength();
+
 	//material
+	uint64_t textureId = 0;
 	for(fastgltf::Material& m : model->materials) {
 		std::cout << "Material: " << m.name.c_str() << '\n';
-		GMSEntry* material = GlobalMaterialStore::add();
+		GMSEntry* material = GlobalMaterialStore::add(&this->mLastGMSMaterial);
+		this->mLastGMSMaterial++; //increment
 		material->name = m.name.c_str();
 		material->material.color = convertToGLM(m.pbrData.baseColorFactor);
 		material->material.specular = glm::vec4(1.0f); //TODO add specular color read without segfault...
@@ -75,9 +79,17 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 		auto& texInfo = m.pbrData.baseColorTexture;
 		if(texInfo.has_value()) {
 			material->material.textureAmount = 1.0f;
+			material->material.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 			auto& texture = model->textures[texInfo->textureIndex];
 			if(texture.imageIndex.has_value()) {
 				auto& image = model->images[texture.imageIndex.value()];
+				material->material.textureSlot = textureId;
+				textureId++;
+				if(textureId > 32) {
+					std::cerr << LogLevel::ERROR << "Error: more than 32 textures per model are not supported yet!\n" << LogLevel::RESET;
+					//TODO bindless textures
+					return;
+				}
 
 				//for each variant possibility - call correct function
 
@@ -174,35 +186,25 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 		}
 	}
 
-	//TODO dont split meshes
-	//if mesh has more than 10 materials - split
-	//else - is single mesh with some ids
+	//we dont split meshes - can save up to 27 materials simultaneously (exactly how much model has)
+	//last 4 slots (28,29,30,31) - shadows (front left, right, sun, flashlight)
+	//slot 27 - FBO view from above for weather
 
 	//meshes
 	uint64_t meshMatrixId = 0;
 	for(fastgltf::Mesh& m : model->meshes) {
-		//split meshes based on their material
-		std::vector<MeshBlueprint> mbp;
-		for(fastgltf::Material& mat : model->materials) {
-			mbp.push_back({});
-			mbp.back().materialName = mat.name.c_str(); //name of mesh is also name of material of mesh
-			mbp.back().entry = GlobalMaterialStore::getByName(mat.name.c_str());
-		}
+		//aliases
+		std::vector<Vertex> vertices;
+		std::vector<GLuint> indices;
 
 		for(fastgltf::Primitive& p : m.primitives) {
-			//id of split
-			uint64_t meshSplitId = 0;
-			for(uint64_t i = 0; i < mbp.size(); i++) {
-				if(model->materials[p.materialIndex.value()].name.c_str() == mbp[i].materialName) {
-					meshSplitId = i; break;
-				}
-			}
-
-			//aliases
-			auto& vertices = mbp[meshSplitId].vertices;
-			auto& indices = mbp[meshSplitId].indices;
-
 			size_t initialId = vertices.size();
+			uint64_t matIndex = 32;
+			if(p.materialIndex.has_value()) {
+				matIndex = p.materialIndex.value();
+				GMSEntry* g = GlobalMaterialStore::getById(matIndex+this->mFirstGMSMaterial);
+				std::cout << "M" << matIndex << '(' << matIndex+this->mFirstGMSMaterial << "): " << g->name << ':' << g->material.textureSlot << '\n';
+			}
 
 			//indices
 			{
@@ -213,15 +215,13 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 				});
 			}
 
-			//vertices
+			//position + material index
 			{
 				fastgltf::Accessor& verticesAccess = model->accessors[p.findAttribute("POSITION")->accessorIndex];
 				vertices.resize(vertices.size() + verticesAccess.count);
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, verticesAccess, [&](glm::vec3 aV, GLuint aId) {
 					vertices[aId + initialId].position = aV;
-					//std::cout << "vertex in node " <<
-					//meshMatrices[meshMatrixId] << ": " <<
-					//aV << '\n';
+					vertices[initialId+aId].materialId = matIndex;
 				});
 			}
 
@@ -265,19 +265,6 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 						vertices[initialId+aId].boneWeights[1] = aV.y();
 						vertices[initialId+aId].boneWeights[2] = aV.z();
 						vertices[initialId+aId].boneWeights[3] = aV.w();
-
-						//CHECKED
-						//std::cout <<
-						//"JOINTS_0 in node " <<
-						//meshMatrices[meshMatrixId] << ": " <<
-						//vertices[initialId+aId].boneIds[0] << ' ' <<
-						//vertices[initialId+aId].boneIds[1] << ' ' <<
-						//vertices[initialId+aId].boneIds[2] << ' ' <<
-						//vertices[initialId+aId].boneIds[3] << " WEIGHTS_0: " <<
-						//vertices[initialId+aId].boneWeights[0] << ' ' <<
-						//vertices[initialId+aId].boneWeights[1] << ' ' <<
-						//vertices[initialId+aId].boneWeights[2] << ' ' <<
-						//vertices[initialId+aId].boneWeights[3] << '\n';
 					});
 				}
 			}
@@ -285,10 +272,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 
 		meshMatrixId++;
 
-		for(MeshBlueprint& bp : mbp) {
-			if(bp.vertices.size() == 0 || bp.indices.size() == 0) continue;
-			this->mMeshes.emplace_back(bp);
-		}
+		this->mMeshes.emplace_back(m.name.c_str(), vertices, indices);
 	}
 
 	//process animations
@@ -296,7 +280,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 		this->mAnimations.push_back({});
 		auto& anim = this->mAnimations.back();
 		anim.mName = a.name.c_str();
-		std::cout << "Found animaton: " << a.name.c_str() << '\n';
+		std::cout << "Found animation: " << a.name.c_str() << '\n';
 
 		for(fastgltf::AnimationSampler& s : a.samplers) {
 			anim.mSamplers.push_back({});
@@ -338,27 +322,19 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 }
 
 void Model::addVariant(const std::string_view aMaterialName, const std::string_view aTexturePath, const std::string_view aIdentificator) noexcept {
-	GMSEntry* variant = GlobalMaterialStore::copyStandard(aMaterialName);
+	GMSEntry* variant = GlobalMaterialStore::addVariant(aMaterialName, aIdentificator);
 	variant->texture = Texture(aTexturePath);
-	variant->variant = aIdentificator;
 }
 void Model::addVariant(const std::string_view aMaterialName, const Material& aMaterialRef, const std::string_view aIdentificator) noexcept {
-	GMSEntry* variant = GlobalMaterialStore::copyStandard(aMaterialName);
+	GMSEntry* variant = GlobalMaterialStore::addVariant(aMaterialName, aIdentificator);
 	variant->material = aMaterialRef;
-	variant->variant = aIdentificator;
 }
 
 void Model::setVariant(const std::string_view aMaterialName, const std::string_view aIdentificator) noexcept {
-	for(Mesh& m : mMeshes) {
-		//only the meshes with the material name
-		if(m.mEntry->name == aMaterialName) { m.setEntry(GlobalMaterialStore::get(aMaterialName, aIdentificator)); }
-	}
+	GlobalMaterialStore::setVariant(aMaterialName, aIdentificator);
 }
 void Model::resetVariant(const std::string_view aMaterialName) noexcept {
-	for(Mesh& m : mMeshes) {
-		//only the meshes with the material name
-		if(m.mEntry->name == aMaterialName) { m.resetEntry(); }
-	}
+	GlobalMaterialStore::resetVariant(aMaterialName);
 }
 
 void Model::sendAnimationDataToShader(StructUniform<glm::mat4>& aBoneMatrices, const bool aRecalcAnim) noexcept {
@@ -371,8 +347,9 @@ void Model::sendAnimationDataToShader(StructUniform<glm::mat4>& aBoneMatrices, c
 void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept {
 	sendAnimationDataToShader(aBoneMatrices);
 
+	GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstGMSMaterial, this->mLastGMSMaterial);
 	for(Mesh& m : this->mMeshes) {
-		m.draw(aUniform);
+		m.draw();
 	}
 }
 

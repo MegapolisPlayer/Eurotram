@@ -54,6 +54,7 @@ std::ostream& operator<<(std::ostream& aStream, const LogLevel aLevel) noexcept 
 
 std::string readFile(std::fstream& aStream, const std::string_view aFilepath) noexcept {
 	std::string result;
+	result.reserve(FILE_READ_BLOCK_SIZE);
 	std::string buffer(FILE_READ_BLOCK_SIZE, '\0');
 	aStream.open(aFilepath.data(), std::ios::in | std::ios::binary);
 	if(!aStream.is_open()) {
@@ -63,7 +64,7 @@ std::string readFile(std::fstream& aStream, const std::string_view aFilepath) no
 
 	while(aStream.read(&buffer[0], FILE_READ_BLOCK_SIZE)) {
 		result.append(buffer);
-		buffer.clear();
+		memset(&buffer[0], 0, FILE_READ_BLOCK_SIZE); //do not decrease size; string are contiguous
 	};
 
 	result.append(buffer);

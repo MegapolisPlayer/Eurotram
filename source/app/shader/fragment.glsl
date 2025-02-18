@@ -15,6 +15,8 @@ struct Material {
 	int textureSlot;
 	float textureOpacity;
 	float brightness;
+
+	//16 byte aligned
 };
 
 struct Dirlight {
@@ -47,7 +49,7 @@ struct Spotlight {
 out vec4 oColor;
 
 in vec2 pTexCoord;
-flat in float pTexId; //TODO id of material in GMS
+flat in float pMatId;
 in vec3 pNormals;
 in vec3 pFragmentPos;
 
@@ -57,9 +59,8 @@ in vec4 pFragmentFlashlightLightPos;
 in vec4 pFragmentLeftFrontLightPos;
 in vec4 pFragmentRightFrontLightPos;
 
-//TODO pass entire GMS?
 layout(std430, binding = 50) readonly buffer sMaterial {
-	layout(align = 16) Material mat1;
+	Material materials[];
 };
 layout(std430, binding = 51) readonly buffer sDirlight {
 	Dirlight dl;
@@ -159,6 +160,8 @@ float calculateShadows(int aTextureId, vec4 aCoords, vec3 aNormalizedNormal, vec
 }
 
 void main() {
+	Material mat1 = materials[int(round(pMatId))];
+
 	vec4 baseColor = mix(mat1.color, texture(uTextures[mat1.textureSlot], pTexCoord), mat1.textureAmount);
 
 	vec3 normalizedNormal = normalize(pNormals);
@@ -209,6 +212,7 @@ void main() {
 		lighting += calculateSpot(
 			dst, normalizedNormal, lightDirection, viewDirection, mat1, spotlights[i]
 		) * strength * shadow;
+		//specular present only if no shadow
 		lightingSpecular += getSpecular(
 			spotlights[i].color.xyz, dst,
 			spotlights[i].constant, spotlights[i].linear, spotlights[i].quadratic,
@@ -222,9 +226,6 @@ void main() {
 	calculateShadows(13, pFragmentRightFrontLightPos, normalizedNormal, directionalLightDirection);
 	calculateShadows(12, pFragmentLeftFrontLightPos, normalizedNormal, directionalLightDirection);
 
-	//specular present only if no shadow
 	//oColor = vec4(1.0, 0.0, 1.0, 1.0);
-	oColor = vec4(
-		baseColor.xyz * clamp(uAmbientLight + lighting + lightingSpecular, 0.0, 1.0),
-		1.0); //normal calc TODO transparency
+	oColor = vec4(baseColor.xyz * clamp(uAmbientLight + lighting + lightingSpecular, 0.0, 1.0), 1.0); //normal calc TODO transparency
 };

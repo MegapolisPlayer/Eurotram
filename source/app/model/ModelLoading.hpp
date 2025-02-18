@@ -66,6 +66,9 @@ private:
 	std::vector<GLTFNode> mNodes; //pair of node world transform and id of skin
 	std::vector<glm::mat4> mOutput;
 
+	uint64_t mFirstGMSMaterial;
+	uint64_t mLastGMSMaterial;
+
 	glm::mat4 getNewNodeTransform(GLTFNode& aNode) noexcept;
 	void updateJoint(GLTFNode& aNode, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
 };
