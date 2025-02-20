@@ -110,6 +110,8 @@ function renderTextureParcels() {
 }
 
 function texparcelAddMenu(aX, aY) {
+	canvasData.edit.replaceChildren();
+
 	canvasData.edit.appendChild(document.createTextNode("Setup texture parcel x = "+aX+", y = "+aY));
 	canvasData.edit.appendChild(document.createElement("br"));
 

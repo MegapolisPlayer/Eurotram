@@ -5,6 +5,12 @@
 class Transform {
 public:
 	Transform() noexcept;
+	Transform(const glm::mat4& aMatrix) noexcept;
+
+	Transform(Transform&) noexcept = delete;
+	Transform(Transform&& aOther) noexcept;
+	Transform& operator=(Transform&) noexcept = delete;
+	Transform& operator=(Transform&& aOther) noexcept;
 
 	void setPosition(const glm::vec3& aPosition) noexcept;
 	void addPosition(const glm::vec3& aPositionChange) noexcept;

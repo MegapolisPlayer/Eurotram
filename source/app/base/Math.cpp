@@ -1,6 +1,10 @@
 #include "Math.hpp"
 
 namespace Math {
+	float linearInterpolation(const float a1, const float a2, const float aT) noexcept {
+		return a1+((a2-a1)*aT);
+	}
+
 	//3x faster than using glm::mix
 	BezierPoint linearInterpolation(const glm::vec2& a1, const glm::vec2& a2, const float aT) noexcept {
 		return glm::vec2(a1.x+((a2.x-a1.x)*aT), a1.y+((a2.y-a1.y)*aT));
@@ -83,5 +87,18 @@ namespace Math {
 		glm::vec3 edge1 = aPoint2 - aPoint1;
 		glm::vec3 edge2 = aPoint3 - aPoint2;
 		return glm::cross(edge1, edge2);
+	}
+
+	//declared in Math.hpp as extern
+	static std::random_device sRandomDevice;
+	static std::mt19937 sRandomGenerator;
+
+	std::mt19937& getRandomGenerator() noexcept {
+		return sRandomGenerator;
+	}
+
+	float getRandomNumber(const float aMin, const float aMax) noexcept {
+		std::uniform_real_distribution<> distribution(aMin, aMax);
+		return distribution(sRandomGenerator);
 	}
 }

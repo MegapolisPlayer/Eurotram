@@ -11,8 +11,6 @@
 #include "SwitchSignal.hpp"
 #include "Track.hpp"
 #include "StationPillar.hpp"
-#include "Wall.hpp"
-#include "Texparcel.hpp"
 #include "Tree.hpp"
 #include "Button.hpp"
 #include "Wire.hpp"

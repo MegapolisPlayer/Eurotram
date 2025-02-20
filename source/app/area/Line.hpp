@@ -23,7 +23,7 @@ namespace LineData {
 		uint32_t arrivalTime; //in minutes since start of scenario
 		uint32_t timeInStation;
 		bool isControlPoint;
-		std::vector<Switch> switches;
+		std::vector<Switch> switches; //AFTER this station
 	};
 
 	enum LineType : uint8_t {
@@ -72,11 +72,18 @@ public:
 	void open(const std::string_view aFilename, Annunciator* aAnnunciator) noexcept;
 
 	//plays next announcement, returns how long to stay at station currently announced
-	//also updates delay
+	//also updates delay - pass time since start of scenarion in minutes
 	uint64_t next(const uint64_t aMinuteTime) noexcept;
 
-	//returns false is scenario ended
+	//returns false if scenario at end
 	bool nextLoop() noexcept;
+
+	//call when passed switch - gets new one at each call
+	std::optional<LineData::Switch> getNextSwitch() noexcept;
+
+	//for current stop
+	//detection of wrong direction at switch - track if stations not announced correctly - if yes and reach switch GAME OVER TODO
+	std::vector<LineData::Switch>& getSwitchesToNextStop() noexcept;
 
 	void playNextAnnouncement() noexcept;
 
@@ -113,15 +120,20 @@ public:
 	bool isStationLast() const noexcept;
 	bool isLoopLast() const noexcept;
 
+	LineData::Station getNextStation() const noexcept;
+
 	~Line() noexcept;
 private:
 	std::vector<LineData::Loop> mLoops;
 	uint64_t mCurrentLoopId;
-	int64_t mCurrentStationId; //this value might be -1 before first station announcement
+	int64_t mCurrentStationId; //this value can be -1 before first station announcement
+	int64_t mCurrentSwitchId; //this value can be -1 if no more switches before stop TODO
+
 	uint64_t mDelay;
 	uint16_t mWeather;
 	uint64_t mStartDate;
 	bool mInitialized;
+
 	Annunciator* mAnnunciator;
 	std::string mLineName;
 	std::string mAuthorName;

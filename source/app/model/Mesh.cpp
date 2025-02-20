@@ -28,18 +28,29 @@ Mesh& Mesh::operator=(Mesh&& aOther) noexcept {
 	return *this;
 }
 
-void Mesh::draw() noexcept {
+void Mesh::draw(UniformMat4& aTransformUniform, UniformMat3& aNormalUniform) noexcept {
 	this->mVAO.bind();
+	aTransformUniform.set(this->mModel.getMatrix());
+	aNormalUniform.set(this->mModel.getNormalMatrix());
 	//material values bound in model
 	//this->mVBO.drawPoints();
 	this->mIBO.draw();
 	this->mVAO.unbind();
 }
-void Mesh::drawInstanced(const uint64_t aCount) noexcept {
+void Mesh::drawInstanced(UniformMat4& aTransformUniform, UniformMat3& aNormalUniform, const uint64_t aCount) noexcept {
 	this->mVAO.bind();
+	aTransformUniform.set(this->mModel.getMatrix());
+	aNormalUniform.set(this->mModel.getNormalMatrix());
 	//this->mVBO.drawPoints();
 	this->mIBO.drawInstanced(aCount);
 	this->mVAO.unbind();
+}
+
+std::string Mesh::getName() const noexcept {
+	return this->mName;
+}
+Transform& Mesh::getTransform() noexcept {
+	return this->mModel;
 }
 
 Mesh::~Mesh() noexcept {}

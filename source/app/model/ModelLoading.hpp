@@ -53,8 +53,8 @@ public:
 
 	void sendAnimationDataToShader(StructUniform<glm::mat4>& aBoneMatrices, const bool aRecalcAnim = true) noexcept;
 
-	void draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept;
-	void drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aCount) noexcept;
+	void draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, UniformMat4& aTransformUniform, UniformMat3& aNormalUniform) noexcept;
+	void drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, UniformMat4& aTransformUniform, UniformMat3& aNormalUniform, const uint64_t aCount) noexcept;
 
 	void setAnimation(std::string_view aAnimationName, const float aTime) noexcept;
 
@@ -63,6 +63,8 @@ public:
 	//TODO
 
 	void updateAnimation(StructUniform<glm::mat4>& aBoneMatrices) noexcept; //called automatically on draw
+
+	Mesh* getMesh(const std::string_view aName) noexcept;
 
 	~Model() noexcept;
 private:

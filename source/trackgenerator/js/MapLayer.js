@@ -7,13 +7,16 @@ let mapShiftX = 0;
 let mapShiftY = 0;
 
 function mapLayerUpdate(adx = 0, ady = 0) {
-	let p = mapLayer.latLngToContainerPoint(mapCenter);
-	//invert since if we move left map moves right
+	let p = mapLayer.options.crs.latLngToPoint(
+		L.latLng(mapCenter[0], mapCenter[1]), mapLayer.getZoom()
+	);
+	//console.log(p);
 
+	//invert since if we move left map moves right
 	p.x -= adx;
 	p.y -= ady;
 
-	let ll = mapLayer.containerPointToLatLng(p);
+	let ll = mapLayer.options.crs.pointToLatLng(p, mapLayer.getZoom());
 	mapCenter[0] = ll.lat;
 	mapCenter[1] = ll.lng;
 

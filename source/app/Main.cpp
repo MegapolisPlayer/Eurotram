@@ -142,6 +142,7 @@ int main() {
 
 	//WINDOW MUST BE INITIALIZED FOR THIS TO WORK
 	Map m("Praha.etmap");
+	m.randomizeBuildingColors();
 
 	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 1000.0f, 0.1f);
 
@@ -239,7 +240,7 @@ int main() {
 
 	GMSEntry* nightWindows = GlobalMaterialStore::addVariant("Material.windowDay", "NIGHT");
 	nightWindows->material.color = glm::vec4(231.0/255.0, 226.0/255.0, 19.0/255.0, 1.0);
-	nightWindows->material.brightness = 1.0f;
+	nightWindows->material.brightness = MAX_BRIGHTNESS;
 	nightWindows->material.specular = glm::vec4(0.0);
 
 	uint64_t i = 0;
@@ -251,13 +252,13 @@ int main() {
 		ss.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
 		t3rp.sendAnimationDataToShader(lmat);
-		t3rp.draw(uMaterial, uModelMat);
+		t3rp.draw(uMaterial, uModelMat, matModelUniform, matNormalUniform);
 		ss.endPass(mainWindow);
 
 		ds.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
 		t3rp.sendAnimationDataToShader(lmat);
-		t3rp.draw(uMaterial, uModelMat);
+		t3rp.draw(uMaterial, uModelMat, matModelUniform, matNormalUniform);
 		ds.endPass(mainWindow);
 
 		// main draw
@@ -291,13 +292,13 @@ int main() {
 		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
 		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
 
-		t3rp.draw(uMaterial, uModelMat);
+		t3rp.draw(uMaterial, uModelMat, matModelUniform, matNormalUniform);
 
 		matModelUniform.set(glm::mat4(1.0));
 		matNormalUniform.set(glm::mat4(1.0));
 
 		m.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
-		m.draw(uMaterial, uModelMat, 35, uIsInstancedRendering);
+		m.draw(uMaterial, uModelMat, matModelUniform, matNormalUniform, 35, uIsInstancedRendering);
 
 		drawTimer.end();
 

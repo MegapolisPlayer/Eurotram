@@ -227,7 +227,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 				fastgltf::Accessor& verticesAccess = model->accessors[p.findAttribute("POSITION")->accessorIndex];
 				vertices.resize(vertices.size() + verticesAccess.count);
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, verticesAccess, [&](glm::vec3 aV, GLuint aId) {
-					vertices[aId + initialId].position = glm::vec3(this->mNodes[meshMatrices[meshMatrixId]].transformMatrix * glm::vec4(aV, 1.0));
+					vertices[aId + initialId].position = aV;
 					vertices[initialId+aId].materialId = matIndex;
 				});
 			}
@@ -280,6 +280,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 		meshMatrixId++;
 
 		this->mMeshes.emplace_back(m.name.c_str(), vertices, indices);
+		this->mMeshes.back().mModel = Transform(this->mNodes[meshMatrices[meshMatrixId]].transformMatrix);
 	}
 
 	//process animations
@@ -374,15 +375,15 @@ void Model::sendAnimationDataToShader(StructUniform<glm::mat4>& aBoneMatrices, c
 	aBoneMatrices.set();
 }
 
-void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices) noexcept {
+void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, UniformMat4& aTransformUniform, UniformMat3& aNormalUniform) noexcept {
 	sendAnimationDataToShader(aBoneMatrices);
 
 	GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstGMSMaterial, this->mLastGMSMaterial);
 	for(Mesh& m : this->mMeshes) {
-		m.draw();
+		m.draw(aTransformUniform, aNormalUniform);
 	}
 }
-void Model::drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aCount) noexcept {
+void Model::drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, UniformMat4& aTransformUniform, UniformMat3& aNormalUniform, const uint64_t aCount) noexcept {
 	if(aCount == 0) return; //so we dont have to check at each call
 
 	sendAnimationDataToShader(aBoneMatrices);
@@ -390,7 +391,7 @@ void Model::drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& a
 
 	GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstGMSMaterial, this->mLastGMSMaterial);
 	for(Mesh& m : this->mMeshes) {
-		m.drawInstanced(aCount);
+		m.drawInstanced(aTransformUniform, aNormalUniform, aCount);
 	}
 }
 
@@ -409,6 +410,13 @@ void Model::updateAnimation(StructUniform<glm::mat4>& aBoneMatrices) noexcept {
 	for(GLTFNode& n : this->mNodes) {
 		this->updateJoint(n, aBoneMatrices);
 	}
+}
+
+Mesh* Model::getMesh(const std::string_view aName) noexcept {
+	for(Mesh& m : this->mMeshes) {
+		if(m.mName == aName) return &m;
+	}
+	return nullptr;
 }
 
 Model::~Model() noexcept {}

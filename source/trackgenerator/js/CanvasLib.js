@@ -228,7 +228,7 @@ function dragHandler(event) {
 	let dx = Math.trunc((event.pageX - event.target.offsetLeft))-dragStartX;
 	let dy = Math.trunc((event.pageY - event.target.offsetTop))-dragStartY;
 
-	mapLayerUpdate(dx, dy); //send clean data here
+	mapLayerUpdate(dx, dy);
 
 	dx = Math.trunc(dx * (1.0/canvasData.scale));
 	dy = Math.trunc(dy * (1.0/canvasData.scale));

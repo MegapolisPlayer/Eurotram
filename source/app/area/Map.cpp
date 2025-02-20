@@ -20,8 +20,9 @@ void readLocationToString(std::ifstream& aStream, RotatedObjectLocation& aLocati
 
 GMSEntry* Map::msTrackMaterial = nullptr;
 
-Map::Map() noexcept
-	: mTrackVertices(nullptr, 0, 0), mTrackIndices(nullptr, 0),
+Map::Map() noexcept :
+	mOverheadWireVertices(nullptr, 0, 0), mOverheadWireIndices(nullptr, 0),
+	mTrackVertices(nullptr, 0, 0), mTrackIndices(nullptr, 0),
 	mSwitchSignalModel("./SwitchSignal.glb"), mSwitchSignalMatrices(nullptr, 0), mSwitchSignalIds(nullptr, 0),
 	mSignalModel("./Signal.glb"), mSignalMatrices(nullptr, 0), mSignalIds(nullptr, 0),
 	mStationPillarModel("./Stop.glb"), mPillarMatrices(nullptr, 0), mPillarIds(nullptr, 0),
@@ -31,8 +32,9 @@ Map::Map() noexcept
 	mSignVertices(nullptr, 0, 0), mSignIndices(nullptr, 0), mFirstSignMaterial(0), mLastSignMaterial(0),
 	mTexparcelVertices(nullptr, 0, 0), mTexparcelIndices(nullptr, 0) {}
 
-Map::Map(const std::string_view aFilename) noexcept
-	: mTrackVertices(nullptr, 0, 0), mTrackIndices(nullptr, 0),
+Map::Map(const std::string_view aFilename) noexcept :
+	mOverheadWireVertices(nullptr, 0, 0), mOverheadWireIndices(nullptr, 0),
+	mTrackVertices(nullptr, 0, 0), mTrackIndices(nullptr, 0),
 	mSwitchSignalModel("./SwitchSignal.glb"), mSwitchSignalMatrices(nullptr, 0), mSwitchSignalIds(nullptr, 0),
 	mSignalModel("./Signal.glb"), mSignalMatrices(nullptr, 0), mSignalIds(nullptr, 0),
 	mStationPillarModel("./Stop.glb"), mPillarMatrices(nullptr, 0), mPillarIds(nullptr, 0),
@@ -155,7 +157,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 	//F
 	readBytesToString(fileHandle, buffer, 4);
-	this->mSignCount = *((uint32_t*)buffer.data());
+	uint32_t signAmount = *((uint32_t*)buffer.data());
 
 	//X
 	readBytesToString(fileHandle, buffer, 4);
@@ -186,7 +188,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 	std::cout << "Building amount: " << this->mBuildingCount << '\n';
 	std::cout << "Landmark amount: " << landmarksAmount << '\n';
 	std::cout << "Wall amount: " << wallAmount << '\n';
-	std::cout << "Sign amount: " << this->mSignCount << '\n';
+	std::cout << "Sign amount: " << signAmount << '\n';
 	std::cout << "Texparcel amount: " << texparcelAmount << '\n';
 
 	//Nodes list
@@ -372,20 +374,108 @@ void Map::open(const std::string_view aFilename) noexcept {
 		this->mLandmarks.back().landmarkCode = *(uint32_t*)buffer.data();
 	}
 
-	//Wall list
-	this->mWalls.reserve(wallAmount);
-	for(uint32_t i = 0; i < wallAmount; i++) {
-		this->mWalls.push_back({});
-		readLocationToString(fileHandle, this->mWalls.back().firstPoint, unitsPerMeter);
-		readLocationToString(fileHandle, this->mWalls.back().secondPoint, unitsPerMeter);
+	{
+		//Wall list
 
-		readBytesToString(fileHandle, buffer, 2);
-		this->mWalls.back().height = *((int16_t*)buffer.data());
+		std::vector<Vertex> wallVertices;
 
-		readBytesToString(fileHandle, buffer, 4);
-		this->mWalls.back().code = *((uint32_t*)buffer.data());
+		this->mFirstWallMaterial = GlobalMaterialStore::getLength();
+		for(uint32_t i = 0; i < wallAmount; i++) {
+			ObjectLocation o1;
+			ObjectLocation o2;
 
-		std::getline(fileHandle, this->mWalls.back().material, '\0');
+			readLocationToString(fileHandle, o1, unitsPerMeter);
+			readLocationToString(fileHandle, o2, unitsPerMeter);
+
+			readBytesToString(fileHandle, buffer, 2);
+			int16_t height = *((int16_t*)buffer.data());
+
+			readBytesToString(fileHandle, buffer, 4); //ignore st, code
+
+			std::getline(fileHandle, buffer, '\0'); //material name
+
+			//front face
+			wallVertices.emplace_back(glm::vec3(o1.x, o1.h, o1.y));
+			wallVertices.emplace_back(glm::vec3(o2.x, o2.h, o2.y));
+			wallVertices.emplace_back(glm::vec3(o2.x, o2.h+height, o2.y));
+			wallVertices.emplace_back(glm::vec3(o1.x, o1.h+height, o1.y));
+
+			//already CCW order
+			glm::vec3 frontNormal = Math::normals(
+				wallVertices[wallVertices.size()-4].position,
+				wallVertices[wallVertices.size()-3].position,
+				wallVertices[wallVertices.size()-2].position,
+				wallVertices[wallVertices.size()-1].position
+			);
+			for(int8_t j = 0; j < 4; j++) {
+				wallVertices[wallVertices.size()-4+j].normal = frontNormal;
+			}
+
+			//back face - we need this due to backface culling
+			wallVertices.emplace_back(glm::vec3(o2.x, o2.h, o2.y));
+			wallVertices.emplace_back(glm::vec3(o1.x, o1.h, o1.y));
+			wallVertices.emplace_back(glm::vec3(o1.x, o1.h+height, o1.y));
+			wallVertices.emplace_back(glm::vec3(o2.x, o2.h+height, o2.y));
+
+			//already CCW order
+			glm::vec3 backNormal = Math::normals(
+				wallVertices[wallVertices.size()-4].position,
+				wallVertices[wallVertices.size()-3].position,
+				wallVertices[wallVertices.size()-2].position,
+				wallVertices[wallVertices.size()-1].position
+			);
+			for(int8_t j = 0; j < 4; j++) {
+				wallVertices[wallVertices.size()-4+j].normal = backNormal;
+			}
+
+			//tex coords - in correct CCW order from bottom left
+			wallVertices[wallVertices.size()-8].texCoords = glm::vec2(0.0, 0.0);
+			wallVertices[wallVertices.size()-7].texCoords = glm::vec2(1.0, 0.0);
+			wallVertices[wallVertices.size()-6].texCoords = glm::vec2(1.0, 1.0);
+			wallVertices[wallVertices.size()-5].texCoords = glm::vec2(0.0, 1.0);
+
+			wallVertices[wallVertices.size()-4].texCoords = glm::vec2(0.0, 0.0);
+			wallVertices[wallVertices.size()-3].texCoords = glm::vec2(1.0, 0.0);
+			wallVertices[wallVertices.size()-2].texCoords = glm::vec2(1.0, 1.0);
+			wallVertices[wallVertices.size()-1].texCoords = glm::vec2(0.0, 1.0);
+
+			//WallMat is prefix for texparcels
+			GMSEntry* wallMaterial = GlobalMaterialStore::getByName("WallMat."+buffer);
+			uint64_t wallMaterialId = 0;
+			if(!wallMaterial) {
+				wallMaterial = GlobalMaterialStore::add(&wallMaterialId);
+				this->mWallMaterials.push_back(wallMaterial);
+				wallMaterial->name = "WallMat."+buffer;
+				wallMaterial->texture = Texture(WALL_TEXTURE_PREFIX+buffer+"."+TEXTURE_EXTENSION);
+				wallMaterial->material.textureSlot = wallMaterialId - this->mFirstWallMaterial;
+				wallVertices[wallVertices.size()-4].materialId = wallMaterialId - this->mFirstWallMaterial;
+				wallVertices[wallVertices.size()-3].materialId = wallMaterialId - this->mFirstWallMaterial;
+				wallVertices[wallVertices.size()-2].materialId = wallMaterialId - this->mFirstWallMaterial;
+				wallVertices[wallVertices.size()-1].materialId = wallMaterialId - this->mFirstWallMaterial;
+			}
+			else {
+				wallMaterialId = GlobalMaterialStore::findId("WallMat."+buffer); //variants will be add later
+				wallVertices[wallVertices.size()-4].materialId = wallMaterialId - this->mFirstWallMaterial;
+				wallVertices[wallVertices.size()-3].materialId = wallMaterialId - this->mFirstWallMaterial;
+				wallVertices[wallVertices.size()-2].materialId = wallMaterialId - this->mFirstWallMaterial;
+				wallVertices[wallVertices.size()-1].materialId = wallMaterialId - this->mFirstWallMaterial;
+			}
+		}
+		this->mLastWallMaterial = GlobalMaterialStore::getLength(); //non inclusive
+
+		std::vector<GLuint> wallIndices;
+		//same for both sides of wall
+		for(uint32_t i = 0; i < wallVertices.size(); i+=4) {
+			wallIndices.insert(wallIndices.end(), {i, 1+i, 2+i, 2+i, 3+i, 0+i});
+		}
+
+		this->mWallArray.bind();
+
+		this->mWallVertices = VertexBuffer((float*)wallVertices.data(), wallVertices.size(), STANDARD_MODEL_VERTEX_FLOAT_AMOUNT);
+		this->mWallVertices.enableStandardAttributes(&this->mWallArray);
+
+		this->mWallIndices = IndexBuffer(wallIndices.data(), wallIndices.size());
+		this->mWallIndices.bind();
 	}
 
 	{
@@ -394,8 +484,8 @@ void Map::open(const std::string_view aFilename) noexcept {
 		std::vector<Vertex> signVertices;
 		std::vector<GLuint> signIndices;
 
-		this->mSigns.reserve(this->mSignCount);
-		for(uint32_t i = 0; i < this->mSignCount; i++) {
+		this->mSigns.reserve(signAmount);
+		for(uint32_t i = 0; i < signAmount; i++) {
 			this->mSigns.push_back({});
 			readLocationToString(fileHandle, this->mSigns.back().location, unitsPerMeter);
 			readBytesToString(fileHandle, buffer, 4);
@@ -452,7 +542,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 			//tex coords - in correct CCW order from bottom left
 			texparcelVertices[texparcelVertices.size()-4].texCoords = glm::vec2(0.0, 0.0);
-			texparcelVertices[texparcelVertices.size()-3].texCoords = glm::vec2(0.0, 1.0);
+			texparcelVertices[texparcelVertices.size()-3].texCoords = glm::vec2(1.0, 0.0);
 			texparcelVertices[texparcelVertices.size()-2].texCoords = glm::vec2(1.0, 1.0);
 			texparcelVertices[texparcelVertices.size()-1].texCoords = glm::vec2(0.0, 1.0);
 
@@ -463,9 +553,11 @@ void Map::open(const std::string_view aFilename) noexcept {
 			GMSEntry* tpMaterial = GlobalMaterialStore::getByName("TexparcelMat."+buffer);
 			uint64_t texparcelMaterialId = 0;
 			if(!tpMaterial) {
-				GMSEntry* texparcelMaterial = GlobalMaterialStore::add(&texparcelMaterialId);
-				this->mTexparcelMaterials.push_back(texparcelMaterial);
-				texparcelMaterial->texture = Texture("tp-"+buffer+".png");
+				tpMaterial = GlobalMaterialStore::add(&texparcelMaterialId);
+				this->mTexparcelMaterials.push_back(tpMaterial);
+				tpMaterial->name = "TexparcelMat."+buffer;
+				tpMaterial->texture = Texture(TEXPARCEL_TEXTURE_PREFIX+buffer+"."+TEXTURE_EXTENSION);
+				tpMaterial->material.textureSlot = texparcelMaterialId - this->mFirstTPMaterial;
 				texparcelVertices[texparcelVertices.size()-4].materialId = texparcelMaterialId - this->mFirstTPMaterial;
 				texparcelVertices[texparcelVertices.size()-3].materialId = texparcelMaterialId - this->mFirstTPMaterial;
 				texparcelVertices[texparcelVertices.size()-2].materialId = texparcelMaterialId - this->mFirstTPMaterial;
@@ -528,6 +620,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 				secondNode = glm::vec2(this->mNodes[t.second].location.x, this->mNodes[t.second].location.y);
 			}
 
+			uint64_t oldVertexAmount = trackVertices.size();
 			if(t.flags & TRACK_FLAG_BEZIER) {
 				trackVertices.reserve(trackVertices.size() + Math::DEFAULT_BEZIER_PRECISION*4);
 				trackIndices.reserve(trackIndices.size() + Math::DEFAULT_BEZIER_PRECISION/4*6); //for every 4 vertices 6 indices
@@ -541,9 +634,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 				t.points = curve;
 				t.length = Math::bezierLength(t.points);
-
-				//TODO add height loading
-				//TODO make 2 tracks instead of one
+				t.pointsAmount = t.points.size();
 
 				std::vector<Math::BezierPoint> topCurve = Math::moveBezier(curve, glm::vec2(TRACK_GAUGE/2+TRACK_WIDTH/2));
 				std::vector<Math::BezierPoint> topInnerCurve = Math::moveBezier(curve, glm::vec2(TRACK_GAUGE/2));
@@ -555,134 +646,82 @@ void Map::open(const std::string_view aFilename) noexcept {
 				//2 from each bezier curve
 				//generate texcoords based on this
 
-				for(uint32_t i = 0; i < topCurve.size()-1; i+=2) {
+				for(uint32_t i = 0; i < topCurve.size(); i++) {
+					uint8_t point1 = std::floor((float)i/(float)topCurve.size()*TRACK_HEIGHTPOINTS_AMOUNT);
+					uint8_t point2 = std::ceil((float)i/(float)topCurve.size()*TRACK_HEIGHTPOINTS_AMOUNT);
+					float weight = (float)i/(float)topCurve.size()*TRACK_HEIGHTPOINTS_AMOUNT - point1;
+					float height = Math::linearInterpolation(t.heightpoints[point1], t.heightpoints[point2], weight)+TRACK_Z_FIGHT_AVOIDANCE;
+
 					//H values are Y axis
 
 					//rail 1
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(topCurve[i].x, 0.05, topCurve[i].y);
+					trackVertices.back().position = glm::vec3(topCurve[i].x, height, topCurve[i].y);
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(topCurve[i+1].x, 0.05, topCurve[i+1].y);
-					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(topInnerCurve[i].x, 0.05, topInnerCurve[i].y);
-					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(topInnerCurve[i+1].x, 0.05, topInnerCurve[i+1].y);
+					trackVertices.back().position = glm::vec3(topInnerCurve[i].x, height, topInnerCurve[i].y);
 
 					//rail 2
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(bottomCurve[i].x, 0.05, bottomCurve[i].y);
+					trackVertices.back().position = glm::vec3(bottomCurve[i].x, height, bottomCurve[i].y);
 					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(bottomCurve[i+1].x, 0.05, bottomCurve[i+1].y);
-					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(bottomInnerCurve[i].x, 0.05, bottomInnerCurve[i].y);
-					trackVertices.push_back({});
-					trackVertices.back().position = glm::vec3(bottomInnerCurve[i+1].x, 0.05, bottomInnerCurve[i+1].y);
-
-					//index buffer
-					//[0,2,1 ; 2,3,1] top
-					//[4,6,5 ; 6,7,5] bottom
-					trackIndices.insert(trackIndices.end(), {
-						(uint32_t)trackVertices.size()-8 + 0,
-						(uint32_t)trackVertices.size()-8 + 2,
-						(uint32_t)trackVertices.size()-8 + 1,
-						(uint32_t)trackVertices.size()-8 + 2,
-						(uint32_t)trackVertices.size()-8 + 3,
-						(uint32_t)trackVertices.size()-8 + 1,
-
-						(uint32_t)trackVertices.size()-8 + 4,
-						(uint32_t)trackVertices.size()-8 + 6,
-						(uint32_t)trackVertices.size()-8 + 5,
-						(uint32_t)trackVertices.size()-8 + 6,
-						(uint32_t)trackVertices.size()-8 + 7,
-						(uint32_t)trackVertices.size()-8 + 5,
-					});
-					//if not last
-					if(i < topCurve.size()-3) {
-						//connect to next box
-						//[1,3,8 ; 3,10,8] top
-						//[5,7,12; 7,14,12] bottom
-						trackIndices.insert(trackIndices.end(), {
-							(uint32_t)trackVertices.size()-8 + 1,
-							(uint32_t)trackVertices.size()-8 + 3,
-							(uint32_t)trackVertices.size()-8 + 8,
-							(uint32_t)trackVertices.size()-8 + 3,
-							(uint32_t)trackVertices.size()-8 + 10,
-							(uint32_t)trackVertices.size()-8 + 8,
-
-							(uint32_t)trackVertices.size()-8 + 5,
-							(uint32_t)trackVertices.size()-8 + 7,
-							(uint32_t)trackVertices.size()-8 + 12,
-							(uint32_t)trackVertices.size()-8 + 7,
-							(uint32_t)trackVertices.size()-8 + 14,
-							(uint32_t)trackVertices.size()-8 + 12,
-						});
-					}
-
-					trackVertices[(uint32_t)trackVertices.size()-8+0].texCoords = glm::vec2(float(i)/topCurve.size(), 1.0);
-					trackVertices[(uint32_t)trackVertices.size()-8+1].texCoords = glm::vec2(float(i+1)/topCurve.size(), 1.0);
-					trackVertices[(uint32_t)trackVertices.size()-8+2].texCoords = glm::vec2(float(i)/topCurve.size(), 0.0);
-					trackVertices[(uint32_t)trackVertices.size()-8+3].texCoords = glm::vec2(float(i+1)/topCurve.size(), 0.0);
-					trackVertices[(uint32_t)trackVertices.size()-8+4].texCoords = glm::vec2(float(i)/topCurve.size(), 1.0);
-					trackVertices[(uint32_t)trackVertices.size()-8+5].texCoords = glm::vec2(float(i+1)/topCurve.size(), 1.0);
-					trackVertices[(uint32_t)trackVertices.size()-8+6].texCoords = glm::vec2(float(i)/topCurve.size(), 0.0);
-					trackVertices[(uint32_t)trackVertices.size()-8+7].texCoords = glm::vec2(float(i+1)/topCurve.size(), 0.0);
-				}
+					trackVertices.back().position = glm::vec3(bottomInnerCurve[i].x, height, bottomInnerCurve[i].y);
+				} //end of loop
 			}
 			else {
 				t.points.push_back(firstNode);
 				t.points.push_back(secondNode);
 				t.length = (secondNode-firstNode).length();
-
-				//just linear points - same order
+				t.pointsAmount = TRACK_HEIGHTPOINTS_AMOUNT;
 
 				glm::vec2 dirVector = Math::getPerpendicularVectorFromPoints(firstNode, secondNode);
 				glm::vec2 gaugeVector = dirVector*(TRACK_GAUGE/2);
 				glm::vec2 gaugeLongVector = dirVector*(TRACK_GAUGE/2+TRACK_WIDTH/2);
 
-				//rail 1
-				trackVertices.emplace_back(glm::vec3(firstNode.x+gaugeLongVector.x, 0.05, firstNode.y+gaugeLongVector.y));
-				trackVertices.emplace_back(glm::vec3(secondNode.x+gaugeLongVector.x, 0.05, secondNode.y+gaugeLongVector.y));
-				trackVertices.emplace_back(glm::vec3(firstNode.x+gaugeVector.x, 0.05, firstNode.y+gaugeVector.y));
-				trackVertices.emplace_back(glm::vec3(secondNode.x+gaugeVector.x, 0.05, secondNode.y+gaugeVector.y));
+				for(uint8_t i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
+					//just linear points - same order
+					//interpolate height
 
+					glm::vec2 position = Math::linearInterpolation(firstNode, secondNode, i/float(TRACK_HEIGHTPOINTS_AMOUNT-1));
+					float height = t.heightpoints[i]+TRACK_Z_FIGHT_AVOIDANCE;
+
+					//rail 1
+					trackVertices.emplace_back(glm::vec3(position.x+gaugeLongVector.x, height, position.y+gaugeLongVector.y));
+					trackVertices.emplace_back(glm::vec3(position.x+gaugeVector.x, height, position.y+gaugeVector.y));
+
+					//rail 2
+					trackVertices.emplace_back(glm::vec3(position.x-gaugeVector.x, height, position.y-gaugeVector.y));
+					trackVertices.emplace_back(glm::vec3(position.x-gaugeLongVector.x, height, position.y-gaugeLongVector.y));
+				}
+			}
+
+			//add indices and tex coords - only for current track
+			for(uint32_t i = oldVertexAmount; i < trackVertices.size()-4; i+=4) {
+				//index buffer
+				//[0,1,4 ; 1,5,4] top
+				//[2,3,6 ; 3,7,6] bottom
 				trackIndices.insert(trackIndices.end(), {
-					(uint32_t)trackVertices.size()-4 + 0,
-					(uint32_t)trackVertices.size()-4 + 2,
-					(uint32_t)trackVertices.size()-4 + 1,
-					(uint32_t)trackVertices.size()-4 + 2,
-					(uint32_t)trackVertices.size()-4 + 3,
-					(uint32_t)trackVertices.size()-4 + 1
+					i + 0,
+					i + 1,
+					i + 4,
+					i + 1,
+					i + 5,
+					i + 4,
+					i + 2,
+					i + 3,
+					i + 6,
+					i + 3,
+					i + 7,
+					i + 6,
 				});
 
-				//tex coords
-				trackVertices[(uint32_t)trackVertices.size()-4].texCoords = glm::vec2(0.0, 1.0);
-				trackVertices[(uint32_t)trackVertices.size()-3].texCoords = glm::vec2(1.0, 1.0);
-				trackVertices[(uint32_t)trackVertices.size()-2].texCoords = glm::vec2(0.0, 0.0);
-				trackVertices[(uint32_t)trackVertices.size()-1].texCoords = glm::vec2(1.0, 0.0);
-
-				//rail 2
-				trackVertices.emplace_back(glm::vec3(firstNode.x-gaugeVector.x, 0.05, firstNode.y-gaugeVector.y));
-				trackVertices.emplace_back(glm::vec3(secondNode.x-gaugeVector.x, 0.05, secondNode.y-gaugeVector.y));
-				trackVertices.emplace_back(glm::vec3(firstNode.x-gaugeLongVector.x, 0.05, firstNode.y-gaugeLongVector.y));
-				trackVertices.emplace_back(glm::vec3(secondNode.x-gaugeLongVector.x, 0.05, secondNode.y-gaugeLongVector.y));
-
-				trackIndices.insert(trackIndices.end(), {
-					(uint32_t)trackVertices.size()-4 + 0,
-					(uint32_t)trackVertices.size()-4 + 2,
-					(uint32_t)trackVertices.size()-4 + 1,
-					(uint32_t)trackVertices.size()-4 + 2,
-					(uint32_t)trackVertices.size()-4 + 3,
-					(uint32_t)trackVertices.size()-4 + 1
-				});
-
-				//tex coords
-				trackVertices[(uint32_t)trackVertices.size()-4].texCoords = glm::vec2(0.0, 0.0);
-				trackVertices[(uint32_t)trackVertices.size()-3].texCoords = glm::vec2(1.0, 0.0);
-				trackVertices[(uint32_t)trackVertices.size()-2].texCoords = glm::vec2(0.0, 1.0);
-				trackVertices[(uint32_t)trackVertices.size()-1].texCoords = glm::vec2(1.0, 1.0);
+				trackVertices[i+0].texCoords = glm::vec2(float(i)/t.pointsAmount, 1.0);
+				trackVertices[i+1].texCoords = glm::vec2(float(i)/t.pointsAmount, 0.0);
+				trackVertices[i+2].texCoords = glm::vec2(float(i)/t.pointsAmount, 0.0);
+				trackVertices[i+3].texCoords = glm::vec2(float(i)/t.pointsAmount, 1.0);
 			}
 		}
 
+		//add normals
 		for(uint32_t i = 0; i < trackVertices.size(); i+=4) {
 			//1,0,2,3
 			glm::vec3 normal = Math::normals(
@@ -710,20 +749,44 @@ void Map::open(const std::string_view aFilename) noexcept {
 	}
 }
 
+void Map::randomizeBuildingColors() noexcept {
+
+}
+
 void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept {
 	//switch signals
+	{
+		std::vector<glm::mat4> switchSignalInstanceTranslations;
+		for(SwitchSignal& s : this->mSwitchSignals) {
+
+		}
+	}
 
 	//signals
+	{
+		std::vector<glm::mat4> signalInstanceTranslations;
+		for(Signal& s : this->mSignals) {
+
+		}
+	}
 
 	//pillars
+	{
+		std::vector<glm::mat4> pillarInstanceTranslations;
+		for(StationPillar& p : this->mPillars) {
+			glm::mat4 translation = glm::translate(glm::mat4(1.0), glm::vec3(p.location.x, p.location.h, p.location.y));
+			pillarInstanceTranslations.push_back(translation);
+		}
+		this->mPillarMatrices.setNewData(pillarInstanceTranslations.data(), pillarInstanceTranslations.size()*sizeof(glm::mat4));
+	}
 
 	//trees
 	{
+		std::uniform_real_distribution<> randomDistribution(0, 360);
 		std::vector<glm::mat4> treeInstanceTranslations;
 		for(Tree& t : this->mTrees) {
 			glm::mat4 translation = glm::translate(glm::mat4(1.0), glm::vec3(t.location.x, t.location.h, t.location.y));
-			//TODO random rotation
-			//translation = glm::rotate(translation, glm::radians(-l.location.r), glm::vec3(0.0, 1.0, 0.0));
+			translation = glm::rotate(translation, glm::radians((float)-randomDistribution(Math::getRandomGenerator())), glm::vec3(0.0, 1.0, 0.0));
 			treeInstanceTranslations.push_back(translation);
 		}
 		this->mTreeMatrices.setNewData(treeInstanceTranslations.data(), treeInstanceTranslations.size()*sizeof(glm::mat4));
@@ -766,23 +829,23 @@ void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, Stati
 void Map::updateTextures(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept {
 	//signals
 	for(Signal& s : this->mSignals) {
-
+		s.updateTexture();
 	}
 
 	//switch signals
 	for(SwitchSignal& s : this->mSwitchSignals) {
-
+		s.updateTexture();
 	}
 
 	//pillars
 	for(StationPillar& p : this->mPillars) {
-
+		p.updateTexture();
 	}
 }
 
-//TODO add drawPoints are tag in settings
+//TODO add drawPoints is tag in settings
 
-void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aInstanceBufferLocation, UniformInt& aBoolStateUniform) noexcept {
+void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, UniformMat4& aTransformUniform, UniformMat3& aNormalUniform, const uint64_t aInstanceBufferLocation, UniformInt& aBoolStateUniform) noexcept {
 	//ground (texparcels)
 
 	//no materials -> no texparcels!
@@ -795,35 +858,45 @@ void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrice
 		this->mTexparcelIndices.draw();
 	}
 
+	//walls
+	if(this->mWallMaterials.size()  > 0) {
+		this->mWallArray.bind();
+		GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstWallMaterial, this->mLastWallMaterial);
+		this->mWallVertices.bind();
+		this->mWallIndices.bind();
+		//this->mWallVertices.drawPoints();
+		this->mWallIndices.draw();
+	}
+
 	//all objects
 	aBoolStateUniform.set(1);
 
-	//TODO for signals and pillars -> make another bool+buffer combo: set pre-made textures for them
+	//TODO for signals and pillars -> make another bool+buffer combo: set pre-made textures for them via freetype
 
 	//signals
 	this->mSignalMatrices.bind(aInstanceBufferLocation);
-	this->mSignalModel.drawInstanced(aUniform, aBoneMatrices, this->mSignalCount);
+	this->mSignalModel.drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mSignalCount);
 
 	//switch signals
 	this->mSwitchSignalMatrices.bind(aInstanceBufferLocation);
-	this->mSwitchSignalModel.drawInstanced(aUniform, aBoneMatrices, this->mSwitchSignalCount);
+	this->mSwitchSignalModel.drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mSwitchSignalCount);
 
 	//pillars
 	this->mPillarMatrices.bind(aInstanceBufferLocation);
-	this->mStationPillarModel.drawInstanced(aUniform, aBoneMatrices, this->mPillarCount);
+	this->mStationPillarModel.drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mPillarCount);
 
 	//trees
 	this->mTreeMatrices.bind(aInstanceBufferLocation);
-	this->mTreeModel.drawInstanced(aUniform, aBoneMatrices, this->mTreeCount);
+	this->mTreeModel.drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mTreeCount);
 
 	//lampposts
 	this->mLightMatrices.bind(aInstanceBufferLocation);
-	this->mLightModel.drawInstanced(aUniform, aBoneMatrices, this->mLightCount);
+	this->mLightModel.drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mLightCount);
 
 	//buildings
 	for(uint8_t i = 0; i < 4; i++) {
 		this->mBuildingMatrices[i].bind(aInstanceBufferLocation);
-		this->mBuildingModels[i].drawInstanced(aUniform, aBoneMatrices, this->mBuildingCount);
+		this->mBuildingModels[i].drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mBuildingCount);
 	}
 
 	aBoolStateUniform.set(0);
@@ -843,16 +916,6 @@ void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrice
 	//this->mTrackVertices.drawPoints();
 	this->mTrackIndices.draw(); //draw track last
 
-	//walls
-	if(this->mWalls.size() > 0) {
-		this->mWallArray.bind();
-		GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstWallMaterial, this->mLastWallMaterial);
-		this->mWallVertices.bind();
-		this->mWallIndices.bind();
-		//this->mWallVertices.drawPoints();
-		this->mWallIndices.draw();
-	}
-
 	//signs
 	if(this->mSigns.size() > 0) {
 		this->mSignArray.bind();
@@ -865,10 +928,65 @@ void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrice
 
 	//landmarks - should be only of each type per map
 	for(Model& m : this->mLandmarkModels) {
-		m.draw(aUniform, aBoneMatrices);
+		m.draw(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform);
 	}
 }
 
+uint64_t Map::getNextTrack(const uint64_t aCurrentId, const uint64_t aEndNode, LineData::SwitchDirection aDirection) noexcept {
+	auto& track = this->mTracks[aCurrentId];
+
+	if(
+		(track.first == (int32_t)aEndNode && (track.flags & TRACK_FLAG_FIRST_SWITCH)) ||
+		(track.second == (int32_t)aEndNode && (track.flags & TRACK_FLAG_SECOND_SWITCH))
+	) {
+		//one point is switch
+		int32_t secondNewTrackNode = 0;
+
+		switch(aDirection) {
+			case(LineData::SwitchDirection::STRAIGHT):
+				secondNewTrackNode = this->mSwitches[aEndNode].front;
+				break;
+			case(LineData::SwitchDirection::LEFT):
+				secondNewTrackNode = this->mSwitches[aEndNode].left;
+				break;
+			case(LineData::SwitchDirection::RIGHT):
+				secondNewTrackNode = this->mSwitches[aEndNode].right;
+				break;
+			case(LineData::SwitchDirection::NO_SET):
+				//we go against switch
+				secondNewTrackNode = this->mSwitches[aEndNode].front;
+				break;
+			default:
+				std::cerr << LogLevel::WARNING << "Unset switch!\n" << LogLevel::RESET;
+				return UINT64_MAX;
+		}
+
+		//find track by 2 points - if our switch node actually switch and other is not (2-switch tracks not allowed)
+		//non-switch tracks handled in other branch
+		for(uint64_t i = 0; i < this->mTracks.size(); i++) {
+			if(
+				((this->mTracks[i].flags & TRACK_FLAG_FIRST_SWITCH) && this->mTracks[i].first == secondNewTrackNode && this->mTracks[i].second == (int32_t)aEndNode) ||
+				((this->mTracks[i].flags & TRACK_FLAG_SECOND_SWITCH) && this->mTracks[i].second == secondNewTrackNode && this->mTracks[i].first == (int32_t)aEndNode)
+			) { return i; }
+		}
+	}
+
+	for(uint64_t i = 0; i < this->mTracks.size(); i++) {
+		if(aCurrentId == i) continue;
+		//condition:
+		//first OR second node IS EQUAL TO END NODE
+		//AND
+		//not our track (handled in continue)
+		//AND
+		//neither point is switch (handled in other branch)
+		//translation: find track with same point which isnt ours and has no switches
+		if(this->mTracks[aCurrentId].first == (int32_t)aEndNode || this->mTracks[aCurrentId].second == (int32_t)aEndNode) {
+			return i;
+		}
+	}
+
+	return UINT64_MAX;
+}
 Track* Map::getStationByCode(std::string_view aCode) noexcept {
 	for(Track& t : this->mTracks) {
 		if(t.code == *(uint32_t*)aCode.data()) {

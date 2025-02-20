@@ -148,7 +148,7 @@ Texture::Texture(Texture&& aOther) noexcept
 	: mPath(std::move(aOther.mPath)), mWidth(aOther.mWidth), mHeight(aOther.mHeight), mChannels(aOther.mChannels) {
 	glDeleteTextures(1, &this->mHandle);
 	this->mHandle = aOther.mHandle;
-	stbi_image_free(this->mpData);
+	//no free in constructor!
 	this->mpData = aOther.mpData;
 
 	aOther.mHandle = 0;

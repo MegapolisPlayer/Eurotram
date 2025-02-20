@@ -4,6 +4,42 @@ Transform::Transform() noexcept
 	: mPos(0.0f), mRotationDegreesX(1.0f), mRotationDegreesY(1.0f), mRotationDegreesZ(1.0f),
 		mScale(1.0f), mPrecalculated(false), mPrecalcMatrix(1.0f), mPrecalcNormalMatrix(1.0f) {}
 
+Transform::Transform(const glm::mat4& aMatrix) noexcept
+	: mPos(0.0f), mRotationDegreesX(1.0f), mRotationDegreesY(1.0f), mRotationDegreesZ(1.0f),
+		mScale(1.0f), mPrecalculated(true), mPrecalcMatrix(aMatrix), mPrecalcNormalMatrix(1.0f) {
+	glm::quat rotation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	//decompose so class is happy
+	glm::decompose(this->mPrecalcMatrix, this->mScale, rotation, this->mPos, skew, perspective);
+	glm::vec3 rotationAngles = glm::eulerAngles(glm::conjugate(rotation)); //conjugate is inverse of quaternion
+	this->mRotationDegreesX = rotationAngles.x;
+	this->mRotationDegreesY = rotationAngles.y;
+	this->mRotationDegreesZ = rotationAngles.z;
+}
+
+Transform::Transform(Transform&& aOther) noexcept {
+	this->mPos = std::move(aOther.mPos);
+	this->mRotationDegreesX = std::move(aOther.mRotationDegreesX);
+	this->mRotationDegreesY = std::move(aOther.mRotationDegreesY);
+	this->mRotationDegreesZ = std::move(aOther.mRotationDegreesZ);
+	this->mScale = std::move(aOther.mScale);
+	this->mPrecalculated = std::move(aOther.mPrecalculated);
+	this->mPrecalcMatrix = std::move(aOther.mPrecalcMatrix);
+	this->mPrecalcNormalMatrix = std::move(aOther.mPrecalcNormalMatrix);
+}
+Transform& Transform::operator=(Transform&& aOther) noexcept {
+	this->mPos = std::move(aOther.mPos);
+	this->mRotationDegreesX = std::move(aOther.mRotationDegreesX);
+	this->mRotationDegreesY = std::move(aOther.mRotationDegreesY);
+	this->mRotationDegreesZ = std::move(aOther.mRotationDegreesZ);
+	this->mScale = std::move(aOther.mScale);
+	this->mPrecalculated = std::move(aOther.mPrecalculated);
+	this->mPrecalcMatrix = std::move(aOther.mPrecalcMatrix);
+	this->mPrecalcNormalMatrix = std::move(aOther.mPrecalcNormalMatrix);
+	return *this;
+}
+
 void Transform::setPosition(const glm::vec3& aPosition) noexcept {
 	this->mPos = aPosition;
 	this->mPrecalculated = false;

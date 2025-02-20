@@ -2,6 +2,8 @@
 #define EUROTRAM_MATERIAL
 #include "../base/Base.hpp"
 
+constexpr float MAX_BRIGHTNESS = 255.0;
+
 struct alignas(16) Material {
 	glm::vec4 color = glm::vec4(1.0f);
 	glm::vec4 specular = glm::vec4(1.0f);
@@ -11,7 +13,7 @@ struct alignas(16) Material {
 	GLfloat textureAmount = 1.0f; //1.0 texture only, 0.0 color only
 	GLint textureSlot = 0;
 	GLfloat textureOpacity = 1.0f;
-	GLfloat brightness = 0.0f; //below this brightness render as normal, above it is brighter
+	GLfloat brightness = 0.0f; //below this brightness render as normal, above it is brighter (range to 255!!!!)
 };
 
 #define GMS_STANDARD_IDENTIFICATOR "GMSDONOTUSETHISID"
@@ -32,14 +34,9 @@ struct GMSEntry {
 
 	GMSVariant* variantData = nullptr;
 
-	GMSEntry* duplicateOf = nullptr;
+	GMSEntry* duplicateOf = nullptr; //set for duplicates
 
 	GMSEntry() noexcept;
-};
-
-union GMSDataStore {
-	GMSEntry entry;
-	GMSEntry* duplicateOf = nullptr; //set for duplicates
 };
 
 std::ostream& operator<<(std::ostream& aStream, const GMSEntry& aEntry) noexcept;
@@ -87,7 +84,12 @@ public:
 	static void setVariant(const std::string_view aMaterialName, const std::string_view aIdentifier) noexcept;
 	static void resetVariant(const std::string_view aMaterialName) noexcept;
 
+	//updates all entries with name, variants set to same color as base
+	static void randomizeColors(const std::string_view aMaterialName) noexcept;
+
 	static std::ostream& printData(std::ostream& aStream = std::cout) noexcept;
+
+	static std::list<GMSEntry>& getEntryList() noexcept;
 
 	~GlobalMaterialStore() noexcept;
 private:

@@ -7,6 +7,8 @@ namespace Math {
 
 	typedef glm::vec2 BezierPoint;
 
+	float linearInterpolation(const float a1, const float a2, const float aT) noexcept;
+
 	BezierPoint linearInterpolation(const glm::vec2& a1, const glm::vec2& a2, const float aT) noexcept;
 
 	//we "only" calculate 2D bezier - 3D height is stored in track's heightpoints'
@@ -32,6 +34,10 @@ namespace Math {
 	//calculates normals for plane defined by 4 points
 	//front face is GL_CCW (counterclockwise), pass it as counterclockwise
 	glm::vec3 normals(glm::vec3 aPoint1, glm::vec3 aPoint2, glm::vec3 aPoint3, glm::vec3 aPoint4) noexcept;
+
+	std::mt19937& getRandomGenerator() noexcept;
+
+	float getRandomNumber(const float aMin, const float aMax) noexcept;
 }
 
 #endif

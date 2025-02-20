@@ -23,6 +23,7 @@ PUBLIC CONSTANTS USE UPPER SNAKE CASE AND NO PREFIX
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/geometric.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 #include <stbi/stb_image.h>
 #include <stbi/stb_image_write.h>
@@ -43,12 +44,13 @@ PUBLIC CONSTANTS USE UPPER SNAKE CASE AND NO PREFIX
 #include <array>
 #include <vector>
 #include <chrono>
-#include <csignal> //extra helpful to raise interrupts when debugging
+#include <csignal> //can be helpful to raise interrupts when debugging
 #include <clocale>
 #include <thread>
 #include <list>
 #include <filesystem>
 #include <numeric>
+#include <random>
 
 using namespace std::chrono_literals;
 

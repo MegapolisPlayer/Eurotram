@@ -54,9 +54,7 @@ add_executable(eurotram
 "app/objects/StationPillar.cpp"
 "app/objects/Switch.cpp"
 "app/objects/SwitchSignal.cpp"
-"app/objects/Texparcel.cpp"
 "app/objects/Track.cpp"
-"app/objects/Wall.cpp"
 "app/objects/Wire.cpp"
 
 "app/physics/Curve.cpp"

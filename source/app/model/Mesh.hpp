@@ -22,12 +22,15 @@ public:
 	Mesh(Mesh& aOther) noexcept = delete;
 	Mesh& operator=(Mesh& aOther) noexcept = delete;
 
-	void draw() noexcept;
-	void drawInstanced(const uint64_t aCount) noexcept;
+	void draw(UniformMat4& aTransformUniform, UniformMat3& aNormalUniform) noexcept;
+	void drawInstanced(UniformMat4& aTransformUniform, UniformMat3& aNormalUniform, const uint64_t aCount) noexcept;
 
-	 //DO NOT set entry with different material name
+	//DO NOT set entry with different material name
 	void setEntry(GMSEntry* aEntry) noexcept;
 	void resetEntry() noexcept;
+
+	std::string getName() const noexcept;
+	Transform& getTransform() noexcept;
 
 	~Mesh() noexcept;
 private:
@@ -39,6 +42,8 @@ private:
 	IndexBuffer mIBO;
 
 	//material id stored in vertex info
+
+	Transform mModel; //model matrix
 };
 
 #endif
