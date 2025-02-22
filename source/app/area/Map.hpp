@@ -40,10 +40,19 @@ public:
 	//only touches those which belong to the station codes passed as params
 	void updateTextures(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept;
 
-	void draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, UniformMat4& aTransformUniform, UniformMat3& aNormalUniform, const uint64_t aInstanceBufferLocation, UniformInt& aBoolStateUniform) noexcept; //draw map FIRST
+	void draw(
+		UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aInstanceBufferLocation, UniformInt& aBoolStateUniform,
+		UniformMat4* aTransformUniform = nullptr, UniformMat3* aNormalUniform = nullptr
+	) noexcept; //draw map FIRST
 
-	uint64_t getNextTrack(const uint64_t aCurrentId, const uint64_t aEndNode, LineData::SwitchDirection aDirection) noexcept;
+	uint64_t getNextTrack(const uint64_t aCurrentId, const std::pair<uint8_t, uint64_t>& aEndNode, LineData::SwitchDirection aDirection) noexcept;
+
+	Track* getTrackById(const uint64_t aId) noexcept;
 	Track* getStationByCode(std::string_view aCode) noexcept;
+
+	bool isTrackStation(const uint64_t aId) noexcept;
+
+	std::pair<uint8_t, uint64_t> getOtherTrackPoint(const uint64_t aTrackId, const std::pair<uint8_t, uint64_t>& aEndNode) noexcept;
 
 	~Map() noexcept;
 private:

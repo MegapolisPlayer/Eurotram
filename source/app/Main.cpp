@@ -131,7 +131,7 @@ int main() {
 	a.setVolume(0.7);
 
 	Line l;
-	l.open("Linka13-test.etscr", &a);
+	l.open("line.etscr", &a);
 
 	std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
 	float daylightIndex = 1.0f;
@@ -143,6 +143,16 @@ int main() {
 	//WINDOW MUST BE INITIALIZED FOR THIS TO WORK
 	Map m("Praha.etmap");
 	m.randomizeBuildingColors();
+
+	uint64_t trackId = l.getFirstLoopTrack();
+	std::pair<uint8_t, uint64_t> nextNodeId = m.getOtherTrackPoint(trackId, l.getFirstNodePassed());
+	uint64_t switchCount = 0;
+
+	std::cout << "First track " << trackId << " first node (" << nextNodeId.first << ") " << nextNodeId.second << '\n';
+
+	for(auto& a :  l.getSwitchesToNextStop()) {
+		std::cout << "SW" << a.mapId << " DIR" << (uint16_t)a.direction << '\n';
+	}
 
 	Camera windowCamera(&mainWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 1000.0f, 0.1f);
 
@@ -219,8 +229,8 @@ int main() {
 	//Model t3rp(std::filesystem::path("./untitled2.glb"));
 	Model t3rp(std::filesystem::path("./T3.glb"));
 	std::cout << "Model loaded!\n";
-	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
-	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
+	//t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
+	//t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 
 	shader.bind();
 	UniformMaterial uMaterial(50);
@@ -244,6 +254,7 @@ int main() {
 	nightWindows->material.specular = glm::vec4(0.0);
 
 	uint64_t i = 0;
+
     while (mainWindow.isOpen()) {
 		loopTimer.start();
 
@@ -252,13 +263,13 @@ int main() {
 		ss.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
 		t3rp.sendAnimationDataToShader(lmat);
-		t3rp.draw(uMaterial, uModelMat, matModelUniform, matNormalUniform);
+		t3rp.draw(uMaterial, uModelMat, &lmod);
 		ss.endPass(mainWindow);
 
 		ds.beginPass(mainWindow, lpu);
 		lmod.set(t1.getMatrix());
 		t3rp.sendAnimationDataToShader(lmat);
-		t3rp.draw(uMaterial, uModelMat, matModelUniform, matNormalUniform);
+		t3rp.draw(uMaterial, uModelMat, &lmod);
 		ds.endPass(mainWindow);
 
 		// main draw
@@ -289,16 +300,16 @@ int main() {
 
 		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
 
-		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
-		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
+		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
+		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
 
-		t3rp.draw(uMaterial, uModelMat, matModelUniform, matNormalUniform);
+		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
 
 		matModelUniform.set(glm::mat4(1.0));
 		matNormalUniform.set(glm::mat4(1.0));
 
 		m.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
-		m.draw(uMaterial, uModelMat, matModelUniform, matNormalUniform, 35, uIsInstancedRendering);
+		m.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
 
 		drawTimer.end();
 
@@ -396,6 +407,33 @@ int main() {
 			t3rp.setAnimation("driverDoorAction", i);
 			if(i == 0) { i = 40; }
 			i--;
+		};
+
+		if(ImGui::Button("Get next track")) {
+			if(l.isStationLast()) {
+				std::cout << "Reached end of line!\n";
+			}
+			else {
+				if(switchCount >= l.getSwitchesToNextStop().size()) {
+					//we already passed last switch - no more setting up
+					trackId = m.getNextTrack(trackId, nextNodeId, LineData::SwitchDirection::NO_SET);
+				}
+				else {
+					trackId = m.getNextTrack(trackId, nextNodeId, l.getSwitchesToNextStop()[switchCount].direction);
+				}
+				if(nextNodeId.first == 's') {
+					switchCount++;
+				}
+				if(m.isTrackStation(trackId)) {
+					switchCount = 0;
+					l.nextStation();
+					for(auto& a :  l.getSwitchesToNextStop()) {
+						std::cout << "SW" << a.mapId << " DIR" << (uint16_t)a.direction << '\n';
+					}
+				}
+				nextNodeId = m.getOtherTrackPoint(trackId, nextNodeId);
+				std::cout << "Track id " << trackId << "; node id " << nextNodeId.second << '(' << nextNodeId.first << ')' << '\n';
+			}
 		};
 
 		ImGui::End();

@@ -164,7 +164,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			std::cout << ' ' << model->nodes[c].name.c_str();
 			this->mNodes.back().children.push_back(c);
 		}
-		std::cout << '\n';
+		std::cout << ' ' << this->mNodes.back().transformMatrix * glm::vec4(1.0) << '\n';
 	};
 
 	//set node parent attribute
@@ -210,7 +210,6 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			if(p.materialIndex.has_value()) {
 				matIndex = p.materialIndex.value();
 				GMSEntry* g = GlobalMaterialStore::getById(matIndex+this->mFirstGMSMaterial);
-				std::cout << "M" << matIndex << '(' << matIndex+this->mFirstGMSMaterial << "): " << g->name << ':' << g->material.textureSlot << '\n';
 			}
 
 			//indices
@@ -227,7 +226,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 				fastgltf::Accessor& verticesAccess = model->accessors[p.findAttribute("POSITION")->accessorIndex];
 				vertices.resize(vertices.size() + verticesAccess.count);
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, verticesAccess, [&](glm::vec3 aV, GLuint aId) {
-					vertices[aId + initialId].position = aV;
+					vertices[initialId+aId].position = glm::vec3(this->mNodes[meshMatrices[meshMatrixId]].transformMatrix * glm::vec4(aV, 1.0));
 					vertices[initialId+aId].materialId = matIndex;
 				});
 			}
@@ -235,8 +234,9 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			//normals
 			{
 				fastgltf::Accessor& normalAccess = model->accessors[p.findAttribute("NORMAL")->accessorIndex];
+				glm::mat4 normalMatrix = glm::transpose(glm::inverse(this->mNodes[meshMatrices[meshMatrixId]].transformMatrix));
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(*model, normalAccess, [&](glm::vec3 aV, GLuint aId) {
-					vertices[initialId+aId].normal = glm::vec3(this->mNodes[meshMatrices[meshMatrixId]].transformMatrix * glm::vec4(aV, 1.0));
+					vertices[initialId+aId].normal = glm::vec3(normalMatrix * glm::vec4(aV, 1.0));
 				});
 			}
 
@@ -277,10 +277,10 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			}
 		}
 
-		meshMatrixId++;
-
 		this->mMeshes.emplace_back(m.name.c_str(), vertices, indices);
-		this->mMeshes.back().mModel = Transform(this->mNodes[meshMatrices[meshMatrixId]].transformMatrix);
+		this->mMeshes.back().mModel = Transform(glm::mat4(1.0));
+
+		meshMatrixId++;
 	}
 
 	//process animations
@@ -375,7 +375,7 @@ void Model::sendAnimationDataToShader(StructUniform<glm::mat4>& aBoneMatrices, c
 	aBoneMatrices.set();
 }
 
-void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, UniformMat4& aTransformUniform, UniformMat3& aNormalUniform) noexcept {
+void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, UniformMat4* aTransformUniform, UniformMat3* aNormalUniform) noexcept {
 	sendAnimationDataToShader(aBoneMatrices);
 
 	GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstGMSMaterial, this->mLastGMSMaterial);
@@ -383,7 +383,7 @@ void Model::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatri
 		m.draw(aTransformUniform, aNormalUniform);
 	}
 }
-void Model::drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, UniformMat4& aTransformUniform, UniformMat3& aNormalUniform, const uint64_t aCount) noexcept {
+void Model::drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aCount, UniformMat4* aTransformUniform, UniformMat3* aNormalUniform) noexcept {
 	if(aCount == 0) return; //so we dont have to check at each call
 
 	sendAnimationDataToShader(aBoneMatrices);
@@ -391,7 +391,7 @@ void Model::drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& a
 
 	GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstGMSMaterial, this->mLastGMSMaterial);
 	for(Mesh& m : this->mMeshes) {
-		m.drawInstanced(aTransformUniform, aNormalUniform, aCount);
+		m.drawInstanced(aCount, aTransformUniform, aNormalUniform);
 	}
 }
 

@@ -35,25 +35,25 @@ function switchEditMenu(aID) {
 	addBasicEditInputs(switchList[aID]);
 	
 	canvasData.edit.appendChild(document.createTextNode("Before node id: "));
-	addInput(aID, switchList[aID].beforeId, "text");
+	addInput("editbefinput", switchList[aID].beforeId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Front node id: "));
-	addInput(aID, switchList[aID].frontId, "text");
+	addInput("editfroinput", switchList[aID].frontId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Left node id: "));
-	addInput(aID, switchList[aID].leftId, "text");
+	addInput("editlefinput", switchList[aID].leftId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Right node id: "));
-	addInput(aID, switchList[aID].rightId, "text");
+	addInput("editriginput", switchList[aID].rightId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Radio box id: "));
-	addInput(aID, switchList[aID].radioBoxId, "text");
+	addInput("editradinput", switchList[aID].radioBoxId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Switch signal id: "));
-	addInput(aID, switchList[aID].signalId, "text");
+	addInput("editsiginput", switchList[aID].signalId, "text");
 
 	canvasData.edit.appendChild(document.createTextNode("Switch signal letter: "));
-	addInput(aID, switchList[aID].signalLetter, "text");
+	addInput("editsiglinput", switchList[aID].signalLetter, "text");
 
 	canvasData.edit.appendChild(document.createElement("hr"));
 

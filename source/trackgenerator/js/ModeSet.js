@@ -151,8 +151,7 @@ function onclickTrackAddHandler(aX, aY, aisStation) {
 			else if(secondTNode === -1) {
 				redrawTrackFirst();
 				//reset selection
-				trackFirst = -1; //reset selection
-				trackFirstIsSwitch = false;
+				//do not reset selection when nothing clicked!
 				return; //nothing clicked
 			}
 			else {
@@ -395,8 +394,7 @@ function onclickEditTrackHandler(aX, aY) {
 			else if(secondTNode === -1) {
 				redrawTrackFirst();
 				//reset selection
-				trackFirst = -1; //reset selection
-				trackFirstIsSwitch = false;
+				//do not reset selection when nothing clicked!
 				return; //nothing clicked
 			}
 			else {

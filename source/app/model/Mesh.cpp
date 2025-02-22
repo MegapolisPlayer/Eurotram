@@ -28,19 +28,28 @@ Mesh& Mesh::operator=(Mesh&& aOther) noexcept {
 	return *this;
 }
 
-void Mesh::draw(UniformMat4& aTransformUniform, UniformMat3& aNormalUniform) noexcept {
+//material values bound in model
+
+void Mesh::draw(UniformMat4* aTransformUniform, UniformMat3* aNormalUniform) noexcept {
 	this->mVAO.bind();
-	aTransformUniform.set(this->mModel.getMatrix());
-	aNormalUniform.set(this->mModel.getNormalMatrix());
-	//material values bound in model
+	if(aTransformUniform) {
+		//aTransformUniform->set(this->mModel.getMatrix());
+	}
+	if(aNormalUniform) {
+		//aNormalUniform->set(this->mModel.getNormalMatrix());
+	}
 	//this->mVBO.drawPoints();
 	this->mIBO.draw();
 	this->mVAO.unbind();
 }
-void Mesh::drawInstanced(UniformMat4& aTransformUniform, UniformMat3& aNormalUniform, const uint64_t aCount) noexcept {
+void Mesh::drawInstanced(const uint64_t aCount, UniformMat4* aTransformUniform, UniformMat3* aNormalUniform) noexcept {
 	this->mVAO.bind();
-	aTransformUniform.set(this->mModel.getMatrix());
-	aNormalUniform.set(this->mModel.getNormalMatrix());
+	if(aTransformUniform) {
+		//aTransformUniform->set(this->mModel.getMatrix());
+	}
+	if(aNormalUniform) {
+		//aNormalUniform->set(this->mModel.getNormalMatrix());
+	}
 	//this->mVBO.drawPoints();
 	this->mIBO.drawInstanced(aCount);
 	this->mVAO.unbind();

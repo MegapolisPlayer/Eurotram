@@ -78,6 +78,9 @@ public:
 	//returns false if scenario at end
 	bool nextLoop() noexcept;
 
+	//returns false if station last
+	bool nextStation() noexcept;
+
 	//call when passed switch - gets new one at each call
 	std::optional<LineData::Switch> getNextSwitch() noexcept;
 
@@ -122,12 +125,19 @@ public:
 
 	LineData::Station getNextStation() const noexcept;
 
+	uint64_t getFirstLoopTrack() const noexcept;
+	//first - type (letter S/N in utf8), second - id in said list
+	std::pair<uint8_t, uint64_t> getFirstNodePassed() const noexcept;
+
 	~Line() noexcept;
 private:
 	std::vector<LineData::Loop> mLoops;
 	uint64_t mCurrentLoopId;
 	int64_t mCurrentStationId; //this value can be -1 before first station announcement
 	int64_t mCurrentSwitchId; //this value can be -1 if no more switches before stop TODO
+
+	uint64_t mFirstPointId;
+	uint8_t mFirstPointType; //ASCII letters S/N for switch/node
 
 	uint64_t mDelay;
 	uint16_t mWeather;

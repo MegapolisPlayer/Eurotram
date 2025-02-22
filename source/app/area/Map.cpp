@@ -262,8 +262,8 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 		for(uint32_t i = 0; i < TRACK_HEIGHTPOINTS_AMOUNT; i++) {
 			readBytesToString(fileHandle, buffer, 4);
-			//no units per meter division here
-			this->mTracks.back().heightpoints[i] = (*((int32_t*)buffer.data())) * 100.0;
+			//no units per meter division here - stored as multiple of 100
+			this->mTracks.back().heightpoints[i] = (*((int32_t*)buffer.data())) / 100.0;
 		}
 
 		if(isStation) {
@@ -775,6 +775,7 @@ void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, Stati
 		std::vector<glm::mat4> pillarInstanceTranslations;
 		for(StationPillar& p : this->mPillars) {
 			glm::mat4 translation = glm::translate(glm::mat4(1.0), glm::vec3(p.location.x, p.location.h, p.location.y));
+			translation = glm::rotate(translation, glm::radians(p.location.r), glm::vec3(0.0, 1.0, 0.0));
 			pillarInstanceTranslations.push_back(translation);
 		}
 		this->mPillarMatrices.setNewData(pillarInstanceTranslations.data(), pillarInstanceTranslations.size()*sizeof(glm::mat4));
@@ -845,7 +846,7 @@ void Map::updateTextures(StationCode aPrev, StationCode aCurrent, StationCode aN
 
 //TODO add drawPoints is tag in settings
 
-void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, UniformMat4& aTransformUniform, UniformMat3& aNormalUniform, const uint64_t aInstanceBufferLocation, UniformInt& aBoolStateUniform) noexcept {
+void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aInstanceBufferLocation, UniformInt& aBoolStateUniform, UniformMat4* aTransformUniform, UniformMat3* aNormalUniform) noexcept {
 	//ground (texparcels)
 
 	//no materials -> no texparcels!
@@ -875,28 +876,28 @@ void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrice
 
 	//signals
 	this->mSignalMatrices.bind(aInstanceBufferLocation);
-	this->mSignalModel.drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mSignalCount);
+	this->mSignalModel.drawInstanced(aUniform, aBoneMatrices, this->mSignalCount, aTransformUniform, aNormalUniform);
 
 	//switch signals
 	this->mSwitchSignalMatrices.bind(aInstanceBufferLocation);
-	this->mSwitchSignalModel.drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mSwitchSignalCount);
+	this->mSwitchSignalModel.drawInstanced(aUniform, aBoneMatrices, this->mSwitchSignalCount, aTransformUniform, aNormalUniform);
 
 	//pillars
 	this->mPillarMatrices.bind(aInstanceBufferLocation);
-	this->mStationPillarModel.drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mPillarCount);
+	this->mStationPillarModel.drawInstanced(aUniform, aBoneMatrices, this->mPillarCount, aTransformUniform, aNormalUniform);
 
 	//trees
 	this->mTreeMatrices.bind(aInstanceBufferLocation);
-	this->mTreeModel.drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mTreeCount);
+	this->mTreeModel.drawInstanced(aUniform, aBoneMatrices, this->mTreeCount, aTransformUniform, aNormalUniform);
 
 	//lampposts
 	this->mLightMatrices.bind(aInstanceBufferLocation);
-	this->mLightModel.drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mLightCount);
+	this->mLightModel.drawInstanced(aUniform, aBoneMatrices, this->mLightCount, aTransformUniform, aNormalUniform);
 
 	//buildings
 	for(uint8_t i = 0; i < 4; i++) {
 		this->mBuildingMatrices[i].bind(aInstanceBufferLocation);
-		this->mBuildingModels[i].drawInstanced(aUniform, aBoneMatrices, aTransformUniform, aNormalUniform, this->mBuildingCount);
+		this->mBuildingModels[i].drawInstanced(aUniform, aBoneMatrices, this->mBuildingCount, aTransformUniform, aNormalUniform);
 	}
 
 	aBoolStateUniform.set(0);
@@ -932,29 +933,26 @@ void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrice
 	}
 }
 
-uint64_t Map::getNextTrack(const uint64_t aCurrentId, const uint64_t aEndNode, LineData::SwitchDirection aDirection) noexcept {
+uint64_t Map::getNextTrack(const uint64_t aCurrentId, const std::pair<uint8_t, uint64_t>& aEndNode, LineData::SwitchDirection aDirection) noexcept {
 	auto& track = this->mTracks[aCurrentId];
 
-	if(
-		(track.first == (int32_t)aEndNode && (track.flags & TRACK_FLAG_FIRST_SWITCH)) ||
-		(track.second == (int32_t)aEndNode && (track.flags & TRACK_FLAG_SECOND_SWITCH))
-	) {
-		//one point is switch
+	if(aEndNode.first == 's') {
+		//endpoint is switch
 		int32_t secondNewTrackNode = 0;
 
 		switch(aDirection) {
 			case(LineData::SwitchDirection::STRAIGHT):
-				secondNewTrackNode = this->mSwitches[aEndNode].front;
+				secondNewTrackNode = this->mSwitches[aEndNode.second].front;
 				break;
 			case(LineData::SwitchDirection::LEFT):
-				secondNewTrackNode = this->mSwitches[aEndNode].left;
+				secondNewTrackNode = this->mSwitches[aEndNode.second].left;
 				break;
 			case(LineData::SwitchDirection::RIGHT):
-				secondNewTrackNode = this->mSwitches[aEndNode].right;
+				secondNewTrackNode = this->mSwitches[aEndNode.second].right;
 				break;
 			case(LineData::SwitchDirection::NO_SET):
 				//we go against switch
-				secondNewTrackNode = this->mSwitches[aEndNode].front;
+				secondNewTrackNode = this->mSwitches[aEndNode.second].before;
 				break;
 			default:
 				std::cerr << LogLevel::WARNING << "Unset switch!\n" << LogLevel::RESET;
@@ -964,29 +962,29 @@ uint64_t Map::getNextTrack(const uint64_t aCurrentId, const uint64_t aEndNode, L
 		//find track by 2 points - if our switch node actually switch and other is not (2-switch tracks not allowed)
 		//non-switch tracks handled in other branch
 		for(uint64_t i = 0; i < this->mTracks.size(); i++) {
+			if(aCurrentId == i) continue;
 			if(
-				((this->mTracks[i].flags & TRACK_FLAG_FIRST_SWITCH) && this->mTracks[i].first == secondNewTrackNode && this->mTracks[i].second == (int32_t)aEndNode) ||
-				((this->mTracks[i].flags & TRACK_FLAG_SECOND_SWITCH) && this->mTracks[i].second == secondNewTrackNode && this->mTracks[i].first == (int32_t)aEndNode)
+				((this->mTracks[i].flags & TRACK_FLAG_SECOND_SWITCH) && this->mTracks[i].first == secondNewTrackNode && this->mTracks[i].second == (int32_t)aEndNode.second) ||
+				((this->mTracks[i].flags & TRACK_FLAG_FIRST_SWITCH) && this->mTracks[i].second == secondNewTrackNode && this->mTracks[i].first == (int32_t)aEndNode.second)
 			) { return i; }
 		}
 	}
-
-	for(uint64_t i = 0; i < this->mTracks.size(); i++) {
-		if(aCurrentId == i) continue;
-		//condition:
-		//first OR second node IS EQUAL TO END NODE
-		//AND
-		//not our track (handled in continue)
-		//AND
-		//neither point is switch (handled in other branch)
-		//translation: find track with same point which isnt ours and has no switches
-		if(this->mTracks[aCurrentId].first == (int32_t)aEndNode || this->mTracks[aCurrentId].second == (int32_t)aEndNode) {
-			return i;
+	else {
+		for(uint64_t i = 0; i < this->mTracks.size(); i++) {
+			if(aCurrentId == i) continue;
+			//translation: find track with same point which isnt ours and is not switch
+			if(
+				(this->mTracks[i].first == (int32_t)aEndNode.second && !((this->mTracks[i].flags & TRACK_FLAG_FIRST_SWITCH) > 0)) ||
+				(this->mTracks[i].second == (int32_t)aEndNode.second && !((this->mTracks[i].flags & TRACK_FLAG_SECOND_SWITCH) > 0))
+			) {
+				return i;
+			}
 		}
 	}
 
 	return UINT64_MAX;
 }
+
 Track* Map::getStationByCode(std::string_view aCode) noexcept {
 	for(Track& t : this->mTracks) {
 		if(t.code == *(uint32_t*)aCode.data()) {
@@ -994,6 +992,41 @@ Track* Map::getStationByCode(std::string_view aCode) noexcept {
 		}
 	}
 	return nullptr;
+}
+Track* Map::getTrackById(const uint64_t aId) noexcept {
+	return &this->mTracks[aId];
+}
+bool Map::isTrackStation(const uint64_t aId) noexcept {
+	std::cout << "SC " << (((char*)&this->mTracks[aId].code)[0]) << (((char*)&this->mTracks[aId].code)[1]) << (((char*)&this->mTracks[aId].code)[2]) << (((char*)&this->mTracks[aId].code)[3]) << '\n';
+	return this->mTracks[aId].code != 0;
+}
+
+std::pair<uint8_t, uint64_t> Map::getOtherTrackPoint(const uint64_t aTrackId, const std::pair<uint8_t, uint64_t>& aEndNode) noexcept {
+	auto& track = this->mTracks[aTrackId];
+	auto& oldType = aEndNode.first;
+	auto& oldId = aEndNode.second;
+
+	bool isFirstSwitch = track.flags & TRACK_FLAG_FIRST_SWITCH;
+	bool isSecondSwitch = track.flags & TRACK_FLAG_SECOND_SWITCH;
+	bool isEndNodeFirst = ((int32_t)oldId == track.first) && ((isFirstSwitch && oldType == 's') || (!isFirstSwitch && oldType == 'n'));
+	int32_t newId = isEndNodeFirst ? track.second : track.first;
+	uint8_t newType = 'W';
+
+	//second node is switch or not?
+	//if our node first and first node is switch - SWITCH
+	//if our node second and second node is switch - SWITCH
+	//otherwise no
+	if(isFirstSwitch && track.first == newId && !isEndNodeFirst) {
+		newType = 's';
+	}
+	else if(isSecondSwitch && track.second == newId && isEndNodeFirst) {
+		newType = 's';
+	}
+	else {
+		newType = 'n';
+	}
+
+	return std::make_pair(newType, newId);
 }
 
 Map::~Map() noexcept {

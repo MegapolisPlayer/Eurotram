@@ -258,7 +258,7 @@ function lineFinalize() {
 	stationTimes.forEach((v, i, a) => {
 		//for each station
 
-		df.appendChild(document.createTextNode(" Station (code " + v.sc + ") "));
+		df.appendChild(document.createTextNode("Station (code " + v.sc + ") "));
 		
 		df.appendChild(document.createTextNode("Mins from prev: "));
 		let minsFromPrev = document.createElement("input");
@@ -391,6 +391,7 @@ function lineFinalize() {
 			nodes: structuredClone(lineList),
 			tracks: structuredClone(lineTrackList),
 		});
+
 		lineList.length = 0;
 		lineTrackList.length = 0; 
 
@@ -435,8 +436,6 @@ function lineFinalize() {
 }
 
 function lineSerialize() {
-	console.log(lineList);
-
 	let numberValuesArray = [];
 
 	//we use same utils as in Map.js
@@ -500,8 +499,12 @@ function lineSerialize() {
 	numberValuesArray.push(...document.getElementById("authorname").value.split('').map((v) => { return v.charCodeAt(0); }));
 	numberValuesArray.push(0); //null terminator
 
+	let canAddPoints = false; //switch cannot be first
+
 	//for each loop
 	loops.forEach((v, i, a) => {
+		console.log(v.nodes, v.tracks);
+
 		//header
 
 		//normal line
@@ -527,19 +530,23 @@ function lineSerialize() {
 		let stationAmount = v.tracks.map(v => trackList[v]).filter((x) => {
 			return x instanceof StationTrack;
 		}).length;
-		console.log("Loop station amount "+stationAmount);
-		//let switchAmount = v.nodes.filter((x) => {
-		//	return x instanceof Switch;
-		//}).length;
+		console.log("Loop station amount ", stationAmount, " out of ", v.tracks.length);
+		let switchAmount = v.nodes.filter((x) => {
+			return x.t == "s";
+		}).length;
+		console.log("Loop switch amount ", switchAmount, " out of ", v.nodes.length);
 
 		//N
 		numberValuesArray.push(...numberToByteArray(stationAmount, 2));
 
+		//F - first node, T - its type
+		numberValuesArray.push(...numberToByteArray(v.nodes[0].v, 4));
+		console.log("First node: ", v.nodes[0]);
+		numberValuesArray.push(v.nodes[0].t.codePointAt());
+
 		//objects
 		
 		let inputIndex = 0;
-
-		let canAddPoints = false; //switch cannot be first
 
 		for(let i = 0; i < v.tracks.length; i++) {
 			//n + 1 nodes, n tracks
@@ -564,12 +571,12 @@ function lineSerialize() {
 
 				//N
 				//if node immediately after is switch
-				let amountSwitchesToNext = Number(nodeList[v.nodes[i + 1]] instanceof Switch);
+				let amountSwitchesToNext = Number(v.nodes[i + 1].t == 's');
 				for(let j = i + 1; j < v.tracks.length; j++) {
 					if(trackList[v.tracks[j]] instanceof StationTrack) {
 						break;
 					}
-					if(nodeList[v.nodes[j+1]] instanceof Switch) {
+					if(v.nodes[j+1].t == 's') {
 						amountSwitchesToNext++;
 					}
 				}
@@ -577,37 +584,39 @@ function lineSerialize() {
 
 				inputIndex++;
 
-				canAddPoints = true;
+				canAddPoints = true; //adding points after first station
 			}
 
-			if(nodeList[v.nodes[i + 1]] instanceof Switch && canAddPoints) {
+			if(v.nodes[i + 1].t == "s" && canAddPoints) {
+				console.log("Switch ", v.nodes[i + 1].v, " ", i+1);
+
 				numberValuesArray.push('W'.codePointAt());
-				numberValuesArray.push(numberToByteArray(v.nodes[i + 1], 4)); //I
+				numberValuesArray.push(...numberToByteArray(v.nodes[i + 1].v, 4)); //I
 
 				//switch is last
-				if(!v.nodes[i + 2]) { 
+				if(!v.nodes[i + 2].v) { 
 					numberValuesArray.push(0b11111111);
 				}
 				//next is front
-				else if(nodeList[v.nodes[i + 1]].frontId == v.nodes[i + 2]) {
+				else if(switchList[v.nodes[i + 1].v].frontId == v.nodes[i + 2].v) {
 					numberValuesArray.push(0);
 				}
 				//next is left
-				else if(nodeList[v.nodes[i + 1]].leftId == v.nodes[i + 2]) {
+				else if(switchList[v.nodes[i + 1].v].leftId == v.nodes[i + 2].v) {
 					numberValuesArray.push(1);
 				}
 				//next is right
-				else if(nodeList[v.nodes[i + 1]].rightId == v.nodes[i + 2]) {
+				else if(switchList[v.nodes[i + 1].v].rightId == v.nodes[i + 2].v) {
 					numberValuesArray.push(2);
 				}
 				//next is back - different direction
-				else if(nodeList[v.nodes[i + 1]].b11ackId == v.nodes[i + 2]) {
+				else if(switchList[v.nodes[i + 1].v].beforeId == v.nodes[i + 2].v) {
 					numberValuesArray.push(3);
 				}
 				//not set
 				else {
 					numberValuesArray.push(0b11111111);
-					console.warning("Switch ids not set!");
+					console.warn("Switch ids not set!");
 				}
 			}
 		}

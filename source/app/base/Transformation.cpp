@@ -16,6 +16,8 @@ Transform::Transform(const glm::mat4& aMatrix) noexcept
 	this->mRotationDegreesX = rotationAngles.x;
 	this->mRotationDegreesY = rotationAngles.y;
 	this->mRotationDegreesZ = rotationAngles.z;
+
+	this->calculateMatrix();
 }
 
 Transform::Transform(Transform&& aOther) noexcept {

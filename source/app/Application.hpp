@@ -24,4 +24,6 @@ private:
 	Window mWindow;
 	Annunciator mAnnunciator;
 	Map mMap;
+
+	uint64_t mMinuteTime;
 };

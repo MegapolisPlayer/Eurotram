@@ -3,17 +3,19 @@
 static constexpr std::string_view scLineUnitializedString = "Line object uninitialized!";
 
 Line::Line() noexcept
-: mCurrentLoopId(0), mCurrentStationId(-1), mCurrentSwitchId(0), mDelay(0), mWeather(0), mStartDate(0), mInitialized(false), mAnnunciator(nullptr) {}
+: mCurrentLoopId(0), mCurrentStationId(-1), mCurrentSwitchId(0), mFirstPointId(0), mFirstPointType(0), mDelay(0), mWeather(0),
+	mStartDate(0), mInitialized(false), mAnnunciator(nullptr) {}
 
 Line::Line(const std::string_view aFilename, Annunciator* aAnnunciator) noexcept
-: mCurrentLoopId(0), mCurrentStationId(-1), mCurrentSwitchId(0), mDelay(0), mWeather(0), mStartDate(0), mInitialized(false), mAnnunciator(nullptr) {
+: mCurrentLoopId(0), mCurrentStationId(-1), mCurrentSwitchId(0), mFirstPointId(0), mFirstPointType(0), mDelay(0), mWeather(0),
+	mStartDate(0), mInitialized(false), mAnnunciator(nullptr) {
 	this->open(aFilename, aAnnunciator);
 }
 
 Line::Line(Line&& aOther) noexcept
 	: mLoops(std::move(aOther.mLoops)), mCurrentLoopId(aOther.mCurrentLoopId), mCurrentStationId(aOther.mCurrentStationId), mCurrentSwitchId(aOther.mCurrentSwitchId),
-	mDelay(aOther.mDelay), mWeather(aOther.mWeather), mStartDate(aOther.mStartDate), mInitialized(aOther.mInitialized),
-	mAnnunciator(aOther.mAnnunciator), mLineName(std::move(aOther.mLineName)), mAuthorName(std::move(aOther.mAuthorName)) {
+	mFirstPointId(aOther.mFirstPointId), mFirstPointType(aOther.mFirstPointType), mDelay(aOther.mDelay), mWeather(aOther.mWeather), mStartDate(aOther.mStartDate),
+	mInitialized(aOther.mInitialized), mAnnunciator(aOther.mAnnunciator), mLineName(std::move(aOther.mLineName)), mAuthorName(std::move(aOther.mAuthorName)) {
 	aOther.mAnnunciator = nullptr;
 }
 Line& Line::operator=(Line&& aOther) noexcept {
@@ -21,6 +23,8 @@ Line& Line::operator=(Line&& aOther) noexcept {
 	this->mCurrentLoopId = aOther.mCurrentLoopId;
 	this->mCurrentStationId = aOther.mCurrentStationId;
 	this->mCurrentSwitchId = aOther.mCurrentSwitchId;
+	this->mFirstPointId = aOther.mFirstPointId;
+	this->mFirstPointType = aOther.mFirstPointType;
 	this->mDelay = aOther.mDelay;
 	this->mWeather = aOther.mWeather;
 	this->mStartDate = aOther.mStartDate;
@@ -112,6 +116,12 @@ void Line::open(const std::string_view aFilename, Annunciator* aAnnunciator) noe
 		//N
 		readBytesToString(fileHandle, buffer, 2);
 		uint16_t stationAmount = *(uint16_t*)buffer.data();
+
+		//T, F
+		readBytesToString(fileHandle, buffer, 4);
+		this->mFirstPointId = *(uint32_t*)buffer.data();
+		readBytesToString(fileHandle, buffer, 1);
+		this->mFirstPointType = *(uint8_t*)buffer.data();
 
 		this->mLoops.back().stations.reserve(stationAmount);
 		std::cout << "Line loop station amount: " << stationAmount << '\n';
@@ -226,6 +236,16 @@ bool Line::nextLoop() noexcept {
 	}
 }
 
+bool Line::nextStation() noexcept {
+	if(this->isStationLast()) {
+		return this->nextLoop();
+	}
+	else {
+		this->mCurrentStationId++;
+		return true;
+	}
+}
+
 std::optional<LineData::Switch> Line::getNextSwitch() noexcept {
 	if(this->isStationLast() || this->isLoopLast()) {
 		return {}; //empty optional
@@ -244,7 +264,8 @@ std::optional<LineData::Switch> Line::getNextSwitch() noexcept {
 }
 
 std::vector<LineData::Switch>& Line::getSwitchesToNextStop() noexcept {
-	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId].switches;
+	//this->mCurrentStationId starts at -1 so audio announcements work correctly
+	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId+1].switches;
 }
 
 void Line::reset() noexcept {
@@ -383,14 +404,30 @@ uint64_t Line::getStartDate() const noexcept {
 
 bool Line::isStationLast() const noexcept {
 	if(!this->mInitialized) return true;
-	return this->mCurrentStationId >= (int64_t)this->mLoops[this->mCurrentLoopId].stations.size() - 1;
+	//this->mCurrentStationId starts at -1
+	return this->mCurrentStationId+1 >= (int64_t)this->mLoops[this->mCurrentLoopId].stations.size() - 1;
 }
 bool Line::isLoopLast() const noexcept {
 	return this->mCurrentLoopId >= this->mLoops.size() - 1;
 }
 
 LineData::Station Line::getNextStation() const noexcept {
+	if(this->isStationLast()) {
+		if(this->isLoopLast()) {
+			return this->mLoops[0].stations[0]; //repeat?
+		}
+		else {
+			return this->mLoops[this->mCurrentLoopId+1].stations[0];
+		}
+	}
+	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId+1];
+}
 
+uint64_t Line::getFirstLoopTrack() const noexcept {
+	return this->mLoops[this->mCurrentLoopId].stations[0].mapId;
+}
+std::pair<uint8_t, uint64_t> Line::getFirstNodePassed() const noexcept {
+	return std::make_pair(this->mFirstPointType, this->mFirstPointId);
 }
 
 Line::~Line() noexcept {

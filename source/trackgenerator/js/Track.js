@@ -123,10 +123,10 @@ function trackEditMenu(aID) {
 	canvasData.edit.appendChild(document.createTextNode("Editing track "+aID+" between"));
 
 	canvasData.edit.appendChild(document.createTextNode(
-		trackList[aID].firstIsSwitch ? " switch " : " node " + trackList[aID].nodeIdFirst
+		(trackList[aID].firstIsSwitch ? " switch " : " node ") + trackList[aID].nodeIdFirst
 	));
 	canvasData.edit.appendChild(document.createTextNode(
-		trackList[aID].secondIsSwitch ? " switch " : " node " + trackList[aID].nodeIdSecond
+		(trackList[aID].secondIsSwitch ? " switch " : " node ") + trackList[aID].nodeIdSecond
 	));
 
 	canvasData.edit.appendChild(document.createElement("br"));
