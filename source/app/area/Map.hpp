@@ -82,15 +82,20 @@ private:
 	Model mSwitchSignalModel;
 	std::vector<SwitchSignal> mSwitchSignals;
 	ShaderBuffer mSwitchSignalMatrices;
-	ShaderBuffer mSwitchSignalIds;
 	uint64_t mSwitchSignalCount;
 
 	Model mSignalModel;
 	//signal contains presignal id
 	std::vector<Signal> mSignals;
 	ShaderBuffer mSignalMatrices;
-	ShaderBuffer mSignalIds;
 	uint64_t mSignalCount;
+
+	Model mPoleModel; //pole for them
+	Model mPresignalModel; //presignal sign
+	ShaderBuffer mPoleMatrices;
+	ShaderBuffer mPresignalMatrices;
+	uint64_t mPoleCount;
+	uint64_t mPresignalCount;
 
 	//also invisible
 	std::vector<Radiobox> mRadioboxes;
@@ -98,25 +103,22 @@ private:
 	Model mStationPillarModel;
 	std::vector<StationPillar> mPillars;
 	ShaderBuffer mPillarMatrices;
-	ShaderBuffer mPillarIds;
 	uint64_t mPillarCount;
 
 	Model mTreeModel;
 	std::vector<Tree> mTrees;
 	ShaderBuffer mTreeMatrices;
-	ShaderBuffer mTreeIds;
 	uint64_t mTreeCount;
 
 	Model mLightModel;
 	std::vector<Lightpole> mLights;
 	ShaderBuffer mLightMatrices;
-	ShaderBuffer mLightIds;
 	uint64_t mLightCount;
 
 	std::vector<Building> mBuildings;
 	std::vector<Model> mBuildingModels; //mapped to type enum
 	std::vector<ShaderBuffer> mBuildingMatrices; //mapped too
-	uint64_t mBuildingCount;
+	std::vector<uint64_t> mBuildingCounts;
 
 	//landmarks always drawn
 	std::vector<Model> mLandmarkModels;

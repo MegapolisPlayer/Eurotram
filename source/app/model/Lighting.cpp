@@ -109,6 +109,9 @@ void DirectionalShadows::bindMap(const uint64_t aTextureSlot) noexcept {
 const glm::mat4& DirectionalShadows::getProjectionMatrix() const noexcept {
 	return this->mLightMatrix;
 }
+Texture& DirectionalShadows::getFBOTexture() noexcept {
+	return this->mTexture;
+}
 
 DirectionalShadows::~DirectionalShadows() noexcept {}
 
@@ -175,6 +178,9 @@ void SpotlightShadows::bindMap(const uint64_t aTextureSlot) noexcept {
 
 const glm::mat4& SpotlightShadows::getProjectionMatrix() const noexcept {
 	return this->mLightMatrix;
+}
+Texture& SpotlightShadows::getFBOTexture() noexcept {
+	return this->mTexture;
 }
 
 SpotlightShadows::~SpotlightShadows() noexcept {}

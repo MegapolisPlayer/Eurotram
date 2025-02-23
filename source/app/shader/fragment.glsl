@@ -1,6 +1,9 @@
 #version 450 core
 
-//Standard shader for all objects (except shadows)
+//normal fragment shader for all objects
+
+layout(location = 0) out vec4 oColor;
+layout(location = 1) out float oReveal; //for OIT
 
 //NEVER EVER USE VEC3 IN SSBO-UBO LAYOUT!
 //STD140 AND STD430 LAYOUT PACKING IS IDIOTIC AND ALIGNS TO VEC4
@@ -46,8 +49,6 @@ struct Spotlight {
 	int lightType;
 };
 
-out vec4 oColor;
-
 in vec2 pTexCoord;
 flat in float pMatId;
 in vec3 pNormals;
@@ -74,7 +75,7 @@ layout(std430, binding = 53) readonly buffer sSpotlights {
 
 layout(location = 200) uniform float uAmbientLight;
 layout(location = 210) uniform vec3 uCameraPosition;
-layout(location = 232) uniform sampler2D uTextures[16];
+layout(location = 232) uniform sampler2D uTextures[32]; //realistically hardware with OpenGL 4.5/4.6 which we need anyway supports this, we test at startup
 
 float attenuation(float aDistance, float aConstant, float aLinear, float aQuadratic) {
 	return 1.0/(aConstant + aLinear*aDistance + aQuadratic*aDistance*aDistance);
@@ -159,73 +160,112 @@ float calculateShadows(int aTextureId, vec4 aCoords, vec3 aNormalizedNormal, vec
 	return 1.0 - shadow;
 }
 
+//31 - directional shadows fbo
+const int DIRECTIONAL_TEXBIND = 31;
+//tram front lights FBOS
+const int TRAM_FRONT_LEFT_TEXBIND = 30;
+const int TRAM_FRONT_RIGHT_TEXBIND = 29;
+const int FLASHLIGHT_TEXBIND = 28;
+
+layout(location = 37) uniform int uWriteToRenderTargets; //0 - nothing, 1 - discard transparent, 2 - discard solid
+layout(location = 38) uniform int uIgnoreLighting; //if 1 - ignore lighting
+
 void main() {
 	Material mat1 = materials[int(round(pMatId))];
 
 	vec4 baseColor = mix(mat1.color, texture(uTextures[mat1.textureSlot], pTexCoord), mat1.textureAmount);
 
-	vec3 normalizedNormal = normalize(pNormals);
-	vec3 viewDirection = normalize(uCameraPosition - pFragmentPos);
-
-	vec3 directionalLightDirection = normalize(-dl.direction.xyz); //vector from (NOT TO) the light
-	float directionShadow = calculateShadows(15, pFragmentDirectionalLightPos, normalizedNormal, directionalLightDirection);
-	vec3 lighting = calculateDirectional(dl.color.xyz, normalizedNormal, viewDirection, mat1, dl) * directionShadow;
-	vec3 lightingSpecular = getSpecular(dl.color.xyz, 0.0, 1.0, 0.0, 0.0, normalizedNormal, directionalLightDirection, viewDirection, mat1) * float(directionShadow >= SPECULAR_SHADOW_CUTOFF);
-
-	//putting together
-	for(int i = 0; i < pointlights.length(); i++) {
-		vec3 lightDirection = normalize(pointlights[i].position.xyz - pFragmentPos);
-		float dst = length(pointlights[i].position.xyz - pFragmentPos);
-
-		//pointlights have no shadows
-
-		lighting += calculatePoint(dst, normalizedNormal, lightDirection, viewDirection, mat1, pointlights[i]);
-		lightingSpecular += getSpecular(
-			pointlights[i].color.xyz, dst,
-			pointlights[i].constant, pointlights[i].linear, pointlights[i].quadratic,
-			normalizedNormal, lightDirection, viewDirection, mat1
-		);
+	//no other way - i dont see how to integrate stencil here
+	if(baseColor.w <= 0.95 && uWriteToRenderTargets == 1) {
+		discard;
+	}
+	if(baseColor.w >= 0.95 && uWriteToRenderTargets == 2) {
+		discard;
 	}
 
-	for(int i = 0; i < spotlights.length(); i++) {
-		vec3 lightDirection = normalize(spotlights[i].position.xyz - pFragmentPos);
-		float dst = length(spotlights[i].position.xyz - pFragmentPos);
-		float strength = calculateSpotStrength(lightDirection, spotlights[i]);
+	//this branching ok - only changes depending on draw call
+	//also saves a bunch of computation
+	vec3 lightingMultiplier;
+	if(uIgnoreLighting == 0) {
+		vec3 normalizedNormal = normalize(pNormals);
+		vec3 viewDirection = normalize(uCameraPosition - pFragmentPos);
 
-		//spotlight shadows
-		//calculate normal lighting values, then multiply by shadow value if applicable
+		vec3 directionalLightDirection = normalize(-dl.direction.xyz); //vector from (NOT TO) the light
+		float directionShadow = calculateShadows(DIRECTIONAL_TEXBIND, pFragmentDirectionalLightPos, normalizedNormal, directionalLightDirection);
+		vec3 lighting = calculateDirectional(dl.color.xyz, normalizedNormal, viewDirection, mat1, dl) * directionShadow;
+		vec3 lightingSpecular = getSpecular(dl.color.xyz, 0.0, 1.0, 0.0, 0.0, normalizedNormal, directionalLightDirection, viewDirection, mat1) * float(directionShadow >= SPECULAR_SHADOW_CUTOFF);
 
-		float shadow = 1.0;
+		//putting together
+		for(int i = 0; i < pointlights.length(); i++) {
+			vec3 lightDirection = normalize(pointlights[i].position.xyz - pFragmentPos);
+			float dst = length(pointlights[i].position.xyz - pFragmentPos);
 
-		switch(spotlights[i].lightType) {
-			case(1):
-				shadow = calculateShadows(12, pFragmentFlashlightLightPos, normalizedNormal, lightDirection);
-				break;
-			case(2):
-				shadow = calculateShadows(13, pFragmentLeftFrontLightPos, normalizedNormal, lightDirection);
-				break;
-			case(3):
-				shadow = calculateShadows(14, pFragmentRightFrontLightPos, normalizedNormal, lightDirection);
-				break;
+			//pointlights have no shadows
+
+			lighting += calculatePoint(dst, normalizedNormal, lightDirection, viewDirection, mat1, pointlights[i]);
+			lightingSpecular += getSpecular(
+				pointlights[i].color.xyz, dst,
+				pointlights[i].constant, pointlights[i].linear, pointlights[i].quadratic,
+				normalizedNormal, lightDirection, viewDirection, mat1
+			);
 		}
 
-		lighting += calculateSpot(
-			dst, normalizedNormal, lightDirection, viewDirection, mat1, spotlights[i]
-		) * strength * shadow;
-		//specular present only if no shadow
-		lightingSpecular += getSpecular(
-			spotlights[i].color.xyz, dst,
-			spotlights[i].constant, spotlights[i].linear, spotlights[i].quadratic,
-			normalizedNormal, lightDirection, viewDirection, mat1
-		) * strength * float(shadow >= SPECULAR_SHADOW_CUTOFF);
+		for(int i = 0; i < spotlights.length(); i++) {
+			vec3 lightDirection = normalize(spotlights[i].position.xyz - pFragmentPos);
+			float dst = length(spotlights[i].position.xyz - pFragmentPos);
+			float strength = calculateSpotStrength(lightDirection, spotlights[i]);
+
+			//spotlight shadows
+			//calculate normal lighting values, then multiply by shadow value if applicable
+
+			float shadow = 1.0;
+
+			switch(spotlights[i].lightType) {
+				case(1):
+					shadow = calculateShadows(FLASHLIGHT_TEXBIND, pFragmentFlashlightLightPos, normalizedNormal, lightDirection);
+					break;
+				case(2):
+					shadow = calculateShadows(TRAM_FRONT_LEFT_TEXBIND, pFragmentLeftFrontLightPos, normalizedNormal, lightDirection);
+					break;
+				case(3):
+					shadow = calculateShadows(TRAM_FRONT_RIGHT_TEXBIND, pFragmentRightFrontLightPos, normalizedNormal, lightDirection);
+					break;
+			}
+
+			lighting += calculateSpot(
+				dst, normalizedNormal, lightDirection, viewDirection, mat1, spotlights[i]
+			) * strength * shadow;
+			//specular present only if no shadow
+			lightingSpecular += getSpecular(
+				spotlights[i].color.xyz, dst,
+				spotlights[i].constant, spotlights[i].linear, spotlights[i].quadratic,
+				normalizedNormal, lightDirection, viewDirection, mat1
+			) * strength * float(shadow >= SPECULAR_SHADOW_CUTOFF);
+		}
+
+		float shadow = 0.0;
+
+		calculateShadows(14, pFragmentFlashlightLightPos, normalizedNormal, directionalLightDirection);
+		calculateShadows(13, pFragmentRightFrontLightPos, normalizedNormal, directionalLightDirection);
+		calculateShadows(12, pFragmentLeftFrontLightPos, normalizedNormal, directionalLightDirection);
+
+		lightingMultiplier = clamp(max(uAmbientLight + lighting + lightingSpecular, mat1.brightness/255.0), 0.0, 1.0);
+	}
+	else {
+		lightingMultiplier = vec3(1.0);
 	}
 
-	float shadow = 0.0;
+	if(uWriteToRenderTargets >= 1) {
+		//some random weight function
+		//just gets how much color
+		float weight = max(min(1.0, max(max(baseColor.r, baseColor.g), baseColor.b) * baseColor.a), baseColor.a) * clamp(0.03 / (1e-5 + pow(gl_FragDepth / 200, 4.0)), 1e-2, 3e3);
 
-	calculateShadows(14, pFragmentFlashlightLightPos, normalizedNormal, directionalLightDirection);
-	calculateShadows(13, pFragmentRightFrontLightPos, normalizedNormal, directionalLightDirection);
-	calculateShadows(12, pFragmentLeftFrontLightPos, normalizedNormal, directionalLightDirection);
-
-	//oColor = vec4(1.0, 0.0, 1.0, 1.0);
-	oColor = vec4(baseColor.xyz * clamp(max(uAmbientLight + lighting + lightingSpecular, mat1.brightness/255.0), 0.0, 1.0), 1.0); //normal calc TODO transparency
+		oColor = vec4(baseColor.rgb * baseColor.a, baseColor.a) * weight;
+		oReveal = baseColor.a;
+	}
+	else {
+		oColor = vec4(baseColor.xyz * lightingMultiplier, baseColor.w);
+		//oColor = vec4(1.0, 0.0, 1.0, 1.0); //debug purple
+	}
+	return;
 };

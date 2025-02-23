@@ -99,7 +99,7 @@ Texture::Texture(
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glTextureScaleValue);
 }
 
-Texture::Texture(const void* aData, const size_t aPixelAmount, const bool aFlip, TextureScale aScaling, TextureBorder aBorder) noexcept
+Texture::Texture(void* aData, const size_t aPixelAmount, const bool aFlip, TextureScale aScaling, TextureBorder aBorder) noexcept
 	: mPath(""), mHandle(0), mpData(nullptr), mChannels(4) {
 	GLint glTextureScaleValue = 0;
 	GLint glTextureScaleValue2 = 0;

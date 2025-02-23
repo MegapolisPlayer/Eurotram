@@ -195,10 +195,10 @@ function scenarioSerialize() {
 		let isPresignal = v instanceof Presignal;
 
 		if(isPresignal) {
-			numberValuesArray.push(...JUNCTION_SIGNAL_BYTES);
+			numberValuesArray.push(...JUNCTION_PRESIGNAL_BYTES);
 		}
 		else {
-			numberValuesArray.push(...JUNCTION_PRESIGNAL_BYTES);
+			numberValuesArray.push(...JUNCTION_SIGNAL_BYTES);
 		}
 
 		numberValuesArray.push(...numberToByteArray(v.xPos, 4));
@@ -472,7 +472,7 @@ function scenarioDeserialize(afiledata) {
 		readXYHR(numberArrayReference, signalList[i]);
 		signalList[i].poleHeight = readBytesAsNumber(numberArrayReference, 2);
 
-		if(type == JUNCTION_SIGNAL_TYPE) {
+		if(type == JUNCTION_PRESIGNAL_TYPE) {
 			signalList[i].signalId = readBytesAsNumber(numberArrayReference, 4);
 		}
 

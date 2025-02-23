@@ -1,5 +1,7 @@
 #version 450 core
 
+//normal vertex shader
+
 layout(location = 0) in vec3 iPosition;
 layout(location = 1) in vec3 iNormals;
 layout(location = 2) in vec2 iTexCoord;

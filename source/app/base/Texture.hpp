@@ -21,7 +21,7 @@ public:
 	Texture(const uint64_t aWidth, const uint64_t aHeight, const uint64_t aInternalFormat, const uint64_t aFormat, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
 
 	//embedded textures are a pain - usually dont flip textures!!!
-	Texture(const void* aData, const size_t aPixelAmount, const bool aFlip = true, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
+	Texture(void* aData, const size_t aPixelAmount, const bool aFlip = true, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
 
 	Texture(Texture&& aOther) noexcept;
 	Texture& operator=(Texture&& aOther) noexcept;
@@ -67,12 +67,6 @@ public:
 private:
 	UniformIntMultiple<std::array<GLint, tAmount>&> mUniform;
 	std::array<GLint, tAmount> mArray;
-};
-
-class TextureArray {
-public:
-	//TODO
-private:
 };
 
 #endif

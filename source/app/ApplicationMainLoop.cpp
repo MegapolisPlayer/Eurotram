@@ -77,8 +77,13 @@ void Application::rawClickCallback(Window* aWindow, uint32_t aKey, uint32_t aAct
 }
 
 bool Application::runInternal() noexcept {
+	this->mWindow.setBackgroundColor(daylightColor);
+
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 	shader.bind();
+
+	UniformInt uOITEnabled(37);
+	UniformInt uIgnoreLighting(38);
 
 	TextureSamplerArray<32> tsa(232);
 	tsa.set();
@@ -94,7 +99,7 @@ bool Application::runInternal() noexcept {
 	glm::mat4 rotationMatrix = glm::mat4(1.0);
 	d.direction = glm::vec4(0.0f, -1.0f, 0.0f, 1.0f);
 
-	DirectionalShadows ds(lightPos, glm::vec3(0.0f), 20.0f, 0.1f, 30.0f);
+	DirectionalShadows ds(lightPos, glm::vec3(0.0f), 100.0f, 0.1f, 300.0f);
 
 	UniformMat4 spu(13);
 	spu.set(ds.getProjectionMatrix());
@@ -161,14 +166,12 @@ bool Application::runInternal() noexcept {
 
 	UniformInt uIsInstancedRendering(36);
 
-	Transform t1;
-
 	Shader shadowMapProgram("shader/shadowVertex.glsl", "shader/shadowFragment.glsl");
 	shadowMapProgram.bind();
+	UniformInt luIsInstancedRendering(36);
 	UniformMat4 lpu(90);
 	UniformMat4 lmod(91);
 	StructUniform<glm::mat4> lmat(40, 0);
-	lmod.set(t1.getMatrix());
 
 	std::cout << "GMS length " << GlobalMaterialStore::getLength() << '\n';
 	uMaterial.setNewData(nullptr, GlobalMaterialStore::getLength());
@@ -178,19 +181,22 @@ bool Application::runInternal() noexcept {
 	nightWindows->material.brightness = MAX_BRIGHTNESS;
 	nightWindows->material.specular = glm::vec4(0.0);
 
+	ScreenRenderer sr;
+	OIT oit(this->mWindow);
+
 	this->runWindowFrame([&]() {
 		shadowMapProgram.bind();
 
 		ss.beginPass(this->mWindow, lpu);
-		lmod.set(t1.getMatrix());
-		t3rp.sendAnimationDataToShader(lmat);
+		//t3rp.sendAnimationDataToShader(lmat);
 		t3rp.draw(uMaterial, uModelMat, &lmod);
+		this->mMap.draw(uMaterial, uModelMat, 35, luIsInstancedRendering, &lmod);
 		ss.endPass(this->mWindow);
 
 		ds.beginPass(this->mWindow, lpu);
-		lmod.set(t1.getMatrix());
-		t3rp.sendAnimationDataToShader(lmat);
+		//t3rp.sendAnimationDataToShader(lmat);
 		t3rp.draw(uMaterial, uModelMat, &lmod);
+		this->mMap.draw(uMaterial, uModelMat, 35, luIsInstancedRendering, &lmod);
 		ds.endPass(this->mWindow);
 
 		// main draw
@@ -209,18 +215,32 @@ bool Application::runInternal() noexcept {
 		matCameraUniform.set(this->mWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(this->mWindow.getCamera()->getPosition());
 
-		ss.bindMap(12);
-		ds.bindMap(15);
+		ss.bindMap(28); //28 flashlight
+		ds.bindMap(31); //31 sun
+		//29,30 front lights of tram
 
 		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
 
 		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
 		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
 
-		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
+		daylightIndex = 0.5;
+		ambientLightStrength.set(daylightIndex);
 
 		this->mMap.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
+
+		oit.beginOpaquePass(uOITEnabled);
+		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
 		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
+		oit.endOpaquePass(uOITEnabled);
+		oit.beginTransparentPass(uOITEnabled);
+		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
+		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
+		oit.endTransparentPass(uOITEnabled);
+
+		oit.draw(sr);
+
+		shader.bind();
 
 		// gui
 

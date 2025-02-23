@@ -214,6 +214,14 @@ void Framebuffer::unbindAsRead() noexcept {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 }
 
+bool Framebuffer::checkStatus() noexcept {
+	glBindFramebuffer(GL_FRAMEBUFFER, this->mHandle);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		std::cerr << LogLevel::ERROR << " Framebuffer at address " << this << " is incomplete!\n" << LogLevel::RESET;
+	}
+	return true;
+}
+
 GLuint Framebuffer::getHandle() const noexcept {
 	return this->mHandle;
 }

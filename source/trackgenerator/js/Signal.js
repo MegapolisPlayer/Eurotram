@@ -32,14 +32,17 @@ function signalEditMenu(aID) {
 	addBasicEditInputs(signalList[aID]);
 
 	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
-
 	addInput("editrotinput", signalList[aID].rotation, "number");
+
+	canvasData.edit.appendChild(document.createTextNode("Pole height: "));
+	addInput("editphinput", signalList[aID].poleHeight, "number");
 
 	let updateButton = document.createElement("button");
 	updateButton.addEventListener("click", () => {
 		let signalId =  getIDFromInput();
 		getDataFromBasicInputs(signalList[signalId]);
 		signalList[signalId].rotation = Number(document.getElementById("editrotinput").value);
+		signalList[signalId].poleHeight = Number(document.getElementById("editphinput").value);
 		canvasRedraw();
 	});
 	updateButton.textContent = "Update";
@@ -82,6 +85,9 @@ function presignalEditMenu(aID) {
 	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
 	addInput("editrotinput", signalList[aID].rotation, "number");
 
+	canvasData.edit.appendChild(document.createTextNode("Pole height: "));
+	addInput("editphinput", signalList[aID].poleHeight, "number");
+
 	canvasData.edit.appendChild(document.createTextNode("Signal id: "));
 	addInput("editsiginput", signalList[aID].signalId, "number");
 
@@ -90,6 +96,7 @@ function presignalEditMenu(aID) {
 		let signalId = getIDFromInput();
 		getDataFromBasicInputs(signalList[signalId]);
 		signalList[signalId].rotation = Number(document.getElementById("editrotinput").value);
+		signalList[signalId].poleHeight = Number(document.getElementById("editphinput").value);
 		signalList[signalId].signalId = Number(document.getElementById("editsiginput").value);
 		canvasRedraw();
 	});
@@ -161,6 +168,7 @@ function switchSignalEditMenu(aID) {
 
 	addBasicEditInputs(switchSignalList[aID]);
 
+	canvasData.edit.appendChild(document.createTextNode("Rotation: "));
 	addInput("editrotinput", switchSignalList[aID].rotation, "number");	
 
 	let updateButton = document.createElement("button");

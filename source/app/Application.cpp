@@ -3,7 +3,7 @@
 Application::Application() noexcept
 	: mWindow("Eurotram", 1280, 720, false, true),
 	mCamera(&this->mWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 1000.0f, 0.1f),
-	mLogo("logo.png"), mMinuteTime(0) {
+	mLogo("logo.png", false), mMinuteTime(0) {
 	this->mWindow.setBackgroundColor(glm::vec4(0.5f));
 	this->mWindow.enableVSync();
 
@@ -31,8 +31,15 @@ bool Application::renderMainMenu() noexcept {
 		ImGui::Begin("Eurotram 0.1");
 		ImGui::Text("(c) Martin Bykov 2024-2025");
 
-		this->mLogo.bind(0);
-		ImGui::Image(0, ImVec2(this->mLogo.getWidth(), this->mLogo.getHeight()));
+		ImGui::PushItemWidth(150);
+		ImGui::PushItemWidth(100);
+		ImGui::Image(
+			(ImTextureID)(uint64_t)this->mLogo.getHandle(),
+			ImVec2(
+				this->mWindow.getWidth()/3.0-100,
+				(this->mWindow.getWidth()/3.0-100)*((float)this->mLogo.getHeight()/this->mLogo.getWidth())
+			)
+		);
 
 		if(ImGui::Button("Start simulator")) {
 			if(
@@ -109,6 +116,9 @@ void Application::renderPauseMenu() noexcept {
 
 void Application::run() noexcept {
 	static_assert(sizeof(glm::vec3) == sizeof(GLfloat)*3, "Test failed: glm::vec3 has wrong size!");
+	assert(Texture::getAmountOfSlots() >= 32);
+	std::cout << "Texture slots available: " << Texture::getAmountOfSlots() << '\n';
+
 	setUTF8Encoding();
 	initAudioEngine();
 

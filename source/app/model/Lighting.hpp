@@ -104,6 +104,7 @@ public:
 	void bindMap(const uint64_t aTextureSlot) noexcept;
 
 	const glm::mat4& getProjectionMatrix() const noexcept;
+	Texture& getFBOTexture() noexcept;
 
 	~DirectionalShadows() noexcept;
 private:
@@ -143,6 +144,7 @@ public:
 	void bindMap(const uint64_t aTextureSlot) noexcept;
 
 	const glm::mat4& getProjectionMatrix() const noexcept;
+	Texture& getFBOTexture() noexcept;
 
 	~SpotlightShadows() noexcept;
 private:

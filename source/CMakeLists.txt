@@ -32,6 +32,8 @@ add_executable(eurotram
 "app/base/Text.cpp"
 "app/base/Ray.cpp"
 "app/base/Math.cpp"
+"app/base/ScreenRender.cpp"
+"app/base/OIT.cpp"
 
 "app/model/Lighting.cpp"
 "app/model/Sky.cpp"

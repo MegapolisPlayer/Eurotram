@@ -58,6 +58,7 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 	}
 
 	this->mFirstGMSMaterial = GlobalMaterialStore::getLength();
+	this->mLastGMSMaterial = GlobalMaterialStore::getLength();
 
 	//material
 	uint64_t textureId = 0;
@@ -92,9 +93,12 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 				auto& image = model->images[texture.imageIndex.value()];
 				material->material.textureSlot = textureId;
 				textureId++;
-				if(textureId > 32) {
-					std::cerr << LogLevel::ERROR << "Error: more than 32 textures per model are not supported yet!\n" << LogLevel::RESET;
-					//TODO bindless textures
+				//32 - slots
+				//31,30,29,28 - shadows (sun, 2 front lights, flashlight)
+				//27 - weather FBO
+				if(textureId >= 27) {
+					std::cerr << LogLevel::ERROR << "Error: more than 27 material textures per model are not supported yet!\n" << LogLevel::RESET;
+					//TODO 0.2.0 bindless textures (array textures are crap)
 					return;
 				}
 

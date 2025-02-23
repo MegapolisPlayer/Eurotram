@@ -23,11 +23,12 @@ GMSEntry* Map::msTrackMaterial = nullptr;
 Map::Map() noexcept :
 	mOverheadWireVertices(nullptr, 0, 0), mOverheadWireIndices(nullptr, 0),
 	mTrackVertices(nullptr, 0, 0), mTrackIndices(nullptr, 0),
-	mSwitchSignalModel("./SwitchSignal.glb"), mSwitchSignalMatrices(nullptr, 0), mSwitchSignalIds(nullptr, 0),
-	mSignalModel("./Signal.glb"), mSignalMatrices(nullptr, 0), mSignalIds(nullptr, 0),
-	mStationPillarModel("./Stop.glb"), mPillarMatrices(nullptr, 0), mPillarIds(nullptr, 0),
-	mTreeModel("./Tree.glb"), mTreeMatrices(nullptr, 0), mTreeIds(nullptr, 0),
-	mLightModel("./Streetlamp.glb"), mLightMatrices(nullptr, 0), mLightIds(nullptr, 0),
+	mSwitchSignalModel("./Switch.glb"), mSwitchSignalMatrices(nullptr, 0),
+	mSignalModel("./Signal.glb"),  mSignalMatrices(nullptr, 0),
+	mPoleModel("./Pole.glb"), mPresignalModel("./Presig.glb"), mPoleMatrices(nullptr, 0), mPresignalMatrices(nullptr, 0),
+	mStationPillarModel("./Stop.glb"), mPillarMatrices(nullptr, 0),
+	mTreeModel("./Tree.glb"), mTreeMatrices(nullptr, 0),
+	mLightModel("./Streetlamp.glb"), mLightMatrices(nullptr, 0),
 	mWallVertices(nullptr, 0, 0), mWallIndices(nullptr, 0), mFirstWallMaterial(0), mLastWallMaterial(0),
 	mSignVertices(nullptr, 0, 0), mSignIndices(nullptr, 0), mFirstSignMaterial(0), mLastSignMaterial(0),
 	mTexparcelVertices(nullptr, 0, 0), mTexparcelIndices(nullptr, 0) {}
@@ -35,15 +36,15 @@ Map::Map() noexcept :
 Map::Map(const std::string_view aFilename) noexcept :
 	mOverheadWireVertices(nullptr, 0, 0), mOverheadWireIndices(nullptr, 0),
 	mTrackVertices(nullptr, 0, 0), mTrackIndices(nullptr, 0),
-	mSwitchSignalModel("./SwitchSignal.glb"), mSwitchSignalMatrices(nullptr, 0), mSwitchSignalIds(nullptr, 0),
-	mSignalModel("./Signal.glb"), mSignalMatrices(nullptr, 0), mSignalIds(nullptr, 0),
-	mStationPillarModel("./Stop.glb"), mPillarMatrices(nullptr, 0), mPillarIds(nullptr, 0),
-	mTreeModel("./Tree.glb"), mTreeMatrices(nullptr, 0), mTreeIds(nullptr, 0),
-	mLightModel("./Streetlamp.glb"), mLightMatrices(nullptr, 0), mLightIds(nullptr, 0),
+	mSwitchSignalModel("./Switch.glb"), mSwitchSignalMatrices(nullptr, 0),
+	mSignalModel("./Signal.glb"),  mSignalMatrices(nullptr, 0),
+	mPoleModel("./Pole.glb"), mPresignalModel("./Presig.glb"), mPoleMatrices(nullptr, 0), mPresignalMatrices(nullptr, 0),
+	mStationPillarModel("./Stop.glb"), mPillarMatrices(nullptr, 0),
+	mTreeModel("./Tree.glb"), mTreeMatrices(nullptr, 0),
+	mLightModel("./Streetlamp.glb"), mLightMatrices(nullptr, 0),
 	mWallVertices(nullptr, 0, 0), mWallIndices(nullptr, 0), mFirstWallMaterial(0), mLastWallMaterial(0),
 	mSignVertices(nullptr, 0, 0), mSignIndices(nullptr, 0), mFirstSignMaterial(0), mLastSignMaterial(0),
-	mTexparcelVertices(nullptr, 0, 0), mTexparcelIndices(nullptr, 0)
-	{
+	mTexparcelVertices(nullptr, 0, 0), mTexparcelIndices(nullptr, 0) {
 	this->open(aFilename);
 }
 
@@ -72,6 +73,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 		//amount of types
 		for(uint8_t i = 0; i < 4; i++) {
 			this->mBuildingMatrices.emplace_back(ShaderBuffer(nullptr, 0));
+			this->mBuildingCounts.emplace_back(0);
 		}
 
 		//other models loaded
@@ -145,7 +147,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 	//B
 	readBytesToString(fileHandle, buffer, 4);
-	this->mBuildingCount = *((uint32_t*)buffer.data());
+	uint32_t buildingAmount = *((uint32_t*)buffer.data());
 
 	//M
 	readBytesToString(fileHandle, buffer, 4);
@@ -185,7 +187,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 	std::cout << "Pillar amount: " << this->mPillarCount << '\n';
 	std::cout << "Tree amount: " << this->mTreeCount << '\n';
 	std::cout << "Streetlamp amount: " << this->mLightCount  << '\n';
-	std::cout << "Building amount: " << this->mBuildingCount << '\n';
+	std::cout << "Building amount: " << buildingAmount << '\n';
 	std::cout << "Landmark amount: " << landmarksAmount << '\n';
 	std::cout << "Wall amount: " << wallAmount << '\n';
 	std::cout << "Sign amount: " << signAmount << '\n';
@@ -286,21 +288,22 @@ void Map::open(const std::string_view aFilename) noexcept {
 		this->mSwitchSignals.back().letters = buffer;
 	}
 
-	//Signal list
+	//Signal (and pre-signal) list
 	this->mSignals.reserve(this->mSignalCount);
 	for(uint32_t i = 0; i < this->mSignalCount; i++) {
 		this->mSignals.push_back({});
 		bool isPresignal = false;
+		readBytesToString(fileHandle, buffer, 2);
 		if(buffer == "PJ") isPresignal = true;
 		else if(buffer == "JS") isPresignal = false;
 		else {
-			std::cerr << LogLevel::ERROR << "(Pre)signal header wrong!\n" << LogLevel::RESET;
+			std::cerr << LogLevel::ERROR << "(Pre)signal header wrong! - " << buffer << "\n" << LogLevel::RESET;
 			return;
 		}
 		readLocationToString(fileHandle, this->mSignals.back().location, unitsPerMeter);
 
-		readBytesToString(fileHandle, buffer, 4);
-		this->mSignals.back().poleHeight =  *((int32_t*)buffer.data());
+		readBytesToString(fileHandle, buffer, 2);
+		this->mSignals.back().poleHeight =  *((int16_t*)buffer.data());
 
 		if(isPresignal) {
 			//I - id of signal from where to copy
@@ -352,8 +355,8 @@ void Map::open(const std::string_view aFilename) noexcept {
 	}
 
 	//Building list
-	this->mBuildings.reserve(this->mBuildingCount);
-	for(uint32_t i = 0; i < this->mBuildingCount; i++) {
+	this->mBuildings.reserve(buildingAmount);
+	for(uint32_t i = 0; i < buildingAmount; i++) {
 		this->mBuildings.push_back({});
 		readLocationToString(fileHandle, this->mBuildings.back().location, unitsPerMeter);
 
@@ -765,22 +768,47 @@ void Map::randomizeBuildingColors() noexcept {
 }
 
 void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept {
-	//TODO make pole model -> draw it together with signals and switch signals if applicable
-
 	//switch signals
 	{
 		std::vector<glm::mat4> switchSignalInstanceTranslations;
 		for(SwitchSignal& s : this->mSwitchSignals) {
-
+			glm::mat4 translation = glm::translate(glm::mat4(1.0), glm::vec3(s.location.x, s.location.h, s.location.y));
+			translation = glm::rotate(translation, glm::radians(s.location.r), glm::vec3(0.0, 1.0, 0.0));
+			switchSignalInstanceTranslations.push_back(translation);
 		}
+		this->mSwitchSignalMatrices.setNewData(switchSignalInstanceTranslations.data(), switchSignalInstanceTranslations.size()*sizeof(glm::mat4));
 	}
 
 	//signals
 	{
-		std::vector<glm::mat4> signalInstanceTranslations;
-		for(Signal& s : this->mSignals) {
+		this->mPoleCount = 0;
+		this->mPresignalCount = 0;
 
+		std::vector<glm::mat4> poleMatrices;
+		std::vector<glm::mat4> signalInstanceTranslations;
+		std::vector<glm::mat4> presignalMatrices;
+
+		for(Signal& s : this->mSignals) {
+			glm::mat4 translation = glm::translate(glm::mat4(1.0), glm::vec3(s.location.x, s.location.h+s.poleHeight-1, s.location.y));
+			translation = glm::rotate(translation, glm::radians(s.location.r), glm::vec3(0.0, 1.0, 0.0));
+			if(s.signalCopyId != -1) {
+				presignalMatrices.push_back(translation);
+				this->mPresignalCount++;
+			}
+			signalInstanceTranslations.push_back(translation);
+			if(s.poleHeight > 0) {
+				//without poleheight addition (but half because we scale from center)
+				translation = glm::translate(glm::mat4(1.0), glm::vec3(s.location.x, s.location.h, s.location.y));
+				translation = glm::rotate(translation, glm::radians(s.location.r), glm::vec3(0.0, 1.0, 0.0));
+				translation = glm::scale(translation, glm::vec3(1.0, s.poleHeight, 1.0));
+				poleMatrices.push_back(translation);
+				this->mPoleCount++;
+			}
 		}
+
+		this->mPoleMatrices.setNewData(poleMatrices.data(), poleMatrices.size()*sizeof(glm::mat4));
+		this->mSignalMatrices.setNewData(signalInstanceTranslations.data(), signalInstanceTranslations.size()*sizeof(glm::mat4));
+		this->mPresignalMatrices.setNewData(presignalMatrices.data(), presignalMatrices.size()*sizeof(glm::mat4));
 	}
 
 	//pillars
@@ -824,6 +852,7 @@ void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, Stati
 
 		for(uint8_t i = 0; i < 4; i++) {
 			buildingInstanceTranslations[i].clear();
+			this->mBuildingCounts[i] = 0;
 		}
 
 		for(Building& b : this->mBuildings) {
@@ -832,6 +861,7 @@ void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, Stati
 				glm::mat4 translation = glm::translate(glm::mat4(1.0), glm::vec3(b.location.x, b.location.h, b.location.y));
 				translation = glm::rotate(translation, glm::radians(-b.location.r), glm::vec3(0.0, 1.0, 0.0));
 				buildingInstanceTranslations[(uint8_t)b.type].push_back(translation);
+				this->mBuildingCounts[(uint8_t)b.type]++;
 			//}
 		}
 		for(uint8_t i = 0; i < 4; i++) {
@@ -857,13 +887,15 @@ void Map::updateTextures(StationCode aPrev, StationCode aCurrent, StationCode aN
 	}
 }
 
-//TODO add drawPoints is tag in settings
-
 void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aInstanceBufferLocation, UniformInt& aBoolStateUniform, UniformMat4* aTransformUniform, UniformMat3* aNormalUniform) noexcept {
 	//ground (texparcels)
 
-	aTransformUniform->set(glm::mat4(1.0f));
-	aNormalUniform->set(glm::transpose(glm::inverse(glm::mat4(1.0f))));
+	if(aTransformUniform) {
+		aTransformUniform->set(glm::mat4(1.0f));
+	}
+	if(aNormalUniform) {
+		aNormalUniform->set(glm::transpose(glm::inverse(glm::mat4(1.0f))));
+	}
 
 	//no materials -> no texparcels!
 	if(this->mTexparcelMaterials.size() > 0) {
@@ -888,11 +920,13 @@ void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrice
 	//all objects
 	aBoolStateUniform.set(1);
 
-	//TODO for signals and pillars -> make another bool+buffer combo: set pre-made textures for them via freetype
-
 	//signals
 	this->mSignalMatrices.bind(aInstanceBufferLocation);
 	this->mSignalModel.drawInstanced(aUniform, aBoneMatrices, this->mSignalCount, aTransformUniform, aNormalUniform);
+	this->mPoleMatrices.bind(aInstanceBufferLocation);
+	this->mPoleModel.drawInstanced(aUniform, aBoneMatrices, this->mPoleCount, aTransformUniform, aNormalUniform);
+	this->mPresignalMatrices.bind(aInstanceBufferLocation);
+	this->mPresignalModel.drawInstanced(aUniform, aBoneMatrices, this->mPresignalCount, aTransformUniform, aNormalUniform);
 
 	//switch signals
 	this->mSwitchSignalMatrices.bind(aInstanceBufferLocation);
@@ -913,7 +947,7 @@ void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrice
 	//buildings
 	for(uint8_t i = 0; i < 4; i++) {
 		this->mBuildingMatrices[i].bind(aInstanceBufferLocation);
-		this->mBuildingModels[i].drawInstanced(aUniform, aBoneMatrices, this->mBuildingCount, aTransformUniform, aNormalUniform);
+		this->mBuildingModels[i].drawInstanced(aUniform, aBoneMatrices, this->mBuildingCounts[i], aTransformUniform, aNormalUniform);
 	}
 
 	aBoolStateUniform.set(0);
@@ -954,8 +988,6 @@ void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrice
 }
 
 uint64_t Map::getNextTrack(const uint64_t aCurrentId, const std::pair<uint8_t, uint64_t>& aEndNode, LineData::SwitchDirection aDirection) noexcept {
-	auto& track = this->mTracks[aCurrentId];
-
 	if(aEndNode.first == 's') {
 		//endpoint is switch
 		int32_t secondNewTrackNode = 0;
@@ -1054,6 +1086,4 @@ std::pair<uint8_t, uint64_t> Map::getOtherTrackPoint(const uint64_t aTrackId, co
 	return std::make_pair(newType, newId);
 }
 
-Map::~Map() noexcept {
-
-}
+Map::~Map() noexcept {}

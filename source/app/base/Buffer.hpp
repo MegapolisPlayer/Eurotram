@@ -115,6 +115,8 @@ public:
 
 	void bindTexture(const Texture& aTexture, const uint64_t aFormat, const bool aRead = false, const bool aDraw = false) noexcept;
 
+	bool checkStatus() noexcept;
+
 	GLuint getHandle() const noexcept;
 
 	~Framebuffer() noexcept;

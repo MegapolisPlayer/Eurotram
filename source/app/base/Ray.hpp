@@ -5,4 +5,9 @@
 //AABB algorithm, issue #27
 //https://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/
 
+class RayMaker {
+public:
+private:
+};
+
 #endif
