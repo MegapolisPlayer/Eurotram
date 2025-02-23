@@ -668,9 +668,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 				} //end of loop
 			}
 			else {
-				t.points.push_back(firstNode);
-				t.points.push_back(secondNode);
-				t.length = (secondNode-firstNode).length();
+				t.length = glm::distance(firstNode, secondNode);
 				t.pointsAmount = TRACK_HEIGHTPOINTS_AMOUNT;
 
 				glm::vec2 dirVector = Math::getPerpendicularVectorFromPoints(firstNode, secondNode);
@@ -683,6 +681,8 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 					glm::vec2 position = Math::linearInterpolation(firstNode, secondNode, i/float(TRACK_HEIGHTPOINTS_AMOUNT-1));
 					float height = t.heightpoints[i]+TRACK_Z_FIGHT_AVOIDANCE;
+
+					t.points.push_back(position);
 
 					//rail 1
 					trackVertices.emplace_back(glm::vec3(position.x+gaugeLongVector.x, height, position.y+gaugeLongVector.y));
@@ -714,27 +714,38 @@ void Map::open(const std::string_view aFilename) noexcept {
 					i + 6,
 				});
 
-				trackVertices[i+0].texCoords = glm::vec2(float(i)/t.pointsAmount, 1.0);
-				trackVertices[i+1].texCoords = glm::vec2(float(i)/t.pointsAmount, 0.0);
-				trackVertices[i+2].texCoords = glm::vec2(float(i)/t.pointsAmount, 0.0);
-				trackVertices[i+3].texCoords = glm::vec2(float(i)/t.pointsAmount, 1.0);
+				trackVertices[i+0].texCoords = glm::vec2(float(i+0)/t.pointsAmount, 1.0);
+				trackVertices[i+1].texCoords = glm::vec2(float(i+1)/t.pointsAmount, 0.0);
+				trackVertices[i+2].texCoords = glm::vec2(float(i+2)/t.pointsAmount, 0.0);
+				trackVertices[i+3].texCoords = glm::vec2(float(i+3)/t.pointsAmount, 1.0);
 			}
 		}
 
 		//add normals
-		for(uint32_t i = 0; i < trackVertices.size(); i+=4) {
-			//1,0,2,3
-			glm::vec3 normal = Math::normals(
+		for(uint32_t i = 0; i < trackVertices.size(); i+=8) {
+			//rail 1
+			glm::vec3 normalTop = Math::normals(
 				trackVertices[i+1].position,
 				trackVertices[i+0].position,
-				trackVertices[i+2].position,
-				trackVertices[i+3].position
+				trackVertices[i+5].position,
+				trackVertices[i+4].position
+			);
+			//rail 2
+			glm::vec3 normalButton = Math::normals(
+				trackVertices[i+3].position,
+				trackVertices[i+7].position,
+				trackVertices[i+6].position,
+				trackVertices[i+2].position
 			);
 
-			trackVertices[i+0].normal = normal;
-			trackVertices[i+1].normal = normal;
-			trackVertices[i+2].normal = normal;
-			trackVertices[i+3].normal = normal;
+			trackVertices[i+0].normal = normalTop;
+			trackVertices[i+1].normal = normalTop;
+			trackVertices[i+2].normal = normalTop;
+			trackVertices[i+3].normal = normalTop;
+			trackVertices[i+4].normal = normalButton;
+			trackVertices[i+5].normal = normalButton;
+			trackVertices[i+6].normal = normalButton;
+			trackVertices[i+7].normal = normalButton;
 		}
 
 		this->mTrackArray.bind();
@@ -754,6 +765,8 @@ void Map::randomizeBuildingColors() noexcept {
 }
 
 void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept {
+	//TODO make pole model -> draw it together with signals and switch signals if applicable
+
 	//switch signals
 	{
 		std::vector<glm::mat4> switchSignalInstanceTranslations;
@@ -849,6 +862,9 @@ void Map::updateTextures(StationCode aPrev, StationCode aCurrent, StationCode aN
 void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrices, const uint64_t aInstanceBufferLocation, UniformInt& aBoolStateUniform, UniformMat4* aTransformUniform, UniformMat3* aNormalUniform) noexcept {
 	//ground (texparcels)
 
+	aTransformUniform->set(glm::mat4(1.0f));
+	aNormalUniform->set(glm::transpose(glm::inverse(glm::mat4(1.0f))));
+
 	//no materials -> no texparcels!
 	if(this->mTexparcelMaterials.size() > 0) {
 		this->mTexparcelArray.bind();
@@ -903,6 +919,8 @@ void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrice
 	aBoolStateUniform.set(0);
 
 	//track
+	//disable culling - our generator doesnt care about winding order
+	glDisable(GL_CULL_FACE);
 
 	aUniform.update(&Map::msTrackMaterial->material, 0, 0);
 	aUniform.set();
@@ -916,6 +934,8 @@ void Map::draw(UniformMaterial& aUniform, StructUniform<glm::mat4>& aBoneMatrice
 	this->mTrackIndices.bind();
 	//this->mTrackVertices.drawPoints();
 	this->mTrackIndices.draw(); //draw track last
+
+	glEnable(GL_CULL_FACE);
 
 	//signs
 	if(this->mSigns.size() > 0) {
@@ -993,11 +1013,16 @@ Track* Map::getStationByCode(std::string_view aCode) noexcept {
 	}
 	return nullptr;
 }
-Track* Map::getTrackById(const uint64_t aId) noexcept {
-	return &this->mTracks[aId];
+Node& Map::getNodeById(const uint64_t aId) noexcept {
+	return this->mNodes[aId];
+}
+Switch& Map::getSwitchById(const uint64_t aId) noexcept {
+	return this->mSwitches[aId];
+}
+Track& Map::getTrackById(const uint64_t aId) noexcept {
+	return this->mTracks[aId];
 }
 bool Map::isTrackStation(const uint64_t aId) noexcept {
-	std::cout << "SC " << (((char*)&this->mTracks[aId].code)[0]) << (((char*)&this->mTracks[aId].code)[1]) << (((char*)&this->mTracks[aId].code)[2]) << (((char*)&this->mTracks[aId].code)[3]) << '\n';
 	return this->mTracks[aId].code != 0;
 }
 

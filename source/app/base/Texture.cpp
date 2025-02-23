@@ -1,6 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_WINDOWS_UTF8
 #define STBI_FAILURE_USERMSG
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "Texture.hpp"
 #include "TextureIm.hpp"
 
@@ -191,6 +192,19 @@ GLuint Texture::getHandle() const noexcept {
 }
 std::string_view Texture::getPath() const noexcept {
 	return this->mPath;
+}
+
+GLubyte* Texture::getData() const noexcept {
+	return this->mpData;
+}
+int32_t Texture::getWidth() const noexcept {
+	return this->mWidth;
+}
+int32_t Texture::getHeight() const noexcept {
+	return this->mHeight;
+}
+int32_t Texture::getChannels() const noexcept {
+	return this->mChannels;
 }
 
 uint64_t Texture::getAmountOfSlots() noexcept {

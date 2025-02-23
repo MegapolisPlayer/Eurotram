@@ -20,6 +20,16 @@ Transform::Transform(const glm::mat4& aMatrix) noexcept
 	this->calculateMatrix();
 }
 
+Transform::Transform(Transform& aOther) noexcept {
+	this->mPos = aOther.mPos;
+	this->mRotationDegreesX = aOther.mRotationDegreesX;
+	this->mRotationDegreesY = aOther.mRotationDegreesY;
+	this->mRotationDegreesZ = aOther.mRotationDegreesZ;
+	this->mScale = aOther.mScale;
+	this->mPrecalculated = aOther.mPrecalculated;
+	this->mPrecalcMatrix = aOther.mPrecalcMatrix;
+	this->mPrecalcNormalMatrix = aOther.mPrecalcNormalMatrix;
+}
 Transform::Transform(Transform&& aOther) noexcept {
 	this->mPos = std::move(aOther.mPos);
 	this->mRotationDegreesX = std::move(aOther.mRotationDegreesX);
@@ -29,6 +39,17 @@ Transform::Transform(Transform&& aOther) noexcept {
 	this->mPrecalculated = std::move(aOther.mPrecalculated);
 	this->mPrecalcMatrix = std::move(aOther.mPrecalcMatrix);
 	this->mPrecalcNormalMatrix = std::move(aOther.mPrecalcNormalMatrix);
+}
+Transform& Transform::operator=(Transform& aOther) noexcept {
+	this->mPos = aOther.mPos;
+	this->mRotationDegreesX = aOther.mRotationDegreesX;
+	this->mRotationDegreesY = aOther.mRotationDegreesY;
+	this->mRotationDegreesZ = aOther.mRotationDegreesZ;
+	this->mScale = aOther.mScale;
+	this->mPrecalculated = aOther.mPrecalculated;
+	this->mPrecalcMatrix = aOther.mPrecalcMatrix;
+	this->mPrecalcNormalMatrix = aOther.mPrecalcNormalMatrix;
+	return *this;
 }
 Transform& Transform::operator=(Transform&& aOther) noexcept {
 	this->mPos = std::move(aOther.mPos);
@@ -67,6 +88,13 @@ void Transform::setRotationZ(const float aDegrees) noexcept {
 	this->mRotationDegreesZ = aDegrees;
 	this->mPrecalculated = false;
 }
+void Transform::setRotation(const glm::vec3& aEuler) noexcept {
+	this->mRotationDegreesX = aEuler.x;
+	this->mRotationDegreesY = aEuler.y;
+	this->mRotationDegreesZ = aEuler.z;
+	this->mPrecalculated = false;
+}
+
 void Transform::addRotationX(const float aDegrees) noexcept {
 	this->mRotationDegreesX += aDegrees;
 	this->mPrecalculated = false;
@@ -131,9 +159,8 @@ void Transform::calculateMatrix() const noexcept {
 
 	this->mPrecalcMatrix = glm::mat4(1.0f);
 
-	this->mPrecalcMatrix = glm::scale(
-		this->mPrecalcMatrix, this->mScale
-	);
+	this->mPrecalcMatrix = glm::translate(this->mPrecalcMatrix, this->mPos);
+
 
 	this->mPrecalcMatrix = glm::rotate(
 		this->mPrecalcMatrix, glm::radians(this->mRotationDegreesX),
@@ -148,7 +175,9 @@ void Transform::calculateMatrix() const noexcept {
 		glm::vec3(0.0f, 0.0f, 1.0f)
 	);
 
-	this->mPrecalcMatrix = glm::translate(this->mPrecalcMatrix, this->mPos);
+	this->mPrecalcMatrix = glm::scale(
+		this->mPrecalcMatrix, this->mScale
+	);
 
 	this->mPrecalcNormalMatrix = glm::transpose(glm::inverse(this->mPrecalcMatrix));
 

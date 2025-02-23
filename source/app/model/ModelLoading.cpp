@@ -209,7 +209,6 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			uint64_t matIndex = 32;
 			if(p.materialIndex.has_value()) {
 				matIndex = p.materialIndex.value();
-				GMSEntry* g = GlobalMaterialStore::getById(matIndex+this->mFirstGMSMaterial);
 			}
 
 			//indices
@@ -277,7 +276,8 @@ Model::Model(const std::filesystem::path& aPath) noexcept {
 			}
 		}
 
-		this->mMeshes.emplace_back(m.name.c_str(), vertices, indices);
+		//mesh names are non-descriptive usually, use node names (1 node can only have 1 mesh and vice versa)
+		this->mMeshes.emplace_back(this->mNodes[meshMatrices[meshMatrixId]].name, vertices, indices);
 		this->mMeshes.back().mModel = Transform(glm::mat4(1.0));
 
 		meshMatrixId++;
@@ -409,6 +409,15 @@ void Model::updateAnimation(StructUniform<glm::mat4>& aBoneMatrices) noexcept {
 	//expect local matrices to be precalculated by animation
 	for(GLTFNode& n : this->mNodes) {
 		this->updateJoint(n, aBoneMatrices);
+	}
+}
+
+Transform& Model::getGlobalTransform() noexcept {
+	return this->mMeshes[0].getTransform();
+}
+void Model::refreshTransforms() noexcept {
+	for(Mesh& m : this->mMeshes) {
+		m.mModel = this->mMeshes[0].mModel;
 	}
 }
 

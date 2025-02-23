@@ -101,4 +101,8 @@ namespace Math {
 		std::uniform_real_distribution<> distribution(aMin, aMax);
 		return distribution(sRandomGenerator);
 	}
+
+	float getSign(const float aN) noexcept {
+		return (aN > 0.0) - (aN < 0.0);
+	}
 }

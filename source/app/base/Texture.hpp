@@ -36,6 +36,11 @@ public:
 	GLuint getHandle() const noexcept;
 	std::string_view getPath() const noexcept;
 
+	GLubyte* getData() const noexcept;
+	int32_t getWidth() const noexcept;
+	int32_t getHeight() const noexcept;
+	int32_t getChannels() const noexcept;
+
 	static uint64_t getAmountOfSlots() noexcept;
 
 	~Texture() noexcept;
@@ -62,6 +67,12 @@ public:
 private:
 	UniformIntMultiple<std::array<GLint, tAmount>&> mUniform;
 	std::array<GLint, tAmount> mArray;
+};
+
+class TextureArray {
+public:
+	//TODO
+private:
 };
 
 #endif

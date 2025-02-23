@@ -38,6 +38,9 @@ namespace Math {
 	std::mt19937& getRandomGenerator() noexcept;
 
 	float getRandomNumber(const float aMin, const float aMax) noexcept;
+
+	//returns +1/0/-1 depending on sign
+	float getSign(const float aN) noexcept;
 }
 
 #endif

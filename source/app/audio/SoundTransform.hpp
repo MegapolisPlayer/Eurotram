@@ -5,4 +5,9 @@
 
 //we flip files loaded with SFX
 
+class TransformedSound {
+public:
+private:
+};
+
 #endif

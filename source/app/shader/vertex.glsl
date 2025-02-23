@@ -8,6 +8,8 @@ layout(location = 4) in vec4 iBoneIds;
 layout(location = 5) in vec4 iBoneWeights;
 
 layout(location = 10) uniform mat4 uCamera;
+
+//of just mesh
 layout(location = 11) uniform mat4 uMatrixModel;
 layout(location = 12) uniform mat3 uMatrixNormal;
 

@@ -4,7 +4,7 @@
 
 //type definitions
 struct ObjectLocation {
-	float x, y, h;
+	float x, h, y;
 };
 
 struct RotatedObjectLocation : public ObjectLocation {

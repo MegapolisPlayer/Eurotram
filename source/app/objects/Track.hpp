@@ -27,6 +27,12 @@ struct Track {
 	float length;
 
 	float pointsAmount;
+
+	//get position on track: aT percentage specifies where (0 - start, 0.5 - middle, 1 - end)
+	glm::vec3 getPosition(const float aT) noexcept;
+
+	//gets rotation - depends on direction (set bool to true if going towards first node)
+	glm::vec3 getRotation(const float aT, const bool aTowardFirst) noexcept;
 };
 
 #endif

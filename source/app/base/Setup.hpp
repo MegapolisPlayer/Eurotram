@@ -25,13 +25,15 @@ PUBLIC CONSTANTS USE UPPER SNAKE CASE AND NO PREFIX
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/geometric.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 #include <stbi/stb_image.h>
-#include <stbi/stb_image_write.h>
+//#include <stbi/stb_image_write.h> //TODO implement in Texture
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <imgui_stdlib.h>
 
 #include <fastgltf/core.hpp>
 #include <fastgltf/tools.hpp>
@@ -52,6 +54,7 @@ PUBLIC CONSTANTS USE UPPER SNAKE CASE AND NO PREFIX
 #include <filesystem>
 #include <numeric>
 #include <random>
+#include <functional>
 
 using namespace std::chrono_literals;
 

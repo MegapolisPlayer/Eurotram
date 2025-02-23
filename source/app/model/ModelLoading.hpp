@@ -70,6 +70,9 @@ public:
 
 	void updateAnimation(StructUniform<glm::mat4>& aBoneMatrices) noexcept; //called automatically on draw
 
+	Transform& getGlobalTransform() noexcept;
+	void refreshTransforms() noexcept; //updates transforms for all meshes
+
 	Mesh* getMesh(const std::string_view aName) noexcept;
 
 	~Model() noexcept;

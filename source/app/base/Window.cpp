@@ -57,9 +57,9 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	glEnable(GL_DEPTH_TEST); //depth testing
 	glDepthFunc(GL_LESS);
 
-	//glEnable(GL_CULL_FACE); //backface culling TODO reenable
-	//glCullFace(GL_BACK);
-	//glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE); //backface culling
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 	glEnable(GL_MULTISAMPLE); //anti aliasing
 
@@ -84,6 +84,12 @@ void Window::disableVSync() noexcept {
 
 void Window::setBackgroundColor(const std::array<float, 4>& aArray) noexcept {
 	this->mBackgroundColor = aArray;
+}
+void Window::setBackgroundColor(const glm::vec4& aArray) noexcept {
+	this->mBackgroundColor[0] = aArray.r;
+	this->mBackgroundColor[1] = aArray.g;
+	this->mBackgroundColor[2] = aArray.b;
+	this->mBackgroundColor[3] = aArray.a;
 }
 
 void Window::setViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept {

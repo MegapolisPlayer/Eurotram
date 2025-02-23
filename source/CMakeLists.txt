@@ -67,8 +67,9 @@ add_executable(eurotram
 "app/physics/Weather.cpp"
 
 "app/ui/HUD.cpp"
-"app/ui/MainMenu.cpp"
 
+"app/ApplicationPhysics.cpp"
+"app/ApplicationMainLoop.cpp"
 "app/Application.cpp"
 "app/Main.cpp"
 
@@ -81,6 +82,7 @@ add_executable(eurotram
 "depend/imgui/imgui_draw.cpp"
 "depend/imgui/backends/imgui_impl_opengl3.cpp"
 "depend/imgui/backends/imgui_impl_glfw.cpp"
+"depend/imgui/misc/cpp/imgui_stdlib.cpp"
 
 "depend/fastgltf/base64.cpp"
 "depend/fastgltf/fastgltf.cpp"
@@ -92,6 +94,7 @@ target_include_directories(eurotram PUBLIC
 "depend/"
 "depend/imgui/"
 "depend/imgui/backends/"
+"depend/imgui/misc/cpp/"
 "depend/fastgltf/"
 "depend/glad/include/"
 )

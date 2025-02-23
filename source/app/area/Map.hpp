@@ -47,7 +47,10 @@ public:
 
 	uint64_t getNextTrack(const uint64_t aCurrentId, const std::pair<uint8_t, uint64_t>& aEndNode, LineData::SwitchDirection aDirection) noexcept;
 
-	Track* getTrackById(const uint64_t aId) noexcept;
+	Node& getNodeById(const uint64_t aId) noexcept;
+	Switch& getSwitchById(const uint64_t aId) noexcept;
+
+	Track& getTrackById(const uint64_t aId) noexcept;
 	Track* getStationByCode(std::string_view aCode) noexcept;
 
 	bool isTrackStation(const uint64_t aId) noexcept;

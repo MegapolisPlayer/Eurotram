@@ -33,10 +33,10 @@ Mesh& Mesh::operator=(Mesh&& aOther) noexcept {
 void Mesh::draw(UniformMat4* aTransformUniform, UniformMat3* aNormalUniform) noexcept {
 	this->mVAO.bind();
 	if(aTransformUniform) {
-		//aTransformUniform->set(this->mModel.getMatrix());
+		aTransformUniform->set(this->mModel.getMatrix());
 	}
 	if(aNormalUniform) {
-		//aNormalUniform->set(this->mModel.getNormalMatrix());
+		aNormalUniform->set(this->mModel.getNormalMatrix());
 	}
 	//this->mVBO.drawPoints();
 	this->mIBO.draw();
@@ -45,10 +45,10 @@ void Mesh::draw(UniformMat4* aTransformUniform, UniformMat3* aNormalUniform) noe
 void Mesh::drawInstanced(const uint64_t aCount, UniformMat4* aTransformUniform, UniformMat3* aNormalUniform) noexcept {
 	this->mVAO.bind();
 	if(aTransformUniform) {
-		//aTransformUniform->set(this->mModel.getMatrix());
+		aTransformUniform->set(this->mModel.getMatrix());
 	}
 	if(aNormalUniform) {
-		//aNormalUniform->set(this->mModel.getNormalMatrix());
+		aNormalUniform->set(this->mModel.getNormalMatrix());
 	}
 	//this->mVBO.drawPoints();
 	this->mIBO.drawInstanced(aCount);

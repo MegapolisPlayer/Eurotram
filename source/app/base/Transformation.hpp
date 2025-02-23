@@ -7,9 +7,9 @@ public:
 	Transform() noexcept;
 	Transform(const glm::mat4& aMatrix) noexcept;
 
-	Transform(Transform&) noexcept = delete;
+	Transform(Transform& aOther) noexcept;
 	Transform(Transform&& aOther) noexcept;
-	Transform& operator=(Transform&) noexcept = delete;
+	Transform& operator=(Transform& aOther) noexcept;
 	Transform& operator=(Transform&& aOther) noexcept;
 
 	void setPosition(const glm::vec3& aPosition) noexcept;
@@ -19,6 +19,8 @@ public:
 	void setRotationX(const float aDegrees) noexcept;
 	void setRotationY(const float aDegrees) noexcept;
 	void setRotationZ(const float aDegrees) noexcept;
+
+	void setRotation(const glm::vec3& aEuler) noexcept;
 
 	void addRotationX(const float aDegrees) noexcept;
 	void addRotationY(const float aDegrees) noexcept;
