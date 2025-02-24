@@ -92,6 +92,11 @@ void Window::setBackgroundColor(const glm::vec4& aArray) noexcept {
 	this->mBackgroundColor[3] = aArray.a;
 }
 
+void Window::applyBackgroundColor() noexcept {
+	glClearColor(this->mBackgroundColor[0], this->mBackgroundColor[1], this->mBackgroundColor[2], this->mBackgroundColor[3]);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 void Window::setViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept {
 	glViewport(0, 0, aWidth, aHeight);
 	this->updateCamera();
@@ -110,8 +115,7 @@ bool Window::isOpen() const noexcept {
 }
 
 void Window::beginFrame() noexcept {
-	glClearColor(this->mBackgroundColor[0], this->mBackgroundColor[1], this->mBackgroundColor[2], this->mBackgroundColor[3]);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	this->applyBackgroundColor();
 
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();

@@ -18,9 +18,9 @@ class Texture {
 public:
 	//channels = bits per pixel
 	Texture(const std::string_view aFilename, const bool aFlip = true, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
-	Texture(const uint64_t aWidth, const uint64_t aHeight, const uint64_t aInternalFormat, const uint64_t aFormat, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
+	Texture(const uint64_t aWidth, const uint64_t aHeight, const uint64_t aInternalFormat, const uint64_t aFormat, const uint64_t aDataType = GL_FLOAT, const bool aNoMipmaps = false, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
 
-	//embedded textures are a pain - usually dont flip textures!!!
+	//embedded textures are a pain
 	Texture(void* aData, const size_t aPixelAmount, const bool aFlip = true, TextureScale aScaling = TextureScale::LINEAR, TextureBorder aBorder = TextureBorder::REPEAT) noexcept;
 
 	Texture(Texture&& aOther) noexcept;
@@ -67,6 +67,32 @@ public:
 private:
 	UniformIntMultiple<std::array<GLint, tAmount>&> mUniform;
 	std::array<GLint, tAmount> mArray;
+};
+
+//severely limited multisample texture class
+//mostly for framebuffers' anti aliasing
+class FramebufferMultisampleTexture {
+public:
+	//channels = bits per pixel
+	FramebufferMultisampleTexture(const uint64_t aWidth, const uint64_t aHeight, const uint64_t aInternalFormat) noexcept;
+
+	FramebufferMultisampleTexture(FramebufferMultisampleTexture&& aOther) noexcept;
+	FramebufferMultisampleTexture& operator=(FramebufferMultisampleTexture&& aOther) noexcept;
+	FramebufferMultisampleTexture(FramebufferMultisampleTexture& aOther) noexcept = delete;
+	FramebufferMultisampleTexture& operator=(FramebufferMultisampleTexture& aOther) noexcept = delete;
+
+	void bind(const uint64_t aId) noexcept;
+	void unbind() noexcept;
+
+	GLuint getHandle() const noexcept;
+
+	int32_t getWidth() const noexcept;
+	int32_t getHeight() const noexcept;
+
+	~FramebufferMultisampleTexture() noexcept;
+private:
+	GLuint mHandle;
+	int32_t mWidth, mHeight;
 };
 
 #endif

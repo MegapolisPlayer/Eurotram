@@ -21,6 +21,8 @@ public:
 	void setBackgroundColor(const std::array<float, 4>& aArray) noexcept;
 	void setBackgroundColor(const glm::vec4& aArray) noexcept;
 
+	void applyBackgroundColor() noexcept;
+
 	void setViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept;
 	void resetViewport() noexcept; //to window size
 

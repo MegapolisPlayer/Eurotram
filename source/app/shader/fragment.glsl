@@ -176,10 +176,10 @@ void main() {
 	vec4 baseColor = mix(mat1.color, texture(uTextures[mat1.textureSlot], pTexCoord), mat1.textureAmount);
 
 	//no other way - i dont see how to integrate stencil here
-	if(baseColor.w <= 0.95 && uWriteToRenderTargets == 1) {
-		discard;
-	}
-	if(baseColor.w >= 0.95 && uWriteToRenderTargets == 2) {
+	if(
+		(baseColor.w <= 0.95 && uWriteToRenderTargets == 1) ||
+		(baseColor.w >= 0.95 && uWriteToRenderTargets == 2)
+	) {
 		discard;
 	}
 
@@ -255,10 +255,16 @@ void main() {
 		lightingMultiplier = vec3(1.0);
 	}
 
-	if(uWriteToRenderTargets >= 1) {
+	if(uWriteToRenderTargets == 1) {
+		//solid
+		oColor = vec4(baseColor.rgb, 1.0);
+	}
+	else if(uWriteToRenderTargets == 2) {
+		//transparent
+
 		//some random weight function
 		//just gets how much color
-		float weight = max(min(1.0, max(max(baseColor.r, baseColor.g), baseColor.b) * baseColor.a), baseColor.a) * clamp(0.03 / (1e-5 + pow(gl_FragDepth / 200, 4.0)), 1e-2, 3e3);
+		float weight = clamp(pow(min(1.0, baseColor.a * 10.0) + 0.01, 3.0) * 1e8 * pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
 
 		oColor = vec4(baseColor.rgb * baseColor.a, baseColor.a) * weight;
 		oReveal = baseColor.a;
@@ -267,5 +273,4 @@ void main() {
 		oColor = vec4(baseColor.xyz * lightingMultiplier, baseColor.w);
 		//oColor = vec4(1.0, 0.0, 1.0, 1.0); //debug purple
 	}
-	return;
 };

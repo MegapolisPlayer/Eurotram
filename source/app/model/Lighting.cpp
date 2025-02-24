@@ -50,8 +50,8 @@ DirectionalShadows::DirectionalShadows(
 ) noexcept
 	: mFBO(), mTexture(
 		DirectionalShadowMapWidth, DirectionalShadowMapHeight,
-		GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,
-		TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE
+		GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT,
+		false, TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE
 	) {
 	this->mTexture.setOutOfBoundsColor(1.0, 1.0, 1.0); //out of bounds - no shadow
 	this->mFBO.bind();
@@ -120,8 +120,8 @@ SpotlightShadows::SpotlightShadows(
 	const float aNear, const float aFar, const float aFOV
 ) noexcept : mFBO(), mTexture(
 	DirectionalShadowMapWidth, DirectionalShadowMapHeight,
-	GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,
-	TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE
+	GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT,
+	false, TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE
 ) {
 	this->mTexture.setOutOfBoundsColor(1.0, 1.0, 1.0); //out of bounds - no shadow
 	this->mFBO.bind();

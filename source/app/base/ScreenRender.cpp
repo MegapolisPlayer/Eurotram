@@ -16,7 +16,7 @@ ScreenRenderer::ScreenRenderer() noexcept
 	this->mVBO.enableAttribute(&this->mVAO, 2); //pos
 	this->mVBO.enableAttribute(&this->mVAO, 2); //texcoord
 }
-void ScreenRenderer::drawToScreen(const uint64_t aSlot, const bool aClear) {
+void ScreenRenderer::prepareToScreen(const uint64_t aSlot, const bool aClear) {
 	glDisable(GL_DEPTH_TEST);
 	if(aClear) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -26,13 +26,14 @@ void ScreenRenderer::drawToScreen(const uint64_t aSlot, const bool aClear) {
 	this->mVBO.bind();
 	this->mIBO.bind();
 	this->mTextureUniform.set(aSlot);
+}
+void ScreenRenderer::drawToScreen() {
 	this->mIBO.draw();
 	this->mShader.unbind();
 	this->mVAO.unbind();
 	glEnable(GL_DEPTH_TEST);
 }
-void ScreenRenderer::drawCustomToScreen(Shader& aShader, const bool aClear) {
-	glDisable(GL_DEPTH_TEST);
+void ScreenRenderer::prepareCustomToScreen(Shader& aShader, const bool aClear) {
 	if(aClear) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
@@ -40,9 +41,10 @@ void ScreenRenderer::drawCustomToScreen(Shader& aShader, const bool aClear) {
 	aShader.bind();
 	this->mVBO.bind();
 	this->mIBO.bind();
+}
+void ScreenRenderer::drawCustomToScreen(Shader& aShader) {
 	this->mIBO.draw();
 	aShader.unbind();
 	this->mVAO.unbind();
-	glEnable(GL_DEPTH_TEST);
 }
 ScreenRenderer::~ScreenRenderer() noexcept {}

@@ -97,6 +97,7 @@ private:
 };
 
 class Texture;
+class FramebufferMultisampleTexture;
 
 //used for implementing mirrors and shadows
 class Framebuffer {
@@ -114,6 +115,7 @@ public:
 	void unbindAsRead() noexcept;
 
 	void bindTexture(const Texture& aTexture, const uint64_t aFormat, const bool aRead = false, const bool aDraw = false) noexcept;
+	void bindTexture(const FramebufferMultisampleTexture& aTexture, const uint64_t aFormat, const bool aRead = false, const bool aDraw = false) noexcept;
 
 	bool checkStatus() noexcept;
 

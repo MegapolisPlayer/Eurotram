@@ -8,5 +8,5 @@ out vec4 oColor;
 layout(location = 50) uniform sampler2D uRenderData;
 
 void main() {
-	oColor = texture(uRenderData, pTexCoords);
+	oColor = vec4(texture(uRenderData, pTexCoords).rgb, 1.0);
 };

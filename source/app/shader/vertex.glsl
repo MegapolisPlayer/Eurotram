@@ -57,9 +57,9 @@ void main() {
 	}
 
 	pNormals = iNormals; //normalize(mat3(boneTransform) * uMatrixNormal * iNormals); //TODO
-	pFragmentPos = vec3(uMatrixModel * instanceTransform * boneTransform * vec4(iPosition, 1.0));
-	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * instanceTransform * boneTransform * vec4(iPosition, 1.0);
-	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * instanceTransform * boneTransform * vec4(iPosition, 1.0);
+	pFragmentPos = vec3(uMatrixModel * instanceTransform * vec4(iPosition, 1.0));
+	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * instanceTransform * vec4(iPosition, 1.0);
+	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * instanceTransform * vec4(iPosition, 1.0);
 
 	gl_Position = uCamera * vec4(pFragmentPos, 1.0);
 };

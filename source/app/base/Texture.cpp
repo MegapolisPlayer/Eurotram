@@ -11,6 +11,12 @@ void Framebuffer::bindTexture(const Texture& aTexture, const uint64_t aFormat, c
 	if(!aDraw) glDrawBuffer(GL_NONE);
 	if(!aRead) glReadBuffer(GL_NONE);
 }
+void Framebuffer::bindTexture(const FramebufferMultisampleTexture& aTexture, const uint64_t aFormat, const bool aRead, const bool aDraw) noexcept {
+	this->bind();
+	glFramebufferTexture2D(GL_FRAMEBUFFER, aFormat, GL_TEXTURE_2D_MULTISAMPLE, aTexture.getHandle(), 0);
+	if(!aDraw) glDrawBuffer(GL_NONE);
+	if(!aRead) glReadBuffer(GL_NONE);
+}
 
 Texture::Texture(const std::string_view aFilename, const bool aFlip, TextureScale aScaling, TextureBorder aBorder) noexcept
 	: mHandle(0), mpData(nullptr), mPath(aFilename), mWidth(0), mHeight(0), mChannels(0) {
@@ -62,15 +68,20 @@ Texture::Texture(const std::string_view aFilename, const bool aFlip, TextureScal
 }
 Texture::Texture(
 	const uint64_t aWidth, const uint64_t aHeight,
-	const uint64_t aInternalFormat, const uint64_t aFormat,
-	TextureScale aScaling, TextureBorder aBorder) noexcept
+	const uint64_t aInternalFormat, const uint64_t aFormat, const uint64_t aDataType,
+	const bool aNoMipmaps, TextureScale aScaling, TextureBorder aBorder) noexcept
 	: mPath(""), mHandle(0), mpData(nullptr), mWidth(aWidth), mHeight(aHeight), mChannels(0) {
 	GLint glTextureScaleValue = 0;
 	GLint glTextureScaleValue2 = 0;
 	switch(aScaling) {
 		case(TextureScale::LINEAR):
 			glTextureScaleValue = GL_LINEAR;
-			glTextureScaleValue2 = GL_LINEAR_MIPMAP_LINEAR;
+			if(aNoMipmaps) {
+				glTextureScaleValue2 = GL_LINEAR;
+			}
+			else {
+				glTextureScaleValue2 = GL_LINEAR_MIPMAP_LINEAR;
+			}
 			break;
 		case(TextureScale::NEAREST_NEIGHBOR):
 		default:
@@ -92,7 +103,7 @@ Texture::Texture(
 
 	glGenTextures(1, &this->mHandle);
 	glBindTexture(GL_TEXTURE_2D, this->mHandle);
-	glTexImage2D(GL_TEXTURE_2D, 0, aInternalFormat, this->mWidth, this->mHeight, 0, aFormat, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, aInternalFormat, this->mWidth, this->mHeight, 0, aFormat, aDataType, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glTextureBorderValue);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glTextureBorderValue);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glTextureScaleValue2);
@@ -216,4 +227,53 @@ uint64_t Texture::getAmountOfSlots() noexcept {
 Texture::~Texture() noexcept {
 	glDeleteTextures(1, &this->mHandle);
 	stbi_image_free(this->mpData);
+}
+
+//FBO Multisample texture
+
+//channels = bits per pixel
+FramebufferMultisampleTexture::FramebufferMultisampleTexture(
+	const uint64_t aWidth, const uint64_t aHeight, const uint64_t aInternalFormat
+) noexcept : mHandle(0), mWidth(aWidth), mHeight(aHeight) {
+	glGenTextures(1, &this->mHandle);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->mHandle);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, aInternalFormat, this->mWidth, this->mHeight, GL_TRUE);
+}
+
+FramebufferMultisampleTexture::FramebufferMultisampleTexture(FramebufferMultisampleTexture&& aOther) noexcept
+	: mHandle(aOther.mHandle), mWidth(aOther.mWidth), mHeight(aOther.mHeight) {
+	aOther.mHandle = 0;
+}
+FramebufferMultisampleTexture& FramebufferMultisampleTexture::operator=(FramebufferMultisampleTexture&& aOther) noexcept {
+	glDeleteTextures(1, &this->mHandle);
+	this->mHandle = aOther.mHandle;
+	this->mWidth = aOther.mWidth;
+	this->mHeight = aOther.mHeight;
+
+	aOther.mHandle = 0;
+	return *this;
+}
+
+void FramebufferMultisampleTexture::bind(const uint64_t aId) noexcept {
+	if(this->mHandle == 0) return;
+	glActiveTexture(GL_TEXTURE0 + aId);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->mHandle);
+}
+void FramebufferMultisampleTexture::unbind() noexcept {
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+}
+
+GLuint FramebufferMultisampleTexture::getHandle() const noexcept {
+	return this->mHandle;
+}
+
+int32_t FramebufferMultisampleTexture::getWidth() const noexcept {
+	return this->mWidth;
+}
+int32_t FramebufferMultisampleTexture::getHeight() const noexcept {
+	return this->mHeight;
+}
+
+FramebufferMultisampleTexture::~FramebufferMultisampleTexture() noexcept {
+	glDeleteTextures(1, &this->mHandle);
 }

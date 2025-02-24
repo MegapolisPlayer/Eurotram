@@ -15,21 +15,27 @@ public:
 	OIT(Window& aWindow) noexcept;
 
 	//uniform which will discard transparency (1), solids (2) or nothing (0)
-	void beginOpaquePass(UniformInt& aEnabledUniform) noexcept;
+	void beginOpaquePass(Window& aWindow, UniformInt& aEnabledUniform) noexcept;
 	void endOpaquePass(UniformInt& aEnabledUniform) noexcept;
 
 	void beginTransparentPass(UniformInt& aEnabledUniform) noexcept;
 	void endTransparentPass(UniformInt& aEnabledUniform) noexcept;
 
-	void draw(ScreenRenderer& aSR) noexcept;
+	void draw(Window& aWindow, ScreenRenderer& aSR) noexcept;
 
 	~OIT() noexcept;
 private:
-	Framebuffer mOpaque;
-	Framebuffer mTransparent;
-	Texture mAccum;
-	Texture mReveal;
+	Framebuffer mOpaqueFBO;
+	Framebuffer mTransparentFBO;
+	//multisampled textures for anti aliasing
+	FramebufferMultisampleTexture mOpaque;
+	FramebufferMultisampleTexture mAccum;
+	FramebufferMultisampleTexture mReveal;
+	FramebufferMultisampleTexture mDepth;
 	Shader mShader;
+
+	Framebuffer mDestinationFBO;
+	Texture mDestTexture;
 };
 
 #endif
