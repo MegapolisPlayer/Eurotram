@@ -221,24 +221,24 @@ bool Application::runInternal() noexcept {
 
 		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
 
-		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
-		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
+		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
+		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
 
 		daylightIndex = 0.5;
 		ambientLightStrength.set(daylightIndex);
 
 		this->mMap.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
 
-		oit.beginOpaquePass(uOITEnabled);
+		//oit.beginOpaquePass(uOITEnabled);
 		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
 		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
-		oit.endOpaquePass(uOITEnabled);
-		oit.beginTransparentPass(uOITEnabled);
-		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
-		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
-		oit.endTransparentPass(uOITEnabled);
+		//oit.endOpaquePass(uOITEnabled);
+		//oit.beginTransparentPass(uOITEnabled);
+		//t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
+		//this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
+		//oit.endTransparentPass(uOITEnabled);
 
-		oit.draw(sr);
+		//oit.draw(sr);
 
 		shader.bind();
 

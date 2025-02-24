@@ -373,8 +373,7 @@ void Model::resetVariant(const std::string_view aMaterialName) noexcept {
 }
 
 void Model::sendAnimationDataToShader(StructUniform<glm::mat4>& aBoneMatrices, const bool aRecalcAnim) noexcept {
-	DISCARD(aRecalcAnim); //TODO reenable animations
-	//if(aRecalcAnim) this->updateAnimation(aBoneMatrices);
+	if(aRecalcAnim) this->updateAnimation(aBoneMatrices);
 	aBoneMatrices.setNewData(this->mOutput.data(), this->mOutput.size());
 	aBoneMatrices.set();
 }
@@ -391,7 +390,7 @@ void Model::drawInstanced(UniformMaterial& aUniform, StructUniform<glm::mat4>& a
 	if(aCount == 0) return; //so we dont have to check at each call
 
 	sendAnimationDataToShader(aBoneMatrices);
-	//TODO rewrite animations so they are independent of instances
+	//TODO rewrite animations so they are independent of instances (select which instances affected)
 
 	GlobalMaterialStore::copyDataToUniform(aUniform, this->mFirstGMSMaterial, this->mLastGMSMaterial);
 	for(Mesh& m : this->mMeshes) {
