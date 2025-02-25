@@ -1,6 +1,6 @@
 #ifndef EUROTRAM_PHYSICS
 #define EUROTRAM_PHYSICS
 
-#include "PhysicsUpdate.hpp"
+#include "PhysBase.hpp"
 
 #endif

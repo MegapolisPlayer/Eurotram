@@ -1,6 +1,6 @@
 #ifndef EUROTRAM_OBJECTS_VEHICLES_BUSE
 #define EUROTRAM_OBJECTS_VEHICLES_BUSE
-#include "../../base/Base.hpp"
+#include "../../area/Area.hpp"
 
 enum class BUSEPanelType : uint8_t {
 	FRONT = 0, //shows line and end station

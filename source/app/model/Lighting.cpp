@@ -51,7 +51,7 @@ DirectionalShadows::DirectionalShadows(
 	: mFBO(), mTexture(
 		DirectionalShadowMapWidth, DirectionalShadowMapHeight,
 		GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT,
-		false, TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE
+		true, TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE
 	) {
 	this->mTexture.setOutOfBoundsColor(1.0, 1.0, 1.0); //out of bounds - no shadow
 	this->mFBO.bind();
@@ -79,7 +79,9 @@ DirectionalShadows& DirectionalShadows::operator=(DirectionalShadows&& aOther) n
 void DirectionalShadows::beginPass(Window& aWindow, UniformMat4& aLightMatrixUniform) noexcept {
 	aWindow.setViewport(DirectionalShadowMapWidth, DirectionalShadowMapHeight);
 	this->mFBO.bind();
+	this->mFBO.bindTexture(this->mTexture, GL_DEPTH_ATTACHMENT);
 	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 	aLightMatrixUniform.set(this->mLightMatrix);
 }
@@ -121,7 +123,7 @@ SpotlightShadows::SpotlightShadows(
 ) noexcept : mFBO(), mTexture(
 	DirectionalShadowMapWidth, DirectionalShadowMapHeight,
 	GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT,
-	false, TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE
+	true, TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE
 ) {
 	this->mTexture.setOutOfBoundsColor(1.0, 1.0, 1.0); //out of bounds - no shadow
 	this->mFBO.bind();
@@ -149,7 +151,9 @@ SpotlightShadows& SpotlightShadows::operator=(SpotlightShadows&& aOther) noexcep
 void SpotlightShadows::beginPass(Window& aWindow, UniformMat4& aLightMatrixUniform) noexcept {
 	aWindow.setViewport(StandardShadowMapWidth, StandardShadowMapHeight);
 	this->mFBO.bind();
+	this->mFBO.bindTexture(this->mTexture, GL_DEPTH_ATTACHMENT);
 	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 	aLightMatrixUniform.set(this->mLightMatrix);
 }

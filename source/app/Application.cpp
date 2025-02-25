@@ -3,7 +3,7 @@
 Application::Application() noexcept
 	: mWindow("Eurotram", 1280, 720, false, true),
 	mCamera(&this->mWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 1000.0f, 0.1f),
-	mLogo("logo.png", false), mMinuteTime(0) {
+	mLogo("logo.png", false), mMinuteTime(0), mPhysicalUpdateFreq(1), mLastPhysicalUpdateTime(0.0) {
 	this->mWindow.setBackgroundColor(glm::vec4(0.5f));
 	this->mWindow.enableVSync();
 
@@ -138,6 +138,8 @@ void Application::run() noexcept {
 
 	this->mWindow.hideCursor();
 
+	glfwSetTime(0.0); //start count here
+
 	if(!this->runInternal()) {
 		std::cerr << LogLevel::ERROR << "Application error in preparation phase!\n" << LogLevel::RESET;
 	}
@@ -159,7 +161,16 @@ void Application::runWindowFrame(std::function<bool()> aFunction) noexcept {
 			return; //time to exit
 		}
 
-		//TODO handle physics updates and time update
+		double currentTime = glfwGetTime();
+
+		if(currentTime-mLastPhysicalUpdateTime >= mPhysicalUpdateFreq) {
+			mLastPhysicalUpdateTime = currentTime;
+			if(!this->runPhysics()) {
+				std::cerr << LogLevel::ERROR << "Application error in physics loop!\n" << LogLevel::RESET;
+				this->mWindow.endFrame();
+				return;
+			}
+		}
 
 		this->mWindow.endFrame();
 		this->mFrameTimer.end(this->mAverageFrameTime);

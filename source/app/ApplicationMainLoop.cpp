@@ -7,7 +7,7 @@ static glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
 static bool moveWithSpotlight = true;
 
 static std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
-static float daylightIndex = 1.0f;
+static float daylightIndex = 1.0f; //TODO
 
 void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) noexcept {
 	if(aAction == GLFW_RELEASE || !aWindow->isCursorHidden()) return;
@@ -185,24 +185,83 @@ bool Application::runInternal() noexcept {
 	OIT oit(this->mWindow);
 
 	this->runWindowFrame([&]() {
+		if(this->mLine.isStationLast()) {}
+		else {
+			trackRemainingLength -= speed;
+
+			//get bogie position
+			if(trackRemainingLength <= 0) {
+				//get next track
+				if(switchCount >= this->mLine.getSwitchesToNextStop().size()) {
+					//we already passed last switch - no more setting of value (if reach switch - game over)
+					trackId = this->mMap.getNextTrack(trackId, nextNodeId, LineData::SwitchDirection::NO_SET);
+				}
+				else {
+					trackId = this->mMap.getNextTrack(trackId, nextNodeId, this->mLine.getSwitchesToNextStop()[switchCount].direction);
+				}
+				if(nextNodeId.first == 's') {
+					switchCount++;
+				}
+				if(this->mMap.isTrackStation(trackId)) {
+					switchCount = 0;
+					this->mLine.nextStation();
+					for(auto& a :  this->mLine.getSwitchesToNextStop()) {
+						std::cout << "SW" << a.mapId << " DIR" << (uint16_t)a.direction << '\n';
+					}
+				}
+					nextNodeId = this->mMap.getOtherTrackPoint(trackId, nextNodeId);
+					trackRemainingLength += this->mMap.getTrackById(trackId).length;
+					std::cout << "Track id " << trackId << "; node id " << nextNodeId.second << '(' << nextNodeId.first << ')' << " len" << this->mMap.getTrackById(trackId).length << '\n';
+			}
+
+				Track tr = this->mMap.getTrackById(trackId);
+
+				glm::vec3 v, r;
+
+				//still same track
+				//inverse of inverse - we go toward, not from
+				if(
+					(int32_t)nextNodeId.second == tr.first &&
+					(
+						((tr.flags & TRACK_FLAG_FIRST_SWITCH) && nextNodeId.first == 's') ||
+						(!(tr.flags & TRACK_FLAG_FIRST_SWITCH) && nextNodeId.first == 'n')
+					)
+				) {
+					//to first
+					v = tr.getPosition((trackRemainingLength/tr.length));
+					r = tr.getRotation((trackRemainingLength/tr.length), true);
+				}
+				else {
+					//to second
+					v = tr.getPosition(1.0-(trackRemainingLength/tr.length));
+					r = tr.getRotation(1.0-(trackRemainingLength/tr.length), false);
+				}
+
+				t3rp.getGlobalTransform().setPosition(v);
+				t3rp.getGlobalTransform().setRotation(r);
+				t3rp.refreshTransforms();
+		}
+
+		this->mMap.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
+
 		shadowMapProgram.bind();
 
 		ss.beginPass(this->mWindow, lpu);
 		//t3rp.sendAnimationDataToShader(lmat);
-		t3rp.draw(uMaterial, uModelMat, &lmod);
-		this->mMap.draw(uMaterial, uModelMat, 35, luIsInstancedRendering, &lmod);
+		t3rp.draw(uMaterial, lmat, &lmod);
+		this->mMap.draw(uMaterial, lmat, 35, luIsInstancedRendering, &lmod);
 		ss.endPass(this->mWindow);
 
 		ds.beginPass(this->mWindow, lpu);
 		//t3rp.sendAnimationDataToShader(lmat);
-		t3rp.draw(uMaterial, uModelMat, &lmod);
-		this->mMap.draw(uMaterial, uModelMat, 35, luIsInstancedRendering, &lmod);
+		t3rp.draw(uMaterial, lmat, &lmod);
+		this->mMap.draw(uMaterial, lmat,35, luIsInstancedRendering, &lmod);
 		ds.endPass(this->mWindow);
 
 		// main draw
 
 		shader.bind();
-		spu.set(ds.getProjectionMatrix());
+		//spu.set(ds.getProjectionMatrix());
 		fpu.set(ss.getProjectionMatrix());
 
 		if(moveWithSpotlight) {
@@ -216,15 +275,13 @@ bool Application::runInternal() noexcept {
 		cameraPosUniform.set(this->mWindow.getCamera()->getPosition());
 
 		ss.bindMap(28); //28 flashlight
-		ds.bindMap(31); //31 sun
+		//ds.bindMap(31); //31 sun
 		//29,30 front lights of tram
 
 		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
 
 		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
 		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
-
-		this->mMap.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
 
 		shader.bind();
 
@@ -237,7 +294,14 @@ bool Application::runInternal() noexcept {
 		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
 		oit.endTransparentPass(uOITEnabled);
 
+		//TODO shadows issue in OIT draw
+		//they are just weird
+		//without OIT draw works ok (even when OIT moves settings)
+		//composition buffer suspect
 		oit.draw(this->mWindow, sr);
+
+		//t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
+		//this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
 
 		shader.bind();
 
@@ -312,63 +376,6 @@ bool Application::runInternal() noexcept {
 		if(ImGui::Button("Change livery to normal")) t3rp.resetVariant("Material.paint");
 		if(ImGui::Button("Change livery to PLF")) t3rp.setVariant("Material.paint", "PLF");
 		if(ImGui::Button("Change livery to PID")) t3rp.setVariant("Material.paint", "PID");
-
-		if(this->mLine.isStationLast()) {}
-		else {
-			trackRemainingLength -= speed;
-
-			//get bogie position
-			if(trackRemainingLength <= 0) {
-				//get next track
-				if(switchCount >= this->mLine.getSwitchesToNextStop().size()) {
-					//we already passed last switch - no more setting of value (if reach switch - game over)
-					trackId = this->mMap.getNextTrack(trackId, nextNodeId, LineData::SwitchDirection::NO_SET);
-				}
-				else {
-					trackId = this->mMap.getNextTrack(trackId, nextNodeId, this->mLine.getSwitchesToNextStop()[switchCount].direction);
-				}
-				if(nextNodeId.first == 's') {
-					switchCount++;
-				}
-				if(this->mMap.isTrackStation(trackId)) {
-					switchCount = 0;
-					this->mLine.nextStation();
-					for(auto& a :  this->mLine.getSwitchesToNextStop()) {
-						std::cout << "SW" << a.mapId << " DIR" << (uint16_t)a.direction << '\n';
-					}
-				}
-					nextNodeId = this->mMap.getOtherTrackPoint(trackId, nextNodeId);
-					trackRemainingLength += this->mMap.getTrackById(trackId).length;
-					std::cout << "Track id " << trackId << "; node id " << nextNodeId.second << '(' << nextNodeId.first << ')' << " len" << this->mMap.getTrackById(trackId).length << '\n';
-			}
-
-				Track tr = this->mMap.getTrackById(trackId);
-
-				glm::vec3 v, r;
-
-				//still same track
-				//inverse of inverse - we go toward, not from
-				if(
-					(int32_t)nextNodeId.second == tr.first &&
-					(
-						((tr.flags & TRACK_FLAG_FIRST_SWITCH) && nextNodeId.first == 's') ||
-						(!(tr.flags & TRACK_FLAG_FIRST_SWITCH) && nextNodeId.first == 'n')
-					)
-				) {
-					//to first
-					v = tr.getPosition((trackRemainingLength/tr.length));
-					r = tr.getRotation((trackRemainingLength/tr.length), true);
-				}
-				else {
-					//to second
-					v = tr.getPosition(1.0-(trackRemainingLength/tr.length));
-					r = tr.getRotation(1.0-(trackRemainingLength/tr.length), false);
-				}
-
-				t3rp.getGlobalTransform().setPosition(v);
-				t3rp.getGlobalTransform().setRotation(r);
-				t3rp.refreshTransforms();
-		}
 
 		ImGui::End();
 

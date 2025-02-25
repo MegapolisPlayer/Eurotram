@@ -56,7 +56,7 @@ void main() {
 		instanceTransform = instanceMatrices[gl_InstanceID];
 	}
 
-	pNormals = iNormals; //normalize(mat3(boneTransform) * uMatrixNormal * iNormals); //TODO
+	pNormals = normalize(uMatrixNormal * iNormals);
 	pFragmentPos = vec3(uMatrixModel * instanceTransform * vec4(iPosition, 1.0));
 	pFragmentDirectionalLightPos = uMatrixDiright * uMatrixModel * instanceTransform * vec4(iPosition, 1.0);
 	pFragmentFlashlightLightPos = uMatrixFlashlight * uMatrixModel * instanceTransform * vec4(iPosition, 1.0);

@@ -15,6 +15,5 @@
 #include "Button.hpp"
 #include "Wire.hpp"
 #include "Sign.hpp"
-#include "vehicles/Vehicle.hpp"
 
 #endif

@@ -764,7 +764,7 @@ void Map::open(const std::string_view aFilename) noexcept {
 }
 
 void Map::randomizeBuildingColors() noexcept {
-
+	//TODO
 }
 
 void Map::regenerateInstanceArray(StationCode aPrev, StationCode aCurrent, StationCode aNext, StationCode aAfterNext) noexcept {

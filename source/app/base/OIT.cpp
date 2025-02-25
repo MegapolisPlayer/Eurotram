@@ -75,6 +75,8 @@ void OIT::endTransparentPass(UniformInt& aEnabledUniform) noexcept {
 void OIT::draw(Window& aWindow, ScreenRenderer& aSR) noexcept {
 	//composite
 
+	//TODO fix OIT shadow issue
+
 	glDepthFunc(GL_ALWAYS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -91,7 +93,7 @@ void OIT::draw(Window& aWindow, ScreenRenderer& aSR) noexcept {
 	glBlitNamedFramebuffer(
 		this->mOpaqueFBO.getHandle(), this->mDestinationFBO.getHandle(),
 		0, 0, aWindow.getWidth(), aWindow.getHeight(), 0, 0, aWindow.getWidth(), aWindow.getHeight(),
-		GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST
+		GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST
 	);
 
 	//draw
@@ -106,7 +108,7 @@ void OIT::draw(Window& aWindow, ScreenRenderer& aSR) noexcept {
 
 	//draw to backbuffer
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	aSR.prepareToScreen(0);
 	this->mDestTexture.bind(0);

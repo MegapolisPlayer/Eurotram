@@ -9,12 +9,22 @@ class AABBTriggerBox {
 public:
 	AABBTriggerBox() noexcept;
 
-	void collision(AABBTriggerBox& aOther);
+	bool collision(AABBTriggerBox& aOther);
+
+	void makeVisible() noexcept;
 
 	~AABBTriggerBox() noexcept;
 private:
-	glm::vec3 point1, point2, point3, point4;
-	float height;
+	glm::vec3 mCenterPoint; //center point
+	float mWidth, mDepth, mHeight; //size
+	bool mEnabled;
+	bool mVisible;
+};
+
+class AABBTriggerBoxDrawer {
+public:
+private:
+
 };
 
 #endif

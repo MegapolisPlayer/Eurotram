@@ -124,7 +124,7 @@ vec3 calculateSpot(float aDst, vec3 aNormalizedNormal, vec3 aLightDirection, vec
 	return aLight.color.xyz * attenuation(aDst, aLight.constant, aLight.linear, aLight.quadratic) * diffuseComp(aNormalizedNormal, aLightDirection);
 }
 
-const float BIAS_COEF = 0.05;
+const float BIAS_COEF = 0.005;
 const float SPECULAR_SHADOW_CUTOFF = 0.01;
 
 float calculateShadows(int aTextureId, vec4 aCoords, vec3 aNormalizedNormal, vec3 aLightDirection) {
@@ -136,7 +136,7 @@ float calculateShadows(int aTextureId, vec4 aCoords, vec3 aNormalizedNormal, vec
 
 		//float closest = texture(uTextures[1], coords.xy).r; //single-dimensional texture
 		float current = coords.z;
-		float bias = max(BIAS_COEF * (dot(aNormalizedNormal, aLightDirection)), BIAS_COEF/10.0);
+		float bias = max(BIAS_COEF * (dot(aNormalizedNormal, aLightDirection)), BIAS_COEF/100.0);
 		//shadow = float(current - bias > closest);
 
 		vec2 texelSize = vec2(1.0) / textureSize(uTextures[aTextureId], 0); //divide max coord by amount of texels in texture (as vec2)
@@ -245,6 +245,7 @@ void main() {
 
 		float shadow = 0.0;
 
+		//TODO
 		calculateShadows(14, pFragmentFlashlightLightPos, normalizedNormal, directionalLightDirection);
 		calculateShadows(13, pFragmentRightFrontLightPos, normalizedNormal, directionalLightDirection);
 		calculateShadows(12, pFragmentLeftFrontLightPos, normalizedNormal, directionalLightDirection);
@@ -257,7 +258,7 @@ void main() {
 
 	if(uWriteToRenderTargets == 1) {
 		//solid
-		oColor = vec4(baseColor.rgb, 1.0);
+		oColor = vec4(baseColor.rgb * lightingMultiplier, 1.0);
 	}
 	else if(uWriteToRenderTargets == 2) {
 		//transparent
@@ -266,7 +267,7 @@ void main() {
 		//just gets how much color
 		float weight = clamp(pow(min(1.0, baseColor.a * 10.0) + 0.01, 3.0) * 1e8 * pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
 
-		oColor = vec4(baseColor.rgb * baseColor.a, baseColor.a) * weight;
+		oColor = vec4(baseColor.rgb * lightingMultiplier * baseColor.a, baseColor.a) * weight;
 		oReveal = baseColor.a;
 	}
 	else {

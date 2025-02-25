@@ -59,13 +59,7 @@ add_executable(eurotram
 "app/objects/Track.cpp"
 "app/objects/Wire.cpp"
 
-"app/physics/Curve.cpp"
-"app/physics/Drag.cpp"
-"app/physics/ElectricalCircuit.cpp"
-"app/physics/Force.cpp"
-"app/physics/Friction.cpp"
-"app/physics/Nadal.cpp"
-"app/physics/PhysicsUpdate.cpp"
+"app/physics/PhysBase.cpp"
 "app/physics/Weather.cpp"
 
 "app/ui/HUD.cpp"

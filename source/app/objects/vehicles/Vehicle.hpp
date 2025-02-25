@@ -24,16 +24,27 @@ struct VehiclePhysicsData {
 	float consumption;
 };
 
+struct VehicleMovementData {
+	float lengthRemaining1;
+	float lengthRemaining2;
+};
+
 //handles movement and stuff
 class Vehicle {
 public:
 	Vehicle() noexcept;
 
+	void movementUpdate() noexcept;
+
 	void physicsUpdate() noexcept;
 
 	~Vehicle() noexcept;
 private:
+	Map& mMap;
+	Line& mLine;
+
 	VehiclePhysicsData mData;
+	VehicleMovementData mMovementData;
 };
 
 #endif
