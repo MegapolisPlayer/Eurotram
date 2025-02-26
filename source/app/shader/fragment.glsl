@@ -136,7 +136,8 @@ float calculateShadows(int aTextureId, vec4 aCoords, vec3 aNormalizedNormal, vec
 
 		//float closest = texture(uTextures[1], coords.xy).r; //single-dimensional texture
 		float current = coords.z;
-		float bias = max(BIAS_COEF * (dot(aNormalizedNormal, aLightDirection)), BIAS_COEF/100.0);
+		//float bias = max(BIAS_COEF * (dot(aNormalizedNormal, aLightDirection)), BIAS_COEF/100.0);
+		float bias = 0.0;
 		//shadow = float(current - bias > closest);
 
 		vec2 texelSize = vec2(1.0) / textureSize(uTextures[aTextureId], 0); //divide max coord by amount of texels in texture (as vec2)
@@ -185,7 +186,7 @@ void main() {
 
 	//this branching ok - only changes depending on draw call
 	//also saves a bunch of computation
-	vec3 lightingMultiplier;
+	vec3 lightingMultiplier = vec3(1.0);
 	if(uIgnoreLighting == 0) {
 		vec3 normalizedNormal = normalize(pNormals);
 		vec3 viewDirection = normalize(uCameraPosition - pFragmentPos);
@@ -267,7 +268,7 @@ void main() {
 		//just gets how much color
 		float weight = clamp(pow(min(1.0, baseColor.a * 10.0) + 0.01, 3.0) * 1e8 * pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
 
-		oColor = vec4(baseColor.rgb * lightingMultiplier * baseColor.a, baseColor.a) * weight;
+		oColor = vec4((baseColor.rgb * lightingMultiplier) * baseColor.a, baseColor.a) * weight;
 		oReveal = baseColor.a;
 	}
 	else {

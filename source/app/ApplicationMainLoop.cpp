@@ -128,7 +128,7 @@ bool Application::runInternal() noexcept {
 	uSpots.update(&s);
 	uSpots.set();
 
-	SpotlightShadows ss(lightPos, s.direction, 0.1, 30.0, *this->mCamera.getFOVPointer());
+	SpotlightShadows ss(lightPos, s.direction, 1.0, 30.0, *this->mCamera.getFOVPointer());
 	UniformMat4 fpu(14);
 	fpu.set(ss.getProjectionMatrix());
 
@@ -298,12 +298,13 @@ bool Application::runInternal() noexcept {
 		//they are just weird
 		//without OIT draw works ok (even when OIT moves settings)
 		//composition buffer suspect
+		//ISSUE NOT WITH MATRICES, NOT WITH SETTINGS
 		oit.draw(this->mWindow, sr);
+
+		shader.bind();
 
 		//t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
 		//this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
-
-		shader.bind();
 
 		// gui
 

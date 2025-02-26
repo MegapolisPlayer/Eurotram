@@ -24,7 +24,7 @@ void main() {
 	float revealData = texelFetch(uRevealRT, coords, 0).r;
 
 	//save calculation time
-	//if(isApproximatelyEqual(revealData, 1.0f)) { discard; }
+	if(isApproximatelyEqual(revealData, 1.0f)) { discard; }
 
 	vec4 accumData = texelFetch(uAccumRT, coords, 0);
 

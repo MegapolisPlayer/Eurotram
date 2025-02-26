@@ -75,8 +75,6 @@ void OIT::endTransparentPass(UniformInt& aEnabledUniform) noexcept {
 void OIT::draw(Window& aWindow, ScreenRenderer& aSR) noexcept {
 	//composite
 
-	//TODO fix OIT shadow issue
-
 	glDepthFunc(GL_ALWAYS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -116,6 +114,7 @@ void OIT::draw(Window& aWindow, ScreenRenderer& aSR) noexcept {
 
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS); //culprit of shadow issues
 }
 
 OIT::~OIT() noexcept {
