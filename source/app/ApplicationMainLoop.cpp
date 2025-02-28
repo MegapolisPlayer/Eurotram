@@ -138,11 +138,11 @@ bool Application::runInternal() noexcept {
 	float sunAngle = 0;
 
 	std::cout << "Loading T3R.P model...\n";
-	//Model t3rp(std::filesystem::path("./untitled2.glb"));
-	Model t3rp(std::filesystem::path("./T3.glb"));
+	Model t3rp(std::filesystem::path("./untitled.glb"));
+	//Model t3rp(std::filesystem::path("./T3.glb"));
 	std::cout << "Model loaded!\n";
-	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
-	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
+	//t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
+	//t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
 
 	uint64_t trackId = this->mLine.getFirstLoopTrack();
 	std::pair<uint8_t, uint64_t> nextNodeId = this->mMap.getOtherTrackPoint(trackId, this->mLine.getFirstNodePassed());
@@ -185,7 +185,7 @@ bool Application::runInternal() noexcept {
 	OIT oit(this->mWindow);
 
 	this->runWindowFrame([&]() {
-		if(this->mLine.isStationLast()) {}
+		if(true) {}
 		else {
 			trackRemainingLength -= speed;
 
@@ -247,13 +247,13 @@ bool Application::runInternal() noexcept {
 		shadowMapProgram.bind();
 
 		ss.beginPass(this->mWindow, lpu);
-		//t3rp.sendAnimationDataToShader(lmat);
+		t3rp.sendAnimationDataToShader(lmat);
 		t3rp.draw(uMaterial, lmat, &lmod);
 		this->mMap.draw(uMaterial, lmat, 35, luIsInstancedRendering, &lmod);
 		ss.endPass(this->mWindow);
 
 		ds.beginPass(this->mWindow, lpu);
-		//t3rp.sendAnimationDataToShader(lmat);
+		t3rp.sendAnimationDataToShader(lmat);
 		t3rp.draw(uMaterial, lmat, &lmod);
 		this->mMap.draw(uMaterial, lmat,35, luIsInstancedRendering, &lmod);
 		ds.endPass(this->mWindow);
@@ -261,7 +261,7 @@ bool Application::runInternal() noexcept {
 		// main draw
 
 		shader.bind();
-		//spu.set(ds.getProjectionMatrix());
+		spu.set(ds.getProjectionMatrix());
 		fpu.set(ss.getProjectionMatrix());
 
 		if(moveWithSpotlight) {
@@ -275,13 +275,13 @@ bool Application::runInternal() noexcept {
 		cameraPosUniform.set(this->mWindow.getCamera()->getPosition());
 
 		ss.bindMap(28); //28 flashlight
-		//ds.bindMap(31); //31 sun
+		ds.bindMap(31); //31 sun
 		//29,30 front lights of tram
 
-		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
+		t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
 
-		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
-		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
+		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
+		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
 
 		shader.bind();
 
@@ -294,11 +294,6 @@ bool Application::runInternal() noexcept {
 		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
 		oit.endTransparentPass(uOITEnabled);
 
-		//TODO shadows issue in OIT draw
-		//they are just weird
-		//without OIT draw works ok (even when OIT moves settings)
-		//composition buffer suspect
-		//ISSUE NOT WITH MATRICES, NOT WITH SETTINGS
 		oit.draw(this->mWindow, sr);
 
 		shader.bind();

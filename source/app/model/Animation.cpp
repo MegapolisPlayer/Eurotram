@@ -1,5 +1,4 @@
 #include "Animation.hpp"
-
 #include "ModelLoading.hpp" //so model class works
 
 Animation::Animation() noexcept  {}
@@ -14,7 +13,6 @@ void Animation::setStateAtTime(Model& aModel, const float aTime) noexcept {
 		aModel.mNodes[this->mSamplers[i].nodeIndex].localMatrix = glm::mat4(1.0f);
 		data.push_back(this->getLocalSamplerTransform(i, aTime));
 	}
-
 
 	//local matrix reset in Model class
 	for(uint64_t i = 0; i < data.size(); i++) {
