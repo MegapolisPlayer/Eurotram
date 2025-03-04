@@ -45,6 +45,7 @@ add_executable(eurotram
 "app/objects/vehicles/APEX.cpp"
 "app/objects/vehicles/BUSE.cpp"
 "app/objects/vehicles/T3RP.cpp"
+"app/objects/vehicles/Vehicle.cpp"
 "app/objects/Building.cpp"
 "app/objects/Button.cpp"
 "app/objects/Landmark.cpp"

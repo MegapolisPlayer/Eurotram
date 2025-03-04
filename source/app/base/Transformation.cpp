@@ -16,7 +16,6 @@ Transform::Transform(const glm::mat4& aMatrix) noexcept
 	this->mRotationDegreesX = rotationAngles.x;
 	this->mRotationDegreesY = rotationAngles.y;
 	this->mRotationDegreesZ = rotationAngles.z;
-
 	this->calculateMatrix();
 }
 
@@ -154,26 +153,17 @@ Transform::~Transform() noexcept {}
 void Transform::calculateMatrix() const noexcept {
 	if(this->mPrecalculated) return;
 
-	//TRS
-	//first multiply scale, then rot, then translate
-
 	this->mPrecalcMatrix = glm::mat4(1.0f);
+
+	glm::quat q = glm::quat(glm::vec3(
+		glm::radians(this->mRotationDegreesX),
+		glm::radians(this->mRotationDegreesY),
+		glm::radians(this->mRotationDegreesZ)
+	));
 
 	this->mPrecalcMatrix = glm::translate(this->mPrecalcMatrix, this->mPos);
 
-
-	this->mPrecalcMatrix = glm::rotate(
-		this->mPrecalcMatrix, glm::radians(this->mRotationDegreesX),
-		glm::vec3(1.0f, 0.0f, 0.0f)
-	);
-	this->mPrecalcMatrix = glm::rotate(
-		this->mPrecalcMatrix, glm::radians(this->mRotationDegreesY),
-		glm::vec3(0.0f, 1.0f, 0.0f)
-	);
-	this->mPrecalcMatrix = glm::rotate(
-		this->mPrecalcMatrix, glm::radians(this->mRotationDegreesZ),
-		glm::vec3(0.0f, 0.0f, 1.0f)
-	);
+	this->mPrecalcMatrix = this->mPrecalcMatrix * glm::mat4_cast(q);
 
 	this->mPrecalcMatrix = glm::scale(
 		this->mPrecalcMatrix, this->mScale

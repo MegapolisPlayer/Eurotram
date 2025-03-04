@@ -373,7 +373,9 @@ void Model::resetVariant(const std::string_view aMaterialName) noexcept {
 }
 
 void Model::sendAnimationDataToShader(StructUniform<glm::mat4>& aBoneMatrices, const bool aRecalcAnim) noexcept {
-	if(aRecalcAnim) this->updateAnimation(aBoneMatrices);
+	if(aRecalcAnim) {
+		//this->updateAnimation(aBoneMatrices);
+	}
 	aBoneMatrices.setNewData(this->mOutput.data(), this->mOutput.size());
 	aBoneMatrices.set();
 }

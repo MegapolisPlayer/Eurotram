@@ -4,11 +4,14 @@ namespace Math {
 	float linearInterpolation(const float a1, const float a2, const float aT) noexcept {
 		return a1+((a2-a1)*aT);
 	}
-
 	//3x faster than using glm::mix
 	BezierPoint linearInterpolation(const glm::vec2& a1, const glm::vec2& a2, const float aT) noexcept {
 		return glm::vec2(a1.x+((a2.x-a1.x)*aT), a1.y+((a2.y-a1.y)*aT));
 	}
+	glm::vec3 linearInterpolation(const glm::vec3& a1, const glm::vec3& a2, const float aT) noexcept {
+		return glm::vec3(a1.x+((a2.x-a1.x)*aT), a1.y+((a2.y-a1.y)*aT), a1.z+((a2.z-a1.z)*aT));
+	}
+
 
 	BezierPoint bezierAtPoint(const glm::vec2& aPoint1, const glm::vec2& aCP1, const glm::vec2& aCP2, const glm::vec2& aPoint2, const float aT) noexcept {
 		//https://upload.wikimedia.org/wikipedia/commons/d/db/B%C3%A9zier_3_big.gif demonstration gif
@@ -104,5 +107,25 @@ namespace Math {
 
 	float getSign(const float aN) noexcept {
 		return (aN > 0.0) - (aN < 0.0);
+	}
+
+	float getDistance(const glm::vec2& a1, const glm::vec2& a2) noexcept {
+		return std::sqrt(std::pow(a2.x-a1.x, 2) + std::pow(a2.y-a1.y, 2));
+	}
+
+	glm::vec2 getAverageOfVectors(const glm::vec2& a1, const glm::vec2& a2) noexcept {
+		return glm::vec2((a2.x+a1.x)/2.0, (a2.y+a1.y)/2.0);
+	}
+
+	float getRotationOfVector(const glm::vec2& aVector) noexcept {
+		//https://stackoverflow.com/questions/14066933/direct-way-of-computing-the-clockwise-angle-between-two-vectors determinant formula
+		//is made for matrices but work for a pair of vec2s
+
+		glm::vec3 axis = glm::normalize(glm::vec3(0.0, 0.0, 1.0));
+		glm::vec2 vec = glm::normalize(aVector);
+
+		float dotProduct = vec.x*axis.x + vec.y*axis.z;
+		float determinant = vec.x*axis.z - vec.y*axis.x;
+		return glm::degrees(std::atan2(-determinant, -dotProduct)); //rotation around Y axis - yaw
 	}
 }

@@ -76,4 +76,6 @@ private:
 
 	double mLastPhysicalUpdateTime;
 	double mPhysicalUpdateFreq;
+
+	std::vector<Vehicle> mPlayerVehicles;
 };

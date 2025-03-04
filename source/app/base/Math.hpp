@@ -8,8 +8,8 @@ namespace Math {
 	typedef glm::vec2 BezierPoint;
 
 	float linearInterpolation(const float a1, const float a2, const float aT) noexcept;
-
 	BezierPoint linearInterpolation(const glm::vec2& a1, const glm::vec2& a2, const float aT) noexcept;
+	glm::vec3 linearInterpolation(const glm::vec3& a1, const glm::vec3& a2, const float aT) noexcept;
 
 	//we "only" calculate 2D bezier - 3D height is stored in track's heightpoints'
 	//aT is between 0 and 1 - state of curve (0.5 - middle point)
@@ -41,6 +41,13 @@ namespace Math {
 
 	//returns +1/0/-1 depending on sign
 	float getSign(const float aN) noexcept;
+
+	//gets length of track between two points based on straight line length between them
+	float getDistance(const glm::vec2& a1, const glm::vec2& a2) noexcept;
+
+	glm::vec2 getAverageOfVectors(const glm::vec2& a1, const glm::vec2& a2) noexcept;
+
+	float getRotationOfVector(const glm::vec2& aVector) noexcept;
 }
 
 #endif
