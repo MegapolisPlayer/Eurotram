@@ -290,7 +290,7 @@ bool Application::runInternal() noexcept {
 			//TODO calculate bezier length properly
 
 			//rotation because offset from first
-			glm::vec3 rotatedVector = glm::rotate(glm::vec3(0.0, 0.0, 3.0), glm::radians(r.y), glm::vec3(0.0, 1.0, 0.0));
+			glm::vec3 rotatedVector = glm::rotate(glm::vec3(0.0, 0.0, 3.225), glm::radians(r.y), glm::vec3(0.0, 1.0, 0.0));
 			t3rp.getMesh("T3 bogie 1")->getTransform().setPosition(v+rotatedVector);
 			t3rp.getMesh("T3 bogie 1")->getTransform().setRotation(r);
 			t3rp.getMesh("T3 bogie 1 wheels F")->getTransform().setPosition(v+rotatedVector);
@@ -301,7 +301,7 @@ bool Application::runInternal() noexcept {
 			//second position based on first
 
 			//rotation because offset from first
-			glm::vec3 rotatedVector2 = glm::rotate(glm::vec3(0.0, 0.0, -3.0), glm::radians(r2.y), glm::vec3(0.0, 1.0, 0.0));
+			glm::vec3 rotatedVector2 = glm::rotate(glm::vec3(0.0, 0.0, -3.225), glm::radians(r2.y), glm::vec3(0.0, 1.0, 0.0));
 			t3rp.getMesh("T3 bogie 2")->getTransform().setPosition(v2+rotatedVector2);
 			t3rp.getMesh("T3 bogie 2")->getTransform().setRotation(r2);
 			t3rp.getMesh("T3 bogie 2 wheels F")->getTransform().setPosition(v2+rotatedVector2);

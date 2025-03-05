@@ -33,10 +33,16 @@ class BogieMovement {
 public:
 	BogieMovement() noexcept;
 
+	//offset - how far is bogie away from origin
+	void setData(
+		Mesh* aBogieName,
+		Mesh* aBogieShaftSuffix1,
+		Mesh* aBogieShaftSuffix2,
+		const glm::vec3& aBogieOffset
+	) noexcept;
+
 	//updates station - for main bogie
-	void moveLead(Line* aLine, const float aAmount) noexcept;
-	//doesnt update station - for "follower" bogies
-	void moveFollow(Line* aLine, const float aAmount) noexcept;
+	glm::vec2 move(Map* aMap, Line* aLine, const float aAmount, const bool aUpdateStation) noexcept;
 
 	~BogieMovement() noexcept;
 private:
@@ -46,9 +52,10 @@ private:
 	std::pair<uint8_t, uint64_t> mNextNodeId;
 	uint64_t mSwitchCount;
 
-	std::string mBogieShaft1;
-	std::string mBogieShaft2;
-	std::string mBogieName;
+	Mesh* mBogie;
+	Mesh* mShaft1;
+	Mesh* mShaft2;
+	glm::vec3 mBogieOffset;
 };
 
 
@@ -58,7 +65,6 @@ public:
 	Vehicle() noexcept;
 
 	void movementUpdate() noexcept;
-
 	void physicsUpdate() noexcept;
 
 	//TODO getters
@@ -69,7 +75,7 @@ private:
 	Line* mLine;
 
 	VehiclePhysicsData mData;
-	std::vector<BogieMovement> mMovementData;
+	std::vector<BogieMovement> mBogies;
 };
 
 #endif
