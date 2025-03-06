@@ -144,25 +144,21 @@ bool Application::runInternal() noexcept {
 	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
 
-	uint64_t trackId = this->mLine.getFirstLoopTrack();
-	uint64_t trackId2 = this->mLine.getFirstLoopTrack();
-	std::pair<uint8_t, uint64_t> nextNodeId = this->mMap.getOtherTrackPoint(trackId, this->mLine.getFirstNodePassed());
-	std::pair<uint8_t, uint64_t> nextNodeId2 = this->mMap.getOtherTrackPoint(trackId2, this->mLine.getFirstNodePassed());
-	uint64_t switchCount = 0;
-	uint64_t switchCount2 = 0;
-	float speed = 0.1;
-	float trackRemainingLength = 0;
-	float trackRemainingLength2 = 6.45;
+	//TODO starting track can be shorter than 6.45 meter
 
+	VehicleInformation t3rpInfo;
+	t3rpInfo.model = &t3rp;
+	t3rpInfo.bogieNames.push_back("T3 bogie 1");
+	t3rpInfo.bogieNames.push_back("T3 bogie 2");
+	t3rpInfo.bogieShaftSuffixes.push_back(" wheels F");
+	t3rpInfo.bogieShaftSuffixes.push_back(" wheels B");
+	t3rpInfo.bogieTrackOffset.push_back(0.0);
+	t3rpInfo.bogieTrackOffset.push_back(6.45);
+	t3rpInfo.bogieCenterOffset.push_back(glm::vec3(0.0, 0.0, 3.225));
+	t3rpInfo.bogieCenterOffset.push_back(glm::vec3(0.0, 0.0, -3.225));
 
-	std::cout << "First track " << trackId << " first node (" << nextNodeId.first << ") " << nextNodeId.second << '\n';
-
-	for(auto& a :  this->mLine.getSwitchesToNextStop()) {
-		std::cout << "SW" << a.mapId << " DIR" << (uint16_t)a.direction << '\n';
-	}
-
-	//TODO setup base position
-
+	Vehicle v(this->mMap, this->mLine, t3rpInfo);
+	v.getVehiclePhysicsData()->speed = 0.1;
 
 	shader.bind();
 	UniformMaterial uMaterial(50);
@@ -189,126 +185,7 @@ bool Application::runInternal() noexcept {
 	OIT oit(this->mWindow);
 
 	this->runWindowFrame([&]() {
-		if(this->mLine.isStationLast()) {}
-		else {
-			trackRemainingLength -= speed;
-			trackRemainingLength2 -= speed;
-
-			if(trackRemainingLength <= 0) {
-				//get next track
-				if(switchCount >= this->mLine.getSwitchesToNextStop().size()) {
-					//we already passed last switch - no more setting of value (if reach switch - game over)
-					trackId = this->mMap.getNextTrack(trackId, nextNodeId, LineData::SwitchDirection::NO_SET);
-				}
-				else {
-					trackId = this->mMap.getNextTrack(trackId, nextNodeId, this->mLine.getSwitchesToNextStop()[switchCount].direction);
-				}
-				if(nextNodeId.first == 's') {
-					switchCount++;
-				}
-				nextNodeId = this->mMap.getOtherTrackPoint(trackId, nextNodeId);
-				if(this->mMap.isTrackStation(trackId)) {
-					switchCount = 0;
-					this->mLine.nextStation();
-					for(auto& a :  this->mLine.getSwitchesToNextStop()) {
-						std::cout << "SW" << a.mapId << " DIR" << (uint16_t)a.direction << '\n';
-					}
-				}
-				trackRemainingLength += this->mMap.getTrackById(trackId).length;
-				std::cout << "Track id " << trackId << "; node id " << nextNodeId.second << '(' << nextNodeId.first << ')' << " len" << this->mMap.getTrackById(trackId).length << '\n';
-			}
-			if(trackRemainingLength2 <= 0) {
-				//get next track
-				if(switchCount2 >= this->mLine.getSwitchesToNextStop().size()) {
-					//we already passed last switch - no more setting of value (if reach switch - game over)
-					trackId2 = this->mMap.getNextTrack(trackId2, nextNodeId2, LineData::SwitchDirection::NO_SET);
-				}
-				else {
-					trackId2 = this->mMap.getNextTrack(trackId2, nextNodeId2, this->mLine.getSwitchesToNextStop()[switchCount2].direction);
-				}
-				if(nextNodeId2.first == 's') {
-					switchCount2++;
-				}
-				nextNodeId2 = this->mMap.getOtherTrackPoint(trackId2, nextNodeId2);
-				if(this->mMap.isTrackStation(trackId2)) {
-					switchCount2 = 0;
-				}
-				trackRemainingLength2 += this->mMap.getTrackById(trackId2).length;
-			}
-
-
-			Track tr = this->mMap.getTrackById(trackId);
-
-			glm::vec3 v, r;
-			//still same track
-			//inverse of inverse - we go toward, not from
-			if(
-				(int32_t)nextNodeId.second == tr.first &&
-				(
-					((tr.flags & TRACK_FLAG_FIRST_SWITCH) && nextNodeId.first == 's') ||
-					(!(tr.flags & TRACK_FLAG_FIRST_SWITCH) && nextNodeId.first == 'n')
-				)
-			) {
-				//to first
-				v = tr.getPosition((trackRemainingLength/tr.length));
-				r = tr.getRotation((trackRemainingLength/tr.length), true);
-			}
-			else {
-				//to second
-				v = tr.getPosition(1.0-(trackRemainingLength/tr.length));
-				r = tr.getRotation(1.0-(trackRemainingLength/tr.length), false);
-			}
-
-			glm::vec3 v2, r2;
-			//still same track
-			//inverse of inverse - we go toward, not from
-
-			tr = this->mMap.getTrackById(trackId2);
-			if(
-				(int32_t)nextNodeId2.second == tr.first &&
-				(
-					((tr.flags & TRACK_FLAG_FIRST_SWITCH) && nextNodeId2.first == 's') ||
-					(!(tr.flags & TRACK_FLAG_FIRST_SWITCH) && nextNodeId2.first == 'n')
-				)
-			) {
-				//to first
-				v2 = tr.getPosition((trackRemainingLength2/tr.length));
-				r2 = tr.getRotation((trackRemainingLength2/tr.length), true);
-			}
-			else {
-				//to second
-				v2 = tr.getPosition(1.0-(trackRemainingLength2/tr.length));
-				r2 = tr.getRotation(1.0-(trackRemainingLength2/tr.length), false);
-			}
-
-			glm::vec2 avg = Math::getAverageOfVectors(glm::vec2(v2.x, v2.z), glm::vec2(v.x, v.z));
-			t3rp.getGlobalTransform().setPosition(glm::vec3(avg.x, 0.0, avg.y));
-			glm::vec2 dif = glm::vec2((v - v2).x, (v - v2).z);
-			t3rp.getGlobalTransform().setRotation(glm::vec3(0.0, Math::getRotationOfVector(dif), 0.0));
-			t3rp.refreshTransforms();
-
-			//TODO calculate bezier length properly
-
-			//rotation because offset from first
-			glm::vec3 rotatedVector = glm::rotate(glm::vec3(0.0, 0.0, 3.225), glm::radians(r.y), glm::vec3(0.0, 1.0, 0.0));
-			t3rp.getMesh("T3 bogie 1")->getTransform().setPosition(v+rotatedVector);
-			t3rp.getMesh("T3 bogie 1")->getTransform().setRotation(r);
-			t3rp.getMesh("T3 bogie 1 wheels F")->getTransform().setPosition(v+rotatedVector);
-			t3rp.getMesh("T3 bogie 1 wheels F")->getTransform().setRotation(r);
-			t3rp.getMesh("T3 bogie 1 wheels B")->getTransform().setPosition(v+rotatedVector);
-			t3rp.getMesh("T3 bogie 1 wheels B")->getTransform().setRotation(r);
-
-			//second position based on first
-
-			//rotation because offset from first
-			glm::vec3 rotatedVector2 = glm::rotate(glm::vec3(0.0, 0.0, -3.225), glm::radians(r2.y), glm::vec3(0.0, 1.0, 0.0));
-			t3rp.getMesh("T3 bogie 2")->getTransform().setPosition(v2+rotatedVector2);
-			t3rp.getMesh("T3 bogie 2")->getTransform().setRotation(r2);
-			t3rp.getMesh("T3 bogie 2 wheels F")->getTransform().setPosition(v2+rotatedVector2);
-			t3rp.getMesh("T3 bogie 2 wheels F")->getTransform().setRotation(r2);
-			t3rp.getMesh("T3 bogie 2 wheels B")->getTransform().setPosition(v2+rotatedVector2);
-			t3rp.getMesh("T3 bogie 2 wheels B")->getTransform().setRotation(r2);
-		}
+		v.update(this->mMap, this->mLine);
 
 		this->mMap.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
 

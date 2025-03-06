@@ -3,13 +3,38 @@
 #include "APEX.hpp"
 #include "BUSE.hpp"
 
+struct VehicleInformation {
+	Model* model;
+
+	float mass = 0.0;
+	float areaFront = 0.0;
+	float contactResistance = 0.0;
+
+	//TODO add list of meshes which every bogie moves
+	//something:
+	//
+	//body1 - 0,1
+	//body2 - 1,2
+	//
+	//for other meshes - apply averages of first 2 bogies
+	//
+	//TODO validation
+	//of all sizes
+	//more or equal to 2 shafts
+	//more or equal to 2 bogies
+	//
+	//TODO test on multi vehicle systems
+	//add method for duplicating data
+
+	std::vector<std::string> bogieNames;
+	//1 bogie = 2 shafts
+	std::vector<std::string> bogieShaftSuffixes;
+	std::vector<glm::vec3> bogieCenterOffset; //relative to center of model
+	std::vector<float> bogieTrackOffset; //relative to previous, first value usually zero
+};
+
 struct VehiclePhysicsData {
 	float speed;
-
-	//information
-	float mass;
-	float areaFront;
-	float contactResistance;
 
 	//forces
 	float fceFront;
@@ -22,27 +47,35 @@ struct VehiclePhysicsData {
 	//weather
 	float power;
 	float consumption;
-
-	float lengthBetweenBogies;
-	std::vector<std::string> bogieNames;
-	//1 bogie = 2 shafts
-	std::vector<std::string> bogieShaftNames;
 };
 
 class BogieMovement {
 public:
 	BogieMovement() noexcept;
 
-	//offset - how far is bogie away from origin
 	void setData(
-		Mesh* aBogieName,
-		Mesh* aBogieShaftSuffix1,
-		Mesh* aBogieShaftSuffix2,
+		Model& aModel,
+		const std::string_view aBogieName,
+		const std::string_view aBogieShaftSuffix1,
+		const std::string_view aBogieShaftSuffix2,
 		const glm::vec3& aBogieOffset
 	) noexcept;
 
+	//offset - how far is bogie away from origin
+	void setData(
+		Mesh* aBogieName,
+		Mesh* aBogieShaft1,
+		Mesh* aBogieShaft2,
+		const glm::vec3& aBogieOffset
+	) noexcept;
+
+	void init(Map& aMap, Line& aLine, const float aLengthRemainingOverride = 0.0) noexcept;
+
 	//updates station - for main bogie
-	glm::vec2 move(Map* aMap, Line* aLine, const float aAmount, const bool aUpdateStation) noexcept;
+	glm::vec2 move(Map& aMap, Line& aLine, const float aAmount, const bool aUpdateStation) noexcept;
+
+	bool isValid() const noexcept;
+	void validate() const noexcept;
 
 	~BogieMovement() noexcept;
 private:
@@ -58,23 +91,25 @@ private:
 	glm::vec3 mBogieOffset;
 };
 
+//TODO convert to instanced
 
 //handles movement and stuff
 class Vehicle {
 public:
-	Vehicle() noexcept;
+	Vehicle(Map& aMap, Line& aLine, VehicleInformation& aInfo) noexcept;
 
-	void movementUpdate() noexcept;
-	void physicsUpdate() noexcept;
+	//update data of vehicle
+	void update(Map& aMap, Line& aLine) noexcept;
+	void draw() noexcept;
 
-	//TODO getters
+	VehiclePhysicsData* getVehiclePhysicsData() noexcept;
 
 	~Vehicle() noexcept;
 private:
-	Map* mMap;
-	Line* mLine;
+	Model* mModel;
 
-	VehiclePhysicsData mData;
+	VehicleInformation mInfo;
+	VehiclePhysicsData mPhysicsData;
 	std::vector<BogieMovement> mBogies;
 };
 
