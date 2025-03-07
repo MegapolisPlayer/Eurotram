@@ -116,16 +116,25 @@ namespace Math {
 	glm::vec2 getAverageOfVectors(const glm::vec2& a1, const glm::vec2& a2) noexcept {
 		return glm::vec2((a2.x+a1.x)/2.0, (a2.y+a1.y)/2.0);
 	}
+	glm::vec3 getAverageOfVectors(const glm::vec3& a1, const glm::vec3& a2) noexcept {
+		return glm::vec3((a2.x+a1.x)/2.0, (a2.y+a1.y)/2.0, (a2.z+a1.z)/2.0);
+	}
 
-	float getRotationOfVector(const glm::vec2& aVector) noexcept {
-		//https://stackoverflow.com/questions/14066933/direct-way-of-computing-the-clockwise-angle-between-two-vectors determinant formula
-		//is made for matrices but work for a pair of vec2s
+	//https://stackoverflow.com/questions/14066933/direct-way-of-computing-the-clockwise-angle-between-two-vectors determinant formula
+	//is made for matrices but work for a pair of vec2s
 
-		glm::vec3 axis = glm::normalize(glm::vec3(0.0, 0.0, 1.0));
+	float getRotationOfVector2DY(const glm::vec2& aVector) noexcept {
+		glm::vec2 axis = glm::normalize(glm::vec2(0, 1));
 		glm::vec2 vec = glm::normalize(aVector);
-
-		float dotProduct = vec.x*axis.x + vec.y*axis.z;
-		float determinant = vec.x*axis.z - vec.y*axis.x;
-		return glm::degrees(std::atan2(-determinant, -dotProduct)); //rotation around Y axis - yaw
+		float dotProduct = vec.x*axis.x + vec.y*axis.y;
+		float determinant = vec.x*axis.y - vec.y*axis.x;
+		return glm::degrees(std::atan2(-determinant, -dotProduct) + std::numbers::pi); //rotation around Y axis - yaw
+	}
+	float getRotationOfVector2DX(const glm::vec2& aVector) noexcept {
+		glm::vec2 axis = glm::normalize(glm::vec2(1, 0));
+		glm::vec2 vec = glm::normalize(aVector);
+		float dotProduct = vec.x*axis.x + vec.y*axis.y;
+		float determinant = vec.x*axis.y - vec.y*axis.x;
+		return glm::degrees(std::atan2(-determinant, -dotProduct) + std::numbers::pi); //rotation around X axis - pitch
 	}
 }

@@ -4,8 +4,6 @@
 #include "BUSE.hpp"
 
 struct VehicleInformation {
-	Model* model;
-
 	float mass = 0.0;
 	float areaFront = 0.0;
 	float contactResistance = 0.0;
@@ -26,6 +24,10 @@ struct VehicleInformation {
 	//TODO test on multi vehicle systems
 	//add method for duplicating data
 
+	Model* model;
+	//for each bogie pair in bogieNames defined names of meshes
+	//bogie pairs in format 0&1, 1&2, 2&3
+	std::vector<std::vector<std::string>> meshNames;
 	std::vector<std::string> bogieNames;
 	//1 bogie = 2 shafts
 	std::vector<std::string> bogieShaftSuffixes;
@@ -72,7 +74,8 @@ public:
 	void init(Map& aMap, Line& aLine, const float aLengthRemainingOverride = 0.0) noexcept;
 
 	//updates station - for main bogie
-	glm::vec2 move(Map& aMap, Line& aLine, const float aAmount, const bool aUpdateStation) noexcept;
+	std::optional<glm::vec3> move(Map& aMap, Line& aLine, const float aAmount, const bool aUpdateStation) noexcept;
+	void applyMove(Map& aMap, Line& aLine) noexcept;
 
 	bool isValid() const noexcept;
 	void validate() const noexcept;
@@ -89,6 +92,9 @@ private:
 	Mesh* mShaft1;
 	Mesh* mShaft2;
 	glm::vec3 mBogieOffset;
+
+	glm::vec3 mPosition;
+	glm::vec3 mRotation;
 };
 
 //TODO convert to instanced
@@ -107,6 +113,7 @@ public:
 	~Vehicle() noexcept;
 private:
 	Model* mModel;
+	std::vector<std::vector<Mesh*>> mBogieMeshes;
 
 	VehicleInformation mInfo;
 	VehiclePhysicsData mPhysicsData;

@@ -34,8 +34,8 @@ void BogieMovement::init(Map& aMap, Line& aLine, const float aLengthRemainingOve
 	this->mLengthRemaining = aLengthRemainingOverride;
 }
 
-glm::vec2 BogieMovement::move(Map& aMap, Line& aLine, const float aAmount, const bool aUpdateStation) noexcept {
-	if(aLine.isStationLast()) return glm::vec2(0.0);
+std::optional<glm::vec3> BogieMovement::move(Map& aMap, Line& aLine, const float aAmount, const bool aUpdateStation) noexcept {
+	if(aLine.isStationLast()) return {};
 
 	this->mLengthRemaining -= aAmount;
 
@@ -60,12 +60,14 @@ glm::vec2 BogieMovement::move(Map& aMap, Line& aLine, const float aAmount, const
 			}
 		}
 		this->mLengthRemaining += aMap.getTrackById(this->mTrackId).length;
+		if(aLine.isStationLast()) {
+			return {};
+		}
 	}
 
 	//get position of bogies
 
 	Track& tr = aMap.getTrackById(this->mTrackId);
-	glm::vec3 v, r;
 	if(
 		(int32_t)this->mNextNodeId.second == tr.first &&
 		(
@@ -74,25 +76,27 @@ glm::vec2 BogieMovement::move(Map& aMap, Line& aLine, const float aAmount, const
 		)
 	) {
 		//to first
-		v = tr.getPosition((this->mLengthRemaining/tr.length));
-		r = tr.getRotation((this->mLengthRemaining/tr.length), true);
+		this->mPosition = tr.getPosition((this->mLengthRemaining/tr.length));
+		this->mRotation = tr.getRotation((this->mLengthRemaining/tr.length), true);
 	}
 	else {
 		//to second
-		v = tr.getPosition(1.0-(this->mLengthRemaining/tr.length));
-		r = tr.getRotation(1.0-(this->mLengthRemaining/tr.length), false);
+		this->mPosition = tr.getPosition(1.0-(this->mLengthRemaining/tr.length));
+		this->mRotation = tr.getRotation(1.0-(this->mLengthRemaining/tr.length), false);
 	}
 
-	glm::vec3 rv = glm::rotate(this->mBogieOffset, glm::radians(r.y), glm::vec3(0.0, 1.0, 0.0));
-	rv = glm::rotate(rv, glm::radians(r.z), glm::vec3(0.0, 0.0, 1.0));
-	this->mBogie->getTransform().setPosition(v+rv);
-	this->mBogie->getTransform().setRotation(r);
-	this->mShaft1->getTransform().setPosition(v+rv);
-	this->mShaft1->getTransform().setRotation(r);
-	this->mShaft2->getTransform().setPosition(v+rv);
-	this->mShaft2->getTransform().setRotation(r);
+	return this->mPosition;
+}
+void BogieMovement::applyMove(Map& aMap, Line& aLine) noexcept {
+	glm::vec3 rv = glm::rotate(this->mBogieOffset, glm::radians(this->mRotation.y), glm::vec3(0.0, 1.0, 0.0));
+	rv = glm::rotate(rv, glm::radians(this->mRotation.z), glm::vec3(0.0, 0.0, 1.0));
 
-	return v;
+	this->mBogie->getTransform().setPosition(this->mPosition+rv);
+	this->mBogie->getTransform().setRotation(this->mRotation);
+	this->mShaft1->getTransform().setPosition(this->mPosition+rv);
+	this->mShaft1->getTransform().setRotation(this->mRotation);
+	this->mShaft2->getTransform().setPosition(this->mPosition+rv);
+	this->mShaft2->getTransform().setRotation(this->mRotation);
 }
 
 bool BogieMovement::isValid() const noexcept {
@@ -111,20 +115,84 @@ Vehicle::Vehicle(Map& aMap, Line& aLine, VehicleInformation& aInfo) noexcept {
 	//TODO add error info and more validation
 	assert(aInfo.bogieShaftSuffixes.size() == 2);
 	assert(aInfo.bogieNames.size() == aInfo.bogieTrackOffset.size());
+	assert(aInfo.meshNames.size() == aInfo.bogieNames.size()-1 || aInfo.meshNames.empty());
+
+	this->mModel = aInfo.model;
 
 	for(uint64_t i = 0; i < aInfo.bogieNames.size(); i++) {
 		this->mBogies.emplace_back();
 		this->mBogies[i].init(aMap, aLine, aInfo.bogieTrackOffset[i]);
 		this->mBogies[i].setData(*aInfo.model, aInfo.bogieNames[i], aInfo.bogieShaftSuffixes[0], aInfo.bogieShaftSuffixes[1], aInfo.bogieCenterOffset[i]);
 		this->mBogies[i].validate();
+
+		//add meshes which are to be update
+		if(i != 0 && !aInfo.meshNames.empty()) {
+			this->mBogieMeshes.emplace_back();
+			for(uint64_t j = 0; j < aInfo.meshNames[i-1].size(); j++) {
+				Mesh* ptr = aInfo.model->getMesh(aInfo.meshNames[i-1][j]);
+				if(ptr) {
+					this->mBogieMeshes.back().push_back(ptr);
+				}
+				else {
+					std::cerr << LogLevel::WARNING << "Invalid mesh with name " << aInfo.meshNames[i-1][j] << " passed to vehicle.\n" << LogLevel::RESET;
+				}
+			}
+		}
 	}
 }
 
 void Vehicle::update(Map& aMap, Line& aLine) noexcept {
+	std::vector<glm::vec3> positions;
 	bool leading = true;
 	for(BogieMovement& b : this->mBogies) {
-		b.move(aMap, aLine, this->mPhysicsData.speed, leading);
+		auto a = b.move(aMap, aLine, this->mPhysicsData.speed, leading);
+		if(!a.has_value()) {
+			return; //station last, no value
+		}
+		positions.push_back(a.value());
 		leading = false; //only for first bogie
+	}
+
+	//if we reached last - exit
+	if(aLine.isStationLast()) return;
+
+	//move meshes
+
+	//default - apply first pair to all
+	if(this->mBogieMeshes.empty()) {
+		glm::vec3 avg = Math::getAverageOfVectors(positions[1], positions[0]);
+		glm::vec3 dif = glm::vec3((positions[0] - positions[1]).x, (positions[0] - positions[1]).y, (positions[0] - positions[1]).z);
+
+		float rotationHorizontal = Math::getRotationOfVector2DY(glm::vec2(dif.x, dif.z));
+		float rotationVertical = Math::getRotationOfVector2DX(glm::vec2(std::sqrt(std::pow(dif.x,2.0)+std::pow(dif.z,2.0)), dif.y));
+
+		this->mModel->getGlobalTransform().setPosition(avg);
+		//due to some rotation crap we need to add 180 degress to flip TODO improve
+		this->mModel->getGlobalTransform().setRotation(glm::vec3(rotationVertical, rotationHorizontal+180, 0));
+		this->mModel->refreshTransforms();
+	}
+	else {
+		//else not needed
+		for(std::vector<Mesh*> v : this->mBogieMeshes) {
+			for(uint64_t j = 0; j < v.size(); j++) {
+				glm::vec3 avg = Math::getAverageOfVectors(positions[j+1], positions[j]);
+				//switch Z and Y - Z axis in simulator is y field, height in sim is z field
+				glm::vec3 dif = glm::vec3((positions[j] - positions[j+1]).x, (positions[j] - positions[j+1]).y, (positions[j] - positions[j+1]).z);
+
+				float rotationHorizontal = Math::getRotationOfVector2DY(glm::vec2(dif.x, dif.z));
+				float rotationVertical = Math::getRotationOfVector2DX(glm::vec2(std::sqrt(std::pow(dif.x,2.0)+std::pow(dif.z,2.0)), dif.y));
+
+				this->mModel->getGlobalTransform().setPosition(avg);
+				//same here
+				this->mModel->getGlobalTransform().setRotation(glm::vec3(rotationVertical, rotationHorizontal+180, 0));
+				this->mModel->refreshTransforms();
+			}
+		}
+	}
+
+	//apply bogie transform after global
+	for(BogieMovement& m : this->mBogies) {
+		m.applyMove(aMap, aLine);
 	}
 }
 
@@ -132,6 +200,4 @@ VehiclePhysicsData* Vehicle::getVehiclePhysicsData() noexcept {
 	return &this->mPhysicsData;
 }
 
-Vehicle::~Vehicle() noexcept {
-
-}
+Vehicle::~Vehicle() noexcept {}

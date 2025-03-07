@@ -46,8 +46,10 @@ namespace Math {
 	float getDistance(const glm::vec2& a1, const glm::vec2& a2) noexcept;
 
 	glm::vec2 getAverageOfVectors(const glm::vec2& a1, const glm::vec2& a2) noexcept;
+	glm::vec3 getAverageOfVectors(const glm::vec3& a1, const glm::vec3& a2) noexcept;
 
-	float getRotationOfVector(const glm::vec2& aVector) noexcept;
+	float getRotationOfVector2DY(const glm::vec2& aVector) noexcept;
+	float getRotationOfVector2DX(const glm::vec2& aVector) noexcept;
 }
 
 #endif
