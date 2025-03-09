@@ -144,6 +144,10 @@ bool Application::runInternal() noexcept {
 	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
 	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
 
+	//external
+	t3rp.addVariant("Material.paint", "vojtovoPID.png", "SPID");
+	t3rp.addVariant("Material.paint", "vojtovoDPO.png", "DPO");
+
 	//TODO starting track can be shorter than 6.45 meter
 
 	VehicleInformation t3rpInfo;
@@ -187,14 +191,20 @@ bool Application::runInternal() noexcept {
 	Shader weatherShader("shader/weatherVertex.glsl", "shader/weatherFragment.glsl");
 	weatherShader.bind();
 	UniformMat4 whCameraMatrix(34);
-	UniformVec4 whColorMatrix(30);
+	UniformVec4 whColor(30);
 	UniformMat4 whViewMatrix(36);
-	WeatherHandler wh(glm::vec3(0), 10000, 0.05, 0.05, glm::vec4(1, 0, 1, 1));
+	UniformVec2 whSize(38);
+	UniformVec3 whCamUp(39);
+	UniformVec3 whCamRight(40);
+	UniformVec3 whWeatherCenter(41);
+	WeatherHandler wh(glm::vec3(0), 10000, 0.05, 0.10, glm::vec4(0.0, 0.0, 0.5, 1.0));
 
 	this->runWindowFrame([&]() {
 		v.update(this->mMap, this->mLine);
 
 		this->mMap.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
+		wh.move(glm::vec3(this->mCamera.getPosition().x, 0.0, this->mCamera.getPosition().z));
+		wh.advance(0.15);
 
 		shadowMapProgram.bind();
 		t3rp.sendAnimationDataToShader(lmat);
@@ -245,19 +255,18 @@ bool Application::runInternal() noexcept {
 		oit.beginOpaquePass(this->mWindow, uOITEnabled);
 		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
 		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
+		oit.endOpaquePass(uOITEnabled);
+
+		oit.beginTransparentPass(uOITEnabled);
+		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
+		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
 
 		//draw weather
 		weatherShader.bind();
 		whCameraMatrix.set(this->mCamera.getMatrix());
-		wh.draw(whViewMatrix, whColorMatrix, 35, 31);
+		wh.draw(whViewMatrix, whColor, 35, 37, this->mCamera, whCamUp, whCamRight, whWeatherCenter);
 		shader.bind();
 
-		wh.advance(0.1);
-
-		oit.endOpaquePass(uOITEnabled);
-		oit.beginTransparentPass(uOITEnabled);
-		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
-		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
 		oit.endTransparentPass(uOITEnabled);
 
 		oit.draw(this->mWindow, sr);
@@ -335,6 +344,8 @@ bool Application::runInternal() noexcept {
 		if(ImGui::Button("Change livery to normal")) t3rp.resetVariant("Material.paint");
 		if(ImGui::Button("Change livery to PLF")) t3rp.setVariant("Material.paint", "PLF");
 		if(ImGui::Button("Change livery to PID")) t3rp.setVariant("Material.paint", "PID");
+		if(ImGui::Button("Change livery to old PID")) t3rp.setVariant("Material.paint", "SPID");
+		if(ImGui::Button("Change livery to DPO")) t3rp.setVariant("Material.paint", "DPO");
 
 		ImGui::End();
 

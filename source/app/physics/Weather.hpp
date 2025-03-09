@@ -33,7 +33,11 @@ public:
 	//advance weather movement - after FBO drawn
 	void advance(const float aSpeed) noexcept;
 	//for buffer @aMovementForcerLocation - write 1 if drop should move
-	void draw(UniformMat4& aViewMatrix, UniformVec4& aColorLocation, const uint64_t aInstanceTranslationLocation, const uint64_t aMovementForcerLocation) noexcept;
+	void draw(
+		UniformMat4& aViewMatrix, UniformVec4& aColorLocation,
+		const uint64_t aInstanceTranslationLocation, const uint64_t aCenterPointsLocation,
+		Camera& aCamera, UniformVec3& aCameraUp, UniformVec3& aCameraRight, UniformVec3& aWeatherCenterPoint
+	) noexcept;
 	//move center location
 	void move(const glm::vec3& aCenter) noexcept;
 
@@ -41,17 +45,20 @@ public:
 private:
 	uint64_t mDropletAmount;
 	glm::vec4 mColor;
+	glm::vec3 mCenter;
 
 	VertexArray mVAO;
-	std::vector<glm::vec4> mSingleDropVertices;
+	std::vector<float> mSingleDropVertices;
 	VertexBuffer mSingleDropVertex;
 	IndexBuffer mSingleDropIndex;
 
 	//pass to shader
-	std::vector<glm::vec3> mPositions;
+	std::vector<glm::vec4> mPositions;
 	std::vector<glm::mat4> mMatrices;
 	ShaderBuffer mMatrixSSBO;
-	ShaderBuffer mMoverSSBO;
+
+	ShaderBuffer mCenterPointSSBO;
+	glm::vec2 mSize;
 
 	Framebuffer mTopView;
 	Texture mDepthTopView;

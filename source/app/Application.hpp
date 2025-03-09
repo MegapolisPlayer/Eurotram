@@ -19,8 +19,10 @@ struct ApplicationSettings {
 	bool showHUD = true;
 	//set field of view
 	float FOV = 45.0;
-	//draw points for debug
+	//draw points for debug TODO
 	bool drawPoints = false;
+	//draw trigger boxes
+	bool drawTriggers = false;
 };
 
 class Application {

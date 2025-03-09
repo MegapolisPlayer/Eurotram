@@ -52,6 +52,9 @@ public:
 
 	bool isUpdated() const noexcept;
 
+	glm::vec3 getWorldSpaceUp() const noexcept;
+	glm::vec3 getWorldSpaceRight() const noexcept;
+
 	~Camera() noexcept;
 private:
 	Window* mWindow;

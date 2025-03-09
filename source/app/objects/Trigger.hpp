@@ -4,14 +4,21 @@
 #define EUROTRAM_OBJECTS_TRIGGER
 #include "../model/Model.hpp"
 
+//TODO input ray tracing
+//AABB algorithm, issue #27, #46
+// www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/
+
 //sends collision event to respective handler if collision func successful
 class AABBTriggerBox {
 public:
-	AABBTriggerBox() noexcept;
+	AABBTriggerBox(glm::vec3& aCenter, const float aWidth, const float aDepth, const float aHeight) noexcept;
 
 	bool collision(AABBTriggerBox& aOther);
+	void draw() noexcept;
 
-	void makeVisible() noexcept;
+	void setColor(glm::vec4& aColor) noexcept;
+
+
 
 	~AABBTriggerBox() noexcept;
 private:
@@ -19,12 +26,24 @@ private:
 	float mWidth, mDepth, mHeight; //size
 	bool mEnabled;
 	bool mVisible;
+
+	glm::vec4 mColor;
 };
 
-class AABBTriggerBoxDrawer {
+class InputRaycast {
 public:
-private:
+	InputRaycast() noexcept;
 
+	float collision(AABBTriggerBox& aBox);
+
+	~InputRaycast() noexcept;
+private:
+	glm::vec3 mOrigin;
+	glm::vec3 mDirection;
+
+	//maximum points on ray when to count intersection
+	float mMinT;
+	float mMaxT;
 };
 
 #endif

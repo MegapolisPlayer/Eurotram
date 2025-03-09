@@ -49,6 +49,12 @@ public:
 	void set(const glm::mat3& aValue) noexcept;
 };
 
+class UniformVec2 : public Uniform<const glm::vec2&> {
+public:
+	UniformVec2(const uint64_t aLocationOverride) noexcept;
+	UniformVec2(const Shader& aShader, const std::string_view aUniformName) noexcept;
+	void set(const glm::vec2& aValue) noexcept;
+};
 class UniformVec3 : public Uniform<const glm::vec3&> {
 public:
 	UniformVec3(const uint64_t aLocationOverride) noexcept;

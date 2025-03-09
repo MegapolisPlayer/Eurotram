@@ -163,6 +163,15 @@ bool Camera::isUpdated() const noexcept {
 	return this->mPrecalculated;
 }
 
+glm::vec3 Camera::getWorldSpaceUp() const noexcept {
+	this->update();
+	return glm::vec3(this->mView[0][1], this->mView[1][1], this->mView[2][1]);
+}
+glm::vec3 Camera::getWorldSpaceRight() const noexcept {
+	this->update();
+	return glm::vec3(this->mView[0][0], this->mView[1][0], this->mView[2][0]);
+}
+
 Camera::~Camera() noexcept {
 	this->mWindow->bindCamera(NULL);
 }

@@ -17,6 +17,14 @@ void UniformMat3::set(const glm::mat3& aValue) noexcept {
 	glUniformMatrix3fv(this->mHandle, 1, GL_FALSE, glm::value_ptr(aValue));
 }
 
+UniformVec2::UniformVec2(const uint64_t aLocationOverride) noexcept
+: Uniform(aLocationOverride) {}
+UniformVec2::UniformVec2(const Shader& aShader, const std::string_view aUniformName) noexcept
+: Uniform(aShader, aUniformName) {}
+void UniformVec2::set(const glm::vec2& aValue) noexcept {
+	glUniform2fv(this->mHandle, 1, glm::value_ptr(aValue));
+}
+
 UniformVec3::UniformVec3(const uint64_t aLocationOverride) noexcept
 : Uniform(aLocationOverride) {}
 UniformVec3::UniformVec3(const Shader& aShader, const std::string_view aUniformName) noexcept
