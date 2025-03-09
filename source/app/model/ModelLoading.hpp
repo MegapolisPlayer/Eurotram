@@ -38,7 +38,6 @@ public:
 
 	Model(Model&) noexcept = delete;
 	Model(Model&& aOther) noexcept;
-
 	Model& operator=(Model&) noexcept = delete;
 	Model& operator=(Model&& aOther) noexcept;
 

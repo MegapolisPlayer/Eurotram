@@ -184,23 +184,35 @@ bool Application::runInternal() noexcept {
 	ScreenRenderer sr;
 	OIT oit(this->mWindow);
 
+	Shader weatherShader("shader/weatherVertex.glsl", "shader/weatherFragment.glsl");
+	weatherShader.bind();
+	UniformMat4 whCameraMatrix(34);
+	UniformVec4 whColorMatrix(30);
+	UniformMat4 whViewMatrix(36);
+	WeatherHandler wh(glm::vec3(0), 10000, 0.05, 0.05, glm::vec4(1, 0, 1, 1));
+
 	this->runWindowFrame([&]() {
 		v.update(this->mMap, this->mLine);
 
 		this->mMap.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
 
 		shadowMapProgram.bind();
+		t3rp.sendAnimationDataToShader(lmat);
+
+		//write to depth buffer
+		wh.beginPass(this->mWindow, lpu);
+		t3rp.draw(uMaterial, lmat, &lmod);
+		this->mMap.draw(uMaterial, lmat, 35, luIsInstancedRendering, &lmod);
+		wh.endPass(this->mWindow);
 
 		ss.beginPass(this->mWindow, lpu);
-		t3rp.sendAnimationDataToShader(lmat);
 		t3rp.draw(uMaterial, lmat, &lmod);
 		this->mMap.draw(uMaterial, lmat, 35, luIsInstancedRendering, &lmod);
 		ss.endPass(this->mWindow);
 
 		ds.beginPass(this->mWindow, lpu);
-		t3rp.sendAnimationDataToShader(lmat);
 		t3rp.draw(uMaterial, lmat, &lmod);
-		this->mMap.draw(uMaterial, lmat,35, luIsInstancedRendering, &lmod);
+		this->mMap.draw(uMaterial, lmat, 35, luIsInstancedRendering, &lmod);
 		ds.endPass(this->mWindow);
 
 		// main draw
@@ -233,6 +245,15 @@ bool Application::runInternal() noexcept {
 		oit.beginOpaquePass(this->mWindow, uOITEnabled);
 		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
 		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
+
+		//draw weather
+		weatherShader.bind();
+		whCameraMatrix.set(this->mCamera.getMatrix());
+		wh.draw(whViewMatrix, whColorMatrix, 35, 31);
+		shader.bind();
+
+		wh.advance(0.1);
+
 		oit.endOpaquePass(uOITEnabled);
 		oit.beginTransparentPass(uOITEnabled);
 		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
@@ -241,9 +262,9 @@ bool Application::runInternal() noexcept {
 
 		oit.draw(this->mWindow, sr);
 
-		shader.bind();
-
 		// gui
+
+		shader.bind();
 
 		ImGui::Begin("Ingame settings");
 
