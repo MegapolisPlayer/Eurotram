@@ -1,6 +1,7 @@
 #version 450 core
 
 //fragment shader for rendering weather particles
+//lighting - only ambient
 
 flat in int pInstanceId;
 in vec4 pDBCoords;
@@ -12,6 +13,8 @@ layout(location = 1) out float oReveal; //for OIT
 layout(location = 30) uniform vec4 sColor;
 //tex id 0
 layout(binding = 0) uniform sampler2D uDepthTexture;
+
+layout(location = 31) uniform float uAmbient;
 
 void main() {
 	vec3 coords = pDBCoords.xyz / pDBCoords.w;
@@ -29,7 +32,7 @@ void main() {
 		//just gets how much color
 		float weight = clamp(pow(min(1.0, sColor.a * 10.0) + 0.01, 3.0) * 1e8 * pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
 
-		oColor = vec4(sColor.rgb * sColor.a, sColor.a) * weight;
+		oColor = vec4(sColor.rgb * uAmbient * sColor.a, sColor.a) * weight;
 		oReveal = sColor.a;
 	}
 };

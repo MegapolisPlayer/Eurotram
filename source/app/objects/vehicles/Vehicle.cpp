@@ -201,3 +201,15 @@ VehiclePhysicsData* Vehicle::getVehiclePhysicsData() noexcept {
 }
 
 Vehicle::~Vehicle() noexcept {}
+
+/*
+CONFIG VALUES
+--
+NAME=VALUE
+
+
+*/
+
+void Vehicle::loadVehicleFromConfigurationFile(Vehicle& aVehicle, const std::string_view aFilename) noexcept {
+	//TODO load from config
+}

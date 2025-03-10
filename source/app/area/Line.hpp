@@ -56,9 +56,15 @@ namespace LineData {
 	};
 };
 
+class Line;
+
+namespace UI {
+	void drawLineInfoWindow(Line& aLine) noexcept;
+}
+
 class Line {
-	friend void drawLineInfoWindow(Line& aLine) noexcept;
-public:
+	friend void UI::drawLineInfoWindow(Line& aLine) noexcept;
+	public:
 	//just initializes class - call open() later
 	Line() noexcept;
 	//loads a .etscr file - extension required!

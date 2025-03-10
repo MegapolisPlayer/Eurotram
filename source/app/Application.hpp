@@ -21,8 +21,10 @@ struct ApplicationSettings {
 	float FOV = 45.0;
 	//draw points for debug TODO
 	bool drawPoints = false;
-	//draw trigger boxes
-	bool drawTriggers = false;
+	//draw trigger boxes TODO
+	bool drawTriggers = true;
+	//allow vehicle livery change ingame
+	bool allowVehicleLiveryChange = true;
 };
 
 class Application {

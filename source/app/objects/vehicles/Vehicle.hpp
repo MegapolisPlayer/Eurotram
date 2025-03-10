@@ -111,6 +111,8 @@ public:
 	VehiclePhysicsData* getVehiclePhysicsData() noexcept;
 
 	~Vehicle() noexcept;
+
+	static void loadVehicleFromConfigurationFile(Vehicle& aVehicle, const std::string_view aFilename) noexcept;
 private:
 	Model* mModel;
 	std::vector<std::vector<Mesh*>> mBogieMeshes;

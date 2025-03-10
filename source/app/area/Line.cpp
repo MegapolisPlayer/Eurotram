@@ -446,7 +446,12 @@ namespace UI {
 		std::string controlPoints;
 		controlPoints.reserve(1000);
 
-		ImGui::Text("Control points: %s", "IPPV, FLOR");
+		//TODO find them in list
+
+		for(LineData::Station& s : aLine.mLoops[aLine.mCurrentLoopId].stations) {
+
+		}
+		ImGui::Text("Control points: %s", "");
 
 		ImGui::End();
 	}

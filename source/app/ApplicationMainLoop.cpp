@@ -46,6 +46,9 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 		case GLFW_KEY_ESCAPE:
 			aWindow->showCursor();
 			break;
+		case GLFW_KEY_F1:
+			//TODO hide gui
+			break;
 	}
 }
 void Application::rawMouseCallback(Window* aWindow, double aX, double aY) noexcept {
@@ -147,6 +150,7 @@ bool Application::runInternal() noexcept {
 	//external
 	t3rp.addVariant("Material.paint", "vojtovoPID.png", "SPID");
 	t3rp.addVariant("Material.paint", "vojtovoDPO.png", "DPO");
+	t3rp.addVariant("Material.paint", "adamovoPMDP.png", "PMDP");
 
 	//TODO starting track can be shorter than 6.45 meter
 
@@ -192,12 +196,13 @@ bool Application::runInternal() noexcept {
 	weatherShader.bind();
 	UniformMat4 whCameraMatrix(34);
 	UniformVec4 whColor(30);
+	UniformFloat whAmbient(31);
 	UniformMat4 whViewMatrix(36);
 	UniformVec2 whSize(38);
 	UniformVec3 whCamUp(39);
 	UniformVec3 whCamRight(40);
 	UniformVec3 whWeatherCenter(41);
-	WeatherHandler wh(glm::vec3(0), 10000, 0.05, 0.10, glm::vec4(0.0, 0.0, 0.5, 1.0));
+	WeatherHandler wh(glm::vec3(0), 10000, 0.05, 0.10, glm::vec4(0.0, 0.0, 0.5, 0.5));
 
 	this->runWindowFrame([&]() {
 		v.update(this->mMap, this->mLine);
@@ -264,6 +269,7 @@ bool Application::runInternal() noexcept {
 		//draw weather
 		weatherShader.bind();
 		whCameraMatrix.set(this->mCamera.getMatrix());
+		whAmbient.set(daylightIndex);
 		wh.draw(whViewMatrix, whColor, 35, 37, this->mCamera, whCamUp, whCamRight, whWeatherCenter);
 		shader.bind();
 
@@ -346,6 +352,7 @@ bool Application::runInternal() noexcept {
 		if(ImGui::Button("Change livery to PID")) t3rp.setVariant("Material.paint", "PID");
 		if(ImGui::Button("Change livery to old PID")) t3rp.setVariant("Material.paint", "SPID");
 		if(ImGui::Button("Change livery to DPO")) t3rp.setVariant("Material.paint", "DPO");
+		if(ImGui::Button("Change livery to PMDP")) t3rp.setVariant("Material.paint", "PMDP");
 
 		ImGui::End();
 
