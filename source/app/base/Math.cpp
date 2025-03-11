@@ -137,4 +137,11 @@ namespace Math {
 		float determinant = vec.x*axis.y - vec.y*axis.x;
 		return glm::degrees(std::atan2(-determinant, -dotProduct) + std::numbers::pi); //rotation around X axis - pitch
 	}
+
+	glm::vec2 swizzleXZ(const glm::vec3& aVector) noexcept {
+		return glm::vec2(aVector.x, aVector.z);
+	}
+	glm::vec2 swizzleXZ(const glm::vec4& aVector) noexcept {
+		return glm::vec2(aVector.x, aVector.z);
+	}
 }

@@ -50,6 +50,9 @@ namespace Math {
 
 	float getRotationOfVector2DY(const glm::vec2& aVector) noexcept;
 	float getRotationOfVector2DX(const glm::vec2& aVector) noexcept;
+
+	glm::vec2 swizzleXZ(const glm::vec3& aVector) noexcept;
+	glm::vec2 swizzleXZ(const glm::vec4& aVector) noexcept;
 }
 
 #endif

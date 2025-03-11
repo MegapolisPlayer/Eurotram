@@ -80,6 +80,13 @@ void Application::rawClickCallback(Window* aWindow, uint32_t aKey, uint32_t aAct
 }
 
 bool Application::runInternal() noexcept {
+	BoxTrigger bt(glm::vec3(0), glm::vec3(5, 2, 5), 45);
+	BoxTrigger bt2(glm::vec3(3.6, 0, 3.6), glm::vec3(5, 2, 5), 45.0);
+
+	std::cout << bt.collision(bt2) << '\n';
+
+	//return false;
+
 	this->mWindow.setBackgroundColor(daylightColor);
 
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
@@ -189,6 +196,10 @@ bool Application::runInternal() noexcept {
 	nightWindows->material.brightness = MAX_BRIGHTNESS;
 	nightWindows->material.specular = glm::vec4(0.0);
 
+	GMSEntry* nightStation = GlobalMaterialStore::addVariant("Material.symbol", "NIGHT");
+	nightStation->material.brightness = MAX_BRIGHTNESS;
+	nightStation->material.specular = glm::vec4(0.0);
+
 	ScreenRenderer sr;
 	OIT oit(this->mWindow);
 
@@ -288,9 +299,11 @@ bool Application::runInternal() noexcept {
 			ambientLightStrength.set(daylightIndex);
 			if(daylightIndex < 0.5) {
 				GlobalMaterialStore::setVariant("Material.windowDay", "NIGHT");
+				GlobalMaterialStore::setVariant("Material.symbol", "NIGHT");
 			}
 			else {
 				GlobalMaterialStore::resetVariant("Material.windowDay");
+				GlobalMaterialStore::resetVariant("Material.symbol");
 			}
 		}
 		if(ImGui::SliderFloat("Sun angle",  &sunAngle, 0.0, 360.0)) {

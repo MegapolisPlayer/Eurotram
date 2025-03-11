@@ -16,14 +16,12 @@ void setSeasonMaterials(const WeatherCondition aCondition) noexcept {
 	}
 }
 
-static float WEATHER_COORD_OFFSET = 0.5f;
-
 //box of size 1x1 - we scale
 static std::vector<float> WEATHER_VERTICES_BASE = {
-	-WEATHER_COORD_OFFSET, -WEATHER_COORD_OFFSET, 0.0f, 0.0f, 0.0f,
-	 WEATHER_COORD_OFFSET, -WEATHER_COORD_OFFSET, 0.0f, 1.0f, 0.0f,
-	 WEATHER_COORD_OFFSET,  WEATHER_COORD_OFFSET, 0.0f, 1.0f, 1.0f,
-	-WEATHER_COORD_OFFSET,  WEATHER_COORD_OFFSET, 0.0f, 0.0f, 1.0f,
+	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+	 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+	-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
 };
 static GLuint WEATHER_INDICES[] = {
 	0, 1, 2, 2, 3, 0
@@ -35,7 +33,7 @@ constexpr float WEATHER_HEIGHT = 25.0f;
 WeatherHandler::WeatherHandler(const glm::vec3& aCenter, const uint64_t aDropletAmount, const float aDropletX, const float aDropletY, const glm::vec4 aDropletColor) noexcept
 	: mDropletAmount(aDropletAmount), mColor(aDropletColor), mCenter(aCenter), mSingleDropVertex(nullptr, 4, 5), mSingleDropIndex(WEATHER_INDICES, 6),
 	mPositions(this->mDropletAmount), mMatrices(this->mDropletAmount), mMatrixSSBO(nullptr, 0),
-	mCenterPointSSBO(nullptr, 0), mSize(WEATHER_COORD_OFFSET*2*aDropletX, WEATHER_COORD_OFFSET*2*aDropletY),
+	mCenterPointSSBO(nullptr, 0), mSize(0.5f*2*aDropletX, 0.5f*2*aDropletY),
 	mDepthTopView(WEATHER_FBO_TEXTURE_SIZE, WEATHER_FBO_TEXTURE_SIZE, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, true, TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE),
 	mProjection(1.0), mView(1.0), mHandlerMatrix(1.0), mFrictionCoeffChange(0.0) {
 	this->mPositions.resize(this->mDropletAmount); //should not result in realloc - we set in member init list

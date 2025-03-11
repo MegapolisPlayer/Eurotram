@@ -57,6 +57,7 @@ add_executable(eurotram
 "app/objects/Switch.cpp"
 "app/objects/SwitchSignal.cpp"
 "app/objects/Track.cpp"
+"app/objects/Trigger.cpp"
 "app/objects/Wire.cpp"
 
 "app/physics/PhysBase.cpp"
