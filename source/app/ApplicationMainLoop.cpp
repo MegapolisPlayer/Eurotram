@@ -80,13 +80,6 @@ void Application::rawClickCallback(Window* aWindow, uint32_t aKey, uint32_t aAct
 }
 
 bool Application::runInternal() noexcept {
-	BoxTrigger bt(glm::vec3(0), glm::vec3(5, 2, 5), 45);
-	BoxTrigger bt2(glm::vec3(3.6, 0, 3.6), glm::vec3(5, 2, 5), 45.0);
-
-	std::cout << bt.collision(bt2) << '\n';
-
-	//return false;
-
 	this->mWindow.setBackgroundColor(daylightColor);
 
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
@@ -215,6 +208,20 @@ bool Application::runInternal() noexcept {
 	UniformVec3 whWeatherCenter(41);
 	WeatherHandler wh(glm::vec3(0), 10000, 0.05, 0.10, glm::vec4(0.0, 0.0, 0.5, 0.5));
 
+	BoxTrigger bt(glm::vec3(0), glm::vec3(5, 2, 5), 45);
+	bt.setColor(glm::vec4(0.0, 0.5, 0.0, 0.5));
+	BoxTrigger bt2(glm::vec3(3.6, 0, 3.6), glm::vec3(5, 2, 5), 45.0);
+	bt2.setColor(glm::vec4(0.5, 0.0, 0.0, 0.5));
+
+	std::cout << bt.collision(bt2) << '\n';
+
+	Shader btShader("shader/btVertex.glsl", "shader/btFragment.glsl");
+	UniformMat4 btCamera(30);
+
+	BoxTriggerDrawer btd;
+	btd.add(bt);
+	btd.add(bt2);
+
 	this->runWindowFrame([&]() {
 		v.update(this->mMap, this->mLine);
 
@@ -277,11 +284,16 @@ bool Application::runInternal() noexcept {
 		t3rp.draw(uMaterial, uModelMat, &matModelUniform, &matNormalUniform);
 		this->mMap.draw(uMaterial, uModelMat, 35, uIsInstancedRendering, &matModelUniform, &matNormalUniform);
 
+		btShader.bind();
+		btCamera.set(this->mWindow.getCamera()->getMatrix());
+		btd.draw(10, 11);
+
 		//draw weather
 		weatherShader.bind();
 		whCameraMatrix.set(this->mCamera.getMatrix());
 		whAmbient.set(daylightIndex);
 		wh.draw(whViewMatrix, whColor, 35, 37, this->mCamera, whCamUp, whCamRight, whWeatherCenter);
+
 		shader.bind();
 
 		oit.endTransparentPass(uOITEnabled);

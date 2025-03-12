@@ -13,26 +13,28 @@ struct BoxTriggerVertex {
 	float x, y, z, tc1, tc2;
 };
 
+class BoxTrigger;
+
 class BoxTriggerDrawer {
 public:
 	BoxTriggerDrawer() noexcept;
 
 	//returns id of object
-	uint64_t add() noexcept;
+	uint64_t add(BoxTrigger& aBT) noexcept;
 	void remove(const uint64_t aId) noexcept;
-	void draw() noexcept;
-
-	void show(const uint64_t aId) noexcept;
-	void hide(const uint64_t aId) noexcept;
+	void draw(const uint64_t aTransformLocation, const uint64_t aColorLocation) noexcept;
 
 	~BoxTriggerDrawer() noexcept;
 private:
-	uint64_t mAmountBoxes;
-
 	VertexArray mVAO;
 	VertexBuffer mVBO;
 	IndexBuffer mIBO;
+	std::vector<BoxTrigger*> mTriggerList;
+	std::vector<glm::mat4> mTransformsData;
 	ShaderBuffer mTransforms;
+	ShaderBuffer mColors;
+
+	bool mRecalculateData;
 };
 
 //to draw trigger box - render using drawer
@@ -51,6 +53,7 @@ public:
 	void setNewSize(const glm::vec3& aSize) noexcept;
 	void setRotation(const float aRotation) noexcept;
 
+	//disabling doesnt hide trigger!
 	void enable() noexcept;
 	void disable() noexcept;
 	void toggle() noexcept;
