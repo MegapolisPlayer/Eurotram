@@ -210,7 +210,7 @@ bool Application::runInternal() noexcept {
 
 	BoxTrigger bt(glm::vec3(0), glm::vec3(5, 2, 5), 45);
 	bt.setColor(glm::vec4(0.0, 0.5, 0.0, 0.5));
-	BoxTrigger bt2(glm::vec3(3.6, 0, 3.6), glm::vec3(5, 2, 5), 45.0);
+	BoxTrigger bt2(glm::vec3(3.6, 0, 3), glm::vec3(5, 2, 5), 45.0);
 	bt2.setColor(glm::vec4(0.5, 0.0, 0.0, 0.5));
 
 	std::cout << bt.collision(bt2) << '\n';

@@ -152,4 +152,6 @@ std::ostream& operator<<(std::ostream& aStream, const glm::vec2& aVector) noexce
 std::ostream& operator<<(std::ostream& aStream, const glm::vec3& aVector) noexcept;
 std::ostream& operator<<(std::ostream& aStream, const glm::vec4& aVector) noexcept;
 
+std::ostream& operator<<(std::ostream& aStream, const glm::mat4& aMatrix) noexcept;
+
 #endif
