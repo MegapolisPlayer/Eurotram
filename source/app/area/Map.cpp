@@ -432,15 +432,15 @@ void Map::open(const std::string_view aFilename) noexcept {
 			}
 
 			//tex coords - in correct CCW order from bottom left
-			wallVertices[wallVertices.size()-8].texCoords = glm::vec2(0.0, 0.0);
-			wallVertices[wallVertices.size()-7].texCoords = glm::vec2(1.0, 0.0);
-			wallVertices[wallVertices.size()-6].texCoords = glm::vec2(1.0, 1.0);
-			wallVertices[wallVertices.size()-5].texCoords = glm::vec2(0.0, 1.0);
+			wallVertices[wallVertices.size()-8].texCoords = wallVertices[wallVertices.size()-8].position;;
+			wallVertices[wallVertices.size()-7].texCoords = wallVertices[wallVertices.size()-7].position;;
+			wallVertices[wallVertices.size()-6].texCoords = wallVertices[wallVertices.size()-6].position;;
+			wallVertices[wallVertices.size()-5].texCoords = wallVertices[wallVertices.size()-5].position;;
 
-			wallVertices[wallVertices.size()-4].texCoords = glm::vec2(0.0, 0.0);
-			wallVertices[wallVertices.size()-3].texCoords = glm::vec2(1.0, 0.0);
-			wallVertices[wallVertices.size()-2].texCoords = glm::vec2(1.0, 1.0);
-			wallVertices[wallVertices.size()-1].texCoords = glm::vec2(0.0, 1.0);
+			wallVertices[wallVertices.size()-4].texCoords = wallVertices[wallVertices.size()-4].position;
+			wallVertices[wallVertices.size()-3].texCoords = wallVertices[wallVertices.size()-3].position;
+			wallVertices[wallVertices.size()-2].texCoords = wallVertices[wallVertices.size()-2].position;
+			wallVertices[wallVertices.size()-1].texCoords = wallVertices[wallVertices.size()-1].position;
 
 			//WallMat is prefix for texparcels
 			GMSEntry* wallMaterial = GlobalMaterialStore::getByName("WallMat."+buffer);
@@ -544,10 +544,11 @@ void Map::open(const std::string_view aFilename) noexcept {
 			}
 
 			//tex coords - in correct CCW order from bottom left
-			texparcelVertices[texparcelVertices.size()-4].texCoords = glm::vec2(0.0, 0.0);
-			texparcelVertices[texparcelVertices.size()-3].texCoords = glm::vec2(1.0, 0.0);
-			texparcelVertices[texparcelVertices.size()-2].texCoords = glm::vec2(1.0, 1.0);
-			texparcelVertices[texparcelVertices.size()-1].texCoords = glm::vec2(0.0, 1.0);
+			//texture is set to repeat
+			texparcelVertices[texparcelVertices.size()-4].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-4].position);
+			texparcelVertices[texparcelVertices.size()-3].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-3].position);
+			texparcelVertices[texparcelVertices.size()-2].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-2].position);
+			texparcelVertices[texparcelVertices.size()-1].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-1].position);
 
 			readBytesToString(fileHandle, buffer, 8); //2 station codes
 			std::getline(fileHandle, buffer, '\0'); //material name

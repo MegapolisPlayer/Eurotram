@@ -129,6 +129,18 @@ float TimerAverage::getAverageUSfloat() const noexcept {
 
 TimerAverage::~TimerAverage() noexcept {}
 
+void splitString(const std::string aString, const char aDelimiter, std::vector<std::string>& aOutputBuffer) noexcept {
+	size_t previd = 0, id = 0;
+	std::string buffer;
+	while((id = aString.find(aDelimiter, id)) != std::string::npos) {
+		buffer = aString.substr(previd, id-previd);
+		aOutputBuffer.push_back(buffer);
+		id++; //found char
+		previd = id;
+	}
+	aOutputBuffer.push_back(aString.substr(previd)); //last part (from last delim)
+}
+
 void readBytesToString(std::ifstream& aStream, std::string& aBuffer, const uint64_t aBytes) noexcept {
 	try {
 		aBuffer.resize(aBytes);

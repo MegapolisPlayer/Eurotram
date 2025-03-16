@@ -4,27 +4,13 @@
 #include "BUSE.hpp"
 
 struct VehicleInformation {
-	float mass = 0.0;
+	float mass = 0.0, length = 0.0, width = 0.0, height = 0.0;
+	uint64_t seats, standing;
+
 	float areaFront = 0.0;
 	float contactResistance = 0.0;
 
-	//TODO add list of meshes which every bogie moves
-	//something:
-	//
-	//body1 - 0,1
-	//body2 - 1,2
-	//
-	//for other meshes - apply averages of first 2 bogies
-	//
-	//TODO validation
-	//of all sizes
-	//more or equal to 2 shafts
-	//more or equal to 2 bogies
-	//
-	//TODO test on multi vehicle systems
-	//add method for duplicating data
-
-	Model* model;
+	std::string modelFile;
 	//for each bogie pair in bogieNames defined names of meshes
 	//bogie pairs in format 0&1, 1&2, 2&3
 	std::vector<std::vector<std::string>> meshNames;
@@ -33,10 +19,16 @@ struct VehicleInformation {
 	std::vector<std::string> bogieShaftSuffixes;
 	std::vector<glm::vec3> bogieCenterOffset; //relative to center of model
 	std::vector<float> bogieTrackOffset; //relative to previous, first value usually zero
+
+	std::string variantMaterial;
+	std::vector<std::pair<std::string, std::string>> variants; //for liveries, pair <variantName, variantTexture>
+
+	bool validate() noexcept;
 };
 
 struct VehiclePhysicsData {
 	float speed;
+	float maxSpeed;
 
 	//forces
 	float fceFront;
@@ -47,7 +39,8 @@ struct VehiclePhysicsData {
 	float nadal;
 
 	//weather
-	float power;
+	float motorAmount;
+	float power; //final power = power*motorAmount
 	float consumption;
 };
 
@@ -102,7 +95,13 @@ private:
 //handles movement and stuff
 class Vehicle {
 public:
-	Vehicle(Map& aMap, Line& aLine, VehicleInformation& aInfo) noexcept;
+	Vehicle(Map& aMap, Line& aLine, VehicleInformation& aInfo, Model* aModel) noexcept;
+
+	//call init separately
+	Vehicle(const std::string_view aConfigFilename) noexcept;
+
+	std::string getConfigModelFilename() const noexcept;
+	void init(Map& aMap, Line& aLine, Model* aModel) noexcept;
 
 	//update data of vehicle
 	void update(Map& aMap, Line& aLine) noexcept;
@@ -112,7 +111,8 @@ public:
 
 	~Vehicle() noexcept;
 
-	static void loadVehicleFromConfigurationFile(Vehicle& aVehicle, const std::string_view aFilename) noexcept;
+	//returns filename of model file
+	static std::string loadVehicleFromConfigurationFile(Vehicle& aVehicle, const std::string_view aFilename) noexcept;
 private:
 	Model* mModel;
 	std::vector<std::vector<Mesh*>> mBogieMeshes;

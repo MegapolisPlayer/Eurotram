@@ -117,6 +117,8 @@ private:
 
 // OTHER
 
+void splitString(const std::string aString, const char aDelimiter, std::vector<std::string>& aOutputBuffer) noexcept;
+
 void readBytesToString(std::ifstream& aStream, std::string& aBuffer, const uint64_t aBytes) noexcept;
 
 template<typename tType>

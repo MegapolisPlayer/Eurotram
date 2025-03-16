@@ -19,7 +19,7 @@ enum struct WeatherCondition : uint16_t {
 //only for rain and snow (and other falling objects)
 class WeatherHandler {
 public:
-	WeatherHandler(const glm::vec3& aCenter, const uint64_t aDropletAmount, const float aDropletX, const float aDropletY, const glm::vec4 aDropletColor) noexcept;
+	WeatherHandler(const glm::vec3& aCenter, const uint64_t aDropletAmount, const float aDropletX, const float aDropletY, const glm::vec4 aDropletColor, const float aDropSpeed) noexcept;
 
 	WeatherHandler(WeatherHandler&) noexcept = delete;
 	WeatherHandler(WeatherHandler&& aOther) noexcept;
@@ -31,7 +31,7 @@ public:
 	void endPass(Window& aWindow) noexcept;
 
 	//advance weather movement - after FBO drawn
-	void advance(const float aSpeed) noexcept;
+	void advance() noexcept;
 	//for buffer @aMovementForcerLocation - write 1 if drop should move
 	void draw(
 		UniformMat4& aViewMatrix, UniformVec4& aColorLocation,
@@ -64,6 +64,8 @@ private:
 	Texture mDepthTopView;
 
 	glm::mat4 mProjection, mView, mHandlerMatrix;
+
+	float mSpeed;
 
 	float mFrictionCoeffChange;
 	//TODO other

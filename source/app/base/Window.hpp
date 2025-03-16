@@ -15,6 +15,10 @@ class Window {
 public:
 	Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, const bool aFullscreen = false, const bool aDebug = false) noexcept;
 
+	//callback disabling doesnt apply to resize (it has no need to be disabled)
+	void enableCallbacks() noexcept;
+	void disableCallbacks() noexcept;
+
 	void enableVSync() noexcept;
 	void disableVSync() noexcept;
 
@@ -84,6 +88,8 @@ private:
 
 	//defined in Camera.cpp
 	void updateCamera() noexcept;
+
+	bool mDisableCallbacks;
 };
 
 #endif

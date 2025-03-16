@@ -2,7 +2,7 @@
 
 Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, const bool aFullscreen, const bool aDebug) noexcept
 	: mpHandle(nullptr), mReferencedCamera(NULL), mDebugEnabled(aDebug), mExitOverride(false), mCursorHidden(false), mWidth(aWidth), mHeight(aHeight),
-	 mBackgroundColor({1.0f, 0.0f, 1.0f, 1.0f}) {
+	 mBackgroundColor({1.0f, 0.0f, 1.0f, 1.0f}), mDisableCallbacks(false) {
 	if(glfwInit() != GLFW_TRUE) {
 		std::cerr << LogLevel::ERROR << "GLFW failed to initialize." << LogLevel::RESET;
 		std::exit(EXIT_FAILURE);
@@ -72,6 +72,13 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(this->mpHandle, true);
 	ImGui_ImplOpenGL3_Init("#version 450 core");
+}
+
+void Window::enableCallbacks() noexcept {
+	this->mDisableCallbacks = false;
+}
+void Window::disableCallbacks() noexcept {
+	this->mDisableCallbacks = true;
 }
 
 void Window::enableVSync() noexcept {
@@ -207,6 +214,8 @@ void Window::MouseCallback(GLFWwindow* aWindow, double aX, double aY) noexcept {
 	if(!glfwGetWindowAttrib(aWindow, GLFW_FOCUSED)) return;
 
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
+	if(ClassPointer->mDisableCallbacks) return;
+
 	for(WindowMouseCallback Callback : ClassPointer->mMouseCallbacks) {
 		Callback(ClassPointer, aX, aY);
 	}
@@ -215,6 +224,8 @@ void Window::KeyCallback(GLFWwindow* aWindow, int aKey, int aScancode, int aActi
 	if(!glfwGetWindowAttrib(aWindow, GLFW_FOCUSED)) return;
 
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
+	if(ClassPointer->mDisableCallbacks) return;
+
 	for(WindowActionCallback Callback : ClassPointer->mGenericKeyCallbacks) {
 		Callback(ClassPointer, aKey, aAction, aModifiers);
 	}
@@ -228,6 +239,8 @@ void Window::ClickCallback(GLFWwindow* aWindow, int aKey, int aAction, int aModi
 	if(!glfwGetWindowAttrib(aWindow, GLFW_FOCUSED)) return;
 
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
+	if(ClassPointer->mDisableCallbacks) return;
+
 	for(WindowActionCallback Callback : ClassPointer->mClickCallbacks) {
 		Callback(ClassPointer, aKey, aAction, aModifiers);
 	}

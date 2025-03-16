@@ -71,7 +71,10 @@ private:
 
 	glm::vec4 mColor;
 
-	bool mContainsNewData; //this class can only set it to true, drawer then sets to false
+	glm::mat4 mMatrix;
+	void recalculateMatrix() noexcept;
+	bool mRecalculateMatrix;
+	bool mContainsNewData;
 };
 
 class InputRaycast {
@@ -79,9 +82,9 @@ public:
 	InputRaycast(const glm::vec3& aOrigin, const glm::vec3 aDirection) noexcept;
 
 	//returns where exactly along ray collided or 0 if didnt
-	float collision(const BoxTrigger& aBox) noexcept;
+	bool collision(const BoxTrigger& aBox) noexcept;
 	//same as previous, but also sets the color of the box on collision
-	float collision(BoxTrigger& aBox, const glm::vec4& aBoxColor) noexcept;
+	bool collision(BoxTrigger& aBox, const glm::vec4& aBoxColor) noexcept;
 
 	void setOrigin(const glm::vec3& aOrigin) noexcept;
 	void setDirection(const glm::vec3& aDirection) noexcept;

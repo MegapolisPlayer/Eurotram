@@ -52,12 +52,11 @@ void BoxTriggerDrawer::draw(const uint64_t aTransformLocation, const uint64_t aC
 			BoxTrigger* ptr = this->mTriggerList[i];
 			if(ptr->mContainsNewData) {
 				if(!ptr->mVisible) {
-					this->mTransformsData.emplace_back(glm::mat4(0.0)); //null matrix
+					this->mTransformsData[i] = glm::mat4(0.0f); //null matrix
 				}
 				else {
-					this->mTransformsData[i] = glm::translate(glm::mat4(1.0), ptr->mCenterPoint);
-					this->mTransformsData[i] = glm::rotate(this->mTransformsData[i], glm::radians(ptr->mRotation), glm::vec3(0, 1, 0));
-					this->mTransformsData[i] = glm::scale(this->mTransformsData[i], ptr->mSize);
+					ptr->recalculateMatrix();
+					this->mTransformsData[i] = ptr->mMatrix;
 				}
 				ptr->mContainsNewData = false;
 			}
@@ -127,21 +126,17 @@ bool BoxTrigger::collision(BoxTrigger& aOther) {
 
 	//get AND ROTATE vertices
 
-	glm::mat4 m1(1.0f);
-	m1 = glm::translate(m1, this->mCenterPoint);
-	m1 = glm::rotate(m1, this->mRotation, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 m2(1.0f);
-	m2 = glm::translate(glm::mat4(1.0f), aOther.mCenterPoint);
-	m2 = glm::rotate(m2, this->mRotation, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->recalculateMatrix();
+	aOther.recalculateMatrix();
 
-	glm::vec4 vertexA1 = m1 * glm::vec4(-this->mSize.x/2.0,  -this->mSize.y/2.0, -this->mSize.z/2.0,   1.0);
-	glm::vec4 vertexA2 = m1 * glm::vec4(+this->mSize.x/2.0,  -this->mSize.y/2.0, -this->mSize.z/2.0,   1.0);
-	glm::vec4 vertexA3 = m1 * glm::vec4(+this->mSize.x/2.0,  +this->mSize.y/2.0, +this->mSize.z/2.0,   1.0);
-	glm::vec4 vertexA4 = m1 * glm::vec4(-this->mSize.x/2.0,  +this->mSize.y/2.0, +this->mSize.z/2.0,   1.0);
-	glm::vec4 vertexB1 = m2 * glm::vec4(-aOther.mSize.x/2.0, -aOther.mSize.y/2.0, -aOther.mSize.z/2.0, 1.0);
-	glm::vec4 vertexB2 = m2 * glm::vec4(+aOther.mSize.x/2.0, -aOther.mSize.y/2.0, -aOther.mSize.z/2.0, 1.0);
-	glm::vec4 vertexB3 = m2 * glm::vec4(+aOther.mSize.x/2.0, +aOther.mSize.y/2.0, +aOther.mSize.z/2.0, 1.0);
-	glm::vec4 vertexB4 = m2 * glm::vec4(-aOther.mSize.x/2.0, +aOther.mSize.y/2.0, +aOther.mSize.z/2.0, 1.0);
+	glm::vec2 vertexA1 = Math::swizzleXZ(this->mMatrix  * glm::vec4(-0.5, 0.0, -0.5, 1.0));
+	glm::vec2 vertexA2 = Math::swizzleXZ(this->mMatrix  * glm::vec4(+0.5, 0.0, -0.5, 1.0));
+	glm::vec2 vertexA3 = Math::swizzleXZ(this->mMatrix  * glm::vec4(+0.5, 0.0, +0.5, 1.0));
+	glm::vec2 vertexA4 = Math::swizzleXZ(this->mMatrix  * glm::vec4(-0.5, 0.0, +0.5, 1.0));
+	glm::vec2 vertexB1 = Math::swizzleXZ(aOther.mMatrix * glm::vec4(-0.5, 0.0, -0.5, 1.0));
+	glm::vec2 vertexB2 = Math::swizzleXZ(aOther.mMatrix * glm::vec4(+0.5, 0.0, -0.5, 1.0));
+	glm::vec2 vertexB3 = Math::swizzleXZ(aOther.mMatrix * glm::vec4(+0.5, 0.0, +0.5, 1.0));
+	glm::vec2 vertexB4 = Math::swizzleXZ(aOther.mMatrix * glm::vec4(-0.5, 0.0, +0.5, 1.0));
 
 	//DEBUG
 	//std::cout << vertexA1 << ' ' << vertexA2 << ' ' << vertexA3 << ' ' << vertexA4 << '\n';
@@ -184,14 +179,17 @@ void BoxTrigger::setColor(const glm::vec4& aColor) noexcept {
 void BoxTrigger::setCenterPoint(const glm::vec3& aNewPoint) noexcept {
 	this->mCenterPoint = aNewPoint;
 	this->mContainsNewData = true;
+	this->mRecalculateMatrix = true;
 }
 void BoxTrigger::setNewSize(const glm::vec3& aSize) noexcept {
 	this->mSize = aSize;
 	this->mContainsNewData = true;
+	this->mRecalculateMatrix = true;
 }
 void BoxTrigger::setRotation(const float aRotation) noexcept {
 	this->mRotation = aRotation;
 	this->mContainsNewData = true;
+	this->mRecalculateMatrix = true;
 }
 
 void BoxTrigger::enable() noexcept {
@@ -215,6 +213,16 @@ void BoxTrigger::hide() noexcept {
 
 BoxTrigger::~BoxTrigger() noexcept {}
 
+void BoxTrigger::recalculateMatrix() noexcept {
+	if(this->mRecalculateMatrix) return;
+
+	this->mMatrix = glm::translate(glm::mat4(1.0), this->mCenterPoint);
+	this->mMatrix = glm::rotate(this->mMatrix, glm::radians(this->mRotation), glm::vec3(0, 1, 0));
+	this->mMatrix = glm::scale(this->mMatrix, this->mSize);
+
+	this->mRecalculateMatrix = false;
+}
+
 InputRaycast::InputRaycast(const glm::vec3& aOrigin, const glm::vec3 aDirection) noexcept
 	: mOrigin(aOrigin), mDirection(aDirection), mMinT(0.0f), mMaxT(100000.0f) {
 
@@ -222,29 +230,58 @@ InputRaycast::InputRaycast(const glm::vec3& aOrigin, const glm::vec3 aDirection)
 
 //ray cast
 //source http://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/
-float InputRaycast::collision(const BoxTrigger& aBox) noexcept {
-	/*
-	glm::vec3 aabbMax = aBox.mSize;
-	glm::vec3 aabbMin = -aBox.mSize;
+bool InputRaycast::collision(const BoxTrigger& aBox) noexcept {
+	float tMin = this->mMinT;
+	float tMax = this->mMaxT;
 
-	glm::vec3 triggerWorldspace();
+	glm::vec3 aabbMax = +aBox.mSize/glm::vec3(2.0);
+	glm::vec3 aabbMin = -aBox.mSize/glm::vec3(2.0);
+
+	//scaling doesnt work properly
+	glm::mat4 localMatrix = glm::translate(glm::mat4(1.0), aBox.mCenterPoint);
+	localMatrix = glm::rotate(localMatrix, glm::radians(aBox.mRotation), glm::vec3(0, 1, 0));
+
+	glm::vec3 triggerWorldspace(localMatrix[3].x, localMatrix[3].y, localMatrix[3].z);
 	glm::vec3 delta = triggerWorldspace - this->mOrigin;
-	glm::vec3 xaxis();
 
+	glm::vec3 xaxis(localMatrix[0].x, localMatrix[0].y, localMatrix[0].z);
+	glm::vec3 yaxis(localMatrix[1].x, localMatrix[1].y, localMatrix[1].z);
+	glm::vec3 zaxis(localMatrix[2].x, localMatrix[2].y, localMatrix[2].z);
+
+	//x axis
 	float e = glm::dot(xaxis, delta);
-	float f = glm::dot(rayDirection, xaxis);
-
+	float f = glm::dot(this->mDirection, xaxis);
 	float t1 = (e+aabbMin.x)/f;
 	float t2 = (e+aabbMax.x)/f;
 
-	if(t1>t2) {
-		float w=t1; t1=t2; t2=w;
-	}
-	*/
+	if(t1>t2) { float w=t1; t1=t2; t2=w; } //swap
+	if (t2 < tMax) tMax = t2;
+	if (t1 > tMin) tMin = t1;
+	if(tMax < tMin) return false;
 
-	return 0.0; //TODO
+	//y axis
+	e = glm::dot(yaxis, delta);
+	f = glm::dot(this->mDirection, yaxis);
+	t1 = (e+aabbMin.y)/f;
+	t2 = (e+aabbMax.y)/f;
+	if(t1>t2) { float w=t1; t1=t2; t2=w; } //swap
+	if (t2 < tMax) tMax = t2;
+	if (t1 > tMin) tMin = t1;
+	if(tMax < tMin) return false;
+
+	//z axis
+	e = glm::dot(zaxis, delta);
+	f = glm::dot(this->mDirection, zaxis);
+	t1 = (e+aabbMin.z)/f;
+	t2 = (e+aabbMax.z)/f;
+	if(t1>t2) { float w=t1; t1=t2; t2=w; } //swap
+	if (t2 < tMax) tMax = t2;
+	if (t1 > tMin) tMin = t1;
+	if(tMax < tMin) return false;
+
+	return true;
 }
-float InputRaycast::collision(BoxTrigger& aBox, const glm::vec4& aBoxColor) noexcept {
+bool InputRaycast::collision(BoxTrigger& aBox, const glm::vec4& aBoxColor) noexcept {
 	float result = this->collision(aBox);
 	if(result != 0.0) {
 		aBox.setColor(aBoxColor);

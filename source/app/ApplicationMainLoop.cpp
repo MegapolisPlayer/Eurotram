@@ -9,6 +9,8 @@ static bool moveWithSpotlight = true;
 static std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
 static float daylightIndex = 1.0f; //TODO
 
+static bool hideGui = false;
+
 void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) noexcept {
 	if(aAction == GLFW_RELEASE || !aWindow->isCursorHidden()) return;
 
@@ -43,11 +45,8 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 		case GLFW_KEY_P:
 			moveWithSpotlight = !moveWithSpotlight;
 			break;
-		case GLFW_KEY_ESCAPE:
-			aWindow->showCursor();
-			break;
 		case GLFW_KEY_F1:
-			//TODO hide gui
+			hideGui = !hideGui;
 			break;
 	}
 }
@@ -140,32 +139,16 @@ bool Application::runInternal() noexcept {
 
 	float sunAngle = 0;
 
-	std::cout << "Loading T3R.P model...\n";
-	//Model t3rp(std::filesystem::path("./untitled.glb"));
-	Model t3rp(std::filesystem::path("./T3.glb"));
-	std::cout << "Model loaded!\n";
-	t3rp.addVariant("Material.paint", "PaintTexturePLF.png", "PLF");
-	t3rp.addVariant("Material.paint", "PaintTexturePID.png", "PID");
-
-	//external
-	t3rp.addVariant("Material.paint", "vojtovoPID.png", "SPID");
-	t3rp.addVariant("Material.paint", "vojtovoDPO.png", "DPO");
-	t3rp.addVariant("Material.paint", "adamovoPMDP.png", "PMDP");
-
 	//TODO starting track can be shorter than 6.45 meter
 
-	VehicleInformation t3rpInfo;
-	t3rpInfo.model = &t3rp;
-	t3rpInfo.bogieNames.push_back("T3 bogie 1");
-	t3rpInfo.bogieNames.push_back("T3 bogie 2");
-	t3rpInfo.bogieShaftSuffixes.push_back(" wheels F");
-	t3rpInfo.bogieShaftSuffixes.push_back(" wheels B");
-	t3rpInfo.bogieTrackOffset.push_back(0.0);
-	t3rpInfo.bogieTrackOffset.push_back(6.45);
-	t3rpInfo.bogieCenterOffset.push_back(glm::vec3(0.0, 0.0, 3.225));
-	t3rpInfo.bogieCenterOffset.push_back(glm::vec3(0.0, 0.0, -3.225));
+	Vehicle v("t3rp.cfg");
 
-	Vehicle v(this->mMap, this->mLine, t3rpInfo);
+	std::cout << "Loading T3R.P model...\n";
+	//Model t3rp(std::filesystem::path("./untitled.glb"));
+	Model t3rp(std::filesystem::path(v.getConfigModelFilename()));
+	std::cout << "Model loaded!\n";
+
+	v.init(this->mMap, this->mLine, &t3rp);
 	v.getVehiclePhysicsData()->speed = 0.1;
 
 	shader.bind();
@@ -206,7 +189,7 @@ bool Application::runInternal() noexcept {
 	UniformVec3 whCamUp(39);
 	UniformVec3 whCamRight(40);
 	UniformVec3 whWeatherCenter(41);
-	WeatherHandler wh(glm::vec3(0), 10000, 0.05, 0.10, glm::vec4(0.0, 0.0, 0.5, 0.5));
+	WeatherHandler wh(glm::vec3(0), 10000, 0.05, 0.10, glm::vec4(0.0, 0.0, 0.5, 0.5), 0.15);
 
 	BoxTrigger bt(glm::vec3(0), glm::vec3(5, 2, 5), 45);
 	bt.setColor(glm::vec4(0.0, 0.5, 0.0, 0.5));
@@ -222,12 +205,14 @@ bool Application::runInternal() noexcept {
 	btd.add(bt);
 	btd.add(bt2);
 
+	InputRaycast ir(glm::vec3(0.0), glm::vec3(0.0));
+
 	this->runWindowFrame([&]() {
 		v.update(this->mMap, this->mLine);
 
 		this->mMap.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
 		wh.move(glm::vec3(this->mCamera.getPosition().x, 0.0, this->mCamera.getPosition().z));
-		wh.advance(0.15);
+		wh.advance();
 
 		shadowMapProgram.bind();
 		t3rp.sendAnimationDataToShader(lmat);
@@ -260,6 +245,10 @@ bool Application::runInternal() noexcept {
 		}
 		uSpots.update(&s);
 		ss.setPosDirection(s.position, s.direction);
+		ir.setOrigin(s.position); //update ray
+		ir.setDirection(s.direction);
+
+		std::cout << ir.collision(bt) << ',' << ir.collision(bt2) << '\n';
 
 		matCameraUniform.set(this->mWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(this->mWindow.getCamera()->getPosition());
@@ -304,90 +293,92 @@ bool Application::runInternal() noexcept {
 
 		shader.bind();
 
-		ImGui::Begin("Ingame settings");
+		if(!hideGui) {
+			ImGui::Begin("Ingame settings");
 
-		if(ImGui::SliderFloat("Daylight index",  &daylightIndex, 0.0, 1.0)) {
-			this->mWindow.setBackgroundColor(daylightColor*daylightIndex);
-			ambientLightStrength.set(daylightIndex);
-			if(daylightIndex < 0.5) {
-				GlobalMaterialStore::setVariant("Material.windowDay", "NIGHT");
-				GlobalMaterialStore::setVariant("Material.symbol", "NIGHT");
+			if(ImGui::SliderFloat("Daylight index",  &daylightIndex, 0.0, 1.0)) {
+				this->mWindow.setBackgroundColor(daylightColor*daylightIndex);
+				ambientLightStrength.set(daylightIndex);
+				if(daylightIndex < 0.5) {
+					GlobalMaterialStore::setVariant("Material.windowDay", "NIGHT");
+					GlobalMaterialStore::setVariant("Material.symbol", "NIGHT");
+				}
+				else {
+					GlobalMaterialStore::resetVariant("Material.windowDay");
+					GlobalMaterialStore::resetVariant("Material.symbol");
+				}
 			}
-			else {
-				GlobalMaterialStore::resetVariant("Material.windowDay");
-				GlobalMaterialStore::resetVariant("Material.symbol");
+			if(ImGui::SliderFloat("Sun angle",  &sunAngle, 0.0, 360.0)) {
+				rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(sunAngle), glm::vec3(1.0f, 0.0f, 0.0f));
+
+				lightPos = glm::vec3(rotationMatrix * glm::vec4(glm::vec3(0.0f, 0.0f, 20.0f), 1.0f));
+
+				d.direction = glm::normalize(glm::vec4(lightPos, 1.0));
+				//mainWindow.getCamera()->moveTo(lightPos);
+
+				ds.setPosDirection(lightPos, -d.direction);
+
+				shader.bind();
+
+				uDirlight.update(&d);
+				uDirlight.set();
 			}
+
+			ImGui::End();
+
+			ImGui::Begin("Frame");
+
+			ImGui::Text("Frame time: %fms / %fus", this->mFrameTimer.getMSfloat(), this->mFrameTimer.getUSfloat());
+			ImGui::Text("FPS: %f", 1000.0/this->mFrameTimer.getMSfloat());
+
+			ImGui::End();
+
+			UI::drawLineInfoWindow(this->mLine);
+
+			ImGui::Begin("Physics");
+
+			ImGui::Text("Gravitational force (vertical): %f N", 0.0);
+			ImGui::Text("Friction force: %f N", 0.0);
+			ImGui::Text("Friction cf.: %f", 0.0);
+			ImGui::Text("Friction cf. mod.: %s", "none"); //seasons, leaves, ice...
+			ImGui::Text("Acceleration force: %f N", 0.0);
+			ImGui::Text("Brake force: %f N", 0.0);
+			ImGui::Text("Cetripetal force: %f N", 0.0);
+			ImGui::Text("L/V ratio: %f ", 0.0);
+
+			ImGui::End();
+
+			ImGui::Begin("Electricity");
+
+			ImGui::Text("Voltage in network: %f V", 0.0);
+			ImGui::Text("Amperage in network: %f A", 0.0);
+			ImGui::Text("Contact resistance: %f Ohm", 0.0);
+			ImGui::Text("Contact resistance modifiers: %s", "none"); //ice, rain...
+			ImGui::Text("Voltage at pantograph: %f V", 0.0);
+			ImGui::Text("Amperage at pantograph: %f A", 0.0);
+			ImGui::Text("Breakers: %s", "none"); //rain, ice...
+
+			ImGui::End();
+
+			ImGui::Begin("Visual");
+
+			if(ImGui::Button("Change livery to normal")) t3rp.resetVariant("Material.paint");
+			if(ImGui::Button("Change livery to PLF")) t3rp.setVariant("Material.paint", "PLF");
+			if(ImGui::Button("Change livery to PID")) t3rp.setVariant("Material.paint", "PID");
+			if(ImGui::Button("Change livery to old PID")) t3rp.setVariant("Material.paint", "SPID");
+			if(ImGui::Button("Change livery to DPO")) t3rp.setVariant("Material.paint", "DPO");
+			if(ImGui::Button("Change livery to PMDP")) t3rp.setVariant("Material.paint", "PMDP");
+
+			ImGui::End();
+
+			ImGui::Begin("Announcements");
+
+			if(ImGui::Button("Next announcement")) {
+				this->mLine.next(this->mMinuteTime);
+			};
+
+			ImGui::End();
 		}
-		if(ImGui::SliderFloat("Sun angle",  &sunAngle, 0.0, 360.0)) {
-			rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(sunAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-
-			lightPos = glm::vec3(rotationMatrix * glm::vec4(glm::vec3(0.0f, 0.0f, 20.0f), 1.0f));
-
-			d.direction = glm::normalize(glm::vec4(lightPos, 1.0));
-			//mainWindow.getCamera()->moveTo(lightPos);
-
-			ds.setPosDirection(lightPos, -d.direction);
-
-			shader.bind();
-
-			uDirlight.update(&d);
-			uDirlight.set();
-		}
-
-		ImGui::End();
-
-		ImGui::Begin("Frame");
-
-		ImGui::Text("Frame time: %fms / %fus", this->mFrameTimer.getMSfloat(), this->mFrameTimer.getUSfloat());
-		ImGui::Text("FPS: %f", 1000.0/this->mFrameTimer.getMSfloat());
-
-		ImGui::End();
-
-		UI::drawLineInfoWindow(this->mLine);
-
-		ImGui::Begin("Physics");
-
-		ImGui::Text("Gravitational force (vertical): %f N", 0.0);
-		ImGui::Text("Friction force: %f N", 0.0);
-		ImGui::Text("Friction cf.: %f", 0.0);
-		ImGui::Text("Friction cf. mod.: %s", "none"); //seasons, leaves, ice...
-		ImGui::Text("Acceleration force: %f N", 0.0);
-		ImGui::Text("Brake force: %f N", 0.0);
-		ImGui::Text("Cetripetal force: %f N", 0.0);
-		ImGui::Text("L/V ratio: %f ", 0.0);
-
-		ImGui::End();
-
-		ImGui::Begin("Electricity");
-
-		ImGui::Text("Voltage in network: %f V", 0.0);
-		ImGui::Text("Amperage in network: %f A", 0.0);
-		ImGui::Text("Contact resistance: %f Ohm", 0.0);
-		ImGui::Text("Contact resistance modifiers: %s", "none"); //ice, rain...
-		ImGui::Text("Voltage at pantograph: %f V", 0.0);
-		ImGui::Text("Amperage at pantograph: %f A", 0.0);
-		ImGui::Text("Breakers: %s", "none"); //rain, ice...
-
-		ImGui::End();
-
-		ImGui::Begin("Visual");
-
-		if(ImGui::Button("Change livery to normal")) t3rp.resetVariant("Material.paint");
-		if(ImGui::Button("Change livery to PLF")) t3rp.setVariant("Material.paint", "PLF");
-		if(ImGui::Button("Change livery to PID")) t3rp.setVariant("Material.paint", "PID");
-		if(ImGui::Button("Change livery to old PID")) t3rp.setVariant("Material.paint", "SPID");
-		if(ImGui::Button("Change livery to DPO")) t3rp.setVariant("Material.paint", "DPO");
-		if(ImGui::Button("Change livery to PMDP")) t3rp.setVariant("Material.paint", "PMDP");
-
-		ImGui::End();
-
-		ImGui::Begin("Announcements");
-
-		if(ImGui::Button("Next announcement")) {
-			this->mLine.next(this->mMinuteTime);
-		};
-
-		ImGui::End();
 
 		return true;
 	});

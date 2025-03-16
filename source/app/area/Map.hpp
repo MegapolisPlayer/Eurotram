@@ -11,7 +11,7 @@ constexpr uint64_t MAP_FILE_FORMAT_VERSION = 0;
 //prefixes and extensions for loading texture files
 constexpr std::string TEXPARCEL_TEXTURE_PREFIX = "texparcel/tp-";
 constexpr std::string WALL_TEXTURE_PREFIX = "wall/wall-";
-constexpr std::string TEXTURE_EXTENSION = "png";
+constexpr std::string TEXTURE_EXTENSION = "jpg";
 
 //small modifier
 constexpr float TRACK_Z_FIGHT_AVOIDANCE = 0.01;

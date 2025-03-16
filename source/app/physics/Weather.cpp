@@ -30,12 +30,13 @@ static GLuint WEATHER_INDICES[] = {
 constexpr uint64_t WEATHER_FBO_TEXTURE_SIZE = 1024;
 constexpr float WEATHER_HEIGHT = 25.0f;
 
-WeatherHandler::WeatherHandler(const glm::vec3& aCenter, const uint64_t aDropletAmount, const float aDropletX, const float aDropletY, const glm::vec4 aDropletColor) noexcept
+WeatherHandler::WeatherHandler(const glm::vec3& aCenter, const uint64_t aDropletAmount, const float aDropletX, const float aDropletY, const glm::vec4 aDropletColor, const float aDropSpeed) noexcept
 	: mDropletAmount(aDropletAmount), mColor(aDropletColor), mCenter(aCenter), mSingleDropVertex(nullptr, 4, 5), mSingleDropIndex(WEATHER_INDICES, 6),
 	mPositions(this->mDropletAmount), mMatrices(this->mDropletAmount), mMatrixSSBO(nullptr, 0),
 	mCenterPointSSBO(nullptr, 0), mSize(0.5f*2*aDropletX, 0.5f*2*aDropletY),
 	mDepthTopView(WEATHER_FBO_TEXTURE_SIZE, WEATHER_FBO_TEXTURE_SIZE, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, true, TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE),
-	mProjection(1.0), mView(1.0), mHandlerMatrix(1.0), mFrictionCoeffChange(0.0) {
+	mProjection(1.0), mView(1.0), mHandlerMatrix(1.0), mSpeed(aDropSpeed),
+	mFrictionCoeffChange(0.0) {
 	this->mPositions.resize(this->mDropletAmount); //should not result in realloc - we set in member init list
 	this->mMatrices.resize(this->mDropletAmount);
 	this->mMatrixSSBO = ShaderBuffer(this->mMatrices.data(), this->mMatrices.size()*sizeof(glm::mat4));
@@ -79,15 +80,16 @@ WeatherHandler::WeatherHandler(const glm::vec3& aCenter, const uint64_t aDroplet
 	this->mTopView.unbind();
 }
 WeatherHandler::WeatherHandler(WeatherHandler&& aOther) noexcept
-	: mDropletAmount(std::move(aOther.mDropletAmount)), mColor(std::move(aOther.mColor)), mCenter(std::move(aOther.mCenter)), mVAO(std::move(aOther.mVAO)),
+	: mDropletAmount(aOther.mDropletAmount), mColor(std::move(aOther.mColor)), mCenter(std::move(aOther.mCenter)), mVAO(std::move(aOther.mVAO)),
 	mSingleDropVertex(std::move(aOther.mSingleDropVertex)), mSingleDropIndex(std::move(aOther.mSingleDropIndex)),
 	mPositions(std::move(aOther.mPositions)), mMatrices(std::move(aOther.mMatrices)), mMatrixSSBO(std::move(aOther.mMatrixSSBO)),
 	mCenterPointSSBO(std::move(aOther.mCenterPointSSBO)), mSize(std::move(aOther.mSize)),
 	mTopView(std::move(aOther.mTopView)), mDepthTopView(std::move(aOther.mDepthTopView)),
 	mProjection(std::move(aOther.mProjection)), mView(std::move(aOther.mView)), mHandlerMatrix(std::move(aOther.mHandlerMatrix)),
-	mFrictionCoeffChange(std::move(aOther.mFrictionCoeffChange)) {}
+	mSpeed(aOther.mSpeed),
+	mFrictionCoeffChange(aOther.mFrictionCoeffChange) {}
 WeatherHandler& WeatherHandler::operator=(WeatherHandler&& aOther) noexcept {
-	this->mDropletAmount = std::move(aOther.mDropletAmount);
+	this->mDropletAmount = aOther.mDropletAmount;
 	this->mColor = std::move(aOther.mColor);
 	this->mCenter = std::move(aOther.mCenter);
 	this->mVAO = std::move(aOther.mVAO);
@@ -103,7 +105,9 @@ WeatherHandler& WeatherHandler::operator=(WeatherHandler&& aOther) noexcept {
 	this->mProjection = std::move(aOther.mProjection);
 	this->mView = std::move(aOther.mView);
 	this->mHandlerMatrix = std::move(aOther.mHandlerMatrix);
-	this->mFrictionCoeffChange = std::move(aOther.mFrictionCoeffChange);
+	this->mSpeed = aOther.mSpeed;
+
+	this->mFrictionCoeffChange = aOther.mFrictionCoeffChange;
 
 	return *this;
 }
@@ -122,7 +126,7 @@ void WeatherHandler::endPass(Window& aWindow) noexcept {
 	aWindow.resetViewport();
 }
 
-void WeatherHandler::advance(const float aSpeed) noexcept {
+void WeatherHandler::advance() noexcept {
 	for(uint64_t i = 0; i < this->mDropletAmount; i++) {
 		//if depth smaller than value in DB (not deutsche bahn but depth buffer)
 		//we attemped to set this value in shader - WE CANNOT BECAUSE SOME FRAGMENTS GET DISCARDED AND THEY DONT RUN
@@ -130,7 +134,7 @@ void WeatherHandler::advance(const float aSpeed) noexcept {
 		if(this->mPositions[i].y <= this->mCenter.y-WEATHER_HEIGHT) {
 			this->mPositions[i].y += 2*WEATHER_HEIGHT;
 		}
-		this->mPositions[i].y -= aSpeed;
+		this->mPositions[i].y -= this->mSpeed;
 		this->mMatrices[i] = glm::translate(glm::mat4(1.0), this->mCenter+glm::vec3(this->mPositions[i]));
 	}
 }

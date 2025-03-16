@@ -1,5 +1,12 @@
 #include "Vehicle.hpp"
 
+bool VehicleInformation::validate() noexcept {
+	return
+		this->bogieCenterOffset.size() == this->bogieTrackOffset.size() &&
+		this->bogieShaftSuffixes.size() == 2 &&
+		(this->bogieNames.size() == this->meshNames.size()-1 || this->meshNames.empty());
+}
+
 BogieMovement::BogieMovement() noexcept
 	: mBogie(nullptr), mShaft1(nullptr), mShaft2(nullptr), mLengthRemaining(0.0), mTrackId(0), mSwitchCount(0) {}
 
@@ -111,33 +118,175 @@ void BogieMovement::validate() const noexcept {
 
 BogieMovement::~BogieMovement() noexcept {}
 
-Vehicle::Vehicle(Map& aMap, Line& aLine, VehicleInformation& aInfo) noexcept {
-	//TODO add error info and more validation
-	assert(aInfo.bogieShaftSuffixes.size() == 2);
-	assert(aInfo.bogieNames.size() == aInfo.bogieTrackOffset.size());
-	assert(aInfo.meshNames.size() == aInfo.bogieNames.size()-1 || aInfo.meshNames.empty());
+Vehicle::Vehicle(Map& aMap, Line& aLine, VehicleInformation& aInfo, Model* aModel) noexcept {
+	if(!aInfo.validate()) {
+		std::cerr << LogLevel::ERROR << "Vehicle information invalid!\n" << LogLevel::RESET;
+		return;
+	}
 
-	this->mModel = aInfo.model;
+	this->mModel = nullptr;
+	this->mInfo = aInfo;
+	this->init(aMap, aLine, aModel);
+}
 
-	for(uint64_t i = 0; i < aInfo.bogieNames.size(); i++) {
+/*
+ * CONFIG VALUES
+ * --
+ * NAME=VALUE
+ * NAME=VALUE,VALUE;
+ */
+
+constexpr char SEPARATOR_LOW = ',';
+constexpr char SEPARATOR_HIGH = ';';
+
+Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
+	std::ifstream file;
+	file.open(aConfigFilename.data(), std::ios::in); //text mode
+	if(!file.is_open()) {
+		std::cerr << LogLevel::ERROR << "File " << aConfigFilename << " could not be opened!\n" << LogLevel::RESET;
+		return;
+	}
+
+	std::string buffer;
+	while(std::getline(file, buffer)) {
+		if(buffer.empty()) continue;
+		if(buffer[0] == '#') continue; //comment
+
+		std::string name = buffer.substr(0, buffer.find('='));
+		std::string value = buffer.substr(buffer.find('=')+1);
+
+		std::cout << "Vehicle config: " << value << " is " << name << '\n';
+
+		if(name == "MODEL") this->mInfo.modelFile = value; //model loading/setting separate
+		else if(name == "MASS") this->mInfo.mass = std::stof(value);
+		else if(name == "LENGTH") this->mInfo.length = std::stof(value);
+		else if(name == "WIDTH") this->mInfo.width = std::stof(value);
+		else if(name == "HEIGHT") this->mInfo.height = std::stof(value);
+		else if(name == "SEATS") this->mInfo.seats = std::stoull(value);
+		else if(name == "STANDING") this->mInfo.standing = std::stoull(value);
+		else if(name == "MOTORS") this->mPhysicsData.motorAmount = std::stof(value);
+		else if(name == "POWER") this->mPhysicsData.power = std::stof(value);
+		else if(name == "SPEED") this->mPhysicsData.maxSpeed = std::stof(value);
+		else if(name == "BOGIENAMES") {
+			std::vector<std::string> names;
+			splitString(value, SEPARATOR_LOW, names);
+			this->mInfo.bogieNames = std::move(names);
+		}
+		else if(name == "BOGIEWHEELS") {
+			std::vector<std::string> suffixes;
+			splitString(value, SEPARATOR_LOW, suffixes);
+			if(suffixes.size() != 2) {
+				std::cerr << LogLevel::ERROR << "More than 2 axle suffixes present - tram bogie cannot have more than 2 axles! (" <<suffixes.size() << " found)\n" << LogLevel::RESET;
+				return;
+			}
+			this->mInfo.bogieShaftSuffixes = std::move(suffixes);
+		}
+		else if(name == "BOGIEMESHES") {
+			if(value.size() == 0) {
+				std::cerr << LogLevel::WARNING << "No meshes set, using default.\n" << LogLevel::RESET;
+				continue; //dont bother
+			}
+
+			std::vector<std::string> meshNameLists;
+			splitString(value, SEPARATOR_HIGH, meshNameLists);
+
+			for(uint64_t i = 0; i < meshNameLists.size(); i++) {
+				std::vector<std::string> meshNames;
+				splitString(meshNameLists[i], SEPARATOR_LOW, meshNames);
+				this->mInfo.meshNames.push_back(meshNames);
+			}
+		}
+		else if(name == "BOGIEOFFSETS") {
+			std::vector<std::string> offsets;
+			splitString(value, SEPARATOR_HIGH, offsets);
+			for(uint64_t i = 0; i < offsets.size(); i++) {
+				std::vector<std::string> vector;
+				splitString(offsets[i], SEPARATOR_LOW, vector);
+				if(vector.size() != 2) {
+					std::cerr << LogLevel::ERROR << "Vector doesn't contain 2 values: add only values for X and Z axes! (" << vector.size() << " values found)\n" << LogLevel::RESET;
+					return;
+				}
+				this->mInfo.bogieCenterOffset.push_back(glm::vec3(std::stof(vector[0]), 0.0f, std::stof(vector[1])));
+			}
+		}
+		else if(name == "BOGIETROFFSETS") {
+			std::vector<std::string> offsets;
+			splitString(value, SEPARATOR_LOW, offsets);
+			for(uint64_t i = 0; i < offsets.size(); i++) {
+				this->mInfo.bogieTrackOffset.push_back(std::stof(offsets[i]));
+			}
+		}
+		else if(name == "LIVERYMAT") this->mInfo.variantMaterial = value;
+		else if(name == "LIVERY") {
+			std::vector<std::string> values;
+			splitString(value, SEPARATOR_LOW, values);
+			this->mInfo.variants.push_back(std::make_pair(values[0], values[1]));
+		}
+
+		//TODO config sounds - load into vehicle itself so multiple vehicle can play at once
+		else if(name == "SOUNDOPENDOOR") {}
+		else if(name == "SOUNDCLOSEDOOR") {}
+		else if(name == "SOUNDOPENCABIN") {}
+		else if(name == "SOUNDCLOSECABIN") {}
+		else if(name == "SOUNDSTART") {}
+		else if(name == "SOUNDRIDE1") {}
+		else if(name == "SOUNDRRIDE1") {}
+		else if(name == "SOUNDRIDE2") {}
+		else if(name == "SOUNDRRIDE2") {}
+		else if(name == "SOUNDRIDE3") {}
+		else if(name == "SOUNDRRIDE3") {}
+		else if(name == "SOUNDBRAKE") {}
+		else if(name == "SOUNDSWITCH") {}
+		else if(name == "SOUNDINFO") {}
+
+		//future config values go here TODO
+
+		else {
+			std::cerr << LogLevel::ERROR << "Unknown configuration value "+name+" - check the spelling and try again.\n" << LogLevel::RESET;
+			return;
+		}
+	}
+
+	file.close();
+
+	if(!this->mInfo.validate()) {
+		std::cerr << LogLevel::ERROR << "Config invalid!\n" << LogLevel::RESET;
+		return;
+	}
+
+	std::cout << "Vehicle configration loaded!\n";
+}
+
+std::string Vehicle::getConfigModelFilename() const noexcept {
+	return this->mInfo.modelFile;
+}
+void Vehicle::init(Map& aMap, Line& aLine, Model* aModel) noexcept {
+	this->mModel = aModel;
+
+	for(uint64_t i = 0; i < this->mInfo.bogieNames.size(); i++) {
 		this->mBogies.emplace_back();
-		this->mBogies[i].init(aMap, aLine, aInfo.bogieTrackOffset[i]);
-		this->mBogies[i].setData(*aInfo.model, aInfo.bogieNames[i], aInfo.bogieShaftSuffixes[0], aInfo.bogieShaftSuffixes[1], aInfo.bogieCenterOffset[i]);
+		this->mBogies[i].init(aMap, aLine, this->mInfo.bogieTrackOffset[i]);
+		this->mBogies[i].setData(*this->mModel, this->mInfo.bogieNames[i], this->mInfo.bogieShaftSuffixes[0], this->mInfo.bogieShaftSuffixes[1], this->mInfo.bogieCenterOffset[i]);
 		this->mBogies[i].validate();
 
 		//add meshes which are to be update
-		if(i != 0 && !aInfo.meshNames.empty()) {
+		if(i != 0 && !this->mInfo.meshNames.empty()) {
 			this->mBogieMeshes.emplace_back();
-			for(uint64_t j = 0; j < aInfo.meshNames[i-1].size(); j++) {
-				Mesh* ptr = aInfo.model->getMesh(aInfo.meshNames[i-1][j]);
+			for(uint64_t j = 0; j < this->mInfo.meshNames[i-1].size(); j++) {
+				Mesh* ptr = this->mModel->getMesh(this->mInfo.meshNames[i-1][j]);
 				if(ptr) {
 					this->mBogieMeshes.back().push_back(ptr);
 				}
 				else {
-					std::cerr << LogLevel::WARNING << "Invalid mesh with name " << aInfo.meshNames[i-1][j] << " passed to vehicle.\n" << LogLevel::RESET;
+					std::cerr << LogLevel::WARNING << "Invalid mesh with name " << this->mInfo.meshNames[i-1][j] << " passed to vehicle.\n" << LogLevel::RESET;
 				}
 			}
 		}
+	}
+
+	for(uint64_t i = 0; i < this->mInfo.variants.size(); i++) {
+		//first in pair is name, second in pair is filepath
+		this->mModel->addVariant(this->mInfo.variantMaterial, this->mInfo.variants[i].second, this->mInfo.variants[i].first);
 	}
 }
 
@@ -201,15 +350,3 @@ VehiclePhysicsData* Vehicle::getVehiclePhysicsData() noexcept {
 }
 
 Vehicle::~Vehicle() noexcept {}
-
-/*
-CONFIG VALUES
---
-NAME=VALUE
-
-
-*/
-
-void Vehicle::loadVehicleFromConfigurationFile(Vehicle& aVehicle, const std::string_view aFilename) noexcept {
-	//TODO load from config
-}

@@ -43,8 +43,8 @@ public:
 	static void rawMouseCallback(Window* aWindow, double aX, double aY) noexcept;
 	static void rawClickCallback(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) noexcept;
 
-	void togglePauseMenu() noexcept;
-	void renderPauseMenu() noexcept;
+	static void togglePauseMenu(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) noexcept;
+	bool renderPauseMenu() noexcept;
 
 	//*this passed as parameter
 	//return true if continue, false for exit
@@ -58,7 +58,7 @@ public:
 	~Application() noexcept;
 private:
 	ApplicationSettings mSettings;
-	bool mPauseEnabled;
+	static bool mPauseEnabled; //glfw callbacks are static, non-static instance(s) check this when rendering
 	ApplicationRenderState mPhase;
 
 	Window mWindow;

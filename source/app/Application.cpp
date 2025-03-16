@@ -1,5 +1,7 @@
 #include "Application.hpp"
 
+bool Application::mPauseEnabled = false;
+
 Application::Application() noexcept
 	: mWindow("Eurotram", 1280, 720, false, true),
 	mCamera(&this->mWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 1000.0f, 0.1f),
@@ -10,6 +12,8 @@ Application::Application() noexcept
 	this->mWindow.registerGenericKeyCallback(Application::rawKeyCallback);
 	this->mWindow.registerMouseCallback(Application::rawMouseCallback);
 	this->mWindow.registerClickCallback(Application::rawClickCallback);
+
+	this->mWindow.registerKeyCallback(GLFW_KEY_ESCAPE, Application::togglePauseMenu);
 
 	//defaults TODO change
 	this->mAnnunciatorPath = "Linka13.etanc";
@@ -107,11 +111,41 @@ bool Application::renderSettingsMenu() noexcept {
 	return false;
 }
 
-void Application::togglePauseMenu() noexcept {
-	this->mPauseEnabled = !this->mPauseEnabled;
-}
-void Application::renderPauseMenu() noexcept {
+void Application::togglePauseMenu(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) noexcept {
+	if(aAction != GLFW_PRESS) return;
 
+	Application::mPauseEnabled = !Application::mPauseEnabled;
+
+	//force show cursor so no softlock
+	if(Application::mPauseEnabled) {
+		aWindow->showCursor();
+		aWindow->disableCallbacks();
+	}
+	else {
+		aWindow->hideCursor();
+		aWindow->enableCallbacks();
+	}
+}
+bool Application::renderPauseMenu() noexcept {
+	if(Application::mPauseEnabled) {
+		ImGui::SetNextWindowPos(ImVec2(this->mWindow.getWidth()/6.0-this->mWindow.getWidth()/3.0, 100));
+		ImGui::SetNextWindowSize(ImVec2(this->mWindow.getWidth()/3.0, this->mWindow.getHeight()-200));
+		ImGui::Begin("Pause menu");
+
+		if(ImGui::Button("Continue")) {
+			Application::togglePauseMenu(&this->mWindow, GLFW_KEY_ESCAPE, GLFW_PRESS, 0);
+			ImGui::End();
+			return true;
+		}
+		if(ImGui::Button("Quit")) {
+			ImGui::End();
+			return false;
+		}
+
+		ImGui::End();
+	}
+
+	return true;
 }
 
 void Application::run() noexcept {
@@ -144,7 +178,6 @@ void Application::run() noexcept {
 		std::cerr << LogLevel::ERROR << "Application error in preparation phase!\n" << LogLevel::RESET;
 	}
 
-	std::cout << "Application frametime average\n" << this->mAverageFrameTime.getAverageUSfloat() << "us\n";
 	this->terminate();
 }
 
@@ -172,11 +205,20 @@ void Application::runWindowFrame(std::function<bool()> aFunction) noexcept {
 			}
 		}
 
+		//render pause menu
+		if(!this->renderPauseMenu()) {
+			//if false - quit button pressed
+			this->mWindow.endFrame();
+			return;
+		}
+
 		this->mWindow.endFrame();
 		this->mFrameTimer.end(this->mAverageFrameTime);
 	}
 }
 
-void Application::terminate() noexcept {}
+void Application::terminate() noexcept {
+	std::cout << "Application frametime average\n" << this->mAverageFrameTime.getAverageUSfloat() << "us\n";
+}
 
 Application::~Application() noexcept {}
