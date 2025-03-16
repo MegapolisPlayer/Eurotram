@@ -10,6 +10,9 @@ static std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0
 static float daylightIndex = 1.0f; //TODO
 
 static bool hideGui = false;
+static bool cameraFollowsVehicle = false;
+
+static float* vehicleSpeedRef = nullptr;
 
 void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) noexcept {
 	if(aAction == GLFW_RELEASE || !aWindow->isCursorHidden()) return;
@@ -37,7 +40,7 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 			aWindow->getCamera()->moveTo({0.0f, 0.0f, 0.0f});
 			break;
 		case GLFW_KEY_C:
-			aWindow->getCamera()->moveTo(lightPos);
+			cameraFollowsVehicle = !cameraFollowsVehicle;
 			break;
 		case GLFW_KEY_X:
 			aWindow->close();
@@ -47,6 +50,15 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 			break;
 		case GLFW_KEY_F1:
 			hideGui = !hideGui;
+			break;
+		//TODO convert to acceleration
+		//TODO support reverse spped
+		//TODO abstract to controller
+		case GLFW_KEY_KP_ADD:
+			*vehicleSpeedRef += 0.005;
+			break;
+		case GLFW_KEY_KP_SUBTRACT:
+			*vehicleSpeedRef -= 0.005;
 			break;
 	}
 }
@@ -149,7 +161,8 @@ bool Application::runInternal() noexcept {
 	std::cout << "Model loaded!\n";
 
 	v.init(this->mMap, this->mLine, &t3rp);
-	v.getVehiclePhysicsData()->speed = 0.1;
+	vehicleSpeedRef = &v.getVehiclePhysicsData()->speed;
+	*vehicleSpeedRef = 0.0;
 
 	shader.bind();
 	UniformMaterial uMaterial(50);
@@ -207,8 +220,20 @@ bool Application::runInternal() noexcept {
 
 	InputRaycast ir(glm::vec3(0.0), glm::vec3(0.0));
 
+	glm::vec3 oldVehicleRot = glm::vec3(0.0);
+
 	this->runWindowFrame([&]() {
 		v.update(this->mMap, this->mLine);
+		if(cameraFollowsVehicle) {
+			this->mCamera.moveTo(v.getCameraPosition());
+			glm::vec3 cameraVehicleRot = v.getCameraRotation();
+			this->mCamera.addYaw(cameraVehicleRot.y-oldVehicleRot.y);
+			this->mCamera.addPitch(cameraVehicleRot.x-oldVehicleRot.x);
+			oldVehicleRot = cameraVehicleRot;
+		}
+		else {
+			oldVehicleRot = glm::vec3(0.0);
+		}
 
 		this->mMap.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
 		wh.move(glm::vec3(this->mCamera.getPosition().x, 0.0, this->mCamera.getPosition().z));

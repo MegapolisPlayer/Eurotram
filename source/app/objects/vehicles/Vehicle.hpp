@@ -23,6 +23,8 @@ struct VehicleInformation {
 	std::string variantMaterial;
 	std::vector<std::pair<std::string, std::string>> variants; //for liveries, pair <variantName, variantTexture>
 
+	glm::vec3 cameraOffset;
+
 	bool validate() noexcept;
 };
 
@@ -45,6 +47,7 @@ struct VehiclePhysicsData {
 };
 
 class BogieMovement {
+	friend class Vehicle;
 public:
 	BogieMovement() noexcept;
 
@@ -107,7 +110,12 @@ public:
 	void update(Map& aMap, Line& aLine) noexcept;
 	void draw() noexcept;
 
+	//returns false if over speed limit
+	bool setSpeed(const float aSpeed) noexcept;
+
 	VehiclePhysicsData* getVehiclePhysicsData() noexcept;
+	glm::vec3 getCameraPosition() const noexcept;
+	glm::vec3 getCameraRotation() const noexcept; //of first section, used for camera
 
 	~Vehicle() noexcept;
 
@@ -120,6 +128,9 @@ private:
 	VehicleInformation mInfo;
 	VehiclePhysicsData mPhysicsData;
 	std::vector<BogieMovement> mBogies;
+
+	glm::vec3 mCameraLocation;
+	glm::vec3 mCameraRotation; //physics data has own data
 };
 
 #endif

@@ -4,7 +4,8 @@ bool VehicleInformation::validate() noexcept {
 	return
 		this->bogieCenterOffset.size() == this->bogieTrackOffset.size() &&
 		this->bogieShaftSuffixes.size() == 2 &&
-		(this->bogieNames.size() == this->meshNames.size()-1 || this->meshNames.empty());
+		(this->bogieNames.size() == this->meshNames.size()-1 || this->meshNames.empty()) &&
+		this->bogieNames.size() >= 1;
 }
 
 BogieMovement::BogieMovement() noexcept
@@ -222,6 +223,15 @@ Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
 			splitString(value, SEPARATOR_LOW, values);
 			this->mInfo.variants.push_back(std::make_pair(values[0], values[1]));
 		}
+		else if(name == "CAMERAOFFSET") {
+			std::vector<std::string> vector;
+			splitString(value, SEPARATOR_LOW, vector);
+			if(vector.size() != 3) {
+				std::cerr << LogLevel::ERROR << "Vector doesn't contain 3 values! (" << vector.size() << " values found)\n" << LogLevel::RESET;
+				return;
+			}
+			this->mInfo.cameraOffset = glm::vec3(std::stof(vector[0]), std::stof(vector[1]), std::stof(vector[2]));
+		}
 
 		//TODO config sounds - load into vehicle itself so multiple vehicle can play at once
 		else if(name == "SOUNDOPENDOOR") {}
@@ -310,26 +320,36 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 	//default - apply first pair to all
 	if(this->mBogieMeshes.empty()) {
 		glm::vec3 avg = Math::getAverageOfVectors(positions[1], positions[0]);
-		glm::vec3 dif = glm::vec3((positions[0] - positions[1]).x, (positions[0] - positions[1]).y, (positions[0] - positions[1]).z);
+		glm::vec3 dif = positions[0] - positions[1];
 
 		float rotationHorizontal = Math::getRotationOfVector2DY(glm::vec2(dif.x, dif.z));
 		float rotationVertical = Math::getRotationOfVector2DX(glm::vec2(std::sqrt(std::pow(dif.x,2.0)+std::pow(dif.z,2.0)), dif.y));
 
 		this->mModel->getGlobalTransform().setPosition(avg);
-		//due to some rotation crap we need to add 180 degress to flip TODO improve
+		//due to some rotation crap we need to add 180 degress to flip AND camera TODO improve
 		this->mModel->getGlobalTransform().setRotation(glm::vec3(rotationVertical, rotationHorizontal+180, 0));
 		this->mModel->refreshTransforms();
+
+		this->mCameraLocation = avg+glm::rotate(glm::rotate(this->mInfo.cameraOffset, glm::radians(rotationHorizontal), glm::vec3(0, 1, 0)), rotationVertical, glm::vec3(1, 0, 0));
+		this->mCameraRotation = glm::vec3(rotationVertical, -rotationHorizontal, 0.0);
 	}
 	else {
 		//else not needed
+		bool leadingSegment = true;
 		for(std::vector<Mesh*> v : this->mBogieMeshes) {
 			for(uint64_t j = 0; j < v.size(); j++) {
 				glm::vec3 avg = Math::getAverageOfVectors(positions[j+1], positions[j]);
 				//switch Z and Y - Z axis in simulator is y field, height in sim is z field
-				glm::vec3 dif = glm::vec3((positions[j] - positions[j+1]).x, (positions[j] - positions[j+1]).y, (positions[j] - positions[j+1]).z);
+				glm::vec3 dif = positions[j] - positions[j+1];
 
 				float rotationHorizontal = Math::getRotationOfVector2DY(glm::vec2(dif.x, dif.z));
 				float rotationVertical = Math::getRotationOfVector2DX(glm::vec2(std::sqrt(std::pow(dif.x,2.0)+std::pow(dif.z,2.0)), dif.y));
+
+				if(leadingSegment) {
+					this->mCameraLocation = avg+glm::rotate(glm::rotate(this->mInfo.cameraOffset, glm::radians(rotationHorizontal), glm::vec3(0, 1, 0)), rotationVertical, glm::vec3(1, 0, 0));
+					this->mCameraRotation = glm::vec3(rotationVertical, -rotationHorizontal, 0.0);
+					leadingSegment = false; //first segment only
+				}
 
 				this->mModel->getGlobalTransform().setPosition(avg);
 				//same here
@@ -345,8 +365,20 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 	}
 }
 
+bool Vehicle::setSpeed(const float aSpeed) noexcept {
+	this->mPhysicsData.speed = aSpeed;
+	if(aSpeed >= this->mPhysicsData.maxSpeed) return false;
+	return true;
+}
+
 VehiclePhysicsData* Vehicle::getVehiclePhysicsData() noexcept {
 	return &this->mPhysicsData;
+}
+glm::vec3 Vehicle::getCameraPosition() const noexcept {
+	return this->mCameraLocation;
+}
+glm::vec3 Vehicle::getCameraRotation() const noexcept {
+	return this->mCameraRotation;
 }
 
 Vehicle::~Vehicle() noexcept {}
