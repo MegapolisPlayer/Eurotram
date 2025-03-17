@@ -128,7 +128,7 @@ void Application::togglePauseMenu(Window* aWindow, uint32_t aKey, uint32_t aActi
 }
 bool Application::renderPauseMenu() noexcept {
 	if(Application::mPauseEnabled) {
-		ImGui::SetNextWindowPos(ImVec2(this->mWindow.getWidth()/6.0-this->mWindow.getWidth()/3.0, 100));
+		ImGui::SetNextWindowPos(ImVec2(this->mWindow.getWidth()/6.0*2.0, 100));
 		ImGui::SetNextWindowSize(ImVec2(this->mWindow.getWidth()/3.0, this->mWindow.getHeight()-200));
 		ImGui::Begin("Pause menu");
 

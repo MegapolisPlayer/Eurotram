@@ -30,43 +30,38 @@ static GLuint BT_INDICES[] = {
 };
 
 BoxTriggerDrawer::BoxTriggerDrawer() noexcept : mVBO(BT_VERTICES_BASE.data(), 8, 3), mIBO(BT_INDICES, 36),
-	mTransforms(nullptr, 0),  mColors(nullptr, 0), mRecalculateData(true) {
+	mTransforms(nullptr, 0),  mColors(nullptr, 0) {
 	this->mVBO.enableAttribute(&this->mVAO, 3); //pos
 }
 
 uint64_t BoxTriggerDrawer::add(BoxTrigger& aBT) noexcept {
 	this->mTriggerList.push_back(&aBT);
-	this->mRecalculateData = true;
 	return this->mTransformsData.size()-1;
 }
 void BoxTriggerDrawer::remove(const uint64_t aId) noexcept {
 	this->mTriggerList.erase(this->mTriggerList.begin()+aId);
-	this->mRecalculateData = true;
 }
 void BoxTriggerDrawer::draw(const uint64_t aTransformLocation, const uint64_t aColorLocation) noexcept {
-	if(this->mRecalculateData) {
-		std::vector<glm::vec4> colorData;
-		this->mTransformsData.resize(this->mTriggerList.size());
+	std::vector<glm::vec4> colorData;
+	this->mTransformsData.resize(this->mTriggerList.size());
 
-		for(uint64_t i = 0; i < this->mTriggerList.size(); i++) {
-			BoxTrigger* ptr = this->mTriggerList[i];
-			if(ptr->mContainsNewData) {
-				if(!ptr->mVisible) {
-					this->mTransformsData[i] = glm::mat4(0.0f); //null matrix
-				}
-				else {
-					ptr->recalculateMatrix();
-					this->mTransformsData[i] = ptr->mMatrix;
-				}
-				ptr->mContainsNewData = false;
+	for(uint64_t i = 0; i < this->mTriggerList.size(); i++) {
+		BoxTrigger* ptr = this->mTriggerList[i];
+		if(ptr->mContainsNewData) {
+			if(!ptr->mVisible) {
+				this->mTransformsData[i] = glm::mat4(0.0f); //null matrix
 			}
-			colorData.emplace_back(ptr->mColor);
+			else {
+				ptr->recalculateMatrix();
+				this->mTransformsData[i] = ptr->mMatrix;
+			}
+			ptr->mContainsNewData = false;
 		}
-
-		this->mTransforms.setNewData(this->mTransformsData.data(), this->mTransformsData.size()*sizeof(glm::mat4));
-		this->mColors.setNewData(colorData.data(), colorData.size()*sizeof(glm::vec4));
-		this->mRecalculateData = false;
+		colorData.emplace_back(ptr->mColor);
 	}
+
+	this->mTransforms.setNewData(this->mTransformsData.data(), this->mTransformsData.size()*sizeof(glm::mat4));
+	this->mColors.setNewData(colorData.data(), colorData.size()*sizeof(glm::vec4));
 
 	this->mVAO.bind();
 	this->mVBO.bind();
@@ -214,7 +209,7 @@ void BoxTrigger::hide() noexcept {
 BoxTrigger::~BoxTrigger() noexcept {}
 
 void BoxTrigger::recalculateMatrix() noexcept {
-	if(this->mRecalculateMatrix) return;
+	if(!this->mRecalculateMatrix) return;
 
 	this->mMatrix = glm::translate(glm::mat4(1.0), this->mCenterPoint);
 	this->mMatrix = glm::rotate(this->mMatrix, glm::radians(this->mRotation), glm::vec3(0, 1, 0));
@@ -224,9 +219,7 @@ void BoxTrigger::recalculateMatrix() noexcept {
 }
 
 InputRaycast::InputRaycast(const glm::vec3& aOrigin, const glm::vec3 aDirection) noexcept
-	: mOrigin(aOrigin), mDirection(aDirection), mMinT(0.0f), mMaxT(100000.0f) {
-
-}
+	: mOrigin(aOrigin), mDirection(aDirection), mMinT(0.0f), mMaxT(100000.0f) {}
 
 //ray cast
 //source http://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/
@@ -281,11 +274,16 @@ bool InputRaycast::collision(const BoxTrigger& aBox) noexcept {
 
 	return true;
 }
-bool InputRaycast::collision(BoxTrigger& aBox, const glm::vec4& aBoxColor) noexcept {
-	float result = this->collision(aBox);
-	if(result != 0.0) {
-		aBox.setColor(aBoxColor);
+bool InputRaycast::collision(BoxTrigger& aBox, const glm::vec4& aBoxColorYes, const glm::vec4& aBoxColorNo) noexcept {
+	bool result = this->collision(aBox);
+
+	if(result) {
+		aBox.setColor(aBoxColorYes);
 	}
+	else {
+		aBox.setColor(aBoxColorNo);
+	}
+
 	return result;
 }
 

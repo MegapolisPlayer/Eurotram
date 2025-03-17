@@ -204,19 +204,8 @@ bool Application::runInternal() noexcept {
 	UniformVec3 whWeatherCenter(41);
 	WeatherHandler wh(glm::vec3(0), 10000, 0.05, 0.10, glm::vec4(0.0, 0.0, 0.5, 0.5), 0.15);
 
-	BoxTrigger bt(glm::vec3(0), glm::vec3(5, 2, 5), 45);
-	bt.setColor(glm::vec4(0.0, 0.5, 0.0, 0.5));
-	BoxTrigger bt2(glm::vec3(3.6, 0, 3), glm::vec3(5, 2, 5), 45.0);
-	bt2.setColor(glm::vec4(0.5, 0.0, 0.0, 0.5));
-
-	std::cout << bt.collision(bt2) << '\n';
-
 	Shader btShader("shader/btVertex.glsl", "shader/btFragment.glsl");
 	UniformMat4 btCamera(30);
-
-	BoxTriggerDrawer btd;
-	btd.add(bt);
-	btd.add(bt2);
 
 	InputRaycast ir(glm::vec3(0.0), glm::vec3(0.0));
 
@@ -273,7 +262,9 @@ bool Application::runInternal() noexcept {
 		ir.setOrigin(s.position); //update ray
 		ir.setDirection(s.direction);
 
-		std::cout << ir.collision(bt) << ',' << ir.collision(bt2) << '\n';
+		for(BoxTrigger& bt : v.getTriggers()) {
+			ir.collision(bt, glm::vec4(0.0, 1.0, 0.0, 0.5), glm::vec4(1.0, 0.0, 0.0, 0.5));
+		}
 
 		matCameraUniform.set(this->mWindow.getCamera()->getMatrix());
 		cameraPosUniform.set(this->mWindow.getCamera()->getPosition());
@@ -282,10 +273,8 @@ bool Application::runInternal() noexcept {
 		ds.bindMap(31); //31 sun
 		//29,30 front lights of tram
 
-		//t3rp.setAnimation("ArmatureAction", std::fmod(glfwGetTime(), 3.3));
-
-		t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
-		t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
+		//t3rp.setAnimation("pantographAction", std::fmod(glfwGetTime(), 3.3));
+		//t3rp.setAnimation("driverDoorAction", std::fmod(glfwGetTime(), 3.3));
 
 		shader.bind();
 
@@ -300,7 +289,7 @@ bool Application::runInternal() noexcept {
 
 		btShader.bind();
 		btCamera.set(this->mWindow.getCamera()->getMatrix());
-		btd.draw(10, 11);
+		v.getControlsDraw().draw(10, 11);
 
 		//draw weather
 		weatherShader.bind();

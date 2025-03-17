@@ -28,6 +28,35 @@ struct VehicleInformation {
 	bool validate() noexcept;
 };
 
+struct VehicleCabinTriggerDataEntry {
+	glm::vec3 offset;
+	glm::vec3 size = glm::vec3(0.1);
+	float rotation;
+};
+
+struct VehicleCabinTriggerData {
+	enum VEHICLE_CABIN_TRIGGER_DATA_ID : uint16_t {
+		STARTER = 0, SANDER, STOP,
+		CONTROL_AMOUNT //must be last!
+	};
+
+	std::vector<VehicleCabinTriggerDataEntry> data;
+	//TODO
+};
+
+#define ENUM_TO_INT(x) int64_t(x)
+
+struct VehicleControlData {
+	float throttle;
+
+	float brakeDynamic; //stop motors, makes then regenerate electricity
+	float brakeMechanic; //stops motors using friction - when under 5km/h
+	float brakeRail; //physical, adds much more friction
+
+	bool sander;
+	bool pantographContact;
+};
+
 struct VehiclePhysicsData {
 	float speed;
 	float maxSpeed;
@@ -108,7 +137,6 @@ public:
 
 	//update data of vehicle
 	void update(Map& aMap, Line& aLine) noexcept;
-	void draw() noexcept;
 
 	//returns false if over speed limit
 	bool setSpeed(const float aSpeed) noexcept;
@@ -116,6 +144,9 @@ public:
 	VehiclePhysicsData* getVehiclePhysicsData() noexcept;
 	glm::vec3 getCameraPosition() const noexcept;
 	glm::vec3 getCameraRotation() const noexcept; //of first section, used for camera
+
+	BoxTriggerDrawer& getControlsDraw() noexcept;
+	std::vector<BoxTrigger>& getTriggers() noexcept;
 
 	~Vehicle() noexcept;
 
@@ -128,6 +159,10 @@ private:
 	VehicleInformation mInfo;
 	VehiclePhysicsData mPhysicsData;
 	std::vector<BogieMovement> mBogies;
+
+	VehicleCabinTriggerData mCabinData;
+	BoxTriggerDrawer mTriggerDrawer;
+	std::vector<BoxTrigger> mTriggers;
 
 	glm::vec3 mCameraLocation;
 	glm::vec3 mCameraRotation; //physics data has own data

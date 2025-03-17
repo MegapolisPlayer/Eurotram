@@ -140,6 +140,27 @@ Vehicle::Vehicle(Map& aMap, Line& aLine, VehicleInformation& aInfo, Model* aMode
 constexpr char SEPARATOR_LOW = ',';
 constexpr char SEPARATOR_HIGH = ';';
 
+static void loadVector3(const std::string_view aInput, glm::vec3& aVector, const std::string_view aName) {
+	std::vector<std::string> vector;
+	splitString(aInput.data(), SEPARATOR_LOW, vector);
+	if(vector.size() != 3) {
+		std::cerr << LogLevel::ERROR << "Vector " << aName << " doesn't contain 3 values! (" << vector.size() << " values found)\n" << LogLevel::RESET;
+		return;
+	}
+	aVector = glm::vec3(std::stof(vector[0]), std::stof(vector[1]), std::stof(vector[2]));
+}
+
+static void loadVector3r(const std::string_view aInput, glm::vec3& aVector, float& aFloat, const std::string_view aName) {
+	std::vector<std::string> vector;
+	splitString(aInput.data(), SEPARATOR_LOW, vector);
+	if(vector.size() != 4) {
+		std::cerr << LogLevel::ERROR << "Vector " << aName << " doesn't contain 3 values + float! (" << vector.size() << " values found)\n" << LogLevel::RESET;
+		return;
+	}
+	aVector = glm::vec3(std::stof(vector[0]), std::stof(vector[1]), std::stof(vector[2]));
+	aFloat = std::stof(vector[3]);
+}
+
 Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
 	std::ifstream file;
 	file.open(aConfigFilename.data(), std::ios::in); //text mode
@@ -147,6 +168,8 @@ Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
 		std::cerr << LogLevel::ERROR << "File " << aConfigFilename << " could not be opened!\n" << LogLevel::RESET;
 		return;
 	}
+
+	this->mCabinData.data.resize(VehicleCabinTriggerData::CONTROL_AMOUNT);
 
 	std::string buffer;
 	while(std::getline(file, buffer)) {
@@ -223,15 +246,29 @@ Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
 			splitString(value, SEPARATOR_LOW, values);
 			this->mInfo.variants.push_back(std::make_pair(values[0], values[1]));
 		}
-		else if(name == "CAMERAOFFSET") {
-			std::vector<std::string> vector;
-			splitString(value, SEPARATOR_LOW, vector);
-			if(vector.size() != 3) {
-				std::cerr << LogLevel::ERROR << "Vector doesn't contain 3 values! (" << vector.size() << " values found)\n" << LogLevel::RESET;
-				return;
-			}
-			this->mInfo.cameraOffset = glm::vec3(std::stof(vector[0]), std::stof(vector[1]), std::stof(vector[2]));
-		}
+		else if(name == "CAMERAOFFSET") loadVector3(value, this->mInfo.cameraOffset, "CAMERAOFFSET");
+
+		//TODO controls setup
+
+		//starter
+		else if(name == "STARTEROFFSET") loadVector3(value, this->mCabinData.data[VehicleCabinTriggerData::STARTER].offset, "STARTEROFFSET");
+		else if(name == "STARTERSIZE") loadVector3r(value,
+			this->mCabinData.data[VehicleCabinTriggerData::STARTER].size,
+			this->mCabinData.data[VehicleCabinTriggerData::STARTER].rotation, "STARTERSIZE");
+
+		//sander
+		else if(name == "SANDEROFFSET") loadVector3(value, this->mCabinData.data[VehicleCabinTriggerData::SANDER].offset, "SANDEROFFSET");
+		else if(name == "SANDERSIZE") loadVector3r(value,
+			this->mCabinData.data[VehicleCabinTriggerData::SANDER].size,
+			this->mCabinData.data[VehicleCabinTriggerData::SANDER].rotation, "SANDERSIZE");
+
+		//stop announcement
+		else if(name == "STOPOFFSET") loadVector3(value, this->mCabinData.data[VehicleCabinTriggerData::STOP].offset, "STOPOFFSET");
+		else if(name == "STOPSIZE") loadVector3r(value,
+			this->mCabinData.data[VehicleCabinTriggerData::STOP].size,
+			this->mCabinData.data[VehicleCabinTriggerData::STOP].rotation, "STOPSIZE");
+
+		//TODO others
 
 		//TODO config sounds - load into vehicle itself so multiple vehicle can play at once
 		else if(name == "SOUNDOPENDOOR") {}
@@ -298,7 +335,19 @@ void Vehicle::init(Map& aMap, Line& aLine, Model* aModel) noexcept {
 		//first in pair is name, second in pair is filepath
 		this->mModel->addVariant(this->mInfo.variantMaterial, this->mInfo.variants[i].second, this->mInfo.variants[i].first);
 	}
+
+	//add trigger boxes TODO more
+	for(VehicleCabinTriggerDataEntry& v : this->mCabinData.data) {
+		this->mTriggers.emplace_back(v.offset, v.size, v.rotation);
+		this->mTriggers.back().setColor(glm::vec4(0.0, 1.0, 0.0, 0.5));
+		std::cout << "TRIGGER: " << v.offset << v.size << v.rotation << '\n'; //TODO remove DEBUG
+	}
+
+	//add to drawer
+	for(BoxTrigger& bt : this->mTriggers) mTriggerDrawer.add(bt);
 }
+
+//TODO reset function
 
 void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 	std::vector<glm::vec3> positions;
@@ -315,27 +364,36 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 	//if we reached last - exit
 	if(aLine.isStationLast()) return;
 
+	//calculate first transform
+	glm::vec3 avg = Math::getAverageOfVectors(positions[1], positions[0]);
+	glm::vec3 dif = positions[0] - positions[1];
+	float rotationHorizontal = Math::getRotationOfVector2DY(glm::vec2(dif.x, dif.z));
+	float rotationVertical = Math::getRotationOfVector2DX(glm::vec2(std::sqrt(std::pow(dif.x,2.0)+std::pow(dif.z,2.0)), dif.y));
+
+	//apply to camera
+	this->mCameraLocation = avg+glm::rotate(glm::rotate(this->mInfo.cameraOffset, glm::radians(rotationHorizontal), glm::vec3(0, 1, 0)), rotationVertical, glm::vec3(1, 0, 0));
+	this->mCameraRotation = glm::vec3(rotationVertical, -rotationHorizontal, 0.0);
+
+	//apply to controls
+	for(uint64_t i = 0; i < this->mTriggers.size(); i++) {
+		BoxTrigger& bt = this->mTriggers[i];
+		VehicleCabinTriggerDataEntry& v = this->mCabinData.data[i];
+
+		bt.setCenterPoint(avg+glm::rotate(glm::rotate(v.offset, glm::radians(rotationHorizontal), glm::vec3(0, 1, 0)), rotationVertical, glm::vec3(1, 0, 0)));
+		bt.setRotation(rotationHorizontal);
+	}
+
 	//move meshes
 
 	//default - apply first pair to all
 	if(this->mBogieMeshes.empty()) {
-		glm::vec3 avg = Math::getAverageOfVectors(positions[1], positions[0]);
-		glm::vec3 dif = positions[0] - positions[1];
-
-		float rotationHorizontal = Math::getRotationOfVector2DY(glm::vec2(dif.x, dif.z));
-		float rotationVertical = Math::getRotationOfVector2DX(glm::vec2(std::sqrt(std::pow(dif.x,2.0)+std::pow(dif.z,2.0)), dif.y));
-
 		this->mModel->getGlobalTransform().setPosition(avg);
 		//due to some rotation crap we need to add 180 degress to flip AND camera TODO improve
 		this->mModel->getGlobalTransform().setRotation(glm::vec3(rotationVertical, rotationHorizontal+180, 0));
 		this->mModel->refreshTransforms();
-
-		this->mCameraLocation = avg+glm::rotate(glm::rotate(this->mInfo.cameraOffset, glm::radians(rotationHorizontal), glm::vec3(0, 1, 0)), rotationVertical, glm::vec3(1, 0, 0));
-		this->mCameraRotation = glm::vec3(rotationVertical, -rotationHorizontal, 0.0);
 	}
 	else {
 		//else not needed
-		bool leadingSegment = true;
 		for(std::vector<Mesh*> v : this->mBogieMeshes) {
 			for(uint64_t j = 0; j < v.size(); j++) {
 				glm::vec3 avg = Math::getAverageOfVectors(positions[j+1], positions[j]);
@@ -344,12 +402,6 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 
 				float rotationHorizontal = Math::getRotationOfVector2DY(glm::vec2(dif.x, dif.z));
 				float rotationVertical = Math::getRotationOfVector2DX(glm::vec2(std::sqrt(std::pow(dif.x,2.0)+std::pow(dif.z,2.0)), dif.y));
-
-				if(leadingSegment) {
-					this->mCameraLocation = avg+glm::rotate(glm::rotate(this->mInfo.cameraOffset, glm::radians(rotationHorizontal), glm::vec3(0, 1, 0)), rotationVertical, glm::vec3(1, 0, 0));
-					this->mCameraRotation = glm::vec3(rotationVertical, -rotationHorizontal, 0.0);
-					leadingSegment = false; //first segment only
-				}
 
 				this->mModel->getGlobalTransform().setPosition(avg);
 				//same here
@@ -379,6 +431,13 @@ glm::vec3 Vehicle::getCameraPosition() const noexcept {
 }
 glm::vec3 Vehicle::getCameraRotation() const noexcept {
 	return this->mCameraRotation;
+}
+
+BoxTriggerDrawer& Vehicle::getControlsDraw() noexcept {
+	return this->mTriggerDrawer;
+}
+std::vector<BoxTrigger>& Vehicle::getTriggers() noexcept {
+	return this->mTriggers;
 }
 
 Vehicle::~Vehicle() noexcept {}

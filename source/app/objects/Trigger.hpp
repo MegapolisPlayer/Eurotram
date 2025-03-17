@@ -33,8 +33,6 @@ private:
 	std::vector<glm::mat4> mTransformsData;
 	ShaderBuffer mTransforms;
 	ShaderBuffer mColors;
-
-	bool mRecalculateData;
 };
 
 //to draw trigger box - render using drawer
@@ -84,7 +82,7 @@ public:
 	//returns where exactly along ray collided or 0 if didnt
 	bool collision(const BoxTrigger& aBox) noexcept;
 	//same as previous, but also sets the color of the box on collision
-	bool collision(BoxTrigger& aBox, const glm::vec4& aBoxColor) noexcept;
+	bool collision(BoxTrigger& aBox, const glm::vec4& aBoxColorYes, const glm::vec4& aBoxColorNo) noexcept;
 
 	void setOrigin(const glm::vec3& aOrigin) noexcept;
 	void setDirection(const glm::vec3& aDirection) noexcept;
