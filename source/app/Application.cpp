@@ -5,7 +5,7 @@ bool Application::mPauseEnabled = false;
 Application::Application() noexcept
 	: mWindow("Eurotram", 1280, 720, false, true),
 	mCamera(&this->mWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 1000.0f, 0.1f),
-	mLogo("logo.png", false), mMinuteTime(0), mPhysicalUpdateFreq(1), mLastPhysicalUpdateTime(0.0) {
+	mLogo("logo.png", false), mMinuteTime(0), mPhysicalUpdateFreq(1.0/50.0), mLastPhysicalUpdateTime(0.0) {
 	this->mWindow.setBackgroundColor(glm::vec4(0.5f));
 	this->mWindow.enableVSync();
 

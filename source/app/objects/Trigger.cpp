@@ -34,6 +34,21 @@ BoxTriggerDrawer::BoxTriggerDrawer() noexcept : mVBO(BT_VERTICES_BASE.data(), 8,
 	this->mVBO.enableAttribute(&this->mVAO, 3); //pos
 }
 
+BoxTriggerDrawer::BoxTriggerDrawer(BoxTriggerDrawer&& aOther) noexcept
+	: mVAO(std::move(aOther.mVAO)), mVBO(std::move(aOther.mVBO)), mIBO(std::move(aOther.mIBO)),
+	mTriggerList(std::move(aOther.mTriggerList)), mTransformsData(std::move(aOther.mTransformsData)),
+	mTransforms(std::move(aOther.mTransforms)), mColors(std::move(aOther.mColors)) {}
+BoxTriggerDrawer& BoxTriggerDrawer::operator=(BoxTriggerDrawer&& aOther) noexcept {
+	this->mVAO = std::move(aOther.mVAO);
+	this->mVBO = std::move(aOther.mVBO);
+	this->mIBO = std::move(aOther.mIBO);
+	this->mTriggerList = std::move(aOther.mTriggerList);
+	this->mTransformsData = std::move(aOther.mTransformsData);
+	this->mTransforms = std::move(aOther.mTransforms);
+	this->mColors = std::move(aOther.mColors);
+	return *this;
+}
+
 uint64_t BoxTriggerDrawer::add(BoxTrigger& aBT) noexcept {
 	this->mTriggerList.push_back(&aBT);
 	return this->mTransformsData.size()-1;

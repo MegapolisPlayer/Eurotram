@@ -304,6 +304,36 @@ Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
 	std::cout << "Vehicle configration loaded!\n";
 }
 
+Vehicle::Vehicle(Vehicle&& aOther) noexcept {
+	this->mModel = std::move(aOther.mModel);
+	aOther.mModel = nullptr;
+	this->mBogieMeshes = std::move(aOther.mBogieMeshes);
+	this->mInfo = std::move(aOther.mInfo);
+	this->mPhysicsData = std::move(aOther.mPhysicsData);
+	this->mBogies = std::move(aOther.mBogies);
+	this->mControlData = std::move(aOther.mControlData);
+	this->mCabinData = std::move(aOther.mCabinData);
+	this->mTriggerDrawer = std::move(aOther.mTriggerDrawer);
+	this->mTriggers = std::move(aOther.mTriggers);
+	this->mCameraLocation = std::move(aOther.mCameraLocation);
+	this->mCameraRotation = std::move(aOther.mCameraRotation);
+}
+Vehicle& Vehicle::operator=(Vehicle&& aOther) noexcept {
+	this->mModel = std::move(aOther.mModel);
+	aOther.mModel = nullptr;
+	this->mBogieMeshes = std::move(aOther.mBogieMeshes);
+	this->mInfo = std::move(aOther.mInfo);
+	this->mPhysicsData = std::move(aOther.mPhysicsData);
+	this->mBogies = std::move(aOther.mBogies);
+	this->mControlData = std::move(aOther.mControlData);
+	this->mCabinData = std::move(aOther.mCabinData);
+	this->mTriggerDrawer = std::move(aOther.mTriggerDrawer);
+	this->mTriggers = std::move(aOther.mTriggers);
+	this->mCameraLocation = std::move(aOther.mCameraLocation);
+	this->mCameraRotation = std::move(aOther.mCameraRotation);
+	return *this;
+}
+
 std::string Vehicle::getConfigModelFilename() const noexcept {
 	return this->mInfo.modelFile;
 }
@@ -417,12 +447,22 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 	}
 }
 
+void Vehicle::physicsUpdate(const float aPhysicsUpdateFreq) noexcept {
+	//power in kW
+	//this->mPhysicsData.fceFront = Physics::forceFromPower(this->mPhysicsData.power*this->mPhysicsData.motorAmount*1000, this->mControlData.throttle, this->mPhysicsData.speed);
+	//this->mPhysicsData.acceleration = Physics::accelerationFromForce(this->mPhysicsData.fceFront, this->mInfo.mass);
+	//this->mPhysicsData.speed += this->mPhysicsData.acceleration*(1.0/aPhysicsUpdateFreq);
+}
+
 bool Vehicle::setSpeed(const float aSpeed) noexcept {
 	this->mPhysicsData.speed = aSpeed;
 	if(aSpeed >= this->mPhysicsData.maxSpeed) return false;
 	return true;
 }
 
+VehicleControlData* Vehicle::getVehicleControlData() noexcept {
+	return &this->mControlData;
+}
 VehiclePhysicsData* Vehicle::getVehiclePhysicsData() noexcept {
 	return &this->mPhysicsData;
 }

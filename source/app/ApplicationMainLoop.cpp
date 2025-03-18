@@ -12,7 +12,7 @@ static float daylightIndex = 1.0f; //TODO
 static bool hideGui = false;
 static bool cameraFollowsVehicle = false;
 
-static float* vehicleSpeedRef = nullptr;
+static float* vehicleThrottleRef = nullptr;
 
 void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) noexcept {
 	if(aAction == GLFW_RELEASE || !aWindow->isCursorHidden()) return;
@@ -51,14 +51,13 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 		case GLFW_KEY_F1:
 			hideGui = !hideGui;
 			break;
-		//TODO convert to acceleration
 		//TODO support reverse spped
 		//TODO abstract to controller
 		case GLFW_KEY_KP_ADD:
-			*vehicleSpeedRef += 0.005;
+			*vehicleThrottleRef += 0.005;
 			break;
 		case GLFW_KEY_KP_SUBTRACT:
-			*vehicleSpeedRef -= 0.005;
+			*vehicleThrottleRef -= 0.005;
 			break;
 	}
 }
@@ -153,7 +152,7 @@ bool Application::runInternal() noexcept {
 
 	//TODO starting track can be shorter than 6.45 meter
 
-	Vehicle v("t3rp.cfg");
+	Vehicle& v = this->mPlayerVehicles.emplace_back("t3rp.cfg");
 
 	std::cout << "Loading T3R.P model...\n";
 	//Model t3rp(std::filesystem::path("./untitled.glb"));
@@ -161,8 +160,8 @@ bool Application::runInternal() noexcept {
 	std::cout << "Model loaded!\n";
 
 	v.init(this->mMap, this->mLine, &t3rp);
-	vehicleSpeedRef = &v.getVehiclePhysicsData()->speed;
-	*vehicleSpeedRef = 0.0;
+	vehicleThrottleRef = &v.getVehiclePhysicsData()->speed; //TODO change to accel
+	*vehicleThrottleRef = 0.0;
 
 	shader.bind();
 	UniformMaterial uMaterial(50);
@@ -212,6 +211,10 @@ bool Application::runInternal() noexcept {
 	glm::vec3 oldVehicleRot = glm::vec3(0.0);
 
 	this->runWindowFrame([&]() {
+		std::cout << "THR " << v.getVehicleControlData()->throttle << '\n';
+		std::cout << "ACC " << v.getVehiclePhysicsData()->acceleration << '\n';
+		std::cout << "SPD " << v.getVehiclePhysicsData()->speed << '\n';
+
 		v.update(this->mMap, this->mLine);
 		if(cameraFollowsVehicle) {
 			this->mCamera.moveTo(v.getCameraPosition());

@@ -2,8 +2,8 @@
 
 //returns false on error
 bool Application::runPhysics() noexcept {
-	for(Vehicle& v : mPlayerVehicles) {
-		v.update(this->mMap, this->mLine);
+	for(Vehicle& v : this->mPlayerVehicles) {
+		v.physicsUpdate(1.0/this->mPhysicalUpdateFreq);
 	}
-	return true; //TODO
+	return true;
 }

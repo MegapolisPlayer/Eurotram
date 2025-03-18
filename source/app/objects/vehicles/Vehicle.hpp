@@ -3,12 +3,13 @@
 #include "APEX.hpp"
 #include "BUSE.hpp"
 
+#include "../../physics/Physics.hpp"
+
 struct VehicleInformation {
 	float mass = 0.0, length = 0.0, width = 0.0, height = 0.0;
 	uint64_t seats, standing;
 
 	float areaFront = 0.0;
-	float contactResistance = 0.0;
 
 	std::string modelFile;
 	//for each bogie pair in bogieNames defined names of meshes
@@ -47,32 +48,36 @@ struct VehicleCabinTriggerData {
 #define ENUM_TO_INT(x) int64_t(x)
 
 struct VehicleControlData {
-	float throttle;
+	float throttle = 0.0;
 
-	float brakeDynamic; //stop motors, makes then regenerate electricity
-	float brakeMechanic; //stops motors using friction - when under 5km/h
-	float brakeRail; //physical, adds much more friction
+	float brakeDynamic = 0.0; //stop motors, makes then regenerate electricity
+	float brakeMechanic = 0.0; //stops motors using friction - when under 5km/h
+	float brakeRail = 0.0; //physical, adds much more friction
 
-	bool sander;
-	bool pantographContact;
+	bool sander = false;
+	bool pantographContact = true; //TODO
 };
 
 struct VehiclePhysicsData {
-	float speed;
-	float maxSpeed;
+	float speed = 0.0;
+	float maxSpeed = 0.0;
+	float acceleration = 0.0;
 
 	//forces
-	float fceFront;
-	float fceGravity;
-	float fceFriction;
-	float fceAerodynamic;
-	float fceTurn;
-	float nadal;
+	float fceFront = 0.0;
+	float fceGravity = 0.0;
+	float fceFriction = 0.0;
+	float fceAerodynamic = 0.0;
+	float fceTurn = 0.0;
+	float nadal = 0.0;
 
 	//weather
-	float motorAmount;
-	float power; //final power = power*motorAmount
-	float consumption;
+	float motorAmount = 0.0;
+	float power = 0.0; //final power = power*motorAmount
+	float consumption = 0.0;
+
+	//electricity
+	float contactResistance = 0.0;
 };
 
 class BogieMovement {
@@ -132,15 +137,24 @@ public:
 	//call init separately
 	Vehicle(const std::string_view aConfigFilename) noexcept;
 
+	Vehicle(Vehicle& aOther) noexcept = delete;
+	Vehicle& operator=(Vehicle& aOther) noexcept = delete;
+
+	Vehicle(Vehicle&& aOther) noexcept;
+	Vehicle& operator=(Vehicle&& aOther) noexcept;
+
 	std::string getConfigModelFilename() const noexcept;
 	void init(Map& aMap, Line& aLine, Model* aModel) noexcept;
 
 	//update data of vehicle
 	void update(Map& aMap, Line& aLine) noexcept;
 
+	void physicsUpdate(const float aPhysicsUpdateFreq) noexcept;
+
 	//returns false if over speed limit
 	bool setSpeed(const float aSpeed) noexcept;
 
+	VehicleControlData* getVehicleControlData() noexcept;
 	VehiclePhysicsData* getVehiclePhysicsData() noexcept;
 	glm::vec3 getCameraPosition() const noexcept;
 	glm::vec3 getCameraRotation() const noexcept; //of first section, used for camera
@@ -160,6 +174,7 @@ private:
 	VehiclePhysicsData mPhysicsData;
 	std::vector<BogieMovement> mBogies;
 
+	VehicleControlData mControlData;
 	VehicleCabinTriggerData mCabinData;
 	BoxTriggerDrawer mTriggerDrawer;
 	std::vector<BoxTrigger> mTriggers;

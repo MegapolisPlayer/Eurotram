@@ -19,6 +19,12 @@ class BoxTriggerDrawer {
 public:
 	BoxTriggerDrawer() noexcept;
 
+	BoxTriggerDrawer(BoxTriggerDrawer& aOther) noexcept = delete;
+	BoxTriggerDrawer& operator=(BoxTriggerDrawer& aOther) noexcept = delete;
+
+	BoxTriggerDrawer(BoxTriggerDrawer&& aOther) noexcept;
+	BoxTriggerDrawer& operator=(BoxTriggerDrawer&& aOther) noexcept;
+
 	//returns id of object
 	uint64_t add(BoxTrigger& aBT) noexcept;
 	void remove(const uint64_t aId) noexcept;
