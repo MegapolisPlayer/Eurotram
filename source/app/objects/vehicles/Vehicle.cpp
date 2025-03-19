@@ -451,7 +451,7 @@ void Vehicle::physicsUpdate(const float aPhysicsUpdateFreq) noexcept {
 	//power in kW
 	//this->mPhysicsData.fceFront = Physics::forceFromPower(this->mPhysicsData.power*this->mPhysicsData.motorAmount*1000, this->mControlData.throttle, this->mPhysicsData.speed);
 	//this->mPhysicsData.acceleration = Physics::accelerationFromForce(this->mPhysicsData.fceFront, this->mInfo.mass);
-	//this->mPhysicsData.speed += this->mPhysicsData.acceleration*(1.0/aPhysicsUpdateFreq);
+	this->mPhysicsData.speed += this->mPhysicsData.acceleration*(1.0/aPhysicsUpdateFreq);
 }
 
 bool Vehicle::setSpeed(const float aSpeed) noexcept {

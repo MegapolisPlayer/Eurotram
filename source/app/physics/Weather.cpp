@@ -1,18 +1,34 @@
 #include "Weather.hpp"
 
-//TODO
+namespace SeasonMaterials {
+	GMSEntry* autumnGrass;
+	GMSEntry* winterGrass;
+};
+
+void initSeasonMaterials(const Map& aMap) noexcept {
+	using namespace SeasonMaterials;
+
+	autumnGrass = GlobalMaterialStore::addVariant("TexparcelMat.grass", "autumn");
+	autumnGrass->path = TEXPARCEL_TEXTURE_PREFIX+"grassAutumn."+TEXTURE_EXTENSION;
+	autumnGrass->texture = Texture(autumnGrass->path);
+
+	winterGrass = GlobalMaterialStore::addVariant("TexparcelMat.grass", "winter");
+	winterGrass->path = TEXPARCEL_TEXTURE_PREFIX+"grassWinter."+TEXTURE_EXTENSION;
+	winterGrass->texture = Texture(winterGrass->path);
+}
+
 void setSeasonMaterials(const WeatherCondition aCondition) noexcept {
 	if(((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_SEASONS_SPRING) > 0) {
-
+		GlobalMaterialStore::resetVariantAll();
 	}
 	if(((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_SEASONS_SUMMER) > 0) {
-
+		GlobalMaterialStore::resetVariantAll();
 	}
 	if(((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_SEASONS_AUTUMN) > 0) {
-
+		GlobalMaterialStore::setVariantAll("autumn");
 	}
 	if(((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_SEASONS_WINTER) > 0) {
-
+		GlobalMaterialStore::setVariantAll("winter");
 	}
 }
 

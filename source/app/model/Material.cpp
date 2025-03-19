@@ -189,6 +189,27 @@ void GlobalMaterialStore::resetVariant(const std::string_view aMaterialName) noe
 	variant->variantData->currentVariant = -1;
 }
 
+void GlobalMaterialStore::setVariantAll(const std::string_view aIdentifier) noexcept {
+	for(GMSEntry& g : msContainer) {
+		uint64_t id = findId(g.name, aIdentifier);
+
+		if(!g.variantData) continue;
+
+		for(uint64_t i = 0; i < g.variantData->variants.size(); i++) {
+			if(g.variantData->variants[i] == id) {
+				g.variantData->currentVariant = i;
+				break;
+			}
+		}
+	}
+}
+void GlobalMaterialStore::resetVariantAll() noexcept {
+	for(GMSEntry& g : msContainer) {
+		if(!g.variantData) continue;
+		g.variantData->currentVariant = -1;
+	}
+}
+
 void GlobalMaterialStore::randomizeColors(const std::string_view aMaterialName) noexcept {
 	std::uniform_real_distribution<> distribution(0, 0.75);
 	for(GMSEntry& m : msContainer) {

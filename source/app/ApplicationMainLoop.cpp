@@ -1,4 +1,5 @@
 #include "Application.hpp"
+#include "imgui.h"
 
 static bool FirstMove = true;
 static double LastX = 400, LastY = 400;
@@ -53,10 +54,10 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 			break;
 		//TODO support reverse spped
 		//TODO abstract to controller
-		case GLFW_KEY_KP_ADD:
+		case GLFW_KEY_UP:
 			*vehicleThrottleRef += 0.005;
 			break;
-		case GLFW_KEY_KP_SUBTRACT:
+		case GLFW_KEY_DOWN:
 			*vehicleThrottleRef -= 0.005;
 			break;
 	}
@@ -160,7 +161,7 @@ bool Application::runInternal() noexcept {
 	std::cout << "Model loaded!\n";
 
 	v.init(this->mMap, this->mLine, &t3rp);
-	vehicleThrottleRef = &v.getVehiclePhysicsData()->speed; //TODO change to accel
+	vehicleThrottleRef = &v.getVehiclePhysicsData()->acceleration; //TODO change to accel
 	*vehicleThrottleRef = 0.0;
 
 	shader.bind();
@@ -385,6 +386,17 @@ bool Application::runInternal() noexcept {
 			if(ImGui::Button("Change livery to old PID")) t3rp.setVariant("Material.paint", "SPID");
 			if(ImGui::Button("Change livery to DPO")) t3rp.setVariant("Material.paint", "DPO");
 			if(ImGui::Button("Change livery to PMDP")) t3rp.setVariant("Material.paint", "PMDP");
+
+			ImGui::End();
+
+			ImGui::Begin("Seasons");
+
+			if(ImGui::Button("Spring/Summer"))
+				setSeasonMaterials(WeatherCondition::WEATHER_SEASONS_SPRING);
+			if(ImGui::Button("Autumn"))
+				setSeasonMaterials(WeatherCondition::WEATHER_SEASONS_AUTUMN);
+			if(ImGui::Button("Winter"))
+				setSeasonMaterials(WeatherCondition::WEATHER_SEASONS_WINTER);
 
 			ImGui::End();
 

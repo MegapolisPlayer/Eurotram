@@ -1,6 +1,8 @@
 #include "Application.hpp"
+#include "physics/Weather.hpp"
 
 bool Application::mPauseEnabled = false;
+bool Application::mPauseSettings = false;
 
 Application::Application() noexcept
 	: mWindow("Eurotram", 1280, 720, false, true),
@@ -8,12 +10,6 @@ Application::Application() noexcept
 	mLogo("logo.png", false), mMinuteTime(0), mPhysicalUpdateFreq(1.0/50.0), mLastPhysicalUpdateTime(0.0) {
 	this->mWindow.setBackgroundColor(glm::vec4(0.5f));
 	this->mWindow.enableVSync();
-
-	this->mWindow.registerGenericKeyCallback(Application::rawKeyCallback);
-	this->mWindow.registerMouseCallback(Application::rawMouseCallback);
-	this->mWindow.registerClickCallback(Application::rawClickCallback);
-
-	this->mWindow.registerKeyCallback(GLFW_KEY_ESCAPE, Application::togglePauseMenu);
 
 	//defaults TODO change
 	this->mAnnunciatorPath = "Linka13.etanc";
@@ -39,10 +35,10 @@ bool Application::renderMainMenu() noexcept {
 		ImGui::PushItemWidth(100);
 		ImGui::Image(
 			(ImTextureID)(uint64_t)this->mLogo.getHandle(),
-			ImVec2(
-				this->mWindow.getWidth()/3.0-100,
-				(this->mWindow.getWidth()/3.0-100)*((float)this->mLogo.getHeight()/this->mLogo.getWidth())
-			)
+					 ImVec2(
+						 this->mWindow.getWidth()/3.0-100,
+							(this->mWindow.getWidth()/3.0-100)*((float)this->mLogo.getHeight()/this->mLogo.getWidth())
+					 )
 		);
 
 		if(ImGui::Button("Start simulator")) {
@@ -128,6 +124,14 @@ void Application::togglePauseMenu(Window* aWindow, uint32_t aKey, uint32_t aActi
 }
 bool Application::renderPauseMenu() noexcept {
 	if(Application::mPauseEnabled) {
+		if(Application::mPauseSettings) {
+			if(!Application::renderSettingsMenu()) {
+				//returns true on done button press
+				Application::mPauseSettings = false;
+			}
+			return true;
+		}
+		//else not required here
 		ImGui::SetNextWindowPos(ImVec2(this->mWindow.getWidth()/6.0*2.0, 100));
 		ImGui::SetNextWindowSize(ImVec2(this->mWindow.getWidth()/3.0, this->mWindow.getHeight()-200));
 		ImGui::Begin("Pause menu");
@@ -137,6 +141,11 @@ bool Application::renderPauseMenu() noexcept {
 			ImGui::End();
 			return true;
 		}
+
+		ImGui::Checkbox("Show HUD?", &this->mSettings.showHUD);
+		ImGui::SliderFloat("FOV", &this->mSettings.FOV, 30.0, 90.0);
+		ImGui::Checkbox("Draw debug points?", &this->mSettings.drawPoints);
+
 		if(ImGui::Button("Quit")) {
 			ImGui::End();
 			return false;
@@ -144,6 +153,9 @@ bool Application::renderPauseMenu() noexcept {
 
 		ImGui::End();
 	}
+
+	//update settings!
+	this->mCamera.setFOV(this->mSettings.FOV);
 
 	return true;
 }
@@ -161,12 +173,20 @@ void Application::run() noexcept {
 		return;
 	}
 
+	//register callbacks AFTER main menu
+	this->mWindow.registerGenericKeyCallback(Application::rawKeyCallback);
+	this->mWindow.registerMouseCallback(Application::rawMouseCallback);
+	this->mWindow.registerClickCallback(Application::rawClickCallback);
+
+	this->mWindow.registerKeyCallback(GLFW_KEY_ESCAPE, Application::togglePauseMenu);
+
 	//TODO loading screen
 
 	this->mAnnunciator.open(this->mAnnunciatorPath);
 	this->mAnnunciator.setVolume(0.7);
 	this->mLine.open(this->mLinePath, &this->mAnnunciator);
 	this->mMap.open(this->mMapPath);
+	initSeasonMaterials(this->mMap);
 
 	this->mCamera.setFOV(this->mSettings.FOV);
 

@@ -59,7 +59,7 @@ public:
 private:
 	ApplicationSettings mSettings;
 	static bool mPauseEnabled; //glfw callbacks are static, non-static instance(s) check this when rendering
-	ApplicationRenderState mPhase;
+	static bool mPauseSettings;
 
 	Window mWindow;
 	Camera mCamera;

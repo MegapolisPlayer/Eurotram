@@ -67,7 +67,7 @@ public:
 	static GMSEntry* getByPath(const std::string_view aPath) noexcept;
 
 	//returns new element's id via pointer
-	static GMSEntry* get(const std::string_view aMaterialName, const std::string_view aVariant) noexcept;
+	static GMSEntry* get(const std::string_view aMaterialName, const std::string_view aVariant = GMS_STANDARD_IDENTIFICATOR) noexcept;
 	static GMSEntry* getStandard(const std::string_view aMaterialName) noexcept;
 
 	static GMSEntry* getById(const uint64_t aId) noexcept;
@@ -83,6 +83,9 @@ public:
 
 	static void setVariant(const std::string_view aMaterialName, const std::string_view aIdentifier) noexcept;
 	static void resetVariant(const std::string_view aMaterialName) noexcept;
+
+	static void setVariantAll(const std::string_view aIdentifier) noexcept;
+	static void resetVariantAll() noexcept;
 
 	//updates all entries with name, variants set to same color as base
 	static void randomizeColors(const std::string_view aMaterialName) noexcept;

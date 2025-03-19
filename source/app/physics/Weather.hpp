@@ -2,6 +2,7 @@
 #define EUROTRAM_PHYSICS_WEATHER
 #include "../model/Model.hpp"
 #include "../objects/Objects.hpp"
+#include "../area/Map.hpp"
 
 enum struct WeatherCondition : uint16_t {
 	WEATHER_CLEAR          = 0,
@@ -71,6 +72,8 @@ private:
 	//TODO other
 };
 
+//call after map initialization
+void initSeasonMaterials(const Map& aMap) noexcept;
 void setSeasonMaterials(const WeatherCondition aCondition) noexcept;
 
 #endif
