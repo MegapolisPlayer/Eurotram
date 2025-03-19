@@ -105,7 +105,16 @@ void Window::applyBackgroundColor() noexcept {
 }
 
 void Window::setViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept {
-	glViewport(0, 0, aWidth, aHeight);
+	glViewport(0,0, aWidth, aHeight);
+	this->updateCamera();
+}
+void Window::setResizeViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept {
+	glViewport(
+		aWidth/2-this->mWidth/2,
+		aHeight/2-this->mHeight/2,
+		aWidth,
+		aHeight
+	);
 	this->updateCamera();
 }
 void Window::resetViewport() noexcept {
@@ -279,5 +288,5 @@ void Window::ResizeCallback(GLFWwindow* aWindow, int aNewX, int aNewY) noexcept 
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
 	ClassPointer->mWidth = aNewX;
 	ClassPointer->mHeight = aNewY;
-	glViewport(0, 0, ClassPointer->mWidth, ClassPointer->mHeight);
+	ClassPointer->setResizeViewport(aNewX, aNewY);
 }

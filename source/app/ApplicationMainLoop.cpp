@@ -55,10 +55,11 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 		//TODO support reverse spped
 		//TODO abstract to controller
 		case GLFW_KEY_UP:
-			*vehicleThrottleRef += 0.005;
+			*vehicleThrottleRef += 0.01;
+			if(*vehicleThrottleRef >= 1.0) *vehicleThrottleRef = 1.0;
 			break;
 		case GLFW_KEY_DOWN:
-			*vehicleThrottleRef -= 0.005;
+			*vehicleThrottleRef -= 0.01;
 			break;
 	}
 }
@@ -161,7 +162,7 @@ bool Application::runInternal() noexcept {
 	std::cout << "Model loaded!\n";
 
 	v.init(this->mMap, this->mLine, &t3rp);
-	vehicleThrottleRef = &v.getVehiclePhysicsData()->acceleration; //TODO change to accel
+	vehicleThrottleRef = &v.getVehicleControlData()->throttle;
 	*vehicleThrottleRef = 0.0;
 
 	shader.bind();
@@ -213,8 +214,9 @@ bool Application::runInternal() noexcept {
 
 	this->runWindowFrame([&]() {
 		std::cout << "THR " << v.getVehicleControlData()->throttle << '\n';
-		std::cout << "ACC " << v.getVehiclePhysicsData()->acceleration << '\n';
-		std::cout << "SPD " << v.getVehiclePhysicsData()->speed << '\n';
+		std::cout << "ACC " << v.getVehiclePhysicsData()->acceleration << "m/s" << '\n';
+		std::cout << "SPD " << v.getVehiclePhysicsData()->speed << " " << v.getVehiclePhysicsData()->speed*50 << "m/s" << '\n';
+		std::cout << "FCE " << v.getVehiclePhysicsData()->fceFront << '\n';
 
 		v.update(this->mMap, this->mLine);
 		if(cameraFollowsVehicle) {

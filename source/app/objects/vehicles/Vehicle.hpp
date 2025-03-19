@@ -10,6 +10,7 @@ struct VehicleInformation {
 	uint64_t seats, standing;
 
 	float areaFront = 0.0;
+	float gearRatio = 0.0, wheelDiameter = 0.0, motorRPM = 0.0, motorAmount = 0.0;
 
 	std::string modelFile;
 	//for each bogie pair in bogieNames defined names of meshes
@@ -72,12 +73,13 @@ struct VehiclePhysicsData {
 	float nadal = 0.0;
 
 	//weather
-	float motorAmount = 0.0;
 	float power = 0.0; //final power = power*motorAmount
-	float consumption = 0.0;
 
-	//electricity
-	float contactResistance = 0.0;
+	//electricity - just for display
+	float voltage = 0.0;
+
+	//counters
+	float energyUsed = 0.0;
 };
 
 class BogieMovement {

@@ -42,9 +42,8 @@ void BogieMovement::init(Map& aMap, Line& aLine, const float aLengthRemainingOve
 	this->mLengthRemaining = aLengthRemainingOverride;
 }
 
+//doesnt have any check - responsibilty of the caller
 std::optional<glm::vec3> BogieMovement::move(Map& aMap, Line& aLine, const float aAmount, const bool aUpdateStation) noexcept {
-	if(aLine.isStationLast()) return {};
-
 	this->mLengthRemaining -= aAmount;
 
 	//update track
@@ -68,9 +67,6 @@ std::optional<glm::vec3> BogieMovement::move(Map& aMap, Line& aLine, const float
 			}
 		}
 		this->mLengthRemaining += aMap.getTrackById(this->mTrackId).length;
-		if(aLine.isStationLast()) {
-			return {};
-		}
 	}
 
 	//get position of bogies
@@ -188,9 +184,12 @@ Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
 		else if(name == "HEIGHT") this->mInfo.height = std::stof(value);
 		else if(name == "SEATS") this->mInfo.seats = std::stoull(value);
 		else if(name == "STANDING") this->mInfo.standing = std::stoull(value);
-		else if(name == "MOTORS") this->mPhysicsData.motorAmount = std::stof(value);
+		else if(name == "MOTORS") this->mInfo.motorAmount = std::stof(value);
 		else if(name == "POWER") this->mPhysicsData.power = std::stof(value);
 		else if(name == "SPEED") this->mPhysicsData.maxSpeed = std::stof(value);
+		else if(name == "MOTORRPM") this->mInfo.motorRPM = std::stof(value);
+		else if(name == "GEARRATIO") this->mInfo.gearRatio = std::stof(value);
+		else if(name == "WHEELDIAMETER") this->mInfo.wheelDiameter = std::stof(value);
 		else if(name == "BOGIENAMES") {
 			std::vector<std::string> names;
 			splitString(value, SEPARATOR_LOW, names);
@@ -383,16 +382,18 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 	std::vector<glm::vec3> positions;
 	bool leading = true;
 	for(BogieMovement& b : this->mBogies) {
+		if(leading) {
+			//if leading bogie on last station and not at our station track - exit
+			if(aLine.isStationLast() && !aMap.isTrackStation(b.mTrackId)) return;
+		}
 		auto a = b.move(aMap, aLine, this->mPhysicsData.speed, leading);
 		if(!a.has_value()) {
+			//if we are at last and want to move further - exit
 			return; //station last, no value
 		}
 		positions.push_back(a.value());
 		leading = false; //only for first bogie
 	}
-
-	//if we reached last - exit
-	if(aLine.isStationLast()) return;
 
 	//calculate first transform
 	glm::vec3 avg = Math::getAverageOfVectors(positions[1], positions[0]);
@@ -449,9 +450,13 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 
 void Vehicle::physicsUpdate(const float aPhysicsUpdateFreq) noexcept {
 	//power in kW
-	//this->mPhysicsData.fceFront = Physics::forceFromPower(this->mPhysicsData.power*this->mPhysicsData.motorAmount*1000, this->mControlData.throttle, this->mPhysicsData.speed);
-	//this->mPhysicsData.acceleration = Physics::accelerationFromForce(this->mPhysicsData.fceFront, this->mInfo.mass);
-	this->mPhysicsData.speed += this->mPhysicsData.acceleration*(1.0/aPhysicsUpdateFreq);
+	this->mPhysicsData.fceFront = Physics::forceFromPower(
+		this->mPhysicsData.power*this->mInfo.motorAmount*1000, this->mControlData.throttle,
+		this->mInfo.motorRPM, this->mInfo.gearRatio, this->mPhysicsData.speed, this->mInfo.wheelDiameter
+	);
+	this->mPhysicsData.acceleration = Physics::accelerationFromForce(this->mPhysicsData.fceFront, this->mInfo.mass);
+	//get extra speed per second (m/s), divide by physics update frequency
+	this->mPhysicsData.speed += Physics::perFrameSpeedFromAcceleration(this->mPhysicsData.acceleration, 1.0/aPhysicsUpdateFreq)/aPhysicsUpdateFreq;
 }
 
 bool Vehicle::setSpeed(const float aSpeed) noexcept {
