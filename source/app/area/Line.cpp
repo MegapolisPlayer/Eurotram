@@ -446,10 +446,8 @@ namespace UI {
 		std::string controlPoints;
 		controlPoints.reserve(1000);
 
-		//TODO find them in list
-
 		for(LineData::Station& s : aLine.mLoops[aLine.mCurrentLoopId].stations) {
-
+			if(s.isControlPoint) controlPoints.append(s.stationCode);
 		}
 		ImGui::Text("Control points: %s", "");
 

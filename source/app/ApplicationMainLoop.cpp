@@ -213,10 +213,7 @@ bool Application::runInternal() noexcept {
 	glm::vec3 oldVehicleRot = glm::vec3(0.0);
 
 	this->runWindowFrame([&]() {
-		std::cout << "THR " << v.getVehicleControlData()->throttle << '\n';
-		std::cout << "ACC " << v.getVehiclePhysicsData()->acceleration << "m/s" << '\n';
-		std::cout << "SPD " << v.getVehiclePhysicsData()->speed << " " << v.getVehiclePhysicsData()->speed*50 << "m/s" << '\n';
-		std::cout << "FCE " << v.getVehiclePhysicsData()->fceFront << '\n';
+		//std::cout << "THR " << v.getVehicleControlData()->throttle << '\n';
 
 		v.update(this->mMap, this->mLine);
 		if(cameraFollowsVehicle) {
@@ -354,31 +351,7 @@ bool Application::runInternal() noexcept {
 			ImGui::End();
 
 			UI::drawLineInfoWindow(this->mLine);
-
-			ImGui::Begin("Physics");
-
-			ImGui::Text("Gravitational force (vertical): %f N", 0.0);
-			ImGui::Text("Friction force: %f N", 0.0);
-			ImGui::Text("Friction cf.: %f", 0.0);
-			ImGui::Text("Friction cf. mod.: %s", "none"); //seasons, leaves, ice...
-			ImGui::Text("Acceleration force: %f N", 0.0);
-			ImGui::Text("Brake force: %f N", 0.0);
-			ImGui::Text("Cetripetal force: %f N", 0.0);
-			ImGui::Text("L/V ratio: %f ", 0.0);
-
-			ImGui::End();
-
-			ImGui::Begin("Electricity");
-
-			ImGui::Text("Voltage in network: %f V", 0.0);
-			ImGui::Text("Amperage in network: %f A", 0.0);
-			ImGui::Text("Contact resistance: %f Ohm", 0.0);
-			ImGui::Text("Contact resistance modifiers: %s", "none"); //ice, rain...
-			ImGui::Text("Voltage at pantograph: %f V", 0.0);
-			ImGui::Text("Amperage at pantograph: %f A", 0.0);
-			ImGui::Text("Breakers: %s", "none"); //rain, ice...
-
-			ImGui::End();
+			UI::drawPhysicsInfoWindow(v);
 
 			ImGui::Begin("Visual");
 
@@ -399,6 +372,13 @@ bool Application::runInternal() noexcept {
 				setSeasonMaterials(WeatherCondition::WEATHER_SEASONS_AUTUMN);
 			if(ImGui::Button("Winter"))
 				setSeasonMaterials(WeatherCondition::WEATHER_SEASONS_WINTER);
+
+			ImGui::End();
+
+			ImGui::Begin("Controls");
+
+			if(ImGui::Button("EMERGENCY BRAKE!!!"))
+				v.getVehicleControlData()->brakeEmergency = !v.getVehicleControlData()->brakeEmergency;
 
 			ImGui::End();
 

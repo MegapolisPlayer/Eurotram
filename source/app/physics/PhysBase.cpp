@@ -28,10 +28,29 @@ namespace Physics {
 			//calculate "normal" tractive effort (P = Fv) => F = P/v
 			return pow*throttle/velocity;
 		}
-
-		return 0.0;
+	}
+	float nadalLimit(float frictionCoef, float angle) noexcept {
+		return (std::tan(glm::radians(angle)) - frictionCoef) / (1.0 + frictionCoef * std::tan(glm::radians(angle)));
 	}
 	float verticalForce(float v, float l, float angle) noexcept {
-		return 0.0; //TODO
+
+
+	}
+
+	float forceGravity(float m, float g) noexcept {
+		return m*g;
+	}
+	float forceNormal(float forceGravity, float angle) noexcept {
+		return forceGravity*std::cos(glm::radians(angle));
+	}
+	float forceFriction(float normal, float coef) noexcept {
+		return normal*coef;
+	}
+	float forceRollingResistance(float normal, float coef) noexcept {
+		return normal*coef;
+	}
+	float forceAerodynamic(float speed, float frontArea, float aerodynamicCoef) noexcept {
+		//1/2pv2cS
+		return 0.5 * speed * speed * aerodynamicCoef * frontArea;
 	}
 }

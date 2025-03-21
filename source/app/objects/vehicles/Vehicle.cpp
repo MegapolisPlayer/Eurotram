@@ -190,6 +190,7 @@ Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
 		else if(name == "MOTORRPM") this->mInfo.motorRPM = std::stof(value);
 		else if(name == "GEARRATIO") this->mInfo.gearRatio = std::stof(value);
 		else if(name == "WHEELDIAMETER") this->mInfo.wheelDiameter = std::stof(value);
+		else if(name == "AEROCOEF") this->mInfo.aerodynamicCoef = std::stof(value);
 		else if(name == "BOGIENAMES") {
 			std::vector<std::string> names;
 			splitString(value, SEPARATOR_LOW, names);
@@ -300,6 +301,8 @@ Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
 		return;
 	}
 
+	this->mInfo.areaFront = this->mInfo.height*this->mInfo.width;
+
 	std::cout << "Vehicle configration loaded!\n";
 }
 
@@ -369,7 +372,6 @@ void Vehicle::init(Map& aMap, Line& aLine, Model* aModel) noexcept {
 	for(VehicleCabinTriggerDataEntry& v : this->mCabinData.data) {
 		this->mTriggers.emplace_back(v.offset, v.size, v.rotation);
 		this->mTriggers.back().setColor(glm::vec4(0.0, 1.0, 0.0, 0.5));
-		std::cout << "TRIGGER: " << v.offset << v.size << v.rotation << '\n'; //TODO remove DEBUG
 	}
 
 	//add to drawer
@@ -448,17 +450,46 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 	}
 }
 
-void Vehicle::physicsUpdate(const float aPhysicsUpdateFreq) noexcept {
-	//power in kW
+void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateFreq) noexcept {
+	//calculate forces
+
+	//power in KW
 	this->mPhysicsData.fceFront = Physics::forceFromPower(
 		this->mPhysicsData.power*this->mInfo.motorAmount*1000, this->mControlData.throttle,
-		this->mInfo.motorRPM, this->mInfo.gearRatio, this->mPhysicsData.speed, this->mInfo.wheelDiameter
+		this->mInfo.motorRPM, this->mInfo.gearRatio, this->mPhysicsData.physicsSpeed, this->mInfo.wheelDiameter
 	);
-	this->mPhysicsData.acceleration = Physics::accelerationFromForce(this->mPhysicsData.fceFront, this->mInfo.mass);
-	//get extra speed per second (m/s), divide by physics update frequency
-	this->mPhysicsData.speed += Physics::perFrameSpeedFromAcceleration(this->mPhysicsData.acceleration, 1.0/aPhysicsUpdateFreq)/aPhysicsUpdateFreq;
-}
+	this->mPhysicsData.fceAerodynamic = Physics::forceAerodynamic(this->mPhysicsData.physicsSpeed, this->mInfo.areaFront, this->mInfo.aerodynamicCoef);
+	this->mPhysicsData.fceGravity = Physics::forceGravity(this->mInfo.mass);
+	this->mPhysicsData.fceNormal = Physics::forceNormal(this->mPhysicsData.fceGravity, this->mBogies[0].mRotation.x);
 
+	//friction
+	float frictionCoef = getFrictionFromWeather((WeatherCondition)aWeather);
+	this->mPhysicsData.fceFriction = Physics::forceFriction(this->mPhysicsData.fceNormal, frictionCoef);
+	float appliedFrictionForce = 0.0;
+	if(this->mControlData.brakeEmergency) appliedFrictionForce = this->mPhysicsData.fceFriction;
+
+	//rolling resistance
+	this->mPhysicsData.fceResistance = Physics::forceRollingResistance(this->mPhysicsData.fceNormal);
+
+	//vertical movement - Nadal and so on
+	//TODO
+
+	//TODO apply resistance forces only when needed (remove them from fceFront? split into fceFront and back - back force only applied if spped > 0)
+
+	this->mPhysicsData.fceResult = this->mPhysicsData.fceFront - appliedFrictionForce - this->mPhysicsData.fceResistance - this->mPhysicsData.fceAerodynamic;
+
+	if(this->mPhysicsData.fceResult > this->mPhysicsData.fceFriction) {
+		//slip!
+		std::cout << "SLIP!\n"; //TODO
+	}
+	else {
+		//horizontal speed
+		this->mPhysicsData.acceleration = Physics::accelerationFromForce(this->mPhysicsData.fceResult, this->mInfo.mass);
+		//get extra speed per second (m/s), divide by physics update frequency
+		this->mPhysicsData.physicsSpeed += Physics::perFrameSpeedFromAcceleration(this->mPhysicsData.acceleration, 1.0/aPhysicsUpdateFreq);
+		this->mPhysicsData.speed = this->mPhysicsData.physicsSpeed/aPhysicsUpdateFreq;
+	}
+}
 bool Vehicle::setSpeed(const float aSpeed) noexcept {
 	this->mPhysicsData.speed = aSpeed;
 	if(aSpeed >= this->mPhysicsData.maxSpeed) return false;
@@ -486,3 +517,24 @@ std::vector<BoxTrigger>& Vehicle::getTriggers() noexcept {
 }
 
 Vehicle::~Vehicle() noexcept {}
+
+void UI::drawPhysicsInfoWindow(Vehicle& aVehicle) noexcept {
+	ImGui::Begin("Vehicle physics data");
+
+	ImGui::Text("Speed: %f m/s", aVehicle.mPhysicsData.physicsSpeed);
+	ImGui::Text("Total energy used: %f N", aVehicle.mPhysicsData.energyUsed);
+
+	ImGui::Text("Movement force: %f N", aVehicle.mPhysicsData.fceFront);
+	ImGui::Text("Gravitational force (vertical): %f N", aVehicle.mPhysicsData.fceGravity);
+	ImGui::Text("Rolling resistance: %f N", aVehicle.mPhysicsData.fceResistance);
+	ImGui::Text("Friction force: %f N", aVehicle.mPhysicsData.fceFriction);
+	ImGui::Text("Aerodynamic resistance: %f N", aVehicle.mPhysicsData.fceAerodynamic);
+	ImGui::Text("Cetripetal force: %f N", aVehicle.mPhysicsData.fceTurn);
+	ImGui::Text("L/V ratio: %f ", aVehicle.mPhysicsData.nadal);
+	ImGui::Text(""); //empty line
+	ImGui::Text("Voltage: %f V", aVehicle.mPhysicsData.voltage);
+	ImGui::Text(""); //empty line
+	ImGui::Text("Friction cf.: %f", aVehicle.mPhysicsData.frictionCoef);
+
+	ImGui::End();
+}

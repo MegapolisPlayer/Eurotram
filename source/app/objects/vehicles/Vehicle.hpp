@@ -10,6 +10,7 @@ struct VehicleInformation {
 	uint64_t seats, standing;
 
 	float areaFront = 0.0;
+	float aerodynamicCoef = 0.0;
 	float gearRatio = 0.0, wheelDiameter = 0.0, motorRPM = 0.0, motorAmount = 0.0;
 
 	std::string modelFile;
@@ -53,20 +54,30 @@ struct VehicleControlData {
 
 	float brakeDynamic = 0.0; //stop motors, makes then regenerate electricity
 	float brakeMechanic = 0.0; //stops motors using friction - when under 5km/h
-	float brakeRail = 0.0; //physical, adds much more friction
+	float brakeEmergency = 0.0; //physical, adds much more friction, EMERGENCY BRAKE
 
 	bool sander = false;
 	bool pantographContact = true; //TODO
 };
 
 struct VehiclePhysicsData {
-	float speed = 0.0;
+	float frictionCoef = 0.0;
+
+	float speed = 0.0; //per 1/50 of a second
+	float physicsSpeed = 0.0; //in meters per second
 	float maxSpeed = 0.0;
 	float acceleration = 0.0;
 
 	//forces
+	float fceResult = 0.0;
+
+	float fceVertical = 0.0;
+	float verticalDistanceTravelled = 0.0; //for derailments
+
 	float fceFront = 0.0;
 	float fceGravity = 0.0;
+	float fceNormal = 0.0;
+	float fceResistance = 0.0; //rolling resistance
 	float fceFriction = 0.0;
 	float fceAerodynamic = 0.0;
 	float fceTurn = 0.0;
@@ -131,8 +142,15 @@ private:
 
 //TODO convert to instanced
 
+class Vehicle;
+
+namespace UI {
+	void drawPhysicsInfoWindow(Vehicle& aVehicle) noexcept;
+}
+
 //handles movement and stuff
 class Vehicle {
+	friend void UI::drawPhysicsInfoWindow(Vehicle& aVehicle) noexcept;
 public:
 	Vehicle(Map& aMap, Line& aLine, VehicleInformation& aInfo, Model* aModel) noexcept;
 
@@ -151,7 +169,7 @@ public:
 	//update data of vehicle
 	void update(Map& aMap, Line& aLine) noexcept;
 
-	void physicsUpdate(const float aPhysicsUpdateFreq) noexcept;
+	void physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateFreq) noexcept;
 
 	//returns false if over speed limit
 	bool setSpeed(const float aSpeed) noexcept;
@@ -163,6 +181,8 @@ public:
 
 	BoxTriggerDrawer& getControlsDraw() noexcept;
 	std::vector<BoxTrigger>& getTriggers() noexcept;
+
+	bool isEmergencyBraking() noexcept;
 
 	~Vehicle() noexcept;
 

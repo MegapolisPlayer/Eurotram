@@ -40,9 +40,9 @@ Window::Window(const char* aTitle, uint64_t aWidth, const uint64_t aHeight, cons
 		std::exit(EXIT_FAILURE);
 	}
 
-	//we must support bindless textures
+	//we must support bindless textures TODO
 
-	glViewport(0, 0, this->mWidth, this->mHeight);
+	this->setViewport(this->mWidth, this->mHeight);
 
 	if(this->mDebugEnabled) {
 		glEnable(GL_DEBUG_OUTPUT);
@@ -108,17 +108,26 @@ void Window::setViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept
 	glViewport(0,0, aWidth, aHeight);
 	this->updateCamera();
 }
+//TODO!
 void Window::setResizeViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept {
+	float fWidth = (float)aWidth;
+	float fHeight = (float)aHeight;
+
 	glViewport(
-		aWidth/2-this->mWidth/2,
-		aHeight/2-this->mHeight/2,
-		aWidth,
-		aHeight
+		(fWidth-1280)/2.0,
+		(fHeight-720)/2.0,
+		1280,
+		720
 	);
+
+	//std::cout << movementX << ' ' << movementY << ' ' << fWidth << ' ' << fHeight << '\n';
+
+	//this->mWidth = aWidth;
+	//this->mHeight = aHeight;
 	this->updateCamera();
 }
 void Window::resetViewport() noexcept {
-	glViewport(0, 0, this->mWidth, this->mHeight);
+	glViewport(0, 0, 1280, 720);
 	this->updateCamera();
 }
 
@@ -286,7 +295,5 @@ void Window::GLCallback(GLenum source, GLenum type, GLuint id, GLenum severity, 
 }
 void Window::ResizeCallback(GLFWwindow* aWindow, int aNewX, int aNewY) noexcept {
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
-	ClassPointer->mWidth = aNewX;
-	ClassPointer->mHeight = aNewY;
 	ClassPointer->setResizeViewport(aNewX, aNewY);
 }
