@@ -32,21 +32,28 @@ void setSeasonMaterials(const WeatherCondition aCondition) noexcept {
 	}
 }
 
-float getFrictionFromWeather(const WeatherCondition aCondition) noexcept {
-	float result = BASE_RAIL_FRICTION;
-	if(((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_RAIN) && ((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_SNOW)) {
-		result -= 0.2;
-	}
+namespace Physics {
+	float getWeatherFrictionCoeffDelta(const WeatherCondition aCondition) noexcept {
+		float result = 0.0;
+		if(((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_RAIN) && ((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_SNOW)) {
+			result -= 0.2;
+		}
 
-	if(((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_SEASONS_AUTUMN) > 0) {
-		result -= 0.3;
-	}
-	else if(((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_SEASONS_WINTER) > 0) {
-		result -= 0.2;
-	}
-	else {}
+		if(((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_SEASONS_AUTUMN) > 0) {
+			result -= 0.3;
+		}
+		else if(((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_SEASONS_WINTER) > 0) {
+			result -= 0.2;
+		}
+		else {}
 
-	return result;
+		return result;
+	}
+	float getWeatherFrictionCoeff(const WeatherCondition aCondition, const float aVelocity) noexcept {
+		//floating point inprecision
+		if(aVelocity > -0.01 && aVelocity < 0.01) return BASE_RAIL_STANDSTILL_FRICTION - getWeatherFrictionCoeffDelta(aCondition);
+		else return BASE_RAIL_FRICTION - getWeatherFrictionCoeffDelta(aCondition);
+	}
 }
 
 //box of size 1x1 - we scale

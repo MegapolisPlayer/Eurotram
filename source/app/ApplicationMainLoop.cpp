@@ -377,15 +377,17 @@ bool Application::runInternal() noexcept {
 
 			ImGui::Begin("Controls");
 
-			if(ImGui::Button("EMERGENCY BRAKE!!!"))
+			if(ImGui::Button("EMERGENCY BRAKE!!!")) {
 				v.getVehicleControlData()->brakeEmergency = !v.getVehicleControlData()->brakeEmergency;
+				std::cout << "BRAKE " << v.getVehicleControlData()->brakeEmergency << '\n';
+			}
 
 			ImGui::End();
 
 			ImGui::Begin("Announcements");
 
 			if(ImGui::Button("Next announcement")) {
-				this->mLine.next(this->mMinuteTime);
+				this->mLine.playCurrentAnnouncement();
 			};
 
 			ImGui::End();

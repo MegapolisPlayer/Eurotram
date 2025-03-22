@@ -144,4 +144,41 @@ namespace Math {
 	glm::vec2 swizzleXZ(const glm::vec4& aVector) noexcept {
 		return glm::vec2(aVector.x, aVector.z);
 	}
+
+	static float cross2(const glm::vec2& a1, const glm::vec2& a2) {
+		return a1.x*a2.y - a1.y*a2.x;
+	}
+
+	//TODO
+
+	//https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+	glm::vec2 getIntersectionPoint(const glm::vec2& a1base, const float a1rot, const glm::vec2& a2base, const float a2rot) noexcept {
+		glm::vec2 r = glm::vec2(std::cos(a1rot), std::sin(a1rot));
+		glm::vec2 s = glm::vec2(std::cos(a2rot), std::sin(a2rot));
+
+		float t = cross2((a2base - a1base), s) / cross2(r, s);
+		//float u = cross2((a1base - a2base), r) / cross2(r, s);
+
+		if(cross2(r, s) == 0 && cross2(a1base - a2base, r) == 0) {
+			return glm::vec2(DBL_MIN+1, DBL_MIN+1); //collinear
+		}
+		else if(cross2(r, s) == 0 && cross2(a1base - a2base, r) != 0) {
+			return glm::vec2(DBL_MIN+2, DBL_MIN+2); //parallel
+		}
+		else {
+			return a1base+t*r; //collinear
+		}
+	}
+
+	float getCurveRadius(const glm::vec2& a1base, const float a1rot, const glm::vec2& a2base, const float a2rot) noexcept {
+		glm::vec2 pt = getIntersectionPoint(a1base, a1rot-90, a2base, a2rot-90);
+		glm::vec2 pt2 = getIntersectionPoint(a1base, a1rot+90, a2base, a2rot+90);
+
+		std::cout << a1base << a2base << '\n';
+		std::cout << pt << pt2 << Math::getAverageOfVectors(a1base, a2base) << '\n';
+
+		if(pt.x <= DBL_MIN+3) return 0.0; //error state
+		//smaller radius of the 2
+		return glm::min(glm::distance(pt, Math::getAverageOfVectors(a1base, a2base)), glm::distance(pt2, Math::getAverageOfVectors(a1base, a2base)));
+	}
 }

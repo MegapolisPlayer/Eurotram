@@ -76,8 +76,12 @@ private:
 void initSeasonMaterials(const Map& aMap) noexcept;
 void setSeasonMaterials(const WeatherCondition aCondition) noexcept;
 
-constexpr float BASE_RAIL_FRICTION = 0.6;
-//gets friction coefficient
-float getFrictionFromWeather(const WeatherCondition aCondition) noexcept;
+namespace Physics {
+	constexpr float BASE_RAIL_FRICTION = 0.5;
+	constexpr float BASE_RAIL_STANDSTILL_FRICTION = 0.7;
+	float getWeatherFrictionCoeffDelta(const WeatherCondition aCondition) noexcept;
+	//gets friction coefficient
+	float getWeatherFrictionCoeff(const WeatherCondition aCondition, const float aVelocity) noexcept;
+}
 
 #endif

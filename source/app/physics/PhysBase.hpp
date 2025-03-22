@@ -18,6 +18,10 @@ namespace Physics {
 	float forceFriction(float normal, float coef) noexcept;
 	float forceRollingResistance(float normal, float coef = 0.001) noexcept;
 	float forceAerodynamic(float speed, float frontArea, float aerodynamicCoef) noexcept;
+	float forceTurn(float mass, float speed, float radius) noexcept;
+
+	float maxResistanceForce(float speed, float mass, float time) noexcept;
+	float resultingForce(float forward, float resistance, float maxResistance) noexcept;
 };
 
 #endif

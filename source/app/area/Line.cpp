@@ -190,6 +190,7 @@ void Line::open(const std::string_view aFilename, Annunciator* aAnnunciator) noe
 	this->mInitialized = true;
 }
 
+//same as playCurrentAnnouncement but also sets some stuff
 uint64_t Line::next(const uint64_t aMinuteTime) noexcept {
 	if(!this->mInitialized) return UINT64_MAX;
 
@@ -266,6 +267,23 @@ std::optional<LineData::Switch> Line::getNextSwitch() noexcept {
 std::vector<LineData::Switch>& Line::getSwitchesToNextStop() noexcept {
 	//this->mCurrentStationId starts at -1 so audio announcements work correctly
 	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId+1].switches;
+}
+
+void Line::playCurrentAnnouncement() noexcept {
+	if(!this->mInitialized) return;
+
+	if(this->mCurrentStationId == 0) {
+		uint8_t lineNumber2 = this->mLoops[this->mCurrentLoopId].lineNumber2;
+		if(lineNumber2 == LineData::LINE_TYPE_NORMAL_NUMBERED) {
+			this->mAnnunciator->addAnnouncementStart(
+				this->mLoops[this->mCurrentLoopId].lineNumber, this->getLastStationCode()
+			);
+		}
+	}
+	this->mAnnunciator->addAnnouncementCurrent(this->getCurrentStationCode());
+
+	if(this->isStationLast()) this->mAnnunciator->addAnnouncementTerminus().play();
+	else this->mAnnunciator->addAnnouncementNext(this->getNextStationCode()).play();
 }
 
 void Line::reset() noexcept {

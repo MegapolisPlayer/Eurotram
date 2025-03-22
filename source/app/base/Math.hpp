@@ -53,6 +53,9 @@ namespace Math {
 
 	glm::vec2 swizzleXZ(const glm::vec3& aVector) noexcept;
 	glm::vec2 swizzleXZ(const glm::vec4& aVector) noexcept;
+
+	glm::vec2 getIntersectionPoint(const glm::vec2& a1base, const float a1rot, const glm::vec2& a2base, const float a2rot) noexcept;
+	float getCurveRadius(const glm::vec2& a1base, const float a1rot, const glm::vec2& a2base, const float a2rot) noexcept;
 }
 
 #endif

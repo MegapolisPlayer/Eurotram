@@ -33,8 +33,7 @@ namespace Physics {
 		return (std::tan(glm::radians(angle)) - frictionCoef) / (1.0 + frictionCoef * std::tan(glm::radians(angle)));
 	}
 	float verticalForce(float v, float l, float angle) noexcept {
-
-
+		return 0.0;
 	}
 
 	float forceGravity(float m, float g) noexcept {
@@ -52,5 +51,29 @@ namespace Physics {
 	float forceAerodynamic(float speed, float frontArea, float aerodynamicCoef) noexcept {
 		//1/2pv2cS
 		return 0.5 * speed * speed * aerodynamicCoef * frontArea;
+	}
+	float forceTurn(float mass, float speed, float radius) noexcept {
+		if(radius == 0.0) return 0.0;
+ 		//F = ma
+		//a = v2/r
+		return mass * speed * speed / radius;
+	}
+
+	float maxResistanceForce(float speed, float mass, float time) noexcept {
+		//cannot be larger than force to brake - this is the force to bring tram to halt in 1 tick
+		//v/t = a
+		//v = at   //*t
+		//v = Ft/m
+		//vm = Ft  //*m
+		//vm/t = F  // /t
+		//does make sense: amount of newtons to make acceleration equal current speed (remove it in 1 tick)
+		//units fit:  m/s * kg / s = kgm/s2 = N
+		return speed*mass/time;
+	}
+
+	float resultingForce(float forward, float resistance, float maxResistance) noexcept {
+		//if forward < 0 -> multiply by 1
+		//if forward negative -> reverse also resistance strength
+		return forward + ((forward < 0)*2-1) * std::min(std::abs(resistance), std::abs(maxResistance));
 	}
 }

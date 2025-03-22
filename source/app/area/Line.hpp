@@ -94,7 +94,7 @@ class Line {
 	//detection of wrong direction at switch - track if stations not announced correctly - if yes and reach switch GAME OVER TODO
 	std::vector<LineData::Switch>& getSwitchesToNextStop() noexcept;
 
-	void playNextAnnouncement() noexcept;
+	void playCurrentAnnouncement() noexcept;
 
 	void reset() noexcept; //resets line to original state
 	void destroy() noexcept; //destroys object, have to remake with open()

@@ -72,6 +72,7 @@ struct VehiclePhysicsData {
 	float fceResult = 0.0;
 
 	float fceVertical = 0.0;
+	float verticalAcceleration = 0.0;
 	float verticalDistanceTravelled = 0.0; //for derailments
 
 	float fceFront = 0.0;
@@ -130,6 +131,7 @@ private:
 	uint64_t mTrackId;
 	std::pair<uint8_t, uint64_t> mNextNodeId;
 	uint64_t mSwitchCount;
+	std::vector<std::pair<uint8_t, uint64_t>> mPassedNodes;
 
 	Mesh* mBogie;
 	Mesh* mShaft1;

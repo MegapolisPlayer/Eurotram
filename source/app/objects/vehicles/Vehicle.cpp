@@ -68,6 +68,18 @@ std::optional<glm::vec3> BogieMovement::move(Map& aMap, Line& aLine, const float
 		}
 		this->mLengthRemaining += aMap.getTrackById(this->mTrackId).length;
 	}
+	else if(this->mLengthRemaining >= aMap.getTrackById(this->mTrackId).length) {
+		this->mLengthRemaining -= aMap.getTrackById(this->mTrackId).length;
+		//reverse
+		auto sharedPoint = aMap.getOtherTrackPoint(this->mTrackId, this->mNextNodeId);
+		if(sharedPoint.first == 's') {
+			//cannot back into switch
+			std::cerr << LogLevel::ERROR << "Cannot back into switch!\n" << LogLevel::RESET;
+			return {};
+		}
+		this->mTrackId = aMap.getNextTrack(this->mTrackId, sharedPoint, aLine.getSwitchesToNextStop()[this->mSwitchCount].direction);
+		this->mNextNodeId = sharedPoint; //move point back
+	}
 
 	//get position of bogies
 
@@ -390,6 +402,7 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 		}
 		auto a = b.move(aMap, aLine, this->mPhysicsData.speed, leading);
 		if(!a.has_value()) {
+			std::cout << "Dropping bogie!\n";
 			//if we are at last and want to move further - exit
 			return; //station last, no value
 		}
@@ -463,7 +476,7 @@ void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateF
 	this->mPhysicsData.fceNormal = Physics::forceNormal(this->mPhysicsData.fceGravity, this->mBogies[0].mRotation.x);
 
 	//friction
-	float frictionCoef = getFrictionFromWeather((WeatherCondition)aWeather);
+	float frictionCoef = Physics::getWeatherFrictionCoeff((WeatherCondition)aWeather, this->mPhysicsData.physicsSpeed);
 	this->mPhysicsData.fceFriction = Physics::forceFriction(this->mPhysicsData.fceNormal, frictionCoef);
 	float appliedFrictionForce = 0.0;
 	if(this->mControlData.brakeEmergency) appliedFrictionForce = this->mPhysicsData.fceFriction;
@@ -471,16 +484,31 @@ void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateF
 	//rolling resistance
 	this->mPhysicsData.fceResistance = Physics::forceRollingResistance(this->mPhysicsData.fceNormal);
 
+	this->mPhysicsData.fceTurn = Physics::forceTurn(
+		this->mInfo.mass, this->mPhysicsData.physicsSpeed,
+		Math::getCurveRadius(
+			Math::swizzleXZ(this->mBogies[0].mPosition), this->mBogies[0].mRotation.y,
+			Math::swizzleXZ(this->mBogies[1].mPosition), this->mBogies[1].mRotation.y
+		)
+	);
+
 	//vertical movement - Nadal and so on
+	this->mPhysicsData.nadal = Physics::nadalLimit(frictionCoef);
+	this->mPhysicsData.fceVertical = Physics::verticalForce(this->mPhysicsData.physicsSpeed, this->mPhysicsData.fceTurn);
 	//TODO
 
 	//TODO apply resistance forces only when needed (remove them from fceFront? split into fceFront and back - back force only applied if spped > 0)
 
-	this->mPhysicsData.fceResult = this->mPhysicsData.fceFront - appliedFrictionForce - this->mPhysicsData.fceResistance - this->mPhysicsData.fceAerodynamic;
+	float maxResistance = Physics::maxResistanceForce(this->mPhysicsData.physicsSpeed, this->mInfo.mass, 1.0/aPhysicsUpdateFreq);
+	this->mPhysicsData.fceResult = Physics::resultingForce(
+		this->mPhysicsData.fceFront,
+		appliedFrictionForce + std::abs(this->mPhysicsData.fceResistance) + std::abs(this->mPhysicsData.fceAerodynamic),
+		maxResistance
+	);
 
-	if(this->mPhysicsData.fceResult > this->mPhysicsData.fceFriction) {
-		//slip!
-		std::cout << "SLIP!\n"; //TODO
+	if(std::abs(this->mPhysicsData.fceResult) > std::abs(this->mPhysicsData.fceFriction)) {
+		//slip! - dont apply anything
+		std::cout << "SLIP!\n";
 	}
 	else {
 		//horizontal speed
@@ -522,8 +550,9 @@ void UI::drawPhysicsInfoWindow(Vehicle& aVehicle) noexcept {
 	ImGui::Begin("Vehicle physics data");
 
 	ImGui::Text("Speed: %f m/s", aVehicle.mPhysicsData.physicsSpeed);
-	ImGui::Text("Total energy used: %f N", aVehicle.mPhysicsData.energyUsed);
+	ImGui::Text("Total energy used: %f J", aVehicle.mPhysicsData.energyUsed);
 
+	ImGui::Text("Resulting force: %f N", aVehicle.mPhysicsData.fceResult);
 	ImGui::Text("Movement force: %f N", aVehicle.mPhysicsData.fceFront);
 	ImGui::Text("Gravitational force (vertical): %f N", aVehicle.mPhysicsData.fceGravity);
 	ImGui::Text("Rolling resistance: %f N", aVehicle.mPhysicsData.fceResistance);
