@@ -33,7 +33,11 @@ namespace Physics {
 		return (std::tan(glm::radians(angle)) - frictionCoef) / (1.0 + frictionCoef * std::tan(glm::radians(angle)));
 	}
 	float verticalForce(float v, float l, float angle) noexcept {
-		return 0.0;
+		if(l == 0.0) return 0.0;
+		glm::vec2 r = glm::vec2(v, l);
+		float alpha = Math::getRotationOfVector2DY(r);
+		//first cosine - get Ftan, second - get vertical part of it
+		return glm::cos(glm::radians(90 - angle)) * glm::length(r) * std::cos(glm::radians(alpha - angle));
 	}
 
 	float forceGravity(float m, float g) noexcept {
@@ -56,7 +60,7 @@ namespace Physics {
 		if(radius == 0.0) return 0.0;
  		//F = ma
 		//a = v2/r
-		return mass * speed * speed / radius;
+		return std::abs(mass * speed * speed) / std::abs(radius);
 	}
 
 	float maxResistanceForce(float speed, float mass, float time) noexcept {
@@ -71,9 +75,13 @@ namespace Physics {
 		return speed*mass/time;
 	}
 
-	float resultingForce(float forward, float resistance, float maxResistance) noexcept {
-		//if forward < 0 -> multiply by 1
-		//if forward negative -> reverse also resistance strength
-		return forward + ((forward < 0)*2-1) * std::min(std::abs(resistance), std::abs(maxResistance));
+	float resultingForce(float forward, float resistance, float maxResistance, float velocity) noexcept {
+		//if velocity positive -> multiply by 1
+		//if velocity negative -> reverse also resistance strength
+		return forward - ((velocity >= -0.005)*2-1) * std::min(std::abs(resistance), std::abs(maxResistance));
+	}
+
+	float powerConsumed(float pow, float throttle) noexcept {
+		return 0.0;
 	}
 }

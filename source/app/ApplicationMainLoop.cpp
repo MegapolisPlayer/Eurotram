@@ -14,6 +14,7 @@ static bool hideGui = false;
 static bool cameraFollowsVehicle = false;
 
 static float* vehicleThrottleRef = nullptr;
+static Line* lineRef = nullptr;
 
 void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) noexcept {
 	if(aAction == GLFW_RELEASE || !aWindow->isCursorHidden()) return;
@@ -52,8 +53,10 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 		case GLFW_KEY_F1:
 			hideGui = !hideGui;
 			break;
-		//TODO support reverse spped
 		//TODO abstract to controller
+		case GLFW_KEY_G:
+			lineRef->playCurrentAnnouncement();
+			break;
 		case GLFW_KEY_UP:
 			*vehicleThrottleRef += 0.01;
 			if(*vehicleThrottleRef >= 1.0) *vehicleThrottleRef = 1.0;
@@ -92,6 +95,8 @@ void Application::rawClickCallback(Window* aWindow, uint32_t aKey, uint32_t aAct
 }
 
 bool Application::runInternal() noexcept {
+	lineRef = &this->mLine;
+
 	this->mWindow.setBackgroundColor(daylightColor);
 
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");

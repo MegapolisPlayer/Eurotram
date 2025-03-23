@@ -73,6 +73,7 @@ struct VehiclePhysicsData {
 
 	float fceVertical = 0.0;
 	float verticalAcceleration = 0.0;
+	float verticalSpeed = 0.0;
 	float verticalDistanceTravelled = 0.0; //for derailments
 
 	float fceFront = 0.0;
@@ -82,7 +83,9 @@ struct VehiclePhysicsData {
 	float fceFriction = 0.0;
 	float fceAerodynamic = 0.0;
 	float fceTurn = 0.0;
-	float nadal = 0.0;
+
+	float lvr = 0.0; //actual
+	float nadal = 0.0; //limit
 
 	//weather
 	float power = 0.0; //final power = power*motorAmount

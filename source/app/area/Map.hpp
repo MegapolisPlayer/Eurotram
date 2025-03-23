@@ -5,6 +5,7 @@
 
 constexpr float TRACK_GAUGE = 1.435; //standard gauge
 constexpr float TRACK_WIDTH = 0.30; //30cm width of track
+constexpr float TRACK_HEIGHT = 0.20; //30cm width of track
 
 constexpr uint64_t MAP_FILE_FORMAT_VERSION = 0;
 

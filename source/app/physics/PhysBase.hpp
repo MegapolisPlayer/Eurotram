@@ -10,8 +10,8 @@ namespace Physics {
 	float forceFromPower(float pow, float throttle, float engineRot, float gearRatio, float velocity, float wheelDiameter, float efficiency = 0.95) noexcept;
 
 	//angle picked arbitrarily
-	float nadalLimit(float frictionCoef, float angle = 20.0) noexcept;
-	float verticalForce(float v, float l, float angle = 20.0) noexcept;
+	float nadalLimit(float frictionCoef, float angle = 30.0) noexcept;
+	float verticalForce(float v, float l, float angle = 30.0) noexcept;
 
 	float forceGravity(float m, float g = 9.81) noexcept;
 	float forceNormal(float forceGravity, float angle) noexcept;
@@ -21,7 +21,9 @@ namespace Physics {
 	float forceTurn(float mass, float speed, float radius) noexcept;
 
 	float maxResistanceForce(float speed, float mass, float time) noexcept;
-	float resultingForce(float forward, float resistance, float maxResistance) noexcept;
+	float resultingForce(float forward, float resistance, float maxResistance, float velocity) noexcept;
+
+	float powerConsumed(float pow, float throttle) noexcept;
 };
 
 #endif

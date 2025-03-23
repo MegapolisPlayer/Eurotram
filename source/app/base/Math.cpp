@@ -149,36 +149,32 @@ namespace Math {
 		return a1.x*a2.y - a1.y*a2.x;
 	}
 
-	//TODO
-
 	//https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 	glm::vec2 getIntersectionPoint(const glm::vec2& a1base, const float a1rot, const glm::vec2& a2base, const float a2rot) noexcept {
-		glm::vec2 r = glm::vec2(std::cos(a1rot), std::sin(a1rot));
-		glm::vec2 s = glm::vec2(std::cos(a2rot), std::sin(a2rot));
+		glm::vec2 r = glm::vec2(std::cos(glm::radians(a1rot)), std::sin(glm::radians(a1rot)));
+		glm::vec2 s = glm::vec2(std::cos(glm::radians(a2rot)), std::sin(glm::radians(a2rot)));
+		//std::cout << "RS" << r << s << '\n';
 
 		float t = cross2((a2base - a1base), s) / cross2(r, s);
 		//float u = cross2((a1base - a2base), r) / cross2(r, s);
 
-		if(cross2(r, s) == 0 && cross2(a1base - a2base, r) == 0) {
-			return glm::vec2(DBL_MIN+1, DBL_MIN+1); //collinear
+		if(cross2(r, s) == 0 && cross2(a2base - a1base, r) == 0) {
+			return glm::vec2(DBL_MAX); //collinear
 		}
-		else if(cross2(r, s) == 0 && cross2(a1base - a2base, r) != 0) {
-			return glm::vec2(DBL_MIN+2, DBL_MIN+2); //parallel
+		else if(cross2(r, s) == 0 && cross2(a2base - a1base, r) != 0) {
+			return glm::vec2(DBL_MAX); //parallel
 		}
 		else {
-			return a1base+t*r; //collinear
+			return a1base+(t*r);
 		}
 	}
 
 	float getCurveRadius(const glm::vec2& a1base, const float a1rot, const glm::vec2& a2base, const float a2rot) noexcept {
-		glm::vec2 pt = getIntersectionPoint(a1base, a1rot-90, a2base, a2rot-90);
-		glm::vec2 pt2 = getIntersectionPoint(a1base, a1rot+90, a2base, a2rot+90);
+		glm::vec2 pt = getIntersectionPoint(a1base, std::fmod(a1rot-90, 360), a2base, std::fmod(a2rot-90, 360));
 
-		std::cout << a1base << a2base << '\n';
-		std::cout << pt << pt2 << Math::getAverageOfVectors(a1base, a2base) << '\n';
+		if(pt.x >= DBL_MAX-1.0) return 0.0;
 
-		if(pt.x <= DBL_MIN+3) return 0.0; //error state
 		//smaller radius of the 2
-		return glm::min(glm::distance(pt, Math::getAverageOfVectors(a1base, a2base)), glm::distance(pt2, Math::getAverageOfVectors(a1base, a2base)));
+		return glm::distance(pt, Math::getAverageOfVectors(a1base, a2base));
 	}
 }

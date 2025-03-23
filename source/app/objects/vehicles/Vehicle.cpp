@@ -493,20 +493,34 @@ void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateF
 	);
 
 	//vertical movement - Nadal and so on
+	this->mPhysicsData.lvr = this->mPhysicsData.fceTurn/this->mPhysicsData.fceNormal;
 	this->mPhysicsData.nadal = Physics::nadalLimit(frictionCoef);
 	this->mPhysicsData.fceVertical = Physics::verticalForce(this->mPhysicsData.physicsSpeed, this->mPhysicsData.fceTurn);
-	//TODO
+	this->mPhysicsData.verticalAcceleration = Physics::accelerationFromForce(this->mPhysicsData.fceVertical - this->mPhysicsData.fceGravity, this->mInfo.mass);
+	//get extra speed per second (m/s), divide by physics update frequency
+	this->mPhysicsData.verticalSpeed += Physics::perFrameSpeedFromAcceleration(this->mPhysicsData.verticalAcceleration, 1.0/aPhysicsUpdateFreq);
+	this->mPhysicsData.verticalDistanceTravelled += this->mPhysicsData.verticalSpeed/aPhysicsUpdateFreq;
 
-	//TODO apply resistance forces only when needed (remove them from fceFront? split into fceFront and back - back force only applied if spped > 0)
+	//clamp to zero
+	this->mPhysicsData.verticalDistanceTravelled = std::max(this->mPhysicsData.verticalDistanceTravelled, 0.0f);
+	if(this->mPhysicsData.verticalDistanceTravelled == 0.0) {
+		this->mPhysicsData.verticalSpeed = 0.0;
+		this->mPhysicsData.verticalDistanceTravelled = 0.0;
+	}
+
+	if(this->mPhysicsData.verticalDistanceTravelled > TRACK_HEIGHT) {
+		std::cerr << LogLevel::SUCCESS << "Vehicle derailed!\n" << LogLevel::RESET;
+		std::exit(0);
+	}
 
 	float maxResistance = Physics::maxResistanceForce(this->mPhysicsData.physicsSpeed, this->mInfo.mass, 1.0/aPhysicsUpdateFreq);
 	this->mPhysicsData.fceResult = Physics::resultingForce(
 		this->mPhysicsData.fceFront,
 		appliedFrictionForce + std::abs(this->mPhysicsData.fceResistance) + std::abs(this->mPhysicsData.fceAerodynamic),
-		maxResistance
+		maxResistance, this->mPhysicsData.physicsSpeed
 	);
 
-	if(std::abs(this->mPhysicsData.fceResult) > std::abs(this->mPhysicsData.fceFriction)) {
+	if(std::abs(this->mPhysicsData.fceFront) > std::abs(this->mPhysicsData.fceFriction)) {
 		//slip! - dont apply anything
 		std::cout << "SLIP!\n";
 	}
@@ -559,7 +573,10 @@ void UI::drawPhysicsInfoWindow(Vehicle& aVehicle) noexcept {
 	ImGui::Text("Friction force: %f N", aVehicle.mPhysicsData.fceFriction);
 	ImGui::Text("Aerodynamic resistance: %f N", aVehicle.mPhysicsData.fceAerodynamic);
 	ImGui::Text("Cetripetal force: %f N", aVehicle.mPhysicsData.fceTurn);
-	ImGui::Text("L/V ratio: %f ", aVehicle.mPhysicsData.nadal);
+	ImGui::Text("Vertical force: %f N", aVehicle.mPhysicsData.fceVertical);
+	ImGui::Text("L/V ratio: %f ", aVehicle.mPhysicsData.lvr);
+	ImGui::Text("L/V, Nadal limit: %f ", aVehicle.mPhysicsData.nadal);
+	ImGui::Text("Wheel climb dst: %f ", aVehicle.mPhysicsData.verticalDistanceTravelled);
 	ImGui::Text(""); //empty line
 	ImGui::Text("Voltage: %f V", aVehicle.mPhysicsData.voltage);
 	ImGui::Text(""); //empty line
