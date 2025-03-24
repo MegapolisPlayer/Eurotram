@@ -545,10 +545,10 @@ void Map::open(const std::string_view aFilename) noexcept {
 
 			//tex coords - in correct CCW order from bottom left
 			//texture is set to repeat
-			texparcelVertices[texparcelVertices.size()-4].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-4].position);
-			texparcelVertices[texparcelVertices.size()-3].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-3].position);
-			texparcelVertices[texparcelVertices.size()-2].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-2].position);
-			texparcelVertices[texparcelVertices.size()-1].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-1].position);
+			texparcelVertices[texparcelVertices.size()-4].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-4].position)/glm::vec2(20.0f);
+			texparcelVertices[texparcelVertices.size()-3].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-3].position)/glm::vec2(20.0f);
+			texparcelVertices[texparcelVertices.size()-2].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-2].position)/glm::vec2(20.0f);
+			texparcelVertices[texparcelVertices.size()-1].texCoords = Math::swizzleXZ(texparcelVertices[texparcelVertices.size()-1].position)/glm::vec2(20.0f);
 
 			readBytesToString(fileHandle, buffer, 8); //2 station codes
 			std::getline(fileHandle, buffer, '\0'); //material name

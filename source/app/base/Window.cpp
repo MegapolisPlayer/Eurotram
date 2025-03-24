@@ -295,4 +295,6 @@ void Window::GLCallback(GLenum source, GLenum type, GLuint id, GLenum severity, 
 void Window::ResizeCallback(GLFWwindow* aWindow, int aNewX, int aNewY) noexcept {
 	Window* ClassPointer = (Window*)glfwGetWindowUserPointer(aWindow);
 	ClassPointer->setResizeViewport(aNewX, aNewY);
+	ClassPointer->mWidth = aNewX;
+	ClassPointer->mHeight = aNewY;
 }

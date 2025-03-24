@@ -64,11 +64,11 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 			lineRef->playCurrentAnnouncement();
 			break;
 		case GLFW_KEY_UP:
-			*vehicleThrottleRef += 0.001;
+			*vehicleThrottleRef += 0.01;
 			if(*vehicleThrottleRef >= 1.0) *vehicleThrottleRef = 1.0;
 			break;
 		case GLFW_KEY_DOWN:
-			*vehicleThrottleRef -= 0.001;
+			*vehicleThrottleRef -= 0.01;
 			if(*vehicleThrottleRef <= -1.0) *vehicleThrottleRef = -1.0;
 			break;
 	}
