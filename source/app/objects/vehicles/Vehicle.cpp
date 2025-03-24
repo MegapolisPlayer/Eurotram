@@ -43,7 +43,7 @@ void BogieMovement::init(Map& aMap, Line& aLine, const float aLengthRemainingOve
 }
 
 //doesnt have any check - responsibilty of the caller
-std::optional<glm::vec3> BogieMovement::move(Map& aMap, Line& aLine, const float aAmount, const bool aUpdateStation) noexcept {
+std::optional<glm::vec3> BogieMovement::move(Map& aMap, Line& aLine, const float aAmount, const bool aUpdateStation, SoundSimulation& aSim) noexcept {
 	this->mLengthRemaining -= aAmount;
 
 	//update track
@@ -57,6 +57,7 @@ std::optional<glm::vec3> BogieMovement::move(Map& aMap, Line& aLine, const float
 			this->mTrackId = aMap.getNextTrack(this->mTrackId, this->mNextNodeId, aLine.getSwitchesToNextStop()[this->mSwitchCount].direction);
 		}
 		if(this->mNextNodeId.first == 's') {
+			aSim.playSwitch();
 			this->mSwitchCount++;
 		}
 		this->mNextNodeId = aMap.getOtherTrackPoint(this->mTrackId, this->mNextNodeId);
@@ -127,17 +128,6 @@ void BogieMovement::validate() const noexcept {
 
 BogieMovement::~BogieMovement() noexcept {}
 
-Vehicle::Vehicle(Map& aMap, Line& aLine, VehicleInformation& aInfo, Model* aModel) noexcept {
-	if(!aInfo.validate()) {
-		std::cerr << LogLevel::ERROR << "Vehicle information invalid!\n" << LogLevel::RESET;
-		return;
-	}
-
-	this->mModel = nullptr;
-	this->mInfo = aInfo;
-	this->init(aMap, aLine, aModel);
-}
-
 /*
  * CONFIG VALUES
  * --
@@ -169,7 +159,7 @@ static void loadVector3r(const std::string_view aInput, glm::vec3& aVector, floa
 	aFloat = std::stof(vector[3]);
 }
 
-Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
+Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept : mSoundSimulation(aConfigFilename) {
 	std::ifstream file;
 	file.open(aConfigFilename.data(), std::ios::in); //text mode
 	if(!file.is_open()) {
@@ -280,30 +270,11 @@ Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
 			this->mCabinData.data[VehicleCabinTriggerData::STOP].size,
 			this->mCabinData.data[VehicleCabinTriggerData::STOP].rotation, "STOPSIZE");
 
-		//TODO others
+		//TODO others cabin
 
-		//TODO config sounds - load into vehicle itself so multiple vehicle can play at once
-		else if(name == "SOUNDOPENDOOR") {}
-		else if(name == "SOUNDCLOSEDOOR") {}
-		else if(name == "SOUNDOPENCABIN") {}
-		else if(name == "SOUNDCLOSECABIN") {}
-		else if(name == "SOUNDSTART") {}
-		else if(name == "SOUNDRIDE1") {}
-		else if(name == "SOUNDRRIDE1") {}
-		else if(name == "SOUNDRIDE2") {}
-		else if(name == "SOUNDRRIDE2") {}
-		else if(name == "SOUNDRIDE3") {}
-		else if(name == "SOUNDRRIDE3") {}
-		else if(name == "SOUNDBRAKE") {}
-		else if(name == "SOUNDSWITCH") {}
-		else if(name == "SOUNDINFO") {}
+		//sound info loaded in vehicle
 
 		//future config values go here TODO
-
-		else {
-			std::cerr << LogLevel::ERROR << "Unknown configuration value "+name+" - check the spelling and try again.\n" << LogLevel::RESET;
-			return;
-		}
 	}
 
 	file.close();
@@ -318,7 +289,7 @@ Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept {
 	std::cout << "Vehicle configration loaded!\n";
 }
 
-Vehicle::Vehicle(Vehicle&& aOther) noexcept {
+Vehicle::Vehicle(Vehicle&& aOther) noexcept : mSoundSimulation(std::move(aOther.mSoundSimulation)) {
 	this->mModel = std::move(aOther.mModel);
 	aOther.mModel = nullptr;
 	this->mBogieMeshes = std::move(aOther.mBogieMeshes);
@@ -345,6 +316,7 @@ Vehicle& Vehicle::operator=(Vehicle&& aOther) noexcept {
 	this->mTriggers = std::move(aOther.mTriggers);
 	this->mCameraLocation = std::move(aOther.mCameraLocation);
 	this->mCameraRotation = std::move(aOther.mCameraRotation);
+	this->mSoundSimulation = std::move(aOther.mSoundSimulation);
 	return *this;
 }
 
@@ -393,6 +365,9 @@ void Vehicle::init(Map& aMap, Line& aLine, Model* aModel) noexcept {
 //TODO reset function
 
 void Vehicle::update(Map& aMap, Line& aLine) noexcept {
+	this->mSoundSimulation.playMotor(this->mControlData.throttle);
+	this->mSoundSimulation.playBrake(this->mControlData.throttle);
+
 	std::vector<glm::vec3> positions;
 	bool leading = true;
 	for(BogieMovement& b : this->mBogies) {
@@ -400,7 +375,7 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 			//if leading bogie on last station and not at our station track - exit
 			if(aLine.isStationLast() && !aMap.isTrackStation(b.mTrackId)) return;
 		}
-		auto a = b.move(aMap, aLine, this->mPhysicsData.speed, leading);
+		auto a = b.move(aMap, aLine, this->mPhysicsData.speed, leading, this->mSoundSimulation);
 		if(!a.has_value()) {
 			std::cout << "Dropping bogie!\n";
 			//if we are at last and want to move further - exit
@@ -576,6 +551,10 @@ float Vehicle::getEnergyUsed() const noexcept {
 
 float Vehicle::getDistanceTravelled() const noexcept {
 	return this->mDistanceTravelled;
+}
+
+SoundSimulation* Vehicle::getSoundSimulation() noexcept {
+	return &this->mSoundSimulation;
 }
 
 Vehicle::~Vehicle() noexcept {}

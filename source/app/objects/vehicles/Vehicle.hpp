@@ -122,7 +122,7 @@ public:
 	void init(Map& aMap, Line& aLine, const float aLengthRemainingOverride = 0.0) noexcept;
 
 	//updates station - for main bogie
-	std::optional<glm::vec3> move(Map& aMap, Line& aLine, const float aAmount, const bool aUpdateStation) noexcept;
+	std::optional<glm::vec3> move(Map& aMap, Line& aLine, const float aAmount, const bool aUpdateStation, SoundSimulation& aSim) noexcept;
 	void applyMove(Map& aMap, Line& aLine) noexcept;
 
 	bool isValid() const noexcept;
@@ -158,8 +158,6 @@ namespace UI {
 class Vehicle {
 	friend void UI::drawPhysicsInfoWindow(Vehicle& aVehicle) noexcept;
 public:
-	Vehicle(Map& aMap, Line& aLine, VehicleInformation& aInfo, Model* aModel) noexcept;
-
 	//call init separately
 	Vehicle(const std::string_view aConfigFilename) noexcept;
 
@@ -195,6 +193,8 @@ public:
 
 	float getDistanceTravelled() const noexcept;
 
+	SoundSimulation* getSoundSimulation() noexcept;
+
 	~Vehicle() noexcept;
 
 	//returns filename of model file
@@ -216,6 +216,8 @@ private:
 	glm::vec3 mCameraRotation; //physics data has own data
 
 	float mDistanceTravelled;
+
+	SoundSimulation mSoundSimulation;
 };
 
 #endif

@@ -18,6 +18,10 @@ void initAudioEngine() noexcept  {
 	sInitialized = true;
 }
 ma_engine* getAudioEngine() noexcept {
+	if(!sInitialized) {
+		std::cerr << LogLevel::WARNING << "Audio engine not initialized at get call!\n" << LogLevel::RESET;
+		return nullptr;
+	}
 	return &sEngine;
 }
 void terminateAudioEngine() noexcept {

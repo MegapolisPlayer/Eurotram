@@ -2,8 +2,6 @@
 
 //TODO rewrite errors as exceptions?
 
-#define AUDIO_FILE_EXTENSION ".wav"
-
 Annunciator::Annunciator() noexcept : mInitialized(false) {}
 Annunciator::Annunciator(const std::string_view aFilename) noexcept
 	: mInitialized(false) {

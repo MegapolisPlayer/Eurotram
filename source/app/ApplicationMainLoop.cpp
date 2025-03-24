@@ -15,6 +15,7 @@ static bool cameraFollowsVehicle = false;
 
 static float* vehicleThrottleRef = nullptr;
 static Line* lineRef = nullptr;
+static Vehicle* vehicleRef = nullptr;
 
 void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) noexcept {
 	if(aAction == GLFW_RELEASE || !aWindow->isCursorHidden()) return;
@@ -53,16 +54,22 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 		case GLFW_KEY_F1:
 			hideGui = !hideGui;
 			break;
-		//TODO abstract to controller
+		case GLFW_KEY_B:
+			vehicleRef->getSoundSimulation()->toggleBell();
+			break;
+		case GLFW_KEY_Z:
+			vehicleRef->getSoundSimulation()->toggleInfo();
+			break;
 		case GLFW_KEY_G:
 			lineRef->playCurrentAnnouncement();
 			break;
 		case GLFW_KEY_UP:
-			*vehicleThrottleRef += 0.01;
+			*vehicleThrottleRef += 0.001;
 			if(*vehicleThrottleRef >= 1.0) *vehicleThrottleRef = 1.0;
 			break;
 		case GLFW_KEY_DOWN:
-			*vehicleThrottleRef -= 0.01;
+			*vehicleThrottleRef -= 0.001;
+			if(*vehicleThrottleRef <= -1.0) *vehicleThrottleRef = -1.0;
 			break;
 	}
 }
@@ -169,6 +176,7 @@ bool Application::runInternal() noexcept {
 	v.init(this->mMap, this->mLine, &t3rp);
 	vehicleThrottleRef = &v.getVehicleControlData()->throttle;
 	*vehicleThrottleRef = 0.0;
+	vehicleRef = &v;
 
 	shader.bind();
 	UniformMaterial uMaterial(50);
@@ -388,6 +396,12 @@ bool Application::runInternal() noexcept {
 			if(ImGui::Button("EMERGENCY BRAKE!!!")) {
 				v.getVehicleControlData()->brakeEmergency = !v.getVehicleControlData()->brakeEmergency;
 				std::cout << "BRAKE " << v.getVehicleControlData()->brakeEmergency << '\n';
+			}
+			if(ImGui::Button("Bell")) {
+				v.getSoundSimulation()->toggleBell();
+			}
+			if(ImGui::Button("Info")) {
+				v.getSoundSimulation()->toggleInfo();
 			}
 
 			ImGui::End();

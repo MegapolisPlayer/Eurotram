@@ -16,9 +16,8 @@ add_executable(eurotram
 "app/area/Map.cpp"
 
 "app/audio/Announcements.cpp"
-"app/audio/SFX.cpp"
 "app/audio/AudioManager.cpp"
-"app/audio/SoundTransform.cpp"
+"app/audio/SoundSimulation.cpp"
 
 "app/base/Buffer.cpp"
 "app/base/Shader.cpp"
