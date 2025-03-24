@@ -81,7 +81,11 @@ namespace Physics {
 		return forward - ((velocity >= -0.005)*2-1) * std::min(std::abs(resistance), std::abs(maxResistance));
 	}
 
-	float powerConsumed(float pow, float throttle) noexcept {
-		return 0.0;
+	float current(float pow, float voltage, float phaseAngleRad) noexcept {
+		if(pow == 0.0) return 0.0;
+		return pow/(voltage*std::cos(phaseAngleRad));
+	}
+	float powerConsumed(float pow, float throttle, float time) noexcept {
+		return pow*throttle*time;
 	}
 }

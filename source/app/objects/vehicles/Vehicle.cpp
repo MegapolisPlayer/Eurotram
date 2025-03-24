@@ -410,6 +410,8 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 		leading = false; //only for first bogie
 	}
 
+	this->mDistanceTravelled += this->mPhysicsData.speed;
+
 	//calculate first transform
 	glm::vec3 avg = Math::getAverageOfVectors(positions[1], positions[0]);
 	glm::vec3 dif = positions[0] - positions[1];
@@ -492,6 +494,12 @@ void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateF
 		)
 	);
 
+	//electricity and energy
+	this->mPhysicsData.current = Physics::current(this->mPhysicsData.power*this->mInfo.motorAmount*1000*this->mControlData.throttle);
+	float consumedEnergy = Physics::powerConsumed(this->mPhysicsData.power*this->mInfo.motorAmount*1000, this->mControlData.throttle, 1.0/aPhysicsUpdateFreq);
+	//regen braking only 75 percent effective
+	this->mPhysicsData.energyUsed += consumedEnergy < 0.0 ? consumedEnergy*0.75 : consumedEnergy;
+
 	//vertical movement - Nadal and so on
 	this->mPhysicsData.lvr = this->mPhysicsData.fceTurn/this->mPhysicsData.fceNormal;
 	this->mPhysicsData.nadal = Physics::nadalLimit(frictionCoef);
@@ -530,6 +538,7 @@ void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateF
 		//get extra speed per second (m/s), divide by physics update frequency
 		this->mPhysicsData.physicsSpeed += Physics::perFrameSpeedFromAcceleration(this->mPhysicsData.acceleration, 1.0/aPhysicsUpdateFreq);
 		this->mPhysicsData.speed = this->mPhysicsData.physicsSpeed/aPhysicsUpdateFreq;
+		//distance set in update()
 	}
 }
 bool Vehicle::setSpeed(const float aSpeed) noexcept {
@@ -558,6 +567,17 @@ std::vector<BoxTrigger>& Vehicle::getTriggers() noexcept {
 	return this->mTriggers;
 }
 
+uint64_t Vehicle::getMaxPassengersAmount() const noexcept {
+	return this->mInfo.seats+this->mInfo.standing;
+}
+float Vehicle::getEnergyUsed() const noexcept {
+	return this->mPhysicsData.energyUsed;
+}
+
+float Vehicle::getDistanceTravelled() const noexcept {
+	return this->mDistanceTravelled;
+}
+
 Vehicle::~Vehicle() noexcept {}
 
 void UI::drawPhysicsInfoWindow(Vehicle& aVehicle) noexcept {
@@ -579,8 +599,7 @@ void UI::drawPhysicsInfoWindow(Vehicle& aVehicle) noexcept {
 	ImGui::Text("Wheel climb dst: %f ", aVehicle.mPhysicsData.verticalDistanceTravelled);
 	ImGui::Text(""); //empty line
 	ImGui::Text("Voltage: %f V", aVehicle.mPhysicsData.voltage);
-	ImGui::Text(""); //empty line
-	ImGui::Text("Friction cf.: %f", aVehicle.mPhysicsData.frictionCoef);
+	ImGui::Text("Current: %f A", aVehicle.mPhysicsData.current);
 
 	ImGui::End();
 }

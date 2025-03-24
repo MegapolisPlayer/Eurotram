@@ -62,6 +62,9 @@ public:
 	uint64_t getWidth() const noexcept;
 	uint64_t getHeight() const noexcept;
 
+	std::array<float, 4> getBackgroundColor() const noexcept;
+	glm::vec4 getBackgroundColorGLM() const noexcept;
+
 	~Window() noexcept;
 private:
 	GLFWwindow* mpHandle;

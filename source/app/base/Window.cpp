@@ -108,26 +108,13 @@ void Window::setViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept
 	glViewport(0,0, aWidth, aHeight);
 	this->updateCamera();
 }
-//TODO!
+//TODO! normal resizing
 void Window::setResizeViewport(const uint32_t aWidth, const uint32_t aHeight) noexcept {
-	float fWidth = (float)aWidth;
-	float fHeight = (float)aHeight;
-
-	glViewport(
-		(fWidth-1280)/2.0,
-		(fHeight-720)/2.0,
-		1280,
-		720
-	);
-
-	//std::cout << movementX << ' ' << movementY << ' ' << fWidth << ' ' << fHeight << '\n';
-
-	//this->mWidth = aWidth;
-	//this->mHeight = aHeight;
+	glViewport(0,0, aWidth, aHeight);
 	this->updateCamera();
 }
 void Window::resetViewport() noexcept {
-	glViewport(0, 0, 1280, 720);
+	glViewport(0, 0, this->mWidth, this->mHeight);
 	this->updateCamera();
 }
 
@@ -218,6 +205,18 @@ uint64_t Window::getWidth() const noexcept {
 }
 uint64_t Window::getHeight() const noexcept {
 	return this->mHeight;
+}
+
+std::array<float, 4> Window::getBackgroundColor() const noexcept {
+	return this->mBackgroundColor;
+}
+glm::vec4 Window::getBackgroundColorGLM() const noexcept {
+	return glm::vec4(
+		this->mBackgroundColor[0],
+		this->mBackgroundColor[1],
+		this->mBackgroundColor[2],
+		this->mBackgroundColor[3]
+	);
 }
 
 Window::~Window() noexcept {

@@ -148,7 +148,7 @@ bool Application::runInternal() noexcept {
 	uSpots.update(&s);
 	uSpots.set();
 
-	SpotlightShadows ss(lightPos, s.direction, 1.0, 30.0, *this->mCamera.getFOVPointer());
+	SpotlightShadows ss(lightPos, s.direction, 0.1, 30.0, *this->mCamera.getFOVPointer());
 	UniformMat4 fpu(14);
 	fpu.set(ss.getProjectionMatrix());
 
@@ -217,10 +217,13 @@ bool Application::runInternal() noexcept {
 
 	glm::vec3 oldVehicleRot = glm::vec3(0.0);
 
+	initLightningHandler();
+
 	this->runWindowFrame([&]() {
 		//std::cout << "THR " << v.getVehicleControlData()->throttle << '\n';
 
-		v.update(this->mMap, this->mLine);
+		lightningHandler(this->mWindow, &daylightIndex);
+		//vehicle updated in physics loop
 		if(cameraFollowsVehicle) {
 			this->mCamera.moveTo(v.getCameraPosition());
 			glm::vec3 cameraVehicleRot = v.getCameraRotation();
@@ -400,6 +403,46 @@ bool Application::runInternal() noexcept {
 
 		return true;
 	});
+
+	float vehicleConsumed = v.getEnergyUsed()/3600000; //from joule to kwh
+	float vehicleTravelled = v.getDistanceTravelled()/1000; //km
+
+	//calculate amount of emissions
+	constexpr float EMISSISIONS_PER_KWH = 0.450; //in kg
+	constexpr float EMISSISIONS_CAR_KM = 0.400; //in kg
+
+	float tramEmissions = EMISSISIONS_PER_KWH*vehicleConsumed;
+	//5 is capacity of typical car, 1.25 is approx. average
+	float carEmissionsMin = v.getMaxPassengersAmount()/5.0*EMISSISIONS_CAR_KM*vehicleTravelled;
+	float carEmissionsMax = v.getMaxPassengersAmount()/1.25*EMISSISIONS_CAR_KM*vehicleTravelled;
+
+	//calculate price of electricity
+	constexpr float PRICE_EUR_KWH_CZECHIA = 0.35;
+	constexpr float PRICE_EUR_KWH_GERMANY = 0.4;
+	constexpr float PRICE_EUR_KWH_POLSKA = 0.21;
+
+	float priceEurCzechia = vehicleConsumed*PRICE_EUR_KWH_CZECHIA;
+	float priceEurGermany = vehicleConsumed*PRICE_EUR_KWH_GERMANY;
+	float priceEurPolska = vehicleConsumed*PRICE_EUR_KWH_POLSKA;
+
+	//convert to local currency
+
+	float priceCzechia = priceEurCzechia*24.980;
+	//conversion via CZK (EUR -> CZK -> PLN / EUR*CZK/PLN)
+	float pricePolska = priceEurPolska*24.980/5.950;
+
+	std::cout << LogLevel::SUCCESS <<
+	"Used energy: " << vehicleConsumed << "kWh\n" <<
+	"Travelled distance: " << vehicleTravelled << "km\n" <<
+	"--\n" <<
+	"Total emissions (Czech electricity generation): " << tramEmissions << "kgCO2e\n" <<
+	"Equivalent car emissions (avg. 1.25 people/car): " << carEmissionsMax << "kgCO2e\n" <<
+	"Equivalent car emissions (carsharing, 5 people/car): " << carEmissionsMin << "kgCO2e\n" <<
+	"--\n" <<
+	"Price of electricity for tram in Czechia:" << priceEurCzechia << "EUR (" << priceCzechia << " CZK)\n" <<
+	"Price of electricity for tram in Germany:" << priceEurGermany << "EUR\n" <<
+	"Price of electricity for tram in Poland:" << priceEurPolska << "EUR (" << pricePolska << " PLN)\n" <<
+	"--\n" << LogLevel::RESET;
 
 	return true;
 }

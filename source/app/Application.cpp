@@ -69,6 +69,13 @@ bool Application::renderMainMenu() noexcept {
 			return false;
 		}
 
+		//an admission of guilt... (this took approx me 3 months)
+		ImGui::TextWrapped(
+			"This is a very early prototype that still has a lot of issues.\n"
+			"Consider this a tech demo - a quickly patched-together demonstration program.\n"
+			"         -M.B. 31.3.2025"
+		);
+
 		ImGui::End();
 
 		this->mWindow.endFrame();

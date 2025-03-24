@@ -84,4 +84,13 @@ namespace Physics {
 	float getWeatherFrictionCoeff(const WeatherCondition aCondition, const float aVelocity) noexcept;
 }
 
+//configration of lightning
+constexpr glm::vec3 LIGHTNING_COLOR = glm::vec3(175/255.0, 157/255.0,183/255.0);
+constexpr float LIGHTNING_INTERVAL = 10.0;
+constexpr float LIGHTNING_REPEAT = 0.2;
+constexpr uint16_t LIGHTNING_REPEAT_AMOUNT = 2;
+
+void initLightningHandler() noexcept;
+void lightningHandler(Window& aWindow, float* aAmbient) noexcept;
+
 #endif

@@ -91,7 +91,8 @@ struct VehiclePhysicsData {
 	float power = 0.0; //final power = power*motorAmount
 
 	//electricity - just for display
-	float voltage = 0.0;
+	float voltage = 600.0;
+	float current = 0.0;
 
 	//counters
 	float energyUsed = 0.0;
@@ -189,6 +190,11 @@ public:
 
 	bool isEmergencyBraking() noexcept;
 
+	uint64_t getMaxPassengersAmount() const noexcept;
+	float getEnergyUsed() const noexcept;
+
+	float getDistanceTravelled() const noexcept;
+
 	~Vehicle() noexcept;
 
 	//returns filename of model file
@@ -208,6 +214,8 @@ private:
 
 	glm::vec3 mCameraLocation;
 	glm::vec3 mCameraRotation; //physics data has own data
+
+	float mDistanceTravelled;
 };
 
 #endif

@@ -200,13 +200,50 @@ void WeatherHandler::draw(
 	this->mSingleDropIndex.bind();
 	this->mSingleDropIndex.drawInstanced(this->mDropletAmount);
 }
-//TODO check when move ends (aCenter doesnt change)
-//TODO when moving dont move drops
 void WeatherHandler::move(const glm::vec3& aCenter) noexcept {
 	this->mCenter = aCenter;
 	this->mView = glm::lookAt(glm::vec3(aCenter.x, WEATHER_HEIGHT+aCenter.y, aCenter.z), aCenter, glm::vec3(1.0f, 0.0f, 0.0f));
 	//projection stays
 	this->mHandlerMatrix = this->mProjection * this->mView;
 }
-
 WeatherHandler::~WeatherHandler() noexcept {}
+
+static glm::vec4 lightningNormalColor;
+static float lightningStartTime = 0.0;
+static float lightningRunTime = 0.0;
+static uint16_t lightningStep = 0;
+
+void initLightningHandler() noexcept {
+	lightningStartTime = glfwGetTime();
+}
+void lightningHandler(Window& aWindow, float* aAmbient) noexcept {
+	if(glfwGetTime() - lightningStartTime >= LIGHTNING_INTERVAL) {
+		if(lightningStep != 0 && glfwGetTime() - lightningRunTime < LIGHTNING_REPEAT) return;
+
+		if(lightningStep % 2 == 0) {
+			//rise
+			aWindow.setBackgroundColor(glm::vec4(LIGHTNING_COLOR, 1.0));
+			*aAmbient += 0.2;
+			*aAmbient = std::min(*aAmbient, 1.0f); //clamp
+		}
+		else {
+			//fall
+			aWindow.setBackgroundColor(lightningNormalColor);
+			*aAmbient -= 0.2;
+			*aAmbient = std::max(*aAmbient, 0.0f); //clamp
+		}
+
+		lightningRunTime = glfwGetTime();
+		lightningStep++;
+		//one step start one step end
+		if(lightningStep == LIGHTNING_REPEAT_AMOUNT*2) {
+			//stop lightning
+			lightningStartTime = glfwGetTime();
+			lightningRunTime = 0.0;
+			lightningStep = 0;
+		}
+	}
+	else {
+		lightningNormalColor = aWindow.getBackgroundColorGLM(); //constantly update normal color
+	}
+}

@@ -23,7 +23,8 @@ namespace Physics {
 	float maxResistanceForce(float speed, float mass, float time) noexcept;
 	float resultingForce(float forward, float resistance, float maxResistance, float velocity) noexcept;
 
-	float powerConsumed(float pow, float throttle) noexcept;
+	float current(float pow, float voltage = 600, float phaseAngleRad = 0.9) noexcept;
+	float powerConsumed(float pow, float throttle, float time) noexcept;
 };
 
 #endif

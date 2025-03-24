@@ -57,6 +57,7 @@ namespace LineData {
 };
 
 class Line;
+class Map;
 
 namespace UI {
 	void drawLineInfoWindow(Line& aLine) noexcept;
