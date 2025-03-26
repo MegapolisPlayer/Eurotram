@@ -445,6 +445,8 @@ bool Application::runInternal() noexcept {
 	//conversion via CZK (EUR -> CZK -> PLN / EUR*CZK/PLN)
 	float pricePolska = priceEurPolska*24.980/5.950;
 
+	float gradePercentage = v.getActualPoints()/(float)v.getMaxPoints();
+
 	std::cout << LogLevel::SUCCESS <<
 	"Used energy: " << vehicleConsumed << "kWh\n" <<
 	"Travelled distance: " << vehicleTravelled << "km\n" <<
@@ -456,7 +458,10 @@ bool Application::runInternal() noexcept {
 	"Price of electricity for tram in Czechia:" << priceEurCzechia << "EUR (" << priceCzechia << " CZK)\n" <<
 	"Price of electricity for tram in Germany:" << priceEurGermany << "EUR\n" <<
 	"Price of electricity for tram in Poland:" << priceEurPolska << "EUR (" << pricePolska << " PLN)\n" <<
-	"--\n" << LogLevel::RESET;
+	"--\n" <<
+	"Achieved points: " << v.getActualPoints() << " out of " << v.getMaxPoints() << '\n' <<
+	"Percentage: " << gradePercentage*100 << "% (grade " << v.getPointGrade() << ")\n" <<
+	LogLevel::RESET;
 
 	return true;
 }

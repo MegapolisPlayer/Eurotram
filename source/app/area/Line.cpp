@@ -3,11 +3,11 @@
 static constexpr std::string_view scLineUnitializedString = "Line object uninitialized!";
 
 Line::Line() noexcept
-: mCurrentLoopId(0), mCurrentStationId(-1), mCurrentSwitchId(0), mFirstPointId(0), mFirstPointType(0), mDelay(0), mWeather(0),
+: mCurrentLoopId(0), mCurrentStationId(0), mCurrentSwitchId(0), mFirstPointId(0), mFirstPointType(0), mDelay(0), mWeather(0),
 	mStartDate(0), mInitialized(false), mAnnunciator(nullptr) {}
 
 Line::Line(const std::string_view aFilename, Annunciator* aAnnunciator) noexcept
-: mCurrentLoopId(0), mCurrentStationId(-1), mCurrentSwitchId(0), mFirstPointId(0), mFirstPointType(0), mDelay(0), mWeather(0),
+: mCurrentLoopId(0), mCurrentStationId(0), mCurrentSwitchId(0), mFirstPointId(0), mFirstPointType(0), mDelay(0), mWeather(0),
 	mStartDate(0), mInitialized(false), mAnnunciator(nullptr) {
 	this->open(aFilename, aAnnunciator);
 }
@@ -194,8 +194,6 @@ void Line::open(const std::string_view aFilename, Annunciator* aAnnunciator) noe
 uint64_t Line::next(const uint64_t aMinuteTime) noexcept {
 	if(!this->mInitialized) return UINT64_MAX;
 
-	this->mCurrentStationId++;
-
 	if(this->mCurrentStationId == 0) {
 		//first station - play start announcement first
 		uint8_t lineNumber2 = this->mLoops[this->mCurrentLoopId].lineNumber2;
@@ -219,7 +217,8 @@ uint64_t Line::next(const uint64_t aMinuteTime) noexcept {
 	}
 	else {
 		this->mAnnunciator->addAnnouncementNext(this->getNextStationCode()).play();
-		return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId].timeInStation;
+		this->mCurrentStationId++;
+		return this->mLoops[this->mCurrentLoopId-1].stations[this->mCurrentStationId-1].timeInStation;
 	}
 }
 
@@ -231,7 +230,7 @@ bool Line::nextLoop() noexcept {
 	}
 	else {
 		this->mCurrentLoopId++;
-		this->mCurrentStationId = -1;
+		this->mCurrentStationId = 0;
 		this->mDelay = 0;
 		return true;
 	}
@@ -265,8 +264,7 @@ std::optional<LineData::Switch> Line::getNextSwitch() noexcept {
 }
 
 std::vector<LineData::Switch>& Line::getSwitchesToNextStop() noexcept {
-	//this->mCurrentStationId starts at -1 so audio announcements work correctly
-	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId+1].switches;
+	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId].switches;
 }
 
 void Line::playCurrentAnnouncement() noexcept {
@@ -289,7 +287,7 @@ void Line::playCurrentAnnouncement() noexcept {
 void Line::reset() noexcept {
 	//dont destroy - just reset to beginning
 	this->mCurrentLoopId = 0;
-	this->mCurrentStationId = -1;
+	this->mCurrentStationId = 0;
 	this->mDelay = 0;
 }
 void Line::destroy() noexcept {
@@ -297,7 +295,7 @@ void Line::destroy() noexcept {
 
 	this->mLoops.clear();
 	this->mCurrentLoopId = 0;
-	this->mCurrentStationId = -1;
+	this->mCurrentStationId = 0;
 	this->mDelay = 0;
 	this->mInitialized = false;
 	this->mAnnunciator = nullptr;
@@ -305,7 +303,6 @@ void Line::destroy() noexcept {
 
 uint64_t Line::getTimeInCurrentStation() const noexcept {
 	if(!this->mInitialized) return UINT64_MAX;
-	if(this->mCurrentStationId == -1) return this->mLoops[this->mCurrentLoopId].stations[0].timeInStation;
 	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId].timeInStation;
 }
 
@@ -322,15 +319,11 @@ const std::string_view Line::getFirstStationName() const noexcept {
 
 const std::string_view Line::getCurrentStationCode() const noexcept {
 	if(!this->mInitialized) return scLineUnitializedString;
-	if(this->mCurrentStationId == -1) return this->mLoops[this->mCurrentLoopId].stations[0].stationCode;
 	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId].stationCode;
 }
 const std::string_view Line::getCurrentStationName() const noexcept {
 	if(!this->mInitialized) return scLineUnitializedString;
-	std::string_view code;
-	if(this->mCurrentStationId == -1) code = this->mLoops[this->mCurrentLoopId].stations[0].stationCode;
-	else code = this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId].stationCode;
-	return this->mAnnunciator->getStationName(code);
+	return this->mAnnunciator->getStationName(this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId].stationCode);
 }
 
 const std::string_view Line::getNextStationCode() const noexcept {
@@ -360,11 +353,11 @@ const std::string_view Line::getLastStationName() const noexcept {
 uint64_t Line::getNextStationTime() const noexcept {
 	if(!this->mInitialized) return UINT64_MAX;
 	if(this->isStationLast()) return this->mLoops[this->mCurrentLoopId].stations.back().arrivalTime;
-	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId + 1].arrivalTime;
+	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId+1].arrivalTime;
 }
 bool Line::isNextStationControlPoint() const noexcept {
 	if(this->isStationLast() || !this->mInitialized) return false;
-	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId + 1].isControlPoint;
+	return this->mLoops[this->mCurrentLoopId].stations[this->mCurrentStationId+1].isControlPoint;
 }
 uint64_t Line::getDelay() const noexcept {
 	return this->mDelay;
@@ -422,8 +415,7 @@ uint64_t Line::getStartDate() const noexcept {
 
 bool Line::isStationLast() const noexcept {
 	if(!this->mInitialized) return true;
-	//this->mCurrentStationId starts at -1
-	return this->mCurrentStationId+1 >= (int64_t)this->mLoops[this->mCurrentLoopId].stations.size() - 1;
+	return this->mCurrentStationId >= (int64_t)this->mLoops[this->mCurrentLoopId].stations.size() - 1;
 }
 bool Line::isLoopLast() const noexcept {
 	return this->mCurrentLoopId >= this->mLoops.size() - 1;
@@ -446,6 +438,22 @@ uint64_t Line::getFirstLoopTrack() const noexcept {
 }
 std::pair<uint8_t, uint64_t> Line::getFirstNodePassed() const noexcept {
 	return std::make_pair(this->mFirstPointType, this->mFirstPointId);
+}
+
+uint64_t Line::getTotalPointsAvailable() const noexcept {
+	uint64_t totalPoints = 0;
+	for(const LineData::Station& s : this->mLoops[this->mCurrentLoopId].stations) {
+		totalPoints += s.switches.size()*200;
+
+		totalPoints += 200; //announcement
+		if(this->mAnnunciator->isRequest(s.stationCode)) {
+			totalPoints += 1000;
+		}
+		else {
+			totalPoints += 500;
+		}
+	}
+	return totalPoints;
 }
 
 Line::~Line() noexcept {

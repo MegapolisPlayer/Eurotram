@@ -168,6 +168,7 @@ public:
 	Vehicle& operator=(Vehicle&& aOther) noexcept;
 
 	std::string getConfigModelFilename() const noexcept;
+
 	void init(Map& aMap, Line& aLine, Model* aModel) noexcept;
 
 	//update data of vehicle
@@ -195,6 +196,11 @@ public:
 
 	SoundSimulation* getSoundSimulation() noexcept;
 
+	uint64_t getActualPoints() const noexcept;
+	uint64_t getMaxPoints() const noexcept;
+
+	uint64_t getPointGrade() const noexcept;
+
 	~Vehicle() noexcept;
 
 	//returns filename of model file
@@ -218,6 +224,9 @@ private:
 	float mDistanceTravelled;
 
 	SoundSimulation mSoundSimulation;
+
+	uint64_t mPoints;
+	uint64_t mMaxPoints;
 };
 
 #endif

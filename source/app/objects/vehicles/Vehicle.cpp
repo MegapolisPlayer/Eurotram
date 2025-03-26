@@ -302,6 +302,8 @@ Vehicle::Vehicle(Vehicle&& aOther) noexcept : mSoundSimulation(std::move(aOther.
 	this->mTriggers = std::move(aOther.mTriggers);
 	this->mCameraLocation = std::move(aOther.mCameraLocation);
 	this->mCameraRotation = std::move(aOther.mCameraRotation);
+	this->mPoints = aOther.mPoints;
+	this->mMaxPoints = aOther.mMaxPoints;
 }
 Vehicle& Vehicle::operator=(Vehicle&& aOther) noexcept {
 	this->mModel = std::move(aOther.mModel);
@@ -317,6 +319,8 @@ Vehicle& Vehicle::operator=(Vehicle&& aOther) noexcept {
 	this->mCameraLocation = std::move(aOther.mCameraLocation);
 	this->mCameraRotation = std::move(aOther.mCameraRotation);
 	this->mSoundSimulation = std::move(aOther.mSoundSimulation);
+	this->mPoints = aOther.mPoints;
+	this->mMaxPoints = aOther.mMaxPoints;
 	return *this;
 }
 
@@ -324,6 +328,10 @@ std::string Vehicle::getConfigModelFilename() const noexcept {
 	return this->mInfo.modelFile;
 }
 void Vehicle::init(Map& aMap, Line& aLine, Model* aModel) noexcept {
+	this->mPoints = 0.0;
+	this->mMaxPoints = aLine.getTotalPointsAvailable();
+	//TODO points
+
 	this->mModel = aModel;
 
 	for(uint64_t i = 0; i < this->mInfo.bogieNames.size(); i++) {
@@ -454,6 +462,9 @@ void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateF
 
 	//friction
 	float frictionCoef = Physics::getWeatherFrictionCoeff((WeatherCondition)aWeather, this->mPhysicsData.physicsSpeed);
+	if(this->mControlData.sander) {
+		frictionCoef += 0.3;
+	}
 	this->mPhysicsData.fceFriction = Physics::forceFriction(this->mPhysicsData.fceNormal, frictionCoef);
 	float appliedFrictionForce = 0.0;
 	if(this->mControlData.brakeEmergency) appliedFrictionForce = this->mPhysicsData.fceFriction;
@@ -555,6 +566,23 @@ float Vehicle::getDistanceTravelled() const noexcept {
 
 SoundSimulation* Vehicle::getSoundSimulation() noexcept {
 	return &this->mSoundSimulation;
+}
+
+uint64_t Vehicle::getActualPoints() const noexcept {
+	return this->mPoints;
+}
+uint64_t Vehicle::getMaxPoints() const noexcept {
+	return this->mMaxPoints;
+}
+
+uint64_t Vehicle::getPointGrade() const noexcept {
+	float percentage = (float)this->mPoints/(float)this->mMaxPoints;
+
+	if(percentage > 0.85) return 1;
+	if(percentage > 0.65) return 2;
+	if(percentage > 0.40) return 3;
+	if(percentage > 0.20) return 4;
+	else return 5;
 }
 
 Vehicle::~Vehicle() noexcept {}

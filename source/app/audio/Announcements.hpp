@@ -90,6 +90,9 @@ public:
 	std::string_view getStationName(const std::string_view aStationCode) const noexcept;
 	std::string_view getStationName(const uint32_t aStationCode) const noexcept;
 
+	bool isRequest(const std::string_view aStationCode) const noexcept;
+	bool isRequest(const uint32_t aStationCode) const noexcept;
+
 	~Annunciator() noexcept;
 private:
 	std::string mAnnunciatorName;

@@ -3,7 +3,6 @@
 #include "area/Area.hpp"
 #include "objects/vehicles/Vehicle.hpp"
 #include "physics/Physics.hpp"
-#include "points/Points.hpp"
 
 enum struct ApplicationRenderState : uint8_t {
 	LOADING_FIRST = 0, //first load

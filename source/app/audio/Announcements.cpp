@@ -345,6 +345,16 @@ std::string_view Annunciator::getStationName(const uint32_t aStationCode) const 
 	return "";
 }
 
+bool Annunciator::isRequest(const std::string_view aStationCode) const noexcept {
+	return this->isRequest(*((uint32_t*)aStationCode.data()));
+}
+bool Annunciator::isRequest(const uint32_t aStationCode) const noexcept {
+	for(const AnnunciatorStationSound& sound : this->mStationSounds) {
+		if(sound.stationCode == aStationCode) return (sound.flags & STATION_FLAG_ON_REQUEST) > 0;
+	}
+	return false;
+}
+
 Annunciator::~Annunciator() noexcept {
 	this->destroy();
 }

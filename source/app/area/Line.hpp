@@ -136,6 +136,8 @@ class Line {
 	//first - type (letter S/N in utf8), second - id in said list
 	std::pair<uint8_t, uint64_t> getFirstNodePassed() const noexcept;
 
+	uint64_t getTotalPointsAvailable() const noexcept;
+
 	~Line() noexcept;
 private:
 	std::vector<LineData::Loop> mLoops;
