@@ -76,6 +76,8 @@ class Line {
 	Line& operator=(Line&& aOther) noexcept;
 	Line& operator=(Line& aOther) noexcept = delete;
 
+	void setWeather(uint16_t aWeather) noexcept;
+
 	void open(const std::string_view aFilename, Annunciator* aAnnunciator) noexcept;
 
 	//plays next announcement, returns how long to stay at station currently announced

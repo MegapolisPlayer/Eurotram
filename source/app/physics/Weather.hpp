@@ -6,11 +6,13 @@
 
 enum struct WeatherCondition : uint16_t {
 	WEATHER_CLEAR          = 0,
+	//condition maks         0b1111000000000000
 	WEATHER_WIND           = 0b0000000000000001,
 	WEATHER_RAIN           = 0b0000000000000010,
 	WEATHER_LIGHTING       = 0b0000000000000100,
 	WEATHER_FOG            = 0b0000000000001000,
 	WEATHER_SNOW           = 0b0000000000010000,
+	//season mask            0b0000111111111111
 	WEATHER_SEASONS_SPRING = 0b0001000000000000,
 	WEATHER_SEASONS_SUMMER = 0b0010000000000000,
 	WEATHER_SEASONS_AUTUMN = 0b0100000000000000,
@@ -67,10 +69,10 @@ private:
 	glm::mat4 mProjection, mView, mHandlerMatrix;
 
 	float mSpeed;
-
-	float mFrictionCoeffChange;
-	//TODO other
 };
+
+WeatherCondition setWeather(const WeatherCondition aOriginal, const WeatherCondition aWeather) noexcept;
+WeatherCondition setSeason(const WeatherCondition aOriginal, const WeatherCondition aSeason) noexcept;
 
 //call after map initialization
 void initSeasonMaterials(const Map& aMap) noexcept;
@@ -90,7 +92,7 @@ constexpr float LIGHTNING_INTERVAL = 10.0;
 constexpr float LIGHTNING_REPEAT = 0.2;
 constexpr uint16_t LIGHTNING_REPEAT_AMOUNT = 2;
 
-void initLightningHandler() noexcept;
-void lightningHandler(Window& aWindow, float* aAmbient) noexcept;
+void initLightningHandler(const glm::vec4& aNormalColor) noexcept;
+void lightningHandler(Window& aWindow, float* aAmbient, WeatherCondition aCondition) noexcept;
 
 #endif

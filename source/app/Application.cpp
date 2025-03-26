@@ -7,7 +7,8 @@ bool Application::mPauseSettings = false;
 Application::Application() noexcept
 	: mWindow("Eurotram", 1280, 720, false, true),
 	mCamera(&this->mWindow, glm::vec3(0.0f, 5.0f, 0.0f), 45.0f, 1000.0f, 0.1f),
-	mLogo("logo.png", false), mMinuteTime(0), mPhysicalUpdateFreq(1.0/50.0), mLastPhysicalUpdateTime(0.0) {
+	mLogo("logo.png", false), mMinuteTime(0), mPhysicalUpdateFreq(1.0/50.0), mLastPhysicalUpdateTime(0.0),
+	mWeatherEffect(this->mCamera.getPosition(), 1000, 0.05, 0.05, glm::vec4(1, 0, 1, 1), 0.15) {
 	this->mWindow.setBackgroundColor(glm::vec4(0.5f));
 	this->mWindow.enableVSync();
 
@@ -197,6 +198,22 @@ void Application::run() noexcept {
 
 	this->mCamera.setFOV(this->mSettings.FOV);
 
+	this->mSkyColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
+	if(Math::getRandomNumber(0, 1000) <= 1.1) {
+		//sandstorm
+		this->mFogColor = {117.0f/255.0f, 100.0f/255.0f, 58.0f/255.0f, 1.0f};
+	}
+	else {
+		this->mFogColor = {0.5f, 0.5f, 0.5f, 1.0f};
+
+	}
+	this->mAmbient = 1.0;
+
+	if(this->mLine.getWeather() & (uint16_t)WeatherCondition::WEATHER_FOG) initLightningHandler(this->mFogColor*this->mAmbient);
+	else initLightningHandler(this->mSkyColor*this->mAmbient);
+
+	this->setWeather();
+
 	this->mWindow.hideCursor();
 
 	glfwSetTime(0.0); //start count here
@@ -212,6 +229,17 @@ void Application::runWindowFrame(std::function<bool()> aFunction) noexcept {
 	while(this->mWindow.isOpen()) {
 		this->mFrameTimer.start();
 		this->mWindow.beginFrame();
+
+		if(this->mLine.getWeather() & (uint16_t)WeatherCondition::WEATHER_FOG) this->mWindow.setBackgroundColor(this->mFogColor*this->mAmbient);
+		else this->mWindow.setBackgroundColor(this->mSkyColor*this->mAmbient);
+		this->mWindow.applyBackgroundColor();
+
+		lightningHandler(this->mWindow, &this->mAmbient, (WeatherCondition)this->mLine.getWeather());
+
+		if(this->mLine.getWeather() != this->mOldWeather) {
+			this->mOldWeather = this->mLine.getWeather();
+			this->setWeather();
+		}
 
 		this->mCamera.update();
 
@@ -246,6 +274,28 @@ void Application::runWindowFrame(std::function<bool()> aFunction) noexcept {
 
 void Application::terminate() noexcept {
 	std::cout << "Application frametime average\n" << this->mAverageFrameTime.getAverageUSfloat() << "us\n";
+}
+
+void Application::setWeather() noexcept {
+	setSeasonMaterials((WeatherCondition)this->mLine.getWeather());
+
+	if(this->mLine.getWeather() & (uint16_t)WeatherCondition::WEATHER_RAIN || this->mLine.getWeather() & (uint16_t)WeatherCondition::WEATHER_LIGHTING) {
+		this->mWeatherEffect = WeatherHandler(this->mCamera.getPosition(), 5000, 0.05, 0.10, glm::vec4(0.0, 0.0, 0.5, 0.5), 0.15);
+	}
+	else if(this->mLine.getWeather() & (uint16_t)WeatherCondition::WEATHER_SNOW) {
+		this->mWeatherEffect = WeatherHandler(this->mCamera.getPosition(), 5000, 0.05, 0.05, glm::vec4(1.0, 1.0, 1.5, 0.5), 0.03);
+	}
+	else {
+		this->mWeatherEffect = WeatherHandler(this->mCamera.getPosition(), 0, 0, 0, glm::vec4(0.0), 0); //dead object
+	}
+
+	//normal is 1000, fog sets to 50
+	if(this->mLine.getWeather() & (uint16_t)WeatherCondition::WEATHER_FOG) {
+		this->mCamera.setFarPlane(50.0f);
+	}
+	else {
+		this->mCamera.setFarPlane(1000.0f);
+	}
 }
 
 Application::~Application() noexcept {}

@@ -36,6 +36,10 @@ Line& Line::operator=(Line&& aOther) noexcept {
 	return *this;
 }
 
+void Line::setWeather(uint16_t aWeather) noexcept {
+	this->mWeather = aWeather;
+}
+
 void Line::open(const std::string_view aFilename, Annunciator* aAnnunciator) noexcept {
 	this->destroy();
 

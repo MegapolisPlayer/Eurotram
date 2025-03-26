@@ -54,6 +54,8 @@ public:
 
 	void terminate() noexcept;
 
+	void setWeather() noexcept;
+
 	~Application() noexcept;
 private:
 	ApplicationSettings mSettings;
@@ -81,4 +83,11 @@ private:
 	double mPhysicalUpdateFreq;
 
 	std::vector<Vehicle> mPlayerVehicles;
+
+	WeatherHandler mWeatherEffect;
+	glm::vec4 mSkyColor;
+	glm::vec4 mFogColor;
+	float mAmbient;
+
+	uint16_t mOldWeather;
 };

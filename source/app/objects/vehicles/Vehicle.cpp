@@ -385,7 +385,7 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 		}
 		auto a = b.move(aMap, aLine, this->mPhysicsData.speed, leading, this->mSoundSimulation);
 		if(!a.has_value()) {
-			std::cout << "Dropping bogie!\n";
+			std::cerr << LogLevel::WARNING << "Dropping bogie!\n" << LogLevel::RESET;
 			//if we are at last and want to move further - exit
 			return; //station last, no value
 		}
@@ -514,9 +514,10 @@ void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateF
 		maxResistance, this->mPhysicsData.physicsSpeed
 	);
 
-	if(std::abs(this->mPhysicsData.fceFront) > std::abs(this->mPhysicsData.fceFriction)) {
+	if(std::abs(this->mPhysicsData.fceFront) > std::abs(this->mPhysicsData.fceFriction) && !this->mControlData.sander) {
 		//slip! - dont apply anything
-		std::cout << "SLIP!\n";
+		//only if no sanding enabled
+		std::cerr << LogLevel::WARNING << "SLIP!\n" << LogLevel::RESET;
 	}
 	else {
 		//horizontal speed

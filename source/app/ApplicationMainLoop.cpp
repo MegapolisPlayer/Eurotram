@@ -7,9 +7,6 @@ static double LastX = 400, LastY = 400;
 static glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
 static bool moveWithSpotlight = true;
 
-static std::array<float, 4> daylightColor = {100.0f/255.0f, 158.0f/255.0f, 233.0f/255.0f, 1.0f};
-static float daylightIndex = 1.0f; //TODO
-
 static bool hideGui = false;
 static bool cameraFollowsVehicle = false;
 
@@ -48,11 +45,14 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 		case GLFW_KEY_X:
 			aWindow->close();
 			break;
-		case GLFW_KEY_P:
+		case GLFW_KEY_M:
 			moveWithSpotlight = !moveWithSpotlight;
 			break;
 		case GLFW_KEY_F1:
 			hideGui = !hideGui;
+			break;
+		case GLFW_KEY_P:
+			vehicleRef->getVehicleControlData()->sander = !vehicleRef->getVehicleControlData()->sander;
 			break;
 		case GLFW_KEY_B:
 			vehicleRef->getSoundSimulation()->toggleBell();
@@ -103,8 +103,6 @@ void Application::rawClickCallback(Window* aWindow, uint32_t aKey, uint32_t aAct
 
 bool Application::runInternal() noexcept {
 	lineRef = &this->mLine;
-
-	this->mWindow.setBackgroundColor(daylightColor);
 
 	Shader shader("shader/vertex.glsl", "shader/fragment.glsl");
 	shader.bind();
@@ -160,7 +158,7 @@ bool Application::runInternal() noexcept {
 	fpu.set(ss.getProjectionMatrix());
 
 	UniformFloat ambientLightStrength(200);
-	ambientLightStrength.set(daylightIndex);
+	ambientLightStrength.set(this->mAmbient);
 
 	float sunAngle = 0;
 
@@ -216,7 +214,6 @@ bool Application::runInternal() noexcept {
 	UniformVec3 whCamUp(39);
 	UniformVec3 whCamRight(40);
 	UniformVec3 whWeatherCenter(41);
-	WeatherHandler wh(glm::vec3(0), 10000, 0.05, 0.10, glm::vec4(0.0, 0.0, 0.5, 0.5), 0.15);
 
 	Shader btShader("shader/btVertex.glsl", "shader/btFragment.glsl");
 	UniformMat4 btCamera(30);
@@ -225,12 +222,9 @@ bool Application::runInternal() noexcept {
 
 	glm::vec3 oldVehicleRot = glm::vec3(0.0);
 
-	initLightningHandler();
-
 	this->runWindowFrame([&]() {
 		//std::cout << "THR " << v.getVehicleControlData()->throttle << '\n';
 
-		lightningHandler(this->mWindow, &daylightIndex);
 		//vehicle updated in physics loop
 		if(cameraFollowsVehicle) {
 			this->mCamera.moveTo(v.getCameraPosition());
@@ -244,17 +238,15 @@ bool Application::runInternal() noexcept {
 		}
 
 		this->mMap.regenerateInstanceArray(toStationCode("ZELV"), toStationCode("OLSH"), toStationCode("FLOR"), toStationCode("RADH"));
-		wh.move(glm::vec3(this->mCamera.getPosition().x, 0.0, this->mCamera.getPosition().z));
-		wh.advance();
 
 		shadowMapProgram.bind();
 		t3rp.sendAnimationDataToShader(lmat);
 
 		//write to depth buffer
-		wh.beginPass(this->mWindow, lpu);
+		this->mWeatherEffect.beginPass(this->mWindow, lpu);
 		t3rp.draw(uMaterial, lmat, &lmod);
 		this->mMap.draw(uMaterial, lmat, 35, luIsInstancedRendering, &lmod);
-		wh.endPass(this->mWindow);
+		this->mWeatherEffect.endPass(this->mWindow);
 
 		ss.beginPass(this->mWindow, lpu);
 		t3rp.draw(uMaterial, lmat, &lmod);
@@ -313,8 +305,8 @@ bool Application::runInternal() noexcept {
 		//draw weather
 		weatherShader.bind();
 		whCameraMatrix.set(this->mCamera.getMatrix());
-		whAmbient.set(daylightIndex);
-		wh.draw(whViewMatrix, whColor, 35, 37, this->mCamera, whCamUp, whCamRight, whWeatherCenter);
+		whAmbient.set(this->mAmbient);
+		this->mWeatherEffect.draw(whViewMatrix, whColor, 35, 37, this->mCamera, whCamUp, whCamRight, whWeatherCenter);
 
 		shader.bind();
 
@@ -327,12 +319,21 @@ bool Application::runInternal() noexcept {
 		shader.bind();
 
 		if(!hideGui) {
-			ImGui::Begin("Ingame settings");
+			ImGui::Begin("Frame");
 
-			if(ImGui::SliderFloat("Daylight index",  &daylightIndex, 0.0, 1.0)) {
-				this->mWindow.setBackgroundColor(daylightColor*daylightIndex);
-				ambientLightStrength.set(daylightIndex);
-				if(daylightIndex < 0.5) {
+			ImGui::Text("Frame time: %fms / %fus", this->mFrameTimer.getMSfloat(), this->mFrameTimer.getUSfloat());
+			ImGui::Text("FPS: %f", 1000.0/this->mFrameTimer.getMSfloat());
+
+			ImGui::End();
+
+			UI::drawLineInfoWindow(this->mLine);
+			UI::drawPhysicsInfoWindow(v);
+
+			ImGui::Begin("Visual");
+
+			if(ImGui::SliderFloat("Daylight index",  &this->mAmbient, 0.0, 1.0)) {
+				ambientLightStrength.set(this->mAmbient);
+				if(this->mAmbient < 0.5) {
 					GlobalMaterialStore::setVariant("Material.windowDay", "NIGHT");
 					GlobalMaterialStore::setVariant("Material.symbol", "NIGHT");
 				}
@@ -357,20 +358,6 @@ bool Application::runInternal() noexcept {
 				uDirlight.set();
 			}
 
-			ImGui::End();
-
-			ImGui::Begin("Frame");
-
-			ImGui::Text("Frame time: %fms / %fus", this->mFrameTimer.getMSfloat(), this->mFrameTimer.getUSfloat());
-			ImGui::Text("FPS: %f", 1000.0/this->mFrameTimer.getMSfloat());
-
-			ImGui::End();
-
-			UI::drawLineInfoWindow(this->mLine);
-			UI::drawPhysicsInfoWindow(v);
-
-			ImGui::Begin("Visual");
-
 			if(ImGui::Button("Change livery to normal")) t3rp.resetVariant("Material.paint");
 			if(ImGui::Button("Change livery to PLF")) t3rp.setVariant("Material.paint", "PLF");
 			if(ImGui::Button("Change livery to PID")) t3rp.setVariant("Material.paint", "PID");
@@ -383,11 +370,21 @@ bool Application::runInternal() noexcept {
 			ImGui::Begin("Seasons");
 
 			if(ImGui::Button("Spring/Summer"))
-				setSeasonMaterials(WeatherCondition::WEATHER_SEASONS_SPRING);
+				this->mLine.setWeather((uint16_t)setSeason((WeatherCondition)this->mLine.getWeather(), WeatherCondition::WEATHER_SEASONS_SPRING));
 			if(ImGui::Button("Autumn"))
-				setSeasonMaterials(WeatherCondition::WEATHER_SEASONS_AUTUMN);
+				this->mLine.setWeather((uint16_t)setSeason((WeatherCondition)this->mLine.getWeather(), WeatherCondition::WEATHER_SEASONS_AUTUMN));
 			if(ImGui::Button("Winter"))
-				setSeasonMaterials(WeatherCondition::WEATHER_SEASONS_WINTER);
+				this->mLine.setWeather((uint16_t)setSeason((WeatherCondition)this->mLine.getWeather(), WeatherCondition::WEATHER_SEASONS_WINTER));
+			if(ImGui::Button("Clear"))
+				this->mLine.setWeather((uint16_t)::setWeather((WeatherCondition)this->mLine.getWeather(), WeatherCondition::WEATHER_CLEAR)); //Application class has method with same name
+			if(ImGui::Button("Fog"))
+				this->mLine.setWeather((uint16_t)::setWeather((WeatherCondition)this->mLine.getWeather(), WeatherCondition::WEATHER_FOG));
+			if(ImGui::Button("Rain"))
+				this->mLine.setWeather((uint16_t)::setWeather((WeatherCondition)this->mLine.getWeather(), WeatherCondition::WEATHER_RAIN));
+			if(ImGui::Button("Snow"))
+				this->mLine.setWeather((uint16_t)::setWeather((WeatherCondition)this->mLine.getWeather(), WeatherCondition::WEATHER_SNOW));
+			if(ImGui::Button("Lightning"))
+				this->mLine.setWeather((uint16_t)::setWeather((WeatherCondition)this->mLine.getWeather(), WeatherCondition::WEATHER_LIGHTING));
 
 			ImGui::End();
 
@@ -403,10 +400,9 @@ bool Application::runInternal() noexcept {
 			if(ImGui::Button("Info")) {
 				v.getSoundSimulation()->toggleInfo();
 			}
-
-			ImGui::End();
-
-			ImGui::Begin("Announcements");
+			if(ImGui::Button("Sander")) {
+				v.getVehicleControlData()->sander = !v.getVehicleControlData()->sander;
+			}
 
 			if(ImGui::Button("Next announcement")) {
 				this->mLine.playCurrentAnnouncement();

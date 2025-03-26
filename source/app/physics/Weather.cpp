@@ -5,6 +5,31 @@ namespace SeasonMaterials {
 	GMSEntry* winterGrass;
 };
 
+WeatherCondition setWeather(const WeatherCondition aOriginal, const WeatherCondition aWeather) noexcept {
+	switch(aWeather) {
+		case(WeatherCondition::WEATHER_CLEAR):
+			return (WeatherCondition)((uint16_t)aOriginal & (uint16_t)0b1111000000000000);
+		case(WeatherCondition::WEATHER_WIND):
+			return (WeatherCondition)((uint16_t)aOriginal | (uint16_t)WeatherCondition::WEATHER_WIND);
+		case(WeatherCondition::WEATHER_RAIN):
+			//delete snow add rain
+			return (WeatherCondition)(((uint16_t)aOriginal & (~(uint16_t)WeatherCondition::WEATHER_SNOW)) | (uint16_t)WeatherCondition::WEATHER_RAIN);
+		case(WeatherCondition::WEATHER_LIGHTING):
+			return (WeatherCondition)((uint16_t)aOriginal | (uint16_t)WeatherCondition::WEATHER_LIGHTING);
+		case(WeatherCondition::WEATHER_FOG):
+			return (WeatherCondition)((uint16_t)aOriginal | (uint16_t)WeatherCondition::WEATHER_FOG);
+		case(WeatherCondition::WEATHER_SNOW):
+			// //delete rain add snow
+			return (WeatherCondition)(((uint16_t)aOriginal & (~(uint16_t)WeatherCondition::WEATHER_RAIN)) | (uint16_t)WeatherCondition::WEATHER_SNOW);
+		default: break;
+	}
+	return aOriginal;
+}
+WeatherCondition setSeason(const WeatherCondition aOriginal, const WeatherCondition aSeason) noexcept {
+	uint16_t masked = ((uint16_t)aOriginal) & ((uint16_t)0b0000111111111111); //clear season bits
+	return (WeatherCondition)(masked | (uint16_t)aSeason);
+}
+
 void initSeasonMaterials(const Map& aMap) noexcept {
 	using namespace SeasonMaterials;
 
@@ -75,8 +100,7 @@ WeatherHandler::WeatherHandler(const glm::vec3& aCenter, const uint64_t aDroplet
 	mPositions(this->mDropletAmount), mMatrices(this->mDropletAmount), mMatrixSSBO(nullptr, 0),
 	mCenterPointSSBO(nullptr, 0), mSize(0.5f*2*aDropletX, 0.5f*2*aDropletY),
 	mDepthTopView(WEATHER_FBO_TEXTURE_SIZE, WEATHER_FBO_TEXTURE_SIZE, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, true, TextureScale::NEAREST_NEIGHBOR, TextureBorder::FILL_OUT_OF_RANGE),
-	mProjection(1.0), mView(1.0), mHandlerMatrix(1.0), mSpeed(aDropSpeed),
-	mFrictionCoeffChange(0.0) {
+	mProjection(1.0), mView(1.0), mHandlerMatrix(1.0), mSpeed(aDropSpeed) {
 	this->mPositions.resize(this->mDropletAmount); //should not result in realloc - we set in member init list
 	this->mMatrices.resize(this->mDropletAmount);
 	this->mMatrixSSBO = ShaderBuffer(this->mMatrices.data(), this->mMatrices.size()*sizeof(glm::mat4));
@@ -126,8 +150,7 @@ WeatherHandler::WeatherHandler(WeatherHandler&& aOther) noexcept
 	mCenterPointSSBO(std::move(aOther.mCenterPointSSBO)), mSize(std::move(aOther.mSize)),
 	mTopView(std::move(aOther.mTopView)), mDepthTopView(std::move(aOther.mDepthTopView)),
 	mProjection(std::move(aOther.mProjection)), mView(std::move(aOther.mView)), mHandlerMatrix(std::move(aOther.mHandlerMatrix)),
-	mSpeed(aOther.mSpeed),
-	mFrictionCoeffChange(aOther.mFrictionCoeffChange) {}
+	mSpeed(aOther.mSpeed) {}
 WeatherHandler& WeatherHandler::operator=(WeatherHandler&& aOther) noexcept {
 	this->mDropletAmount = aOther.mDropletAmount;
 	this->mColor = std::move(aOther.mColor);
@@ -146,8 +169,6 @@ WeatherHandler& WeatherHandler::operator=(WeatherHandler&& aOther) noexcept {
 	this->mView = std::move(aOther.mView);
 	this->mHandlerMatrix = std::move(aOther.mHandlerMatrix);
 	this->mSpeed = aOther.mSpeed;
-
-	this->mFrictionCoeffChange = aOther.mFrictionCoeffChange;
 
 	return *this;
 }
@@ -213,10 +234,13 @@ static float lightningStartTime = 0.0;
 static float lightningRunTime = 0.0;
 static uint16_t lightningStep = 0;
 
-void initLightningHandler() noexcept {
+void initLightningHandler(const glm::vec4& aNormalColor) noexcept {
 	lightningStartTime = glfwGetTime();
+	lightningNormalColor = aNormalColor;
 }
-void lightningHandler(Window& aWindow, float* aAmbient) noexcept {
+void lightningHandler(Window& aWindow, float* aAmbient, WeatherCondition aCondition) noexcept {
+	if(!((uint16_t)aCondition & (uint16_t)WeatherCondition::WEATHER_LIGHTING)) return;
+
 	if(glfwGetTime() - lightningStartTime >= LIGHTNING_INTERVAL) {
 		if(lightningStep != 0 && glfwGetTime() - lightningRunTime < LIGHTNING_REPEAT) return;
 
