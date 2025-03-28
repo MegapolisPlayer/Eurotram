@@ -460,6 +460,13 @@ uint64_t Line::getTotalPointsAvailable() const noexcept {
 	return totalPoints;
 }
 
+bool Line::isRequest(std::string_view aCode) const noexcept {
+	return this->mAnnunciator->isRequest(aCode);
+}
+bool Line::isRequest(const uint32_t aCode) const noexcept {
+	return this->mAnnunciator->isRequest(aCode);
+}
+
 Line::~Line() noexcept {
 	this->destroy();
 }

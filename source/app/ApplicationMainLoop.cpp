@@ -2,7 +2,7 @@
 #include "imgui.h"
 
 static bool FirstMove = true;
-static double LastX = 400, LastY = 400;
+static double LastX = 1920/2, LastY = 1080/2;
 
 static glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
 static bool moveWithSpotlight = true;
@@ -14,7 +14,23 @@ static float* vehicleThrottleRef = nullptr;
 static Line* lineRef = nullptr;
 static Vehicle* vehicleRef = nullptr;
 
+static bool lastButton = false;
+
 void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aAction, uint32_t aModifiers) noexcept {
+	if(aKey == GLFW_KEY_G) {
+		if(aAction == GLFW_RELEASE) {
+			lastButton = false;
+		}
+		else if (aAction == GLFW_PRESS) {
+			if(!lastButton) {
+				lastButton = true;
+				vehicleRef->confirmAnnouncement();
+				lineRef->playCurrentAnnouncement();
+			}
+		}
+		return;
+	}
+
 	if(aAction == GLFW_RELEASE || !aWindow->isCursorHidden()) return;
 
 	switch(aKey) {
@@ -59,9 +75,6 @@ void Application::rawKeyCallback(Window* aWindow, uint32_t aKey, uint32_t aActio
 			break;
 		case GLFW_KEY_Z:
 			vehicleRef->getSoundSimulation()->toggleInfo();
-			break;
-		case GLFW_KEY_G:
-			lineRef->playCurrentAnnouncement();
 			break;
 		case GLFW_KEY_UP:
 			*vehicleThrottleRef += 0.01;
@@ -405,8 +418,9 @@ bool Application::runInternal() noexcept {
 			}
 
 			if(ImGui::Button("Next announcement")) {
+				v.confirmAnnouncement();
 				this->mLine.playCurrentAnnouncement();
-			};
+			}
 
 			ImGui::End();
 		}

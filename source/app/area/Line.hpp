@@ -140,6 +140,9 @@ class Line {
 
 	uint64_t getTotalPointsAvailable() const noexcept;
 
+	bool isRequest(std::string_view aCode) const noexcept;
+	bool isRequest(const uint32_t aCode) const noexcept;
+
 	~Line() noexcept;
 private:
 	std::vector<LineData::Loop> mLoops;

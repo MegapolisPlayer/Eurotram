@@ -172,9 +172,9 @@ public:
 	void init(Map& aMap, Line& aLine, Model* aModel) noexcept;
 
 	//update data of vehicle
-	void update(Map& aMap, Line& aLine) noexcept;
+	bool update(Map& aMap, Line& aLine) noexcept;
 
-	void physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateFreq) noexcept;
+	bool physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateFreq) noexcept;
 
 	//returns false if over speed limit
 	bool setSpeed(const float aSpeed) noexcept;
@@ -201,6 +201,8 @@ public:
 
 	uint64_t getPointGrade() const noexcept;
 
+	void confirmAnnouncement() noexcept;
+
 	~Vehicle() noexcept;
 
 	//returns filename of model file
@@ -225,8 +227,13 @@ private:
 
 	SoundSimulation mSoundSimulation;
 
-	uint64_t mPoints;
-	uint64_t mMaxPoints;
+	int64_t mPoints;
+	int64_t mMaxPoints;
+
+	uint64_t mStationsPassed;
+	uint64_t mAnnouncementsMade;
+
+	bool mStoppedInThisStation;
 };
 
 #endif

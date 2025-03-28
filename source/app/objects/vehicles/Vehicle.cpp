@@ -287,6 +287,10 @@ Vehicle::Vehicle(const std::string_view aConfigFilename) noexcept : mSoundSimula
 	this->mInfo.areaFront = this->mInfo.height*this->mInfo.width;
 
 	std::cout << "Vehicle configration loaded!\n";
+
+	this->mStationsPassed = 0; //added when we leave
+	this->mAnnouncementsMade = 0;
+	this->mStoppedInThisStation = false;
 }
 
 Vehicle::Vehicle(Vehicle&& aOther) noexcept : mSoundSimulation(std::move(aOther.mSoundSimulation)) {
@@ -304,6 +308,9 @@ Vehicle::Vehicle(Vehicle&& aOther) noexcept : mSoundSimulation(std::move(aOther.
 	this->mCameraRotation = std::move(aOther.mCameraRotation);
 	this->mPoints = aOther.mPoints;
 	this->mMaxPoints = aOther.mMaxPoints;
+	this->mStationsPassed = aOther.mStationsPassed;
+	this->mAnnouncementsMade = aOther.mAnnouncementsMade;
+	this->mStoppedInThisStation = aOther.mStoppedInThisStation;
 }
 Vehicle& Vehicle::operator=(Vehicle&& aOther) noexcept {
 	this->mModel = std::move(aOther.mModel);
@@ -321,6 +328,9 @@ Vehicle& Vehicle::operator=(Vehicle&& aOther) noexcept {
 	this->mSoundSimulation = std::move(aOther.mSoundSimulation);
 	this->mPoints = aOther.mPoints;
 	this->mMaxPoints = aOther.mMaxPoints;
+	this->mStationsPassed = aOther.mStationsPassed;
+	this->mAnnouncementsMade = aOther.mAnnouncementsMade;
+	this->mStoppedInThisStation = aOther.mStoppedInThisStation;
 	return *this;
 }
 
@@ -372,22 +382,73 @@ void Vehicle::init(Map& aMap, Line& aLine, Model* aModel) noexcept {
 
 //TODO reset function
 
-void Vehicle::update(Map& aMap, Line& aLine) noexcept {
+bool Vehicle::update(Map& aMap, Line& aLine) noexcept {
 	this->mSoundSimulation.playMotor(this->mControlData.throttle);
 	this->mSoundSimulation.playBrake(this->mControlData.throttle);
 
 	std::vector<glm::vec3> positions;
 	bool leading = true;
+	uint64_t oldTrackId = this->mBogies[0].mTrackId;
+	bool oldStation = aMap.isTrackStation(oldTrackId);
+	bool oldSwitch = (this->mBogies[0].mNextNodeId.first == 's');
 	for(BogieMovement& b : this->mBogies) {
 		if(leading) {
 			//if leading bogie on last station and not at our station track - exit
-			if(aLine.isStationLast() && !aMap.isTrackStation(b.mTrackId)) return;
+			if(aLine.isStationLast() && !aMap.isTrackStation(b.mTrackId)) return false;
 		}
 		auto a = b.move(aMap, aLine, this->mPhysicsData.speed, leading, this->mSoundSimulation);
 		if(!a.has_value()) {
 			std::cerr << LogLevel::WARNING << "Dropping bogie!\n" << LogLevel::RESET;
 			//if we are at last and want to move further - exit
-			return; //station last, no value
+			return false; //station last, no value
+		}
+		if(leading) {
+			//calculate if we left station
+			bool newTrackStation = aMap.isTrackStation(b.mTrackId);
+			if(!newTrackStation && oldStation) {
+				this->mStationsPassed++;
+				//we left station
+
+				//...AND DIDNT STOP?!?! -500 pts it is then (only if not on request)
+				if(!this->mStoppedInThisStation && !aLine.isRequest(aMap.getTrackById(b.mTrackId).code)) {
+					this->mPoints -= 500;
+					std::cerr << LogLevel::ERROR << "Removed 500 points for passing station!\n";
+				}
+
+				if(this->mAnnouncementsMade == this->mStationsPassed) {
+					this->mStoppedInThisStation = false;
+
+					//announcement ok
+					this->mPoints += 200;
+					std::cerr << LogLevel::SUCCESS << "Added 200 points for correct station announcement!\n" << LogLevel::RESET;
+				}
+				else {
+					this->mPoints -= 500;
+					std::cerr << LogLevel::ERROR << "Removed 500 points for wrong station announcement! ";
+					if(this->mAnnouncementsMade > this->mStationsPassed) std::cerr << this->mAnnouncementsMade - this->mStationsPassed << "announcement(s) ahead\n" << LogLevel::RESET;
+					else std::cerr << this->mStationsPassed - this->mAnnouncementsMade << "announcement(s) behind\n" << LogLevel::RESET;
+				}
+			}
+			if(b.mTrackId == oldTrackId && newTrackStation && !this->mStoppedInThisStation) {
+				//still in station
+				if(std::abs(this->mPhysicsData.physicsSpeed) < 0.5) {
+					if(aLine.isRequest(aMap.getTrackById(b.mTrackId).code)) {
+						this->mPoints += 1000;
+						std::cerr << LogLevel::SUCCESS << "Added 1000 points for stopping in station which is on request!\n" << LogLevel::RESET;
+					}
+					else {
+						this->mPoints += 500;
+						std::cerr << LogLevel::SUCCESS << "Added 500 points for stopping in station!\n" << LogLevel::RESET;
+					}
+					this->mStoppedInThisStation = true;
+				}
+			}
+
+			bool newNodeSwitch = (this->mBogies[0].mNextNodeId.first == 's');
+			if(!newNodeSwitch && oldSwitch) {
+				this->mPoints += 200;
+				std::cerr << LogLevel::SUCCESS << "Added 200 points for passing a switch!\n" << LogLevel::RESET;
+			}
 		}
 		positions.push_back(a.value());
 		leading = false; //only for first bogie
@@ -446,9 +507,11 @@ void Vehicle::update(Map& aMap, Line& aLine) noexcept {
 	for(BogieMovement& m : this->mBogies) {
 		m.applyMove(aMap, aLine);
 	}
+
+	return true;
 }
 
-void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateFreq) noexcept {
+bool Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateFreq) noexcept {
 	//calculate forces
 
 	//power in KW
@@ -504,7 +567,9 @@ void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateF
 
 	if(this->mPhysicsData.verticalDistanceTravelled > TRACK_HEIGHT) {
 		std::cerr << LogLevel::SUCCESS << "Vehicle derailed!\n" << LogLevel::RESET;
-		std::exit(0);
+		std::cerr << LogLevel::ERROR << "Removed 1000 points for derailment!\n" << LogLevel::RESET;
+		this->mPoints -= 1000;
+		return false;
 	}
 
 	float maxResistance = Physics::maxResistanceForce(this->mPhysicsData.physicsSpeed, this->mInfo.mass, 1.0/aPhysicsUpdateFreq);
@@ -527,6 +592,8 @@ void Vehicle::physicsUpdate(const uint16_t aWeather, const float aPhysicsUpdateF
 		this->mPhysicsData.speed = this->mPhysicsData.physicsSpeed/aPhysicsUpdateFreq;
 		//distance set in update()
 	}
+
+	return true;
 }
 bool Vehicle::setSpeed(const float aSpeed) noexcept {
 	this->mPhysicsData.speed = aSpeed;
@@ -584,6 +651,10 @@ uint64_t Vehicle::getPointGrade() const noexcept {
 	if(percentage > 0.40) return 3;
 	if(percentage > 0.20) return 4;
 	else return 5;
+}
+
+void Vehicle::confirmAnnouncement() noexcept {
+	this->mAnnouncementsMade++;
 }
 
 Vehicle::~Vehicle() noexcept {}
