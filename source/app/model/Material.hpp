@@ -87,6 +87,8 @@ public:
 	static void setVariantAll(const std::string_view aIdentifier) noexcept;
 	static void resetVariantAll() noexcept;
 
+	static GMSVariant* getVariantById(const uint64_t aId) noexcept;
+
 	//updates all entries with name, variants set to same color as base
 	static void randomizeColors(const std::string_view aMaterialName) noexcept;
 

@@ -662,7 +662,7 @@ Vehicle::~Vehicle() noexcept {}
 void UI::drawPhysicsInfoWindow(Vehicle& aVehicle) noexcept {
 	ImGui::Begin("Vehicle physics data");
 
-	ImGui::Text("Speed: %f m/s", aVehicle.mPhysicsData.physicsSpeed);
+	ImGui::Text("Speed: %f m/s (%f km/h)", aVehicle.mPhysicsData.physicsSpeed, aVehicle.mPhysicsData.physicsSpeed*3.6);
 	ImGui::Text("Total energy used: %f J", aVehicle.mPhysicsData.energyUsed);
 
 	ImGui::Text("Resulting force: %f N", aVehicle.mPhysicsData.fceResult);

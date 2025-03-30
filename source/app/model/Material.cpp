@@ -210,6 +210,15 @@ void GlobalMaterialStore::resetVariantAll() noexcept {
 	}
 }
 
+GMSVariant* GlobalMaterialStore::getVariantById(const uint64_t aId) noexcept {
+	uint64_t i = 0;
+	for(GMSVariant& m : msVariantBindings) {
+		if(i == aId) return &m;
+		i++;
+	}
+	return nullptr;
+}
+
 void GlobalMaterialStore::randomizeColors(const std::string_view aMaterialName) noexcept {
 	std::uniform_real_distribution<> distribution(0, 0.75);
 	for(GMSEntry& m : msContainer) {

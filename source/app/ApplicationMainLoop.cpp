@@ -371,12 +371,15 @@ bool Application::runInternal() noexcept {
 				uDirlight.set();
 			}
 
+			//dynamically generate buttons for liveries
+
 			if(ImGui::Button("Change livery to normal")) t3rp.resetVariant("Material.paint");
-			if(ImGui::Button("Change livery to PLF")) t3rp.setVariant("Material.paint", "PLF");
-			if(ImGui::Button("Change livery to PID")) t3rp.setVariant("Material.paint", "PID");
-			if(ImGui::Button("Change livery to old PID")) t3rp.setVariant("Material.paint", "SPID");
-			if(ImGui::Button("Change livery to DPO")) t3rp.setVariant("Material.paint", "DPO");
-			if(ImGui::Button("Change livery to PMDP")) t3rp.setVariant("Material.paint", "PMDP");
+			auto& liveries = GlobalMaterialStore::getByName("Material.paint")->variantData->variants;
+			for(const uint64_t id : liveries) {
+				GMSEntry* vr = GlobalMaterialStore::getById(id);
+				//cannot add ImGui buttons with same name (need to add ID with NAME##ID e.g. Save##LowerMenu)
+				if(ImGui::Button(std::string("Change livery to ").append(vr->variant).c_str())) t3rp.setVariant(vr->name, vr->variant);
+			}
 
 			ImGui::End();
 
